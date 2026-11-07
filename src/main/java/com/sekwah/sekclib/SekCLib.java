@@ -1,5 +1,6 @@
 package com.sekwah.sekclib;
 
+import com.sekwah.sekclib.capabilitysync.CapabilityEntry;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.RegisterCapabilitySyncEvent;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.RegisterSyncTrackerTypeEvent;
 import com.sekwah.sekclib.capabilitysync.capability.ISyncData;
@@ -10,40 +11,46 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.ForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * This will be seperated out into its own mod once it has more features.
+ * Fallback SekCLib instance when standalone SekCLib mod is not installed.
  */
 public class SekCLib {
 
-    //public static final String MOD_ID = "sekclib";
-    /**
-     * Switch back to sekclib when split
-     */
     public static final String MOD_ID = "narutomod";
 
     public static final Logger LOGGER = LogManager.getLogger("SekC Lib");
 
-    public SekCLib() {
+    private static boolean initialized = false;
 
-        //ModLoadingContext loadingContext = ModLoadingContext.get();
-        //loadingContext.registerConfig(ModConfig.Type.COMMON, NarutoConfig.MOD_CONFIG, "naruto-mod.toml");
+    public SekCLib() {
+        if (initialized) {
+            return;
+        }
+        initialized = true;
 
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.addListener(this::registerCapabilities);
         eventBus.addListener(this::setup);
         eventBus.addListener(SekCLibRegistries::registerRegistries);
-
     }
 
     private void setup(final FMLCommonSetupEvent event) {
         SekCPacketHandler.init();
-        SekCLibRegistries.CAPABILITY_REGISTRY.unfreeze();
+        if (SekCLibRegistries.CAPABILITY_REGISTRY == null && SekCLibRegistries.CAPABILITY_REGISTRY_SUPPLIER != null) {
+            SekCLibRegistries.CAPABILITY_REGISTRY = (ForgeRegistry<CapabilityEntry>) SekCLibRegistries.CAPABILITY_REGISTRY_SUPPLIER.get();
+        }
+        if (SekCLibRegistries.CAPABILITY_REGISTRY != null) {
+            SekCLibRegistries.CAPABILITY_REGISTRY.unfreeze();
+        }
         ModLoader.get().postEvent(new RegisterSyncTrackerTypeEvent());
         ModLoader.get().postEvent(new RegisterCapabilitySyncEvent());
-        SekCLibRegistries.CAPABILITY_REGISTRY.freeze();
+        if (SekCLibRegistries.CAPABILITY_REGISTRY != null) {
+            SekCLibRegistries.CAPABILITY_REGISTRY.freeze();
+        }
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {

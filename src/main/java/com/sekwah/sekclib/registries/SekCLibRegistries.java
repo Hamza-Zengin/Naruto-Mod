@@ -3,12 +3,16 @@ package com.sekwah.sekclib.registries;
 import com.sekwah.sekclib.SekCLib;
 import com.sekwah.sekclib.capabilitysync.CapabilityEntry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.ForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.NewRegistryEvent;
 import net.minecraftforge.registries.RegistryBuilder;
+
+import java.util.function.Supplier;
 
 public class SekCLibRegistries {
 
+    public static Supplier<IForgeRegistry<CapabilityEntry>> CAPABILITY_REGISTRY_SUPPLIER;
     public static ForgeRegistry<CapabilityEntry> CAPABILITY_REGISTRY;
 
     /**
@@ -19,12 +23,16 @@ public class SekCLibRegistries {
      *
      * @param event
      */
-    public static void registerRegistries(RegistryEvent.NewRegistry event) {
+    public static void registerRegistries(NewRegistryEvent event) {
         RegistryBuilder<CapabilityEntry> capabilityEntries = new RegistryBuilder<>();
         capabilityEntries.setName(new ResourceLocation(SekCLib.MOD_ID, "capability_sync"));
-        capabilityEntries.setType(CapabilityEntry.class);
         capabilityEntries.disableSaving();
-        CAPABILITY_REGISTRY = (ForgeRegistry<CapabilityEntry>) capabilityEntries.create();
+
+        CAPABILITY_REGISTRY_SUPPLIER = event.create(capabilityEntries, (registry) -> {
+            if (registry instanceof ForgeRegistry<CapabilityEntry> fr) {
+                CAPABILITY_REGISTRY = fr;
+            }
+        });
     }
 
 }

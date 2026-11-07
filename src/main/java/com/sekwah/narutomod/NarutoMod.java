@@ -66,7 +66,9 @@ public class NarutoMod {
 
         DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> NarutoInGameGUI::new);
 
-        new SekCLib();
+        if (!net.minecraftforge.fml.ModList.get().isLoaded("sekclib")) {
+            new SekCLib();
+        }
     }
 
 
