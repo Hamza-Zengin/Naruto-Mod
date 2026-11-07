@@ -64,14 +64,12 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
         player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 40, 0, false, false, false));
 
         if (ticksActive % 20 == 0 && player.level() instanceof ServerLevel serverLevel) {
-            // Ethereal flame/aura around player
-            for (int i = 0; i < 12; i++) {
-                double angle = (2 * Math.PI / 12) * i;
-                double x = player.getX() + 1.2 * Math.cos(angle);
-                double z = player.getZ() + 1.2 * Math.sin(angle);
-                serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, x, player.getY() + 0.8, z, 1, 0, 0.05, 0, 0.02);
-                serverLevel.sendParticles(ParticleTypes.ENCHANT, x, player.getY() + 1.5, z, 2, 0.1, 0.1, 0.1, 0.05);
-            }
+            // Subtle ethereal ember at base (greatly reduced particle presence to showcase 3D model)
+            serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
+                    player.getX() + (player.getRandom().nextDouble() - 0.5) * 1.4,
+                    player.getY() + 0.1,
+                    player.getZ() + (player.getRandom().nextDouble() - 0.5) * 1.4,
+                    1, 0, 0.02, 0, 0.01);
 
             // Knock back aggressive foes nearby
             AABB auraBox = player.getBoundingBox().inflate(2.5);

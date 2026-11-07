@@ -40,6 +40,9 @@ public class NarutoRenderEvents {
     public static final ModelLayerLocation FIREBALL_LAYER =
             new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "fireball"), "main");
 
+    public static final ModelLayerLocation SUSANOO_RIBCAGE_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "susanoo_ribcage"), "main");
+
     @SubscribeEvent
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(NarutoEntities.KUNAI.get(), KunaiRenderer::new);
@@ -75,13 +78,17 @@ public class NarutoRenderEvents {
         event.registerLayerDefinition(ANBU_MASK_WITHOUT_EARS_LAYER, () -> AnbuMaskModel.createLayer(false));
         event.registerLayerDefinition(HEADBAND_LAYER, HeadbandModel::createLayer);
         event.registerLayerDefinition(FIREBALL_LAYER, FireballJutsuModel::createLayer);
+        event.registerLayerDefinition(SUSANOO_RIBCAGE_LAYER, com.sekwah.narutomod.client.model.entity.SusanooRibcageModel::createLayer);
     }
 
-/*    @SubscribeEvent
+    @SubscribeEvent
     public static void entityLayers(EntityRenderersEvent.AddLayers event)
     {
-        LivingEntityRenderer<Player, ? extends EntityModel<Player>> renderer = event.getRenderer(EntityType.PLAYER);
-    }*/
-
-
+        for (String skin : event.getSkins()) {
+            net.minecraft.client.renderer.entity.player.PlayerRenderer renderer = event.getSkin(skin);
+            if (renderer != null) {
+                renderer.addLayer(new com.sekwah.narutomod.client.renderer.entity.layers.SusanooRibcageLayer(renderer, event.getEntityModels()));
+            }
+        }
+    }
 }

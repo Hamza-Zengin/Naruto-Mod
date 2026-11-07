@@ -129,5 +129,14 @@
   "naruto.rank.not_ready": "You have not met the requirements for this rank exam yet!",
   "jutsu.scroll.fail_clan": "Your chakra pathways violently reject this secret scroll! You lack the %s bloodline!",
   "jutsu.scroll.requires_clan": "Requires Clan Bloodline: %s",
+  "jutsu.scroll.fail_rank": "You must reach at least the %s rank to comprehend this technique!",
+  "jutsu.scroll.requires_rank": "Required Rank: %s",
+  "jutsu.scroll.unlocked": "You unrolled the scroll and permanently mastered %s!",
+  "jutsu.scroll.already_known": "You have already mastered %s!",
+  "jutsu.scroll.invalid": "This scroll appears unreadable or blank.",
+  "jutsu.scroll.contains": "Contains Technique: %s",
+  "jutsu.scroll.rank": "Classification: %s",
+  "jutsu.scroll.desc": "Secret ninja scroll containing forbidden and elemental jutsu.",
+  "jutsu.scroll.instruction": "Right-click to decipher and master the technique.",
   "jutsu.eight_gates.cannot_close": "The Gate of Death cannot be closed once opened! Your body will burn to the very last spark of chakra!"
 }

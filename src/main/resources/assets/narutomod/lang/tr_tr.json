@@ -129,5 +129,14 @@
   "naruto.rank.not_ready": "Bu rütbe sınavı için gerekli şartları henüz karşılamadınız!",
   "jutsu.scroll.fail_clan": "Çakra kanallarınız bu gizli parşömeni şiddetle reddetti! %s soyundan değilsiniz!",
   "jutsu.scroll.requires_clan": "Gereken Klan Soyu: %s",
+  "jutsu.scroll.fail_rank": "Bu parşömeni kavrayabilmek için en az %s rütbesine ulaşmış olmalısınız!",
+  "jutsu.scroll.requires_rank": "Gereken Rütbe: %s",
+  "jutsu.scroll.unlocked": "Parşömeni okudunuz ve %s tekniğini kalıcı olarak öğrendiniz!",
+  "jutsu.scroll.already_known": "%s tekniğini zaten biliyorsunuz!",
+  "jutsu.scroll.invalid": "Bu parşömen silik veya boş görünüyor.",
+  "jutsu.scroll.contains": "Mühürlü Teknik: %s",
+  "jutsu.scroll.rank": "Gereken Seviye: %s",
+  "jutsu.scroll.desc": "Gizli ve kadim jutsu öğretilerini barındıran ninja parşömeni.",
+  "jutsu.scroll.instruction": "Tekniği kalıcı olarak öğrenmek için Sağ Tıklayın.",
   "jutsu.eight_gates.cannot_close": "Ölüm Kapısı bir kez açıldıktan sonra kapatılamaz! Bedenin son çakrasına kadar yanacak!"
 }

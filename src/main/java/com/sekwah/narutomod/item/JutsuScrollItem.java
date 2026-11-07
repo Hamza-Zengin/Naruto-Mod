@@ -3,6 +3,7 @@ package com.sekwah.narutomod.item;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
+import com.sekwah.narutomod.capabilities.NinjaRank;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -107,6 +108,17 @@ public class JutsuScrollItem extends Item {
                     }
                 }
 
+                // Strict Ninja Rank check: Must meet or exceed ability's required rank!
+                NinjaRank playerRank = NinjaRank.fromString(ninjaData.getRank());
+                if (playerRank.getLevel() < ability.getRequiredRank().getLevel()) {
+                    player.sendSystemMessage(Component.translatable("jutsu.scroll.fail_rank",
+                            Component.literal(ability.getRequiredRank().getTurkishName() + " (" + ability.getRequiredRank().getEnglishName() + ")")
+                                    .withStyle(ChatFormatting.GOLD)
+                    ).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+                    level.playSound(null, player.blockPosition(), SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1.0f, 1.0f);
+                    return;
+                }
+
                 if (ninjaData.isAbilityUnlocked(targetJutsu)) {
                     player.sendSystemMessage(Component.translatable("jutsu.scroll.already_known",
                             Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.RED));
@@ -139,8 +151,8 @@ public class JutsuScrollItem extends Item {
             if (ability != null) {
                 tooltip.add(Component.translatable("jutsu.scroll.contains",
                         Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.GOLD)).withStyle(ChatFormatting.GRAY));
-                tooltip.add(Component.translatable("jutsu.scroll.rank",
-                        Component.literal(ability.getRequiredRank().getDisplayName()).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.DARK_GRAY));
+                tooltip.add(Component.translatable("jutsu.scroll.requires_rank",
+                        Component.literal(ability.getRequiredRank().getTurkishName() + " (" + ability.getRequiredRank().getEnglishName() + ")").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.DARK_GRAY));
             }
         } else {
             tooltip.add(Component.translatable("jutsu.scroll.desc").withStyle(ChatFormatting.GRAY));

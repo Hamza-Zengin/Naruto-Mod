@@ -43,9 +43,6 @@ public class NarutoItems {
     public static final RegistryObject<Item> MILITARY_RATIONS_PILL = ITEMS.register("military_rations_pill", ()
             -> new MilitaryRationsPillItem(new Item.Properties().stacksTo(16)));
 
-    public static final RegistryObject<Item> JUTSU_SCROLL = ITEMS.register("jutsu_scroll", ()
-            -> new JutsuScrollItem(new Item.Properties().stacksTo(16)));
-
     public static final RegistryObject<Item> SCROLL_RASENGAN = ITEMS.register("scroll_rasengan", ()
             -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.RASENGAN.getId()));
 
@@ -150,7 +147,6 @@ public class NarutoItems {
                         output.accept(SCROLL_KIRIN.get());
                         output.accept(SCROLL_AMATERASU.get());
                         output.accept(SCROLL_SUSANOO.get());
-                        output.accept(JUTSU_SCROLL.get());
                         output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
                         output.accept(NarutoBlocks.ITEM_BONSAI_TREE.get());
                     })

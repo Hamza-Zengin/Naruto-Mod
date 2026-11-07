@@ -52,6 +52,10 @@ public class ToggleAbilityData {
         return abilities;
     }
 
+    public boolean hasToggleAbility(ResourceLocation ability) {
+        return this.abilities != null && this.abilities.contains(ability);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(abilities);
