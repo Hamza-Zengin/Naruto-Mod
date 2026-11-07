@@ -50,6 +50,7 @@ public interface INinjaData extends INBTSerializable<Tag> {
     boolean isAbilityUnlocked(Ability ability);
     boolean isAbilityUnlocked(ResourceLocation abilityId);
     void unlockAbility(ResourceLocation abilityId);
+    void lockAbility(ResourceLocation abilityId);
     java.util.Set<ResourceLocation> getUnlockedAbilities();
     String getUnlockedJutsusString();
     void setUnlockedJutsusString(String jutsus);

@@ -7,6 +7,11 @@ import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
+import com.sekwah.narutomod.capabilities.NinjaData;
+import com.sekwah.narutomod.capabilities.NinjaRank;
+import com.sekwah.narutomod.clans.Clan;
+import com.sekwah.narutomod.clans.NarutoClans;
+import net.minecraftforge.registries.RegistryObject;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -54,6 +59,12 @@ public class NarutoCommands {
                                         .then(Commands.argument("targets", EntityArgument.players())
                                                 .executes(ctx -> addStamina(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), FloatArgumentType.getFloat(ctx, "amount")))))))
                 .then(Commands.literal("clan")
+                        .then(Commands.literal("list")
+                                .executes(ctx -> listClans(ctx.getSource())))
+                        .then(Commands.literal("unlock")
+                                .executes(ctx -> unlockClanSelection(ctx.getSource(), Collections.singleton(ctx.getSource().getPlayerOrException())))
+                                .then(Commands.argument("targets", EntityArgument.players())
+                                        .executes(ctx -> unlockClanSelection(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets")))))
                         .then(Commands.literal("get")
                                 .executes(ctx -> getClan(ctx.getSource(), Collections.singleton(ctx.getSource().getPlayerOrException())))
                                 .then(Commands.argument("targets", EntityArgument.players())
@@ -64,6 +75,8 @@ public class NarutoCommands {
                                         .then(Commands.argument("targets", EntityArgument.players())
                                                 .executes(ctx -> setClan(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), StringArgumentType.getString(ctx, "clanName")))))))
                 .then(Commands.literal("rank")
+                        .then(Commands.literal("list")
+                                .executes(ctx -> listRanks(ctx.getSource())))
                         .then(Commands.literal("get")
                                 .executes(ctx -> getRank(ctx.getSource(), Collections.singleton(ctx.getSource().getPlayerOrException())))
                                 .then(Commands.argument("targets", EntityArgument.players())
@@ -74,11 +87,23 @@ public class NarutoCommands {
                                         .then(Commands.argument("targets", EntityArgument.players())
                                                 .executes(ctx -> setRank(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), StringArgumentType.getString(ctx, "rankName")))))))
                 .then(Commands.literal("jutsu")
+                        .then(Commands.literal("list")
+                                .executes(ctx -> listJutsus(ctx.getSource())))
                         .then(Commands.literal("cast")
                                 .then(Commands.argument("jutsuId", StringArgumentType.word())
                                         .executes(ctx -> castJutsu(ctx.getSource(), Collections.singleton(ctx.getSource().getPlayerOrException()), StringArgumentType.getString(ctx, "jutsuId")))
                                         .then(Commands.argument("targets", EntityArgument.players())
-                                                .executes(ctx -> castJutsu(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), StringArgumentType.getString(ctx, "jutsuId"))))))));
+                                                .executes(ctx -> castJutsu(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), StringArgumentType.getString(ctx, "jutsuId"))))))
+                        .then(Commands.literal("unlock")
+                                .then(Commands.argument("jutsuId", StringArgumentType.word())
+                                        .executes(ctx -> unlockJutsu(ctx.getSource(), Collections.singleton(ctx.getSource().getPlayerOrException()), StringArgumentType.getString(ctx, "jutsuId")))
+                                        .then(Commands.argument("targets", EntityArgument.players())
+                                                .executes(ctx -> unlockJutsu(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), StringArgumentType.getString(ctx, "jutsuId"))))))
+                        .then(Commands.literal("lock")
+                                .then(Commands.argument("jutsuId", StringArgumentType.word())
+                                        .executes(ctx -> lockJutsu(ctx.getSource(), Collections.singleton(ctx.getSource().getPlayerOrException()), StringArgumentType.getString(ctx, "jutsuId")))
+                                        .then(Commands.argument("targets", EntityArgument.players())
+                                                .executes(ctx -> lockJutsu(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), StringArgumentType.getString(ctx, "jutsuId"))))))));
     }
 
     private static int getChakra(CommandSourceStack source, Collection<ServerPlayer> players) {
@@ -191,6 +216,94 @@ public class NarutoCommands {
             player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
                 ability.performServer(player, data, 0);
                 source.sendSuccess(() -> Component.literal("Cast " + jutsuId + " on " + player.getScoreboardName()).withStyle(ChatFormatting.GREEN), true);
+            });
+        }
+        return players.size();
+    }
+
+    private static int listClans(CommandSourceStack source) {
+        source.sendSuccess(() -> Component.literal("=== Mevcut Klanlar ===").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);
+        for (RegistryObject<Clan> entry : NarutoClans.CLANS.getEntries()) {
+            source.sendSuccess(() -> Component.literal(" - " + entry.getId().getPath()).withStyle(ChatFormatting.YELLOW), false);
+        }
+        return 1;
+    }
+
+    private static int unlockClanSelection(CommandSourceStack source, Collection<ServerPlayer> players) {
+        for (ServerPlayer player : players) {
+            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
+                data.setClanLocked(false);
+                source.sendSuccess(() -> Component.literal("Unlocked clan selection for " + player.getScoreboardName() + ". They can now re-pick in the 'J' Clan menu.").withStyle(ChatFormatting.GREEN), true);
+            });
+        }
+        return players.size();
+    }
+
+    private static int listRanks(CommandSourceStack source) {
+        source.sendSuccess(() -> Component.literal("=== Mevcut Rütbeler ===").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.BOLD), false);
+        for (NinjaRank rank : NinjaRank.values()) {
+            source.sendSuccess(() -> Component.literal(" - " + rank.name() + " (" + rank.getTurkishName() + ")").withStyle(ChatFormatting.AQUA), false);
+        }
+        return 1;
+    }
+
+    private static int listJutsus(CommandSourceStack source) {
+        source.sendSuccess(() -> Component.literal("=== Mevcut Jutsular & Yetenekler ===").withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD), false);
+        for (RegistryObject<Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
+            Ability a = entry.get();
+            String path = entry.getId().getPath();
+            boolean isScroll = NinjaData.isScrollRequiredJutsu(entry.getId());
+            String tag = isScroll ? " §e[Parşömen]" : "";
+            source.sendSuccess(() -> Component.literal(" - " + path + tag + " §7(Gerekli: " + a.getRequiredRank().getDisplayName() + ")").withStyle(ChatFormatting.WHITE), false);
+        }
+        return 1;
+    }
+
+    private static int unlockJutsu(CommandSourceStack source, Collection<ServerPlayer> players, String jutsuId) {
+        if (jutsuId.equalsIgnoreCase("all")) {
+            for (ServerPlayer player : players) {
+                player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
+                    for (RegistryObject<Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
+                        data.unlockAbility(entry.getId());
+                    }
+                    source.sendSuccess(() -> Component.literal("Unlocked ALL jutsus for " + player.getScoreboardName()).withStyle(ChatFormatting.GREEN), true);
+                });
+            }
+            return players.size();
+        }
+
+        ResourceLocation loc = new ResourceLocation(NarutoMod.MOD_ID, jutsuId.toLowerCase());
+        Ability ability = NarutoAbilities.getAbility(loc);
+        if (ability == null) {
+            source.sendFailure(Component.literal("Unknown jutsu: " + jutsuId));
+            return 0;
+        }
+
+        for (ServerPlayer player : players) {
+            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
+                data.unlockAbility(loc);
+                source.sendSuccess(() -> Component.literal("Unlocked jutsu '" + jutsuId + "' for " + player.getScoreboardName()).withStyle(ChatFormatting.GREEN), true);
+            });
+        }
+        return players.size();
+    }
+
+    private static int lockJutsu(CommandSourceStack source, Collection<ServerPlayer> players, String jutsuId) {
+        if (jutsuId.equalsIgnoreCase("all")) {
+            for (ServerPlayer player : players) {
+                player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
+                    data.setUnlockedJutsusString("");
+                    source.sendSuccess(() -> Component.literal("Locked / cleared all unlocked jutsus for " + player.getScoreboardName()).withStyle(ChatFormatting.YELLOW), true);
+                });
+            }
+            return players.size();
+        }
+
+        ResourceLocation loc = new ResourceLocation(NarutoMod.MOD_ID, jutsuId.toLowerCase());
+        for (ServerPlayer player : players) {
+            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
+                data.lockAbility(loc);
+                source.sendSuccess(() -> Component.literal("Locked jutsu '" + jutsuId + "' for " + player.getScoreboardName()).withStyle(ChatFormatting.YELLOW), true);
             });
         }
         return players.size();

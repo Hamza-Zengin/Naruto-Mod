@@ -267,6 +267,20 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
+    public void lockAbility(ResourceLocation abilityId) {
+        if (abilityId == null) return;
+        java.util.Set<ResourceLocation> unlocked = getUnlockedAbilities();
+        if (unlocked.remove(abilityId)) {
+            StringBuilder sb = new StringBuilder();
+            for (ResourceLocation loc : unlocked) {
+                if (sb.length() > 0) sb.append(",");
+                sb.append(loc.toString());
+            }
+            this.unlockedJutsus = sb.toString();
+        }
+    }
+
+    @Override
     public java.util.Set<ResourceLocation> getUnlockedAbilities() {
         java.util.HashSet<ResourceLocation> set = new java.util.HashSet<>();
         if (this.unlockedJutsus != null && !this.unlockedJutsus.isEmpty()) {
