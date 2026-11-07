@@ -53,6 +53,7 @@ public class NarutoMod {
         eventBus.addListener(NarutoKeyHandler::onRegisterKeyMappings);
         eventBus.addListener(this::setup);
         eventBus.addListener(this::registerCapabilities);
+        eventBus.addListener(com.sekwah.narutomod.trackers.BaseSyncTrackers::registerSyncTrackerEvent);
         eventBus.addListener(this::registerCapabilitySync);
         eventBus.addListener(NarutoRegistries::init);
 
@@ -65,10 +66,6 @@ public class NarutoMod {
         com.sekwah.narutomod.clans.NarutoClans.register(eventBus);
 
         DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> NarutoInGameGUI::new);
-
-        if (!net.minecraftforge.fml.ModList.get().isLoaded("sekclib")) {
-            new SekCLib();
-        }
     }
 
 
@@ -90,6 +87,9 @@ public class NarutoMod {
     }
 
     public void registerCapabilitySync(RegisterCapabilitySyncEvent event) {
+        com.sekwah.sekclib.capabilitysync.capabilitysync.CapabilitySyncRegistry.registerSyncTrackerType(
+                com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData.class,
+                new com.sekwah.narutomod.trackers.ToggleAbilityDataSyncTracker());
         event.registerPlayerCap(new ResourceLocation(NarutoMod.MOD_ID, "ninja_data"), NinjaCapabilityHandler.NINJA_DATA, NinjaData.class);
     }
 }
