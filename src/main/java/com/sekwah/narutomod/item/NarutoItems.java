@@ -1,5 +1,6 @@
 package com.sekwah.narutomod.item;
 
+import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.block.NarutoBlocks;
 import com.sekwah.narutomod.item.armor.NarutoArmorItem;
 import com.sekwah.narutomod.item.armor.NarutoArmorMaterial;
@@ -44,6 +45,24 @@ public class NarutoItems {
 
     public static final RegistryObject<Item> JUTSU_SCROLL = ITEMS.register("jutsu_scroll", ()
             -> new JutsuScrollItem(new Item.Properties().stacksTo(16)));
+
+    public static final RegistryObject<Item> SCROLL_RASENGAN = ITEMS.register("scroll_rasengan", ()
+            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.RASENGAN.getId()));
+
+    public static final RegistryObject<Item> SCROLL_CHIDORI = ITEMS.register("scroll_chidori", ()
+            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.CHIDORI.getId()));
+
+    public static final RegistryObject<Item> SCROLL_SHADOW_CLONE = ITEMS.register("scroll_shadow_clone", ()
+            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.SHADOW_CLONE.getId()));
+
+    public static final RegistryObject<Item> SCROLL_KIRIN = ITEMS.register("scroll_kirin", ()
+            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.KIRIN.getId()));
+
+    public static final RegistryObject<Item> SCROLL_AMATERASU = ITEMS.register("scroll_amaterasu", ()
+            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.AMATERASU.getId(), "uchiha"));
+
+    public static final RegistryObject<Item> SCROLL_SUSANOO = ITEMS.register("scroll_susanoo", ()
+            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.SUSANOO_RIBCAGE.getId(), "uchiha"));
 
     // Armor
     public static final RegistryObject<Item> RED_ANBU_MASK = ITEMS.register("red_anbu_mask", ()
@@ -125,6 +144,12 @@ public class NarutoItems {
                         output.accept(SHURIKEN.get());
                         output.accept(SMOKE_BOMB.get());
                         output.accept(MILITARY_RATIONS_PILL.get());
+                        output.accept(SCROLL_RASENGAN.get());
+                        output.accept(SCROLL_CHIDORI.get());
+                        output.accept(SCROLL_SHADOW_CLONE.get());
+                        output.accept(SCROLL_KIRIN.get());
+                        output.accept(SCROLL_AMATERASU.get());
+                        output.accept(SCROLL_SUSANOO.get());
                         output.accept(JUTSU_SCROLL.get());
                         output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
                         output.accept(NarutoBlocks.ITEM_BONSAI_TREE.get());

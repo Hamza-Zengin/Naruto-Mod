@@ -118,5 +118,16 @@
   "item.narutomod.jutsu_scroll.contains": "Mühürlü Teknik: %s",
   "item.narutomod.jutsu_scroll.rank": "Gereken Seviye: %s",
   "item.narutomod.jutsu_scroll.desc": "Gizli ve kadim jutsu öğretilerini barındıran ninja parşömeni.",
-  "item.narutomod.jutsu_scroll.instruction": "Tekniği kalıcı olarak öğrenmek için Sağ Tıklayın."
+  "item.narutomod.jutsu_scroll.instruction": "Tekniği kalıcı olarak öğrenmek için Sağ Tıklayın.",
+  "item.narutomod.scroll_rasengan": "Jutsu Parşömeni: Rasengan",
+  "item.narutomod.scroll_chidori": "Jutsu Parşömeni: Chidori",
+  "item.narutomod.scroll_shadow_clone": "Jutsu Parşömeni: Gölge Klonu",
+  "item.narutomod.scroll_kirin": "Jutsu Parşömeni: Kirin",
+  "item.narutomod.scroll_amaterasu": "Yasak Parşömen: Amaterasu",
+  "item.narutomod.scroll_susanoo": "Yasak Parşömen: Susanoo",
+  "naruto.rank.promoted": "Tebrikler! Sınavı başarıyla geçtiniz ve %s rütbesine terfi ettiniz!",
+  "naruto.rank.not_ready": "Bu rütbe sınavı için gerekli şartları henüz karşılamadınız!",
+  "jutsu.scroll.fail_clan": "Çakra kanallarınız bu gizli parşömeni şiddetle reddetti! %s soyundan değilsiniz!",
+  "jutsu.scroll.requires_clan": "Gereken Klan Soyu: %s",
+  "jutsu.eight_gates.cannot_close": "Ölüm Kapısı bir kez açıldıktan sonra kapatılamaz! Bedenin son çakrasına kadar yanacak!"
 }

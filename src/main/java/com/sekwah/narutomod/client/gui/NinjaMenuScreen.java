@@ -5,9 +5,11 @@ import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
+import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import com.sekwah.narutomod.clans.NarutoClans;
 import com.sekwah.narutomod.network.PacketHandler;
+import com.sekwah.narutomod.network.c2s.ServerRankUpPacket;
 import com.sekwah.narutomod.network.c2s.ServerSelectClanPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -59,7 +61,9 @@ public class NinjaMenuScreen extends Screen {
             }
         });
 
-        if (this.activeTab == 1) {
+        if (this.activeTab == 0) {
+            initProfileTab(centerX, topY);
+        } else if (this.activeTab == 1) {
             initClanTab(centerX, topY);
         } else if (this.activeTab == 2) {
             initJutsuTab(centerX, topY);
@@ -70,6 +74,39 @@ public class NinjaMenuScreen extends Screen {
         this.activeTab = tab;
         this.jutsuPage = 0;
         this.init();
+    }
+
+    private void initProfileTab(int centerX, int topY) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        mc.player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+            NinjaRank rank = NinjaRank.fromString(ninjaData.getRank());
+            if (rank.getLevel() < NinjaRank.JONIN.getLevel()) {
+                boolean canRank = ninjaData.canRankUp();
+                String btnText;
+                if (canRank) {
+                    NinjaRank next = rank == NinjaRank.ACADEMY_STUDENT ? NinjaRank.GENIN : (rank == NinjaRank.GENIN ? NinjaRank.CHUNIN : NinjaRank.JONIN);
+                    btnText = "★ " + next.getTurkishName() + " Rütbesine Terfi Et! ★";
+                } else {
+                    btnText = "Sınav Şartları Henüz Karşılanmadı";
+                }
+
+                int boxW = 320;
+                int boxH = 175;
+                int boxY = topY + 45;
+                int btnY = boxY + boxH - 26;
+
+                Button rankBtn = Button.builder(Component.literal(btnText), b -> {
+                    PacketHandler.sendToServer(new ServerRankUpPacket());
+                    ninjaData.rankUp();
+                    this.init();
+                }).bounds(centerX - 130, btnY, 260, 20).build();
+
+                rankBtn.active = canRank;
+                this.addRenderableWidget(rankBtn);
+            }
+        });
     }
 
     private void initClanTab(int centerX, int topY) {
@@ -155,9 +192,9 @@ public class NinjaMenuScreen extends Screen {
 
     private void renderProfileTab(GuiGraphics graphics, INinjaData ninjaData, int centerX, int startY) {
         int boxW = 320;
-        int boxH = 155;
+        int boxH = 175;
         int boxX = centerX - boxW / 2;
-        int boxY = startY + 10;
+        int boxY = startY;
 
         // Dark card background
         graphics.fill(boxX, boxY, boxX + boxW, boxY + boxH, 0xCC111116);
@@ -166,44 +203,68 @@ public class NinjaMenuScreen extends Screen {
         Minecraft mc = Minecraft.getInstance();
         String playerName = mc.player != null ? mc.player.getName().getString() : "Shinobi";
 
-        int y = boxY + 12;
-        int x = boxX + 16;
+        int y = boxY + 10;
+        int x = boxX + 14;
 
         graphics.drawString(this.font, "§6§lShinobi: §f" + playerName, x, y, 0xFFFFFFFF);
-        y += 16;
+        y += 14;
 
         String clanPath = ninjaData.getClan() != null ? ninjaData.getClan().getPath() : "shinobi";
         String clanDisplay = clanPath.substring(0, 1).toUpperCase() + clanPath.substring(1) + " Klanı";
-        String lockStatus = ninjaData.isClanLocked() ? " §c[KİLİTLİ - Değiştirilemez]" : " §a[Henüz Seçilmedi]";
-        graphics.drawString(this.font, "§eKlan Durumu: §f" + clanDisplay + lockStatus, x, y, 0xFFFFFFFF);
-        y += 16;
+        String lockStatus = ninjaData.isClanLocked() ? " §c[KİLİTLİ]" : " §a[Henüz Seçilmedi]";
+        graphics.drawString(this.font, "§eKlan: §f" + clanDisplay + lockStatus, x, y, 0xFFFFFFFF);
+        y += 14;
 
         NinjaRank rank = NinjaRank.fromString(ninjaData.getRank());
         graphics.drawString(this.font, "§bNinja Rütbesi: §f" + rank.getTurkishName() + " (" + rank.getEnglishName() + ")", x, y, 0xFFFFFFFF);
-        y += 20;
+        y += 16;
 
         // Chakra Bar
         float chakra = ninjaData.getChakra();
         float maxChakra = ninjaData.getMaxChakra();
         graphics.drawString(this.font, String.format("§9Çakra: §f%.0f / %.0f", chakra, maxChakra), x, y, 0xFFFFFFFF);
-        renderBar(graphics, x + 120, y, 160, 8, chakra / maxChakra, 0xFF2255FF, 0xFF001144);
-        y += 16;
+        renderBar(graphics, x + 115, y, 175, 7, chakra / maxChakra, 0xFF2255FF, 0xFF001144);
+        y += 13;
 
         // Stamina Bar
         float stamina = ninjaData.getStamina();
         float maxStamina = ninjaData.getMaxStamina();
         graphics.drawString(this.font, String.format("§aKondisyon: §f%.0f / %.0f", stamina, maxStamina), x, y, 0xFFFFFFFF);
-        renderBar(graphics, x + 120, y, 160, 8, stamina / maxStamina, 0xFF22DD44, 0xFF003311);
-        y += 16;
+        renderBar(graphics, x + 115, y, 175, 7, stamina / maxStamina, 0xFF22DD44, 0xFF003311);
+        y += 13;
 
         // Chakra EXP Bar
         float chakraExp = ninjaData.getChakraExp();
-        graphics.drawString(this.font, String.format("§dÇakra Gelişimi: §f%.0f / 100", chakraExp), x, y, 0xFFFFFFFF);
-        renderBar(graphics, x + 120, y, 160, 8, chakraExp / 100f, 0xFFAA22EE, 0xFF330044);
-        y += 20;
+        float neededExp = 100f + (maxChakra - 100f) * 3.5f;
+        graphics.drawString(this.font, String.format("§dÇakra Eğitimi: §f%.0f / %.0f", chakraExp, neededExp), x, y, 0xFFFFFFFF);
+        renderBar(graphics, x + 115, y, 175, 7, chakraExp / neededExp, 0xFFAA22EE, 0xFF330044);
+        y += 16;
 
-        int unlockedCount = ninjaData.getUnlockedAbilities().size();
-        graphics.drawString(this.font, "§7Özel Açılan Jutsular: §6" + unlockedCount + " adet jutsu parşömenle öğrenildi.", x, y, 0xFFCCCCCC);
+        // Rank Exam Requirements
+        if (rank == NinjaRank.ACADEMY_STUDENT) {
+            boolean reqC = maxChakra >= 100;
+            boolean reqJ = ninjaData.getJutsusCastCount() >= 10;
+            String cColor = reqC ? "§a" : "§c";
+            String jColor = reqJ ? "§a" : "§c";
+            graphics.drawString(this.font, "§eMezuniyet Şartı: " + cColor + "Çakra (" + (int)maxChakra + "/100) §7| " + jColor + "Jutsu (" + ninjaData.getJutsusCastCount() + "/10)", x, y, 0xFFFFFFFF);
+        } else if (rank == NinjaRank.GENIN) {
+            boolean reqC = maxChakra >= 200;
+            boolean reqK = ninjaData.getEnemiesDefeated() >= 25;
+            String cColor = reqC ? "§a" : "§c";
+            String kColor = reqK ? "§a" : "§c";
+            graphics.drawString(this.font, "§eChūnin Sınavı: " + cColor + "Çakra (" + (int)maxChakra + "/200) §7| " + kColor + "Düşman (" + ninjaData.getEnemiesDefeated() + "/25)", x, y, 0xFFFFFFFF);
+        } else if (rank == NinjaRank.CHUNIN) {
+            boolean reqC = maxChakra >= 350;
+            boolean reqK = ninjaData.getEnemiesDefeated() >= 75;
+            int unlocked = ninjaData.getUnlockedAbilities().size();
+            boolean reqS = unlocked >= 4;
+            String cColor = reqC ? "§a" : "§c";
+            String kColor = reqK ? "§a" : "§c";
+            String sColor = reqS ? "§a" : "§c";
+            graphics.drawString(this.font, "§eJōnin Şartı: " + cColor + "Çakra (" + (int)maxChakra + "/350) §7| " + kColor + "Düşman (" + ninjaData.getEnemiesDefeated() + "/75) §7| " + sColor + "Parşömen (" + unlocked + "/4)", x, y, 0xFFFFFFFF);
+        } else {
+            graphics.drawString(this.font, "§6★ Usta Shinobi - Köyün elit koruyucusu ve Jōnin rütbesi ★", x, y, 0xFFFFAA00);
+        }
     }
 
     private void renderClanTab(GuiGraphics graphics, INinjaData ninjaData, int centerX, int startY) {
@@ -261,6 +322,7 @@ public class NinjaMenuScreen extends Screen {
         for (int i = startIndex; i < endIndex; i++) {
             Ability ability = allAbilities.get(i);
             boolean unlocked = ninjaData.isAbilityUnlocked(ability);
+            ResourceLocation id = ability.getRegistryName();
 
             int bgCol = unlocked ? 0xCC112211 : 0xCC221111;
             int borderCol = unlocked ? 0xFF228822 : 0xFF882222;
@@ -270,12 +332,28 @@ public class NinjaMenuScreen extends Screen {
 
             // Ability Name
             String name = Component.translatable(ability.getTranslationKey()).getString();
-            graphics.drawString(this.font, "§f§l" + name, boxX + 8, cardY + 5, 0xFFFFFFFF);
+            graphics.drawString(this.font, "§f§l" + name, boxX + 8, cardY + 4, 0xFFFFFFFF);
 
-            // Combo & Rank
+            // Combo & Type Info
             String comboText = formatCombo(ability.defaultCombo());
-            graphics.drawString(this.font, "§eMühür Kombo: §b" + comboText, boxX + 8, cardY + 16, 0xFFDDDDDD);
-            graphics.drawString(this.font, "§7Gereken Rütbe: §a" + ability.getRequiredRank().getTurkishName(), boxX + 8, cardY + 25, 0xFFAAAAAA);
+            graphics.drawString(this.font, "§eMühür: §b" + comboText, boxX + 8, cardY + 15, 0xFFDDDDDD);
+
+            // Acquisition Type
+            String reqType;
+            if (id != null && (id.getPath().equals("amaterasu") || id.getPath().equals("susanoo_ribcage"))) {
+                reqType = "§c[Uchiha Parşömeni]";
+            } else if (id != null && id.getPath().equals("sharingan")) {
+                reqType = "§c[Uchiha Doğuştan]";
+            } else if (id != null && id.getPath().equals("byakugan")) {
+                reqType = "§f[Hyūga Doğuştan]";
+            } else if (NinjaData.isScrollRequiredJutsu(id)) {
+                reqType = "§6[Parşömen Gerekir]";
+            } else if (ability.getRequiredRank() == NinjaRank.ACADEMY_STUDENT) {
+                reqType = "§7[Temel Yetenek]";
+            } else {
+                reqType = "§a[Rütbe: " + ability.getRequiredRank().getTurkishName() + "]";
+            }
+            graphics.drawString(this.font, reqType, boxX + 8, cardY + 25, 0xFFAAAAAA);
 
             // Status label
             String status = unlocked ? "§a✔ ÖĞRENİLDİ" : "§c✖ KİLİTLİ";

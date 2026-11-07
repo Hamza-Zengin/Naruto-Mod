@@ -46,10 +46,16 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private boolean clanLocked = false;
 
     @Sync
-    private String rank = "GENIN";
+    private String rank = "ACADEMY_STUDENT";
 
     @Sync
     private float chakraExp = 0;
+
+    @Sync
+    private int enemiesDefeated = 0;
+
+    @Sync
+    private int jutsusCastCount = 0;
 
     @Sync
     private String unlockedJutsus = "";
@@ -107,6 +113,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private static final String CLAN_LOCKED_TAG = "clanLocked";
     private static final String RANK_TAG = "rank";
     private static final String CHAKRA_EXP_TAG = "chakraExp";
+    private static final String ENEMIES_DEFEATED_TAG = "enemiesDefeated";
+    private static final String JUTSUS_CAST_TAG = "jutsusCast";
     private static final String UNLOCKED_JUTSUS_TAG = "unlockedJutsus";
 
     private final LazyOptional<INinjaData> holder = LazyOptional.of(() -> this);
@@ -193,6 +201,13 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         return isAbilityUnlocked(ability.getRegistryName());
     }
 
+    public static boolean isScrollRequiredJutsu(ResourceLocation id) {
+        if (id == null) return false;
+        String path = id.getPath();
+        return path.equals("rasengan") || path.equals("chidori") || path.equals("shadow_clone")
+                || path.equals("kirin") || path.equals("amaterasu") || path.equals("susanoo_ribcage");
+    }
+
     @Override
     public boolean isAbilityUnlocked(ResourceLocation abilityId) {
         if (abilityId == null) return false;
@@ -204,12 +219,32 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             return true;
         }
 
+        // Innate Clan Dōjutsu
+        if (abilityId.getPath().equals("sharingan")) {
+            return this.clan != null && this.clan.getPath().equals("uchiha");
+        }
+        if (abilityId.getPath().equals("byakugan")) {
+            return this.clan != null && this.clan.getPath().equals("hyuga");
+        }
+
+        // Scroll-only advanced & secret jutsus
+        if (isScrollRequiredJutsu(abilityId)) {
+            if (!getUnlockedAbilities().contains(abilityId)) {
+                return false;
+            }
+            // Mangekyo jutsus also strictly require Uchiha bloodline
+            if (abilityId.getPath().equals("amaterasu") || abilityId.getPath().equals("susanoo_ribcage")) {
+                return this.clan != null && this.clan.getPath().equals("uchiha");
+            }
+            return true;
+        }
+
         // Unlocked explicitly via scroll or training
         if (getUnlockedAbilities().contains(abilityId)) {
             return true;
         }
 
-        // Check if player rank meets or exceeds requirement
+        // Check if player rank meets or exceeds requirement for standard elemental/taijutsu abilities
         NinjaRank playerRank = NinjaRank.fromString(this.getRank());
         if (playerRank.getLevel() >= ability.getRequiredRank().getLevel()) {
             return true;
@@ -263,17 +298,79 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Override
     public void addChakraExp(float amount) {
         this.chakraExp += amount;
-        if (this.chakraExp >= 100f && this.maxChakra < 500f) {
-            this.chakraExp -= 100f;
+        float neededExp = 100f + (this.maxChakra - 100f) * 3.5f;
+        if (this.chakraExp >= neededExp && this.maxChakra < 500f) {
+            this.chakraExp -= neededExp;
             this.maxChakra = Math.min(this.maxChakra + 5f, 500f);
         }
+    }
+
+    @Override
+    public int getEnemiesDefeated() {
+        return this.enemiesDefeated;
+    }
+
+    @Override
+    public void addEnemyDefeated() {
+        this.enemiesDefeated++;
+    }
+
+    @Override
+    public void setEnemiesDefeated(int count) {
+        this.enemiesDefeated = count;
+    }
+
+    @Override
+    public int getJutsusCastCount() {
+        return this.jutsusCastCount;
+    }
+
+    @Override
+    public void addJutsuCast() {
+        this.jutsusCastCount++;
+    }
+
+    @Override
+    public void setJutsusCastCount(int count) {
+        this.jutsusCastCount = count;
+    }
+
+    @Override
+    public boolean canRankUp() {
+        NinjaRank current = NinjaRank.fromString(this.getRank());
+        if (current == NinjaRank.ACADEMY_STUDENT) {
+            return this.maxChakra >= 100 && this.jutsusCastCount >= 10;
+        } else if (current == NinjaRank.GENIN) {
+            return this.maxChakra >= 200 && this.enemiesDefeated >= 25;
+        } else if (current == NinjaRank.CHUNIN) {
+            return this.maxChakra >= 350 && this.enemiesDefeated >= 75 && this.getUnlockedAbilities().size() >= 4;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean rankUp() {
+        if (!canRankUp()) return false;
+        NinjaRank current = NinjaRank.fromString(this.getRank());
+        if (current == NinjaRank.ACADEMY_STUDENT) {
+            setRank("GENIN");
+            return true;
+        } else if (current == NinjaRank.GENIN) {
+            setRank("CHUNIN");
+            return true;
+        } else if (current == NinjaRank.CHUNIN) {
+            setRank("JONIN");
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void useChakra(float amount, int cooldown) {
         this.chakra -= amount;
         this.chakraRegenInfo.cooldown = Math.max(cooldown, this.chakraRegenInfo.cooldown);
-        addChakraExp(amount * 0.1f);
+        addChakraExp(amount * 0.02f);
+        addJutsuCast();
     }
 
     @Override
@@ -415,6 +512,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         nbt.putBoolean(CLAN_LOCKED_TAG, this.clanLocked);
         nbt.putString(RANK_TAG, this.rank != null ? this.rank : "GENIN");
         nbt.putFloat(CHAKRA_EXP_TAG, this.chakraExp);
+        nbt.putInt(ENEMIES_DEFEATED_TAG, this.enemiesDefeated);
+        nbt.putInt(JUTSUS_CAST_TAG, this.jutsusCastCount);
         if (this.unlockedJutsus != null) {
             nbt.putString(UNLOCKED_JUTSUS_TAG, this.unlockedJutsus);
         }
@@ -443,6 +542,12 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             }
             if (compoundTag.contains(CHAKRA_EXP_TAG)) {
                 this.chakraExp = compoundTag.getFloat(CHAKRA_EXP_TAG);
+            }
+            if (compoundTag.contains(ENEMIES_DEFEATED_TAG)) {
+                this.enemiesDefeated = compoundTag.getInt(ENEMIES_DEFEATED_TAG);
+            }
+            if (compoundTag.contains(JUTSUS_CAST_TAG)) {
+                this.jutsusCastCount = compoundTag.getInt(JUTSUS_CAST_TAG);
             }
             if (compoundTag.contains(UNLOCKED_JUTSUS_TAG)) {
                 this.unlockedJutsus = compoundTag.getString(UNLOCKED_JUTSUS_TAG);

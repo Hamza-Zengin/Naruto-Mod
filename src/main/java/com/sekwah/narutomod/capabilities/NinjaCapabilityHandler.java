@@ -67,6 +67,13 @@ public class NinjaCapabilityHandler {
         });
     }
 
+    @SubscribeEvent
+    public static void onLivingDeath(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
+        if (event.getSource().getEntity() instanceof Player player) {
+            player.getCapability(NINJA_DATA).ifPresent(INinjaData::addEnemyDefeated);
+        }
+    }
+
     //public static final EntitySize STANDING_SIZE = EntitySize.flexible(0.1F, 0.1F);
 
     // For things like the transformation jutsus (make sure to trigger it manually when you change)

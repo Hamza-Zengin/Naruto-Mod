@@ -62,10 +62,12 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
                 enemy.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 0, false, false));
             }
 
-            // Red visual aura
-            serverLevel.sendParticles(ParticleTypes.FLAME,
-                    player.getX(), player.getY() + 1.2, player.getZ(),
-                    2, 0.2, 0.2, 0.2, 0.01);
+            // Subtle red visual gleam (reduced so vision stays clean)
+            if (ticksActive % 40 == 0) {
+                serverLevel.sendParticles(ParticleTypes.FLAME,
+                        player.getX(), player.getY() + player.getEyeHeight() * 0.95, player.getZ(),
+                        1, 0.05, 0.02, 0.05, 0.005);
+            }
         }
     }
 

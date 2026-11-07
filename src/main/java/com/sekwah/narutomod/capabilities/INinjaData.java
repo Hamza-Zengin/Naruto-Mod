@@ -36,6 +36,17 @@ public interface INinjaData extends INBTSerializable<Tag> {
     float getChakraExp();
     void addChakraExp(float amount);
 
+    int getEnemiesDefeated();
+    void addEnemyDefeated();
+    void setEnemiesDefeated(int count);
+
+    int getJutsusCastCount();
+    void addJutsuCast();
+    void setJutsusCastCount(int count);
+
+    boolean canRankUp();
+    boolean rankUp();
+
     boolean isAbilityUnlocked(Ability ability);
     boolean isAbilityUnlocked(ResourceLocation abilityId);
     void unlockAbility(ResourceLocation abilityId);

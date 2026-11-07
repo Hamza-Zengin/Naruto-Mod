@@ -78,11 +78,17 @@ public class ServerAbilityActivatePacket {
                         ToggleAbilityData abilityTracker = ninjaData.getToggleAbilityData();
                         HashSet<ResourceLocation> abilities = abilityTracker.getAbilitiesHashSet();
                         if(abilities.contains(ability.getRegistryName())) {
+                            if (NarutoAbilities.EIGHT_GATES.getId().equals(ability.getRegistryName())) {
+                                player.sendSystemMessage(Component.translatable("jutsu.eight_gates.cannot_close")
+                                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
+                                return;
+                            }
                             // Toggle ability off
                             abilityTracker.removeAbilityEnded(player, ninjaData, ability);
                         } else {
                             // Toggle ability on
                             abilityTracker.addAbilityStarted(player, ninjaData, ability);
+                            ninjaData.addJutsuCast();
                         }
                     }
                 });
