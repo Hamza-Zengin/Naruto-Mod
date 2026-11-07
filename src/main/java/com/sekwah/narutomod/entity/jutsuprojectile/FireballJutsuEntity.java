@@ -1,5 +1,6 @@
 package com.sekwah.narutomod.entity.jutsuprojectile;
 
+import com.sekwah.narutomod.damagesource.NarutoDamageSource;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -101,7 +102,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
                 float fireDamage = (float) (12f - (distance / 4f));
                 if(fireDamage > 0) {
                     Entity entity1 = this.getOwner();
-                    entity.hurt(this.level().damageSources().fireball(this, entity1), fireDamage);
+                    entity.hurt(NarutoDamageSource.fireball(this, entity1), fireDamage);
                     if (entity1 instanceof LivingEntity) {
                         this.doEnchantDamageEffects((LivingEntity)entity1, entity);
                     }
@@ -157,7 +158,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
     }
 
     @Override
-    public float getBrightness() {
+    public float getLightLevelDependentMagicValue() {
         return 1.0F;
     }
 

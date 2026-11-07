@@ -37,7 +37,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.logging.log4j.core.jmx.Server;
 
 import javax.annotation.Nullable;
-import java.util.Random;
+import net.minecraft.util.RandomSource;
 
 public class PaperBombBlock extends FaceAttachedHorizontalDirectionalBlock {
 
@@ -65,7 +65,7 @@ public class PaperBombBlock extends FaceAttachedHorizontalDirectionalBlock {
 
     @Override
     public void wasExploded(Level levelIn, BlockPos pos, Explosion explosionIn) {
-        spawnPaperbomb(null, levelIn, pos, explosionIn.getSourceMob(), true);
+        spawnPaperbomb(null, levelIn, pos, explosionIn.getIndirectSourceEntity(), true);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class PaperBombBlock extends FaceAttachedHorizontalDirectionalBlock {
     }
 
     @Override
-    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
+    public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource rand) {
         if (!state.getValue(HIDDEN)) {
             worldIn.setBlock(pos, state.setValue(HIDDEN, Boolean.TRUE), 3);
         }

@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderNameplateEvent;
+import net.minecraftforge.client.event.RenderNameTagEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,18 +17,13 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = NarutoMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class RenderEvents {
 
-    /**
-     * {@link net.minecraftforge.client.event.RenderPlayerEvent}
-     *
-     * @param event
-     */
     @SubscribeEvent
     public static void playerRenderEvent(RenderPlayerEvent.Pre event) {
-        //event.setCanceled(true);
+        // Reserved for future model rendering
     }
 
     @SubscribeEvent
-    public static void renderNameplateEvent(RenderNameplateEvent event) {
+    public static void renderNameplateEvent(RenderNameTagEvent event) {
         if (event.getResult() != Event.Result.DENY) {
             Entity entity = event.getEntity();
             if (entity instanceof Player player) {

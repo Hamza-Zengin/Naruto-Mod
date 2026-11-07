@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
-import java.util.Random;
+import net.minecraft.util.RandomSource;
 
 public class PaperBombRenderer extends EntityRenderer<PaperBombEntity> {
 
@@ -48,17 +48,17 @@ public class PaperBombRenderer extends EntityRenderer<PaperBombEntity> {
                 break;
         }
 
-        BlockPos blockpos = new BlockPos(entityIn.getX(), entityIn.getBoundingBox().maxY, entityIn.getZ());
+        BlockPos blockpos = BlockPos.containing(entityIn.getX(), entityIn.getBoundingBox().maxY, entityIn.getZ());
         BlockRenderDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRenderer();
 
         RenderType rendertype = ItemBlockRenderTypes.getMovingBlockRenderType(entityIn.renderBlockState);
         VertexConsumer vertexconsumer = bufferIn.getBuffer(rendertype);
-        blockrendererdispatcher.getModelRenderer().tesselateBlock(entityIn.level,
+        blockrendererdispatcher.getModelRenderer().tesselateBlock(entityIn.level(),
                 blockrendererdispatcher.getBlockModel(entityIn.renderBlockState),
                 entityIn.renderBlockState, blockpos, matrixStackIn,
                 vertexconsumer,
                 false,
-                new Random(),
+                RandomSource.create(),
                 entityIn.renderBlockState.getSeed(entityIn.getOrigin()),
                 OverlayTexture.NO_OVERLAY);
 

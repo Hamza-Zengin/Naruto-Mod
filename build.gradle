@@ -23,7 +23,7 @@ buildscript {
 }
 plugins {
     id "com.matthewprenger.cursegradle" version "1.4.0"
-    id 'net.researchgate.release' version '2.8.1'
+    // id 'net.researchgate.release' version '2.8.1'
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -46,6 +46,7 @@ archivesBaseName = project.archive
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 repositories {
+    mavenLocal()
 //    maven { url = "https://maven.sekwah.com" }
     maven {
         url "https://www.cursemaven.com"
@@ -114,7 +115,6 @@ minecraft {
         data {
             workingDirectory project.file('run')
 
-            forceExit false
             // Recommended logging data for a userdev environment
             property 'forge.logging.markers', ''
             //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
@@ -179,7 +179,7 @@ mixin {
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
     finalizedBy 'reobfJar'
-    classifier = 'universal'
+    archiveClassifier = 'universal'
     manifest {
         attributes([
                 "Specification-Title": project.modid,
@@ -207,14 +207,14 @@ def reobfArtifact = artifacts.add('default', reobfFile) {
 task srcJar(type: Jar) {
     build.dependsOn it
     from sourceSets.main.allSource
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from file("LICENSE")
 }
 
 task deobfJar(type: Jar) {
     build.dependsOn it
     from sourceSets.main.output
-    classifier = 'deobf'
+    archiveClassifier = 'deobf'
     from file("LICENSE")
 }
 configurations.all {
@@ -309,19 +309,19 @@ curseforge {
 
 // https://github.com/researchgate/gradle-release
 // Only other plugin I can find using auto & gradle https://github.com/intuit/hooks
-release {
-    failOnPublishNeeded = false
-    failOnSnapshotDependencies = false
-    git {
-        requireBranch = ''
-    }
-
-
-    // Disable tasks because something we have is causing -x to be ignored
-    createReleaseTag.enabled = false
-    preTagCommit.enabled = false
-    commitNewVersion.enabled = false
-}
+//release {
+//    failOnPublishNeeded = false
+//    failOnSnapshotDependencies = false
+//    git {
+//        requireBranch = ''
+//    }
+//
+//
+//    // Disable tasks because something we have is causing -x to be ignored
+//    createReleaseTag.enabled = false
+//    preTagCommit.enabled = false
+//    commitNewVersion.enabled = false
+//}
 
 task publish {
     doLast {

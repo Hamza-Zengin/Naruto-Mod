@@ -28,7 +28,7 @@ public class LeapAbility extends Ability {
 
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        if(!player.isOnGround()) {
+        if(!player.onGround()) {
             player.displayClientMessage(Component.translatable("jutsu.fail.notonground", Component.translatable("jutsu.leap").withStyle(ChatFormatting.YELLOW)), true);
             return false;
         }

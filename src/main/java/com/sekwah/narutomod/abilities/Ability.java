@@ -17,8 +17,13 @@ public abstract class Ability {
     }
 
     public ResourceLocation getRegistryName() {
-        if (this.registryName == null && NarutoAbilities.ABILITY_REGISTRY != null) {
-            this.registryName = NarutoAbilities.ABILITY_REGISTRY.getKey(this);
+        if (this.registryName == null) {
+            for (net.minecraftforge.registries.RegistryObject<Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
+                if (entry.isPresent() && entry.get() == this) {
+                    this.registryName = entry.getId();
+                    break;
+                }
+            }
         }
         return this.registryName;
     }

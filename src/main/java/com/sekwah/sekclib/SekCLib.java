@@ -1,26 +1,25 @@
 package com.sekwah.sekclib;
 
 import com.sekwah.sekclib.capabilitysync.CapabilityEntry;
+import com.sekwah.sekclib.capabilitysync.capability.ISyncData;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.RegisterCapabilitySyncEvent;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.RegisterSyncTrackerTypeEvent;
-import com.sekwah.sekclib.capabilitysync.capability.ISyncData;
 import com.sekwah.sekclib.network.SekCPacketHandler;
 import com.sekwah.sekclib.registries.SekCLibRegistries;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoader;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * Fallback SekCLib instance when standalone SekCLib mod is not installed.
- */
+@Mod(SekCLib.MOD_ID)
 public class SekCLib {
 
-    public static final String MOD_ID = "narutomod";
+    public static final String MOD_ID = "sekclib";
 
     public static final Logger LOGGER = LogManager.getLogger("SekC Lib");
 

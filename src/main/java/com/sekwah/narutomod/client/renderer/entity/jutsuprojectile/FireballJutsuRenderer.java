@@ -2,7 +2,7 @@ package com.sekwah.narutomod.client.renderer.entity.jutsuprojectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import com.sekwah.narutomod.client.model.jutsu.FireballJutsuModel;
 import com.sekwah.narutomod.client.renderer.NarutoRenderEvents;
 import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-
 
 public class FireballJutsuRenderer extends EntityRenderer<FireballJutsuEntity> {
    public static final ResourceLocation FIREBALL_TEX = new ResourceLocation("narutomod", "textures/entity/jutsu/projectiles/fireball.png");
@@ -37,8 +36,8 @@ public class FireballJutsuRenderer extends EntityRenderer<FireballJutsuEntity> {
                  + (FireballJutsuEntity.GROW_SCALE - (FireballJutsuEntity.GROW_SCALE * ((scaleTime - time) / scaleTime)));
          poseStack.scale(scale, scale, scale);
       }
-      poseStack.mulPose(new Vector3f(1.0F, 0.0F, 0.0F).rotationDegrees(time * 1.5f));
-      poseStack.mulPose(new Vector3f(0.0F, 1.0F, 0.0F).rotationDegrees(time * 1.5f));
+      poseStack.mulPose(Axis.XP.rotationDegrees(time * 1.5f));
+      poseStack.mulPose(Axis.YP.rotationDegrees(time * 1.5f));
       this.model.renderToBuffer(poseStack, vertexconsumer, p_114490_, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
       poseStack.popPose();
       super.render(fireballJutsuEntity, p_114486_, partial, poseStack, multiBufferSource, p_114490_);

@@ -24,7 +24,7 @@ public class NinjaCapabilityHandler {
     @SubscribeEvent
     public static void attachCapability(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player) {
-            event.addCapability(new ResourceLocation(NarutoMod.MOD_ID, "ninja_data"), new NinjaData(!event.getObject().level.isClientSide));
+            event.addCapability(new ResourceLocation(NarutoMod.MOD_ID, "ninja_data"), new NinjaData(!event.getObject().level().isClientSide));
         }
     }
 
@@ -41,7 +41,8 @@ public class NinjaCapabilityHandler {
                     data.updateServerData(player);
                 }
                 data.getToggleAbilityData().getAbilitiesHashSet().forEach(abilityName -> {
-                    Ability ability = NarutoAbilities.ABILITY_REGISTRY.getValue(abilityName);
+                    Ability ability = NarutoAbilities.getAbility(abilityName);
+                    if(ability == null) return;
                     if(event.side.isServer()) {
                         if(ability.handleCost(player, data)) {
                             ability.performServer(player, data);
@@ -60,7 +61,7 @@ public class NinjaCapabilityHandler {
     @SubscribeEvent
     public static void playerClone(PlayerEvent.Clone event) {
         event.getOriginal().getCapability(NINJA_DATA).ifPresent(original -> {
-            event.getPlayer().getCapability(NINJA_DATA).ifPresent(future -> {
+            event.getEntity().getCapability(NINJA_DATA).ifPresent(future -> {
                 future.deserializeNBT(original.serializeNBT());
             });
         });

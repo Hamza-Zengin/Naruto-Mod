@@ -12,7 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
@@ -30,23 +30,24 @@ import java.util.function.Supplier;
  * int how many fields to sync
  * <p>
  * int id for which field on the capability to sync. (this stops types needing to by synced with a registry)
+ * boolean has data (not null) (if its null skip encoding & decoding)
  * (push to the tracker to handle the encoding and decoding)
  */
 public class ClientCapabilitySyncPacket {
 
-    private final int playerId;
+    private final int entityId;
     public List<CapabilityInfo> capabilityData;
     private boolean includePrivate;
 
     /**
      * To construct the data for serialisation
      *
-     * @param player
+     * @param entity
      * @param capabilityData
      * @param includePrivate - should include non global tags
      */
-    public ClientCapabilitySyncPacket(Player player, List<CapabilityInfo> capabilityData, boolean includePrivate) {
-        this.playerId = player.getId();
+    public ClientCapabilitySyncPacket(LivingEntity entity, List<CapabilityInfo> capabilityData, boolean includePrivate) {
+        this.entityId = entity.getId();
         this.capabilityData = new ArrayList<>(capabilityData);
         this.includePrivate = includePrivate;
         if (!includePrivate) {
@@ -55,14 +56,17 @@ public class ClientCapabilitySyncPacket {
     }
 
     private ClientCapabilitySyncPacket(int player, List<CapabilityInfo> capabilityData) {
-        this.playerId = player;
+        this.entityId = player;
         this.capabilityData = capabilityData;
     }
 
     public static void encodeSyncTrackers(List<ISyncTrackerData> trackers, FriendlyByteBuf outBuffer) {
         for (ISyncTrackerData tracker : trackers) {
             outBuffer.writeByte(tracker.getSyncEntry().getTrackerId());
-            tracker.getSyncEntry().getSerializer().encode(tracker.getSendValue(), outBuffer);
+            outBuffer.writeBoolean(tracker.getSendValue() != null);
+            if(tracker.getSendValue() != null) {
+                tracker.getSyncEntry().getSerializer().encode(tracker.getSendValue(), outBuffer);
+            }
         }
     }
 
@@ -78,15 +82,17 @@ public class ClientCapabilitySyncPacket {
         List<ISyncTrackerData> syncTrackerDataList = new ArrayList<>();
         for (int i = 0; i < trackerCount; i++) {
             int trackerId = inBuffer.readByte();
+            boolean hasData = inBuffer.readBoolean();
             SyncEntry tracker = capability.getSyncEntries().get(trackerId);
-            Object data = tracker.getSerializer().decode(inBuffer);
+            Object data = hasData ? tracker.getSerializer().decode(inBuffer) : null;
             syncTrackerDataList.add(new SyncTrackerData(tracker, data));
+
         }
         return syncTrackerDataList;
     }
 
     public static void encode(ClientCapabilitySyncPacket msg, FriendlyByteBuf outBuffer) {
-        outBuffer.writeInt(msg.playerId);
+        outBuffer.writeInt(msg.entityId);
         outBuffer.writeInt(msg.capabilityData.size());
         for (CapabilityInfo capInfo : msg.capabilityData) {
             outBuffer.writeInt(capInfo.capabilityId);
@@ -124,10 +130,13 @@ public class ClientCapabilitySyncPacket {
             context.enqueueWork(() ->
                 DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
                     ClientLevel level = Minecraft.getInstance().level;
-                    Entity entity = level.getEntity(msg.playerId);
-                    if (entity instanceof Player player) {
+                    if (level == null) {
+                        return;
+                    }
+                    Entity entity = level.getEntity(msg.entityId);
+                    if (entity instanceof LivingEntity livingEntity) {
                         for (CapabilityInfo capInfo : msg.capabilityData) {
-                            player.getCapability(capInfo.capability.getCapability()).ifPresent(targetCap -> {
+                            livingEntity.getCapability(capInfo.capability.getCapability()).ifPresent(targetCap -> {
                                 List<SyncEntry> syncEntries = capInfo.capability.getSyncEntries();
                                 for (ISyncTrackerData syncTrackerData : capInfo.changedEntries) {
                                     SyncEntry syncEntry = syncEntries.get(syncTrackerData.getSyncEntry().getTrackerId());

@@ -11,16 +11,13 @@ import net.minecraftforge.fml.common.Mod;
 public class PlayerEvents {
 
     @SubscribeEvent
-    public static void onEntityUpdate(LivingEvent.LivingUpdateEvent event) {
+    public static void onEntityUpdate(LivingEvent.LivingTickEvent event) {
         // Do chakra updates and other stuff here unless handled in capabilities
     }
 
-// Handle if they have some agility perk or leaps.
-//
     @SubscribeEvent
     public static void livingFall(LivingFallEvent event) {
         if (event.getEntity() instanceof Player player){
-          //NarutoMod.logger.info(event.distance);
             float distance = event.getDistance();
             if(distance < 9){
                 distance *= 0.3f;
