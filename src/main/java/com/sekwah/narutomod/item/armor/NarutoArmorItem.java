@@ -56,13 +56,6 @@ public class NarutoArmorItem extends ArmorItem implements IShouldHideNameplate {
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         super.initializeClient(consumer);
         consumer.accept(new IClientItemExtensions() {
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer()
-            {
-                return NarutoRenderEvents.NARUTO_RENDERER;
-            }
-
             @Override
             public HumanoidModel<?> getHumanoidArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot, HumanoidModel<?> _default) {
                 return armorModel != null ? armorModel : _default;

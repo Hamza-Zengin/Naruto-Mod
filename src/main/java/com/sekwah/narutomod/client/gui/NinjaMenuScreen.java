@@ -93,9 +93,9 @@ public class NinjaMenuScreen extends Screen {
                 }
 
                 int boxW = 320;
-                int boxH = 175;
+                int boxH = 185;
                 int boxY = topY + 45;
-                int btnY = boxY + boxH - 26;
+                int btnY = boxY + boxH - 25;
 
                 Button rankBtn = Button.builder(Component.literal(btnText), b -> {
                     PacketHandler.sendToServer(new ServerRankUpPacket());
@@ -192,12 +192,12 @@ public class NinjaMenuScreen extends Screen {
 
     private void renderProfileTab(GuiGraphics graphics, INinjaData ninjaData, int centerX, int startY) {
         int boxW = 320;
-        int boxH = 175;
+        int boxH = 185;
         int boxX = centerX - boxW / 2;
         int boxY = startY;
 
         // Dark card background
-        graphics.fill(boxX, boxY, boxX + boxW, boxY + boxH, 0xCC111116);
+        graphics.fill(boxX, boxY, boxX + boxW, boxY + boxH, 0xDD111116);
         graphics.renderOutline(boxX, boxY, boxW, boxH, 0xFF555577);
 
         Minecraft mc = Minecraft.getInstance();
@@ -222,48 +222,89 @@ public class NinjaMenuScreen extends Screen {
         // Chakra Bar
         float chakra = ninjaData.getChakra();
         float maxChakra = ninjaData.getMaxChakra();
-        graphics.drawString(this.font, String.format("§9Çakra: §f%.0f / %.0f", chakra, maxChakra), x, y, 0xFFFFFFFF);
-        renderBar(graphics, x + 115, y, 175, 7, chakra / maxChakra, 0xFF2255FF, 0xFF001144);
+        float chakraPct = maxChakra > 0 ? (chakra / maxChakra) * 100f : 0f;
+        graphics.drawString(this.font, String.format("§9Çakra: §f%.0f / %.0f §7(%%%.0f)", chakra, maxChakra, chakraPct), x, y, 0xFFFFFFFF);
+        renderBar(graphics, x + 130, y, 160, 7, chakra / maxChakra, 0xFF2255FF, 0xFF001144);
         y += 13;
 
         // Stamina Bar
         float stamina = ninjaData.getStamina();
         float maxStamina = ninjaData.getMaxStamina();
-        graphics.drawString(this.font, String.format("§aKondisyon: §f%.0f / %.0f", stamina, maxStamina), x, y, 0xFFFFFFFF);
-        renderBar(graphics, x + 115, y, 175, 7, stamina / maxStamina, 0xFF22DD44, 0xFF003311);
+        float staminaPct = maxStamina > 0 ? (stamina / maxStamina) * 100f : 0f;
+        graphics.drawString(this.font, String.format("§aKondisyon: §f%.0f / %.0f §7(%%%.0f)", stamina, maxStamina, staminaPct), x, y, 0xFFFFFFFF);
+        renderBar(graphics, x + 130, y, 160, 7, stamina / maxStamina, 0xFF22DD44, 0xFF003311);
         y += 13;
 
         // Chakra EXP Bar
         float chakraExp = ninjaData.getChakraExp();
         float neededExp = 100f + (maxChakra - 100f) * 3.5f;
-        graphics.drawString(this.font, String.format("§dÇakra Eğitimi: §f%.0f / %.0f", chakraExp, neededExp), x, y, 0xFFFFFFFF);
-        renderBar(graphics, x + 115, y, 175, 7, chakraExp / neededExp, 0xFFAA22EE, 0xFF330044);
-        y += 16;
+        float expPct = neededExp > 0 ? Math.min(100f, (chakraExp / neededExp) * 100f) : 0f;
+        graphics.drawString(this.font, String.format("§dÇakra Eğitimi: §f%.0f / %.0f §7(%%%.0f)", chakraExp, neededExp, expPct), x, y, 0xFFFFFFFF);
+        renderBar(graphics, x + 130, y, 160, 7, chakraExp / neededExp, 0xFFAA22EE, 0xFF330044);
+        y += 18;
 
-        // Rank Exam Requirements
+        // Rank Exam Requirements Card
+        int examBoxY = y - 2;
+        int examBoxH = 38;
         if (rank == NinjaRank.ACADEMY_STUDENT) {
             boolean reqC = maxChakra >= 100;
             boolean reqJ = ninjaData.getJutsusCastCount() >= 10;
-            String cColor = reqC ? "§a" : "§c";
-            String jColor = reqJ ? "§a" : "§c";
-            graphics.drawString(this.font, "§eMezuniyet Şartı: " + cColor + "Çakra (" + (int)maxChakra + "/100) §7| " + jColor + "Jutsu (" + ninjaData.getJutsusCastCount() + "/10)", x, y, 0xFFFFFFFF);
+            boolean ready = reqC && reqJ;
+
+            graphics.fill(x - 4, examBoxY, boxX + boxW - 10, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
+            graphics.renderOutline(x - 4, examBoxY, boxW - 20, examBoxH, ready ? 0xFF33CC33 : 0xFF555566);
+
+            String cText = reqC ? "§a✔ Çakra (100/100)" : "§c✖ Çakra (" + (int)Math.min(maxChakra, 100) + "/100)";
+            String jText = reqJ ? "§a✔ Jutsu (10/10)" : "§c✖ Jutsu (" + Math.min(ninjaData.getJutsusCastCount(), 10) + "/10)";
+            graphics.drawString(this.font, "§eMezuniyet Sınavı Şartları: " + cText + " §7| " + jText, x + 2, examBoxY + 5, 0xFFFFFFFF);
+
+            if (ready) {
+                graphics.drawString(this.font, "§a★ Bütün sınav şartları sağlandı! Aşağıdan Genin rütbesine terfi edin.", x + 2, examBoxY + 20, 0xFF55FF55);
+            } else {
+                graphics.drawString(this.font, "§7Temel jutsuları çalışın ve çakranızı 100'e yükseltin.", x + 2, examBoxY + 20, 0xFFAAAAAA);
+            }
         } else if (rank == NinjaRank.GENIN) {
             boolean reqC = maxChakra >= 200;
             boolean reqK = ninjaData.getEnemiesDefeated() >= 25;
-            String cColor = reqC ? "§a" : "§c";
-            String kColor = reqK ? "§a" : "§c";
-            graphics.drawString(this.font, "§eChūnin Sınavı: " + cColor + "Çakra (" + (int)maxChakra + "/200) §7| " + kColor + "Düşman (" + ninjaData.getEnemiesDefeated() + "/25)", x, y, 0xFFFFFFFF);
+            boolean ready = reqC && reqK;
+
+            graphics.fill(x - 4, examBoxY, boxX + boxW - 10, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
+            graphics.renderOutline(x - 4, examBoxY, boxW - 20, examBoxH, ready ? 0xFF33CC33 : 0xFF555566);
+
+            String cText = reqC ? "§a✔ Çakra (200/200)" : "§c✖ Çakra (" + (int)Math.min(maxChakra, 200) + "/200)";
+            String kText = reqK ? "§a✔ Düşman (25/25)" : "§c✖ Düşman (" + Math.min(ninjaData.getEnemiesDefeated(), 25) + "/25)";
+            graphics.drawString(this.font, "§eChūnin Sınavı Şartları: " + cText + " §7| " + kText, x + 2, examBoxY + 5, 0xFFFFFFFF);
+
+            if (ready) {
+                graphics.drawString(this.font, "§a★ Bütün sınav şartları sağlandı! Aşağıdan Chūnin rütbesine terfi edin.", x + 2, examBoxY + 20, 0xFF55FF55);
+            } else {
+                graphics.drawString(this.font, "§7Düşmanları alt edin ve çakranızı 200'e yükseltin.", x + 2, examBoxY + 20, 0xFFAAAAAA);
+            }
         } else if (rank == NinjaRank.CHUNIN) {
             boolean reqC = maxChakra >= 350;
             boolean reqK = ninjaData.getEnemiesDefeated() >= 75;
             int unlocked = ninjaData.getUnlockedAbilities().size();
             boolean reqS = unlocked >= 4;
-            String cColor = reqC ? "§a" : "§c";
-            String kColor = reqK ? "§a" : "§c";
-            String sColor = reqS ? "§a" : "§c";
-            graphics.drawString(this.font, "§eJōnin Şartı: " + cColor + "Çakra (" + (int)maxChakra + "/350) §7| " + kColor + "Düşman (" + ninjaData.getEnemiesDefeated() + "/75) §7| " + sColor + "Parşömen (" + unlocked + "/4)", x, y, 0xFFFFFFFF);
+            boolean ready = reqC && reqK && reqS;
+
+            graphics.fill(x - 4, examBoxY, boxX + boxW - 10, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
+            graphics.renderOutline(x - 4, examBoxY, boxW - 20, examBoxH, ready ? 0xFF33CC33 : 0xFF555566);
+
+            String cText = reqC ? "§a✔ Çakra (350/350)" : "§c✖ Çakra (" + (int)Math.min(maxChakra, 350) + "/350)";
+            String kText = reqK ? "§a✔ Düşman (75/75)" : "§c✖ Düşman (" + Math.min(ninjaData.getEnemiesDefeated(), 75) + "/75)";
+            String sText = reqS ? "§a✔ Parşömen (4/4)" : "§c✖ Parşömen (" + Math.min(unlocked, 4) + "/4)";
+            graphics.drawString(this.font, "§eJōnin Şartları: " + cText + " §7| " + kText + " §7| " + sText, x + 2, examBoxY + 5, 0xFFFFFFFF);
+
+            if (ready) {
+                graphics.drawString(this.font, "§a★ Tebrikler! Köy Konseyi sizi Jōnin rütbesine atamaya hazır.", x + 2, examBoxY + 20, 0xFF55FF55);
+            } else {
+                graphics.drawString(this.font, "§7Parşömenleri öğrenin, düşmanları yenin ve elit seviyeye ulaşın.", x + 2, examBoxY + 20, 0xFFAAAAAA);
+            }
         } else {
-            graphics.drawString(this.font, "§6★ Usta Shinobi - Köyün elit koruyucusu ve Jōnin rütbesi ★", x, y, 0xFFFFAA00);
+            graphics.fill(x - 4, examBoxY, boxX + boxW - 10, examBoxY + examBoxH, 0x33FFAA00);
+            graphics.renderOutline(x - 4, examBoxY, boxW - 20, examBoxH, 0xFFFFAA00);
+            graphics.drawString(this.font, "§6★ Usta Shinobi - Köyün elit koruyucusu ve Jōnin rütbesi ★", x + 2, examBoxY + 5, 0xFFFFAA00);
+            graphics.drawString(this.font, "§aEn yüksek ninja rütbesine ulaştınız. Tekniklerinizi geliştirmeye devam edin!", x + 2, examBoxY + 20, 0xFF55FF55);
         }
     }
 

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "narutomod:items/weapons/smoke_bomb"
+    "layer0": "narutomod:item/weapons/smoke_bomb"
   }
 }

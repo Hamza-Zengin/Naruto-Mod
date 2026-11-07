@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "narutomod:items/scrolls/scroll_susanoo"
+    "layer0": "narutomod:item/scrolls/scroll_susanoo"
   }
 }

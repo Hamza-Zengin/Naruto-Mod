@@ -62,11 +62,10 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
                 enemy.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 0, false, false));
             }
 
-            // Subtle red visual gleam (reduced so vision stays clean)
-            if (ticksActive % 40 == 0) {
-                serverLevel.sendParticles(ParticleTypes.FLAME,
-                        player.getX(), player.getY() + player.getEyeHeight() * 0.95, player.getZ(),
-                        1, 0.05, 0.02, 0.05, 0.005);
+            // On initial activation, play subtle eye awakening sound
+            if (ticksActive == 1) {
+                serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
+                        net.minecraft.sounds.SoundEvents.ENDER_EYE_DEATH, net.minecraft.sounds.SoundSource.PLAYERS, 0.7f, 1.5f);
             }
         }
     }

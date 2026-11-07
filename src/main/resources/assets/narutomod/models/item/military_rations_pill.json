@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "narutomod:items/weapons/military_rations_pill"
+    "layer0": "narutomod:item/weapons/military_rations_pill"
   }
 }

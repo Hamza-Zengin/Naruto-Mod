@@ -297,6 +297,10 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public void addChakraExp(float amount) {
+        if (this.maxChakra >= 500f) {
+            this.chakraExp = 0;
+            return;
+        }
         this.chakraExp += amount;
         float neededExp = 100f + (this.maxChakra - 100f) * 3.5f;
         if (this.chakraExp >= neededExp && this.maxChakra < 500f) {
@@ -307,12 +311,27 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public int getEnemiesDefeated() {
+        NinjaRank current = NinjaRank.fromString(this.getRank());
+        if (current == NinjaRank.GENIN) {
+            return Math.min(this.enemiesDefeated, 25);
+        } else if (current == NinjaRank.CHUNIN) {
+            return Math.min(this.enemiesDefeated, 75);
+        }
         return this.enemiesDefeated;
     }
 
     @Override
     public void addEnemyDefeated() {
-        this.enemiesDefeated++;
+        NinjaRank current = NinjaRank.fromString(this.getRank());
+        if (current == NinjaRank.GENIN) {
+            if (this.enemiesDefeated < 25) {
+                this.enemiesDefeated++;
+            }
+        } else if (current == NinjaRank.CHUNIN) {
+            if (this.enemiesDefeated < 75) {
+                this.enemiesDefeated++;
+            }
+        }
     }
 
     @Override
@@ -322,12 +341,21 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public int getJutsusCastCount() {
+        NinjaRank current = NinjaRank.fromString(this.getRank());
+        if (current == NinjaRank.ACADEMY_STUDENT) {
+            return Math.min(this.jutsusCastCount, 10);
+        }
         return this.jutsusCastCount;
     }
 
     @Override
     public void addJutsuCast() {
-        this.jutsusCastCount++;
+        NinjaRank current = NinjaRank.fromString(this.getRank());
+        if (current == NinjaRank.ACADEMY_STUDENT) {
+            if (this.jutsusCastCount < 10) {
+                this.jutsusCastCount++;
+            }
+        }
     }
 
     @Override
@@ -339,11 +367,11 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     public boolean canRankUp() {
         NinjaRank current = NinjaRank.fromString(this.getRank());
         if (current == NinjaRank.ACADEMY_STUDENT) {
-            return this.maxChakra >= 100 && this.jutsusCastCount >= 10;
+            return this.maxChakra >= 100 && this.getJutsusCastCount() >= 10;
         } else if (current == NinjaRank.GENIN) {
-            return this.maxChakra >= 200 && this.enemiesDefeated >= 25;
+            return this.maxChakra >= 200 && this.getEnemiesDefeated() >= 25;
         } else if (current == NinjaRank.CHUNIN) {
-            return this.maxChakra >= 350 && this.enemiesDefeated >= 75 && this.getUnlockedAbilities().size() >= 4;
+            return this.maxChakra >= 350 && this.getEnemiesDefeated() >= 75 && this.getUnlockedAbilities().size() >= 4;
         }
         return false;
     }
@@ -354,12 +382,18 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         NinjaRank current = NinjaRank.fromString(this.getRank());
         if (current == NinjaRank.ACADEMY_STUDENT) {
             setRank("GENIN");
+            this.jutsusCastCount = 0;
+            this.enemiesDefeated = 0;
             return true;
         } else if (current == NinjaRank.GENIN) {
             setRank("CHUNIN");
+            this.jutsusCastCount = 0;
+            this.enemiesDefeated = 0;
             return true;
         } else if (current == NinjaRank.CHUNIN) {
             setRank("JONIN");
+            this.jutsusCastCount = 0;
+            this.enemiesDefeated = 0;
             return true;
         }
         return false;
@@ -548,6 +582,14 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             }
             if (compoundTag.contains(JUTSUS_CAST_TAG)) {
                 this.jutsusCastCount = compoundTag.getInt(JUTSUS_CAST_TAG);
+            }
+            NinjaRank current = NinjaRank.fromString(this.rank);
+            if (current == NinjaRank.ACADEMY_STUDENT) {
+                if (this.jutsusCastCount > 10) this.jutsusCastCount = 10;
+            } else if (current == NinjaRank.GENIN) {
+                if (this.enemiesDefeated > 25) this.enemiesDefeated = 25;
+            } else if (current == NinjaRank.CHUNIN) {
+                if (this.enemiesDefeated > 75) this.enemiesDefeated = 75;
             }
             if (compoundTag.contains(UNLOCKED_JUTSUS_TAG)) {
                 this.unlockedJutsus = compoundTag.getString(UNLOCKED_JUTSUS_TAG);
