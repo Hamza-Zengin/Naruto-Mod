@@ -145,7 +145,7 @@ dependencies {
     implementation 'org.spongepowered:mixin:0.8.5'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    //compile "com.sekwah:SekCLib:${sekclib_version}:deobf"
+    implementation fg.deobf(files("libs/SekCLib-1.20.1-1.0.2-deobf.jar"))
     // Trick intellij to allow for better editing in here for the discord task
     // compile "org.apache.httpcomponents:httpmime:4.5.13"
     //compileOnly fg.deobf("curse.maven:jei-238222:4711617")
