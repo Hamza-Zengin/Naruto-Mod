@@ -4,7 +4,7 @@ import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -13,7 +13,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * More of a slight speed boost than an actual dash
+ * Water Walking ability
  */
 public class WaterWalkAbility extends Ability implements Ability.Toggled {
 
@@ -32,8 +32,6 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         WaterChecks checks = this.checkSteadyNormalFastPush(player);
 
-        // TODO fix why this is costing a lot more than it should be (client and server dont match up)
-        // Check if the server actually updates the location or if the player is sending the wrong location and when it chooses what to send the server.
         float fullCost = 0;
         if (checks.pushUpFast) {
             fullCost += 1f;
@@ -41,13 +39,12 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
             fullCost += 0.12F;
         }
         if(ninjaData.getChakra() < fullCost) {
-            player.displayClientMessage(new TranslatableComponent("jutsu.fail.notenoughchakra", new TranslatableComponent("jutsu.waterwalk").withStyle(ChatFormatting.YELLOW)), true);
+            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra", Component.translatable("jutsu.waterwalk").withStyle(ChatFormatting.YELLOW)), true);
             return false;
         }
         ninjaData.useChakra(fullCost, CHARKA_COOLDOWN);
         return true;
     }
-
 
     public SoundEvent castingSound() {
         return null;
@@ -56,29 +53,23 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
     public record WaterChecks(boolean steadyCheck, boolean pushUpFast, boolean pushUpNormal) {}
 
     public WaterChecks checkSteadyNormalFastPush(Player player) {
-
         int blockX = (int)Math.floor(player.getX());
         int blockZ = (int)Math.floor(player.getZ());
         final int block1 = (int) Math.round(player.getY() - 0.56f);
-        boolean steadyCheck = triggerWaterWalk(player.level, new BlockPos(blockX, block1, blockZ));
+        boolean steadyCheck = triggerWaterWalk(player.level(), new BlockPos(blockX, block1, blockZ));
 
         int block2 = (int) Math.round(player.getY());
-        boolean pushUpFast = triggerWaterWalk(player.level, new BlockPos(blockX, block2, blockZ));
+        boolean pushUpFast = triggerWaterWalk(player.level(), new BlockPos(blockX, block2, blockZ));
 
         int block3 = (int) Math.round(player.getY() - 0.47f);
-        boolean pushUpNormal = triggerWaterWalk(player.level, new BlockPos(blockX, block3, blockZ));
+        boolean pushUpNormal = triggerWaterWalk(player.level(), new BlockPos(blockX, block3, blockZ));
 
         return new WaterChecks(steadyCheck, pushUpFast, pushUpNormal);
     }
 
     private void updatePlayerMovement(Player player) {
-
-        // TODO rewrite as this is the old way of doing it ported over
-        // TODO also check if the block is waterlogged and non solid
         WaterChecks checks = this.checkSteadyNormalFastPush(player);
 
-
-        // TODO sort offset
         Vec3 vec = player.getDeltaMovement();
         double resultingYSpeed = vec.y();
         if (checks.pushUpFast) {
@@ -99,12 +90,10 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
             if(player.isFallFlying()) {
                 player.stopFallFlying();
             }
-            // This adds the hand bobbing back to the player
             float f = (float)Math.min(0.1D, player.getDeltaMovement().horizontalDistance());
             player.bob += (f - player.bob) * 0.4F;
         }
-        player.lerpMotion(vec.x(), resultingYSpeed, vec.z());
-
+        player.setDeltaMovement(vec.x(), resultingYSpeed, vec.z());
     }
 
     public boolean triggerWaterWalk(Level level, BlockPos blockPos) {

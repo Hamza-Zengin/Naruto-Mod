@@ -17,10 +17,21 @@ public interface INinjaData extends INBTSerializable<Tag> {
     float getMaxStamina();
     void setChakra(float amount);
     void setStamina(float amount);
+    void setMaxChakra(float amount);
+    void setMaxStamina(float amount);
     void useChakra(float amount, int cooldown);
     void useStamina(float amount, int cooldown);
     void addChakra(float amount);
     void addStamina(float amount);
+
+    ResourceLocation getClan();
+    void setClan(ResourceLocation clan);
+
+    String getRank();
+    void setRank(String rank);
+
+    float getChakraExp();
+    void addChakraExp(float amount);
 
     HashMap<String, CooldownTickEvent> getCooldownEvents();
 

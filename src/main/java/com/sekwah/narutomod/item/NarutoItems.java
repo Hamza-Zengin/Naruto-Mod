@@ -1,5 +1,6 @@
 package com.sekwah.narutomod.item;
 
+import com.sekwah.narutomod.block.NarutoBlocks;
 import com.sekwah.narutomod.item.armor.NarutoArmorItem;
 import com.sekwah.narutomod.item.armor.NarutoArmorMaterial;
 import com.sekwah.narutomod.item.weapons.ExplosiveKunaiItem;
@@ -7,7 +8,8 @@ import com.sekwah.narutomod.item.weapons.KunaiItem;
 import com.sekwah.narutomod.item.weapons.SenbonItem;
 import com.sekwah.narutomod.item.weapons.ShurikenItem;
 import com.sekwah.narutomod.sounds.NarutoSounds;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -18,85 +20,56 @@ import static com.sekwah.narutomod.NarutoMod.MOD_ID;
 
 public class NarutoItems {
 
-    public static CreativeModeTab NINJA_WEAPONS = new CreativeModeTab("narutomod_weapons") {
-        @Override
-        public ItemStack makeIcon() {
-            return new ItemStack(KUNAI.get());
-        }
-    };
-
-    public static CreativeModeTab NINJA_ARMOR = new CreativeModeTab("narutomod_armor") {
-        @Override
-        public ItemStack makeIcon() {
-            return new ItemStack(RED_ANBU_MASK.get());
-        }
-    };
-
-    public static CreativeModeTab HEADBANDS = new CreativeModeTab("narutomod_headbands") {
-        @Override
-        public ItemStack makeIcon() {
-            return new ItemStack(HEADBAND_BLUE.get());
-        }
-    };
-
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
+    public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
 
     // Weapons
     public static final RegistryObject<Item> KUNAI = ITEMS.register("kunai", ()
-            -> new KunaiItem(new Item.Properties().tab(NINJA_WEAPONS)));
+            -> new KunaiItem(new Item.Properties()));
 
     public static final RegistryObject<Item> SENBON = ITEMS.register("senbon", ()
-            -> new SenbonItem(new Item.Properties().tab(NINJA_WEAPONS)));
+            -> new SenbonItem(new Item.Properties()));
 
     public static final RegistryObject<Item> EXPLOSIVE_KUNAI = ITEMS.register("explosive_kunai", ()
-            -> new ExplosiveKunaiItem(new Item.Properties().stacksTo(16).tab(NINJA_WEAPONS)));
+            -> new ExplosiveKunaiItem(new Item.Properties().stacksTo(16)));
 
     public static final RegistryObject<Item> SHURIKEN = ITEMS.register("shuriken", ()
-            -> new ShurikenItem(new Item.Properties().tab(NINJA_WEAPONS)));
-
+            -> new ShurikenItem(new Item.Properties()));
 
     // Armor
-
     public static final RegistryObject<Item> RED_ANBU_MASK = ITEMS.register("red_anbu_mask", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, EquipmentSlot.HEAD,  new Item.Properties().tab(NINJA_ARMOR))
+            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
             .setShouldHideNameplate(true));
 
     public static final RegistryObject<Item> YELLOW_ANBU_MASK = ITEMS.register("yellow_anbu_mask", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, EquipmentSlot.HEAD,  new Item.Properties().tab(NINJA_ARMOR))
+            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
             .setShouldHideNameplate(true));
 
     public static final RegistryObject<Item> GREEN_ANBU_MASK = ITEMS.register("green_anbu_mask", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, EquipmentSlot.HEAD,  new Item.Properties().tab(NINJA_ARMOR))
+            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
             .setShouldHideNameplate(true));
 
     public static final RegistryObject<Item> BLUE_ANBU_MASK = ITEMS.register("blue_anbu_mask", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, EquipmentSlot.HEAD,  new Item.Properties().tab(NINJA_ARMOR))
+            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
             .setShouldHideNameplate(true));
 
     public static final RegistryObject<Item> MIST_ANBU_MASK = ITEMS.register("mist_anbu_mask", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, EquipmentSlot.HEAD,  new Item.Properties().tab(NINJA_ARMOR))
+            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
             .setShouldHideNameplate(true));
 
     public static final RegistryObject<Item> LONELY_MARCH = ITEMS.register("lonely_march", ()
-            -> new RecordItem(41, NarutoSounds.LONELY_MARCH,  new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).rarity(Rarity.RARE)));
+            -> new RecordItem(14, NarutoSounds.LONELY_MARCH, new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 41 * 20));
 
-
-    // Ninja Masks
-
+    // Ninja Headbands
     private static RegistryObject<Item> createHeadband(String itemName) {
         return ITEMS.register(itemName, ()
-                -> new NarutoArmorItem(NarutoArmorMaterial.HEADBAND, EquipmentSlot.HEAD,  new Item.Properties().tab(HEADBANDS)));
+                -> new NarutoArmorItem(NarutoArmorMaterial.HEADBAND, ArmorItem.Type.HELMET, new Item.Properties()));
     }
 
-    //    BLANK(0, "blankBlueHeadBand", "headband_blank);"),
     public static final RegistryObject<Item> HEADBAND_BLUE = createHeadband("headband_blue");
-    //    BLANK_BLACK(1, "blankBlackHeadBand", "headband_black);"),
     public static final RegistryObject<Item> HEADBAND_BLACK = createHeadband("headband_black");
-    //    BLANK_RED(2, "blankRedHeadBand", "headband_kred);"),
     public static final RegistryObject<Item> HEADBAND_RED = createHeadband("headband_red");
-    //    CUSTARD(4, "custardHeadband", "headband_custard);"),
     public static final RegistryObject<Item> HEADBAND_CUSTARD = createHeadband("headband_custard");
-
 
     public static final RegistryObject<Item> HEADBAND_LEAF = createHeadband("headband_leaf");
     public static final RegistryObject<Item> HEADBAND_LEAF_SCRATCHED = createHeadband("headband_leaf_scratched");
@@ -127,15 +100,76 @@ public class NarutoItems {
     public static final RegistryObject<Item> HEADBAND_GRASS = createHeadband("headband_grass");
     public static final RegistryObject<Item> HEADBAND_GRASS_SCRATCHED = createHeadband("headband_grass_scratched");
 
-
     public static final RegistryObject<Item> HEADBAND_PRIDE = createHeadband("headband_pride");
     public static final RegistryObject<Item> HEADBAND_YOUTUBE = createHeadband("headband_youtube");
     public static final RegistryObject<Item> HEADBAND_LAVA = createHeadband("headband_lava");
 
-    // Materials
+    // Creative Tabs
+    public static final RegistryObject<CreativeModeTab> NINJA_WEAPONS_TAB = CREATIVE_MODE_TABS.register("narutomod_weapons", () ->
+            CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.narutomod_weapons"))
+                    .icon(() -> new ItemStack(KUNAI.get()))
+                    .displayItems((parameters, output) -> {
+                        output.accept(KUNAI.get());
+                        output.accept(SENBON.get());
+                        output.accept(EXPLOSIVE_KUNAI.get());
+                        output.accept(SHURIKEN.get());
+                        output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
+                        output.accept(NarutoBlocks.ITEM_BONSAI_TREE.get());
+                    })
+                    .build());
+
+    public static final RegistryObject<CreativeModeTab> NINJA_ARMOR_TAB = CREATIVE_MODE_TABS.register("narutomod_armor", () ->
+            CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.narutomod_armor"))
+                    .icon(() -> new ItemStack(RED_ANBU_MASK.get()))
+                    .displayItems((parameters, output) -> {
+                        output.accept(RED_ANBU_MASK.get());
+                        output.accept(YELLOW_ANBU_MASK.get());
+                        output.accept(GREEN_ANBU_MASK.get());
+                        output.accept(BLUE_ANBU_MASK.get());
+                        output.accept(MIST_ANBU_MASK.get());
+                        output.accept(LONELY_MARCH.get());
+                    })
+                    .build());
+
+    public static final RegistryObject<CreativeModeTab> HEADBANDS_TAB = CREATIVE_MODE_TABS.register("narutomod_headbands", () ->
+            CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.narutomod_headbands"))
+                    .icon(() -> new ItemStack(HEADBAND_BLUE.get()))
+                    .displayItems((parameters, output) -> {
+                        output.accept(HEADBAND_BLUE.get());
+                        output.accept(HEADBAND_BLACK.get());
+                        output.accept(HEADBAND_RED.get());
+                        output.accept(HEADBAND_CUSTARD.get());
+                        output.accept(HEADBAND_LEAF.get());
+                        output.accept(HEADBAND_LEAF_SCRATCHED.get());
+                        output.accept(HEADBAND_LEAF_BLACK.get());
+                        output.accept(HEADBAND_LEAF_BLACK_SCRATCHED.get());
+                        output.accept(HEADBAND_ROCK.get());
+                        output.accept(HEADBAND_ROCK_SCRATCHED.get());
+                        output.accept(HEADBAND_SAND.get());
+                        output.accept(HEADBAND_SAND_SCRATCHED.get());
+                        output.accept(HEADBAND_SOUND.get());
+                        output.accept(HEADBAND_SOUND_SCRATCHED.get());
+                        output.accept(HEADBAND_MIST.get());
+                        output.accept(HEADBAND_MIST_SCRATCHED.get());
+                        output.accept(HEADBAND_WATERFALL.get());
+                        output.accept(HEADBAND_WATERFALL_SCRATCHED.get());
+                        output.accept(HEADBAND_CLOUD.get());
+                        output.accept(HEADBAND_CLOUD_SCRATCHED.get());
+                        output.accept(HEADBAND_RAIN.get());
+                        output.accept(HEADBAND_RAIN_SCRATCHED.get());
+                        output.accept(HEADBAND_GRASS.get());
+                        output.accept(HEADBAND_GRASS_SCRATCHED.get());
+                        output.accept(HEADBAND_PRIDE.get());
+                        output.accept(HEADBAND_YOUTUBE.get());
+                        output.accept(HEADBAND_LAVA.get());
+                    })
+                    .build());
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
+        CREATIVE_MODE_TABS.register(eventBus);
     }
-
 }

@@ -3,7 +3,7 @@ package com.sekwah.narutomod.capabilities.toggleabilitydata;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
@@ -12,11 +12,6 @@ import java.util.Objects;
 
 /**
  * Tracks ability references and other information for the server side.
- *
- * On client side the ticks tracked will be since the client knows the ability is active.
- * Do not use it for reliable triggering for effects or behavior when the user is not the player itssself.
- *
- * Try to keep as much behavior solely to server side as you can.
  */
 public class ToggleAbilityData {
 
@@ -36,7 +31,7 @@ public class ToggleAbilityData {
 
     public boolean addAbilityStarted(Player player, INinjaData ninjaData, Ability ability) {
         if (ability.activationType() == Ability.ActivationType.TOGGLE && ability.logInChat()) {
-            player.sendMessage(new TranslatableComponent("jutsu.toggle.enabled", new TranslatableComponent(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN), null);
+            player.sendSystemMessage(Component.translatable("jutsu.toggle.enabled", Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
         }
         return this.addAbility(ability.getRegistryName());
     }
@@ -44,7 +39,7 @@ public class ToggleAbilityData {
     public boolean removeAbilityEnded(Player player, INinjaData ninjaData, Ability ability) {
         if(ability instanceof Ability.HandleEnded endedAbility) endedAbility.handleAbilityEnded(player, ninjaData, 0);
         if (ability.activationType() == Ability.ActivationType.TOGGLE && ability.logInChat()) {
-            player.sendMessage(new TranslatableComponent("jutsu.toggle.disabled", new TranslatableComponent(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.RED), null);
+            player.sendSystemMessage(Component.translatable("jutsu.toggle.disabled", Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.RED));
         }
         return this.removeAbility(ability.getRegistryName());
     }

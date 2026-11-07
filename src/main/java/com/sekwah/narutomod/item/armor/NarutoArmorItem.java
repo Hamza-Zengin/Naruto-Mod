@@ -11,7 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.IItemRenderProperties;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
@@ -22,8 +22,8 @@ public class NarutoArmorItem extends ArmorItem implements IShouldHideNameplate {
     private String armorTexture = null;
     private boolean forceHideName = false;
 
-    public NarutoArmorItem(ArmorMaterial p_i48534_1_, EquipmentSlot p_i48534_2_, Properties p_i48534_3_) {
-        super(p_i48534_1_, p_i48534_2_, p_i48534_3_);
+    public NarutoArmorItem(ArmorMaterial material, ArmorItem.Type type, Properties properties) {
+        super(material, type, properties);
     }
 
     @Nullable
@@ -52,22 +52,20 @@ public class NarutoArmorItem extends ArmorItem implements IShouldHideNameplate {
         return this.forceHideName;
     }
 
-
-    // A little confusing but this is how it works now
     @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         super.initializeClient(consumer);
-        consumer.accept(new IItemRenderProperties() {
+        consumer.accept(new IClientItemExtensions() {
 
             @Override
-            public BlockEntityWithoutLevelRenderer getItemStackRenderer()
+            public BlockEntityWithoutLevelRenderer getCustomRenderer()
             {
                 return NarutoRenderEvents.NARUTO_RENDERER;
             }
 
             @Override
-            public HumanoidModel getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot, HumanoidModel _default) {
-                return armorModel;
+            public HumanoidModel<?> getHumanoidArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot, HumanoidModel<?> _default) {
+                return armorModel != null ? armorModel : _default;
             }
         });
     }

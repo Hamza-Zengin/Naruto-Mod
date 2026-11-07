@@ -50,6 +50,7 @@ public class NarutoMod {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         eventBus.addListener(this::clientSetup);
+        eventBus.addListener(NarutoKeyHandler::onRegisterKeyMappings);
         eventBus.addListener(this::setup);
         eventBus.addListener(this::registerCapabilities);
         eventBus.addListener(this::registerCapabilitySync);
@@ -61,6 +62,7 @@ public class NarutoMod {
         NarutoBlocks.register(eventBus);
         NarutoEntities.register(eventBus);
         NarutoAbilities.register(eventBus);
+        com.sekwah.narutomod.clans.NarutoClans.register(eventBus);
 
         DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> NarutoInGameGUI::new);
 
@@ -70,7 +72,6 @@ public class NarutoMod {
 
     private void clientSetup(FMLClientSetupEvent event) {
         NarutoRenderEvents.registerRenderTypes();
-        NarutoKeyHandler.registerKeyBinds();
     }
 
     private void setup(FMLCommonSetupEvent event) {

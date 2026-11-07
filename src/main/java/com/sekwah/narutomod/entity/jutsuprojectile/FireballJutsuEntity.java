@@ -1,6 +1,5 @@
 package com.sekwah.narutomod.entity.jutsuprojectile;
 
-import com.sekwah.narutomod.damagesource.NarutoDamageSource;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -18,9 +17,7 @@ import net.minecraft.world.phys.HitResult;
 public class FireballJutsuEntity extends AbstractHurtingProjectile {
 
     public int time;
-    // Ticks in rain before destroying
     public int lifeSpan = 70;
-    // For now flat but may want to alter or make customisable later
     public float explosionPower = 2;
 
     public static final float INITIAL_SCALE = 0.1f;
@@ -43,11 +40,10 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
             this.yPower = p_36822_ / d0 * 0.2D;
             this.zPower = p_36823_ / d0 * 0.2D;
         }
-
     }
 
     public FireballJutsuEntity(LivingEntity player, double xVel, double yVel, double zVel) {
-        this(NarutoEntities.FIREBALL_JUTSU.get(), player.getX(), player.getEyeY() - 0.2f, player.getZ(),  xVel, yVel, zVel, player.getLevel());
+        this(NarutoEntities.FIREBALL_JUTSU.get(), player.getX(), player.getEyeY() - 0.2f, player.getZ(), xVel, yVel, zVel, player.level());
         this.setOwner(player);
         this.setRot(player.getYRot(), player.getXRot());
     }
@@ -63,7 +59,6 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
         ++this.time;
         this.refreshDimensions();
 
-
         if (this.isInWaterOrRain()) {
             lifeSpan--;
             if (lifeSpan % 5 == 0) {
@@ -72,8 +67,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
         }
 
         if (this.isInWater() || lifeSpan-- <= 0) {
-
-            if(this.level instanceof ServerLevel serverLevel) {
+            if(this.level() instanceof ServerLevel serverLevel) {
                 serverLevel.sendParticles(ParticleTypes.CLOUD,
                         this.getX(),
                         this.getY() + this.getBbHeight() + 1,
@@ -90,7 +84,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
     protected void onHit(HitResult hitResult) {
         super.onHit(hitResult);
 
-        if(this.level instanceof ServerLevel serverLevel) {
+        if(this.level() instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ParticleTypes.FLAME,
                     this.getX() + (double) (this.random.nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(),
                     this.getY() + this.getBbHeight() / 2 + (double) (this.random.nextFloat() * this.getBbHeight()),
@@ -99,17 +93,15 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
                     this.getBbWidth(), this.getBbWidth(), this.getBbHeight(), 1);
         }
 
-        if (!this.level.isClientSide) {
-
+        if (!this.level().isClientSide) {
             int flameRadius = 12;
-            this.level.getEntities(this, this.getBoundingBox().inflate(flameRadius, flameRadius, flameRadius)).forEach(entity -> {
+            this.level().getEntities(this, this.getBoundingBox().inflate(flameRadius, flameRadius, flameRadius)).forEach(entity -> {
                 double distance = this.position().distanceToSqr(entity.position());
-                // Remember increasing the division reduces the falloff (I keep accidentally moving it the wrong way)
                 float fireSecs = (float) (8f - (distance / 6f)) * 20;
                 float fireDamage = (float) (12f - (distance / 4f));
                 if(fireDamage > 0) {
                     Entity entity1 = this.getOwner();
-                    entity.hurt(NarutoDamageSource.fireball(this, entity1), fireDamage);
+                    entity.hurt(this.level().damageSources().fireball(this, entity1), fireDamage);
                     if (entity1 instanceof LivingEntity) {
                         this.doEnchantDamageEffects((LivingEntity)entity1, entity);
                     }
@@ -119,7 +111,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
                 }
             });
 
-            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level, this.getOwner());
+            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level(), this.getOwner());
 
             if(flag) {
                 int fireSpread = 2;
@@ -127,8 +119,8 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
                     for (int y = (int) this.getY() - fireSpread + 1; y < (int) this.getY() + fireSpread; y++) {
                         for (int z = (int) this.getZ() - fireSpread + 1; z < (int) this.getZ() + fireSpread; z++) {
                             BlockPos blockPos = new BlockPos(x, y, z);
-                            if (this.random.nextInt(2) == 0 && this.level.getBlockState(blockPos).isAir()) {
-                                this.level.setBlockAndUpdate(blockPos, BaseFireBlock.getState(this.level, blockPos));
+                            if (this.random.nextInt(2) == 0 && this.level().getBlockState(blockPos).isAir()) {
+                                this.level().setBlockAndUpdate(blockPos, BaseFireBlock.getState(this.level(), blockPos));
                             }
                         }
                     }
@@ -136,10 +128,8 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
             }
 
             this.playSound(SoundEvents.GENERIC_EXPLODE, 4f, 1.0f);
-
             this.discard();
         }
-
     }
 
     @Override
@@ -188,6 +178,5 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
             this.yPower = d1 / d3 * 0.2D;
             this.zPower = d2 / d3 * 0.2D;
         }
-
     }
 }

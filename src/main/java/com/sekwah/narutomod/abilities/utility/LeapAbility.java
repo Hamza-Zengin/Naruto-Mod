@@ -5,7 +5,7 @@ import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import com.sekwah.sekclib.player.PlayerUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -29,11 +29,11 @@ public class LeapAbility extends Ability {
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         if(!player.isOnGround()) {
-            player.displayClientMessage(new TranslatableComponent("jutsu.fail.notonground", new TranslatableComponent("jutsu.leap").withStyle(ChatFormatting.YELLOW)), true);
+            player.displayClientMessage(Component.translatable("jutsu.fail.notonground", Component.translatable("jutsu.leap").withStyle(ChatFormatting.YELLOW)), true);
             return false;
         }
         if(ninjaData.getStamina() < 10) {
-            player.displayClientMessage(new TranslatableComponent("jutsu.fail.notenoughstamina", new TranslatableComponent("jutsu.leap").withStyle(ChatFormatting.YELLOW)), true);
+            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughstamina", Component.translatable("jutsu.leap").withStyle(ChatFormatting.YELLOW)), true);
             return false;
         }
         ninjaData.useStamina(10, 40);
@@ -46,7 +46,7 @@ public class LeapAbility extends Ability {
         float horScale = 2.41f;
         PlayerUtil.setVelocity(player, lookVector.x * horScale, (lookVector.y + 0.8F)
                 , lookVector.z * horScale, true);
-        player.getLevel().playSound(null,
-                player, NarutoSounds.LEAP.get(), SoundSource.PLAYERS, 0.5f, 1.0f);
+        player.level().playSound(null,
+                player.getX(), player.getY(), player.getZ(), NarutoSounds.LEAP.get(), SoundSource.PLAYERS, 0.5f, 1.0f);
     }
 }

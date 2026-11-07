@@ -1,14 +1,14 @@
 modLoader="javafml"
-loaderVersion="[38,)"
-issueTrackerURL="https://github.com/sekwah41/Naruto-Mod/issues"
+loaderVersion="[47,)"
+issueTrackerURL="https://github.com/Hamza-Zengin/Naruto-Mod/issues"
 license="All rights reserved"
 [[mods]]
     modId="narutomod"
     version="${file.jarVersion}"
-    displayName="Sekwah41's Naruto mod"
+    displayName="Naruto Mod"
     updateJSONURL="https://www.sekwah.com/modversions/narutomod.json"
     displayURL="http://www.planetminecraft.com/mod/naruto-mod-1750133/"
-    authors="Sekwah41"
+    authors="Sekwah41, Hamza Zengin"
     logoFile="narutologo.png"
     description='''
 A mod that adds new items and other features to the game that are from/based on the Naruto manga.
@@ -17,7 +17,7 @@ A mod that adds new items and other features to the game that are from/based on 
 [[dependencies.narutomod]]
     modId="forge"
     mandatory=true
-    versionRange="[38,)"
+    versionRange="[47,)"
     ordering="NONE"
     side="BOTH"
 
@@ -25,7 +25,7 @@ A mod that adds new items and other features to the game that are from/based on 
 [[dependencies.narutomod]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18,)"
+    versionRange="[1.20.1,1.21)"
     ordering="NONE"
     side="BOTH"
 

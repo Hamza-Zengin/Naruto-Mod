@@ -28,8 +28,12 @@ public class NarutoSounds {
 
     public static final RegistryObject<SoundEvent> LONELY_MARCH = register("lonely_march");
 
+    public static final RegistryObject<SoundEvent> CHIDORI = register("chidori");
+    public static final RegistryObject<SoundEvent> RASENGAN = register("rasengan");
+    public static final RegistryObject<SoundEvent> CLONE_POOF = register("clone_poof");
+
     private static RegistryObject<SoundEvent> register(String key) {
-        return SOUNDS.register(key, () -> new SoundEvent(new ResourceLocation(MOD_ID, key)));
+        return SOUNDS.register(key, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, key)));
     }
 
     public static void register(IEventBus eventBus) {

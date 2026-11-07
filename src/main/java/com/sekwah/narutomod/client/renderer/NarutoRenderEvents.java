@@ -49,7 +49,13 @@ public class NarutoRenderEvents {
         event.registerEntityRenderer(NarutoEntities.PAPER_BOMB.get(), PaperBombRenderer::new);
 
         event.registerEntityRenderer(NarutoEntities.FIREBALL_JUTSU.get(), FireballJutsuRenderer::new);
-
+        event.registerEntityRenderer(NarutoEntities.SHADOW_CLONE.get(), (ctx) ->
+                new net.minecraft.client.renderer.entity.HumanoidMobRenderer<>(ctx, new net.minecraft.client.model.HumanoidModel<>(ctx.bakeLayer(net.minecraft.client.model.geom.ModelLayers.PLAYER)), 0.5f) {
+                    @Override
+                    public ResourceLocation getTextureLocation(com.sekwah.narutomod.entity.ShadowCloneEntity entity) {
+                        return new ResourceLocation("minecraft", "textures/entity/player/slim/alex.png");
+                    }
+                });
     }
 
     public static void registerRenderTypes() {
