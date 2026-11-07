@@ -2,6 +2,7 @@ package com.sekwah.narutomod.abilities;
 
 import com.sekwah.narutomod.capabilities.CooldownTickEvent;
 import com.sekwah.narutomod.capabilities.INinjaData;
+import com.sekwah.narutomod.capabilities.NinjaRank;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -31,6 +32,10 @@ public abstract class Ability {
     public Ability setRegistryName(ResourceLocation registryName) {
         this.registryName = registryName;
         return this;
+    }
+
+    public NinjaRank getRequiredRank() {
+        return NinjaRank.GENIN;
     }
 
     public enum ActivationType {

@@ -27,11 +27,21 @@ public interface INinjaData extends INBTSerializable<Tag> {
     ResourceLocation getClan();
     void setClan(ResourceLocation clan);
 
+    boolean isClanLocked();
+    void setClanLocked(boolean locked);
+
     String getRank();
     void setRank(String rank);
 
     float getChakraExp();
     void addChakraExp(float amount);
+
+    boolean isAbilityUnlocked(Ability ability);
+    boolean isAbilityUnlocked(ResourceLocation abilityId);
+    void unlockAbility(ResourceLocation abilityId);
+    java.util.Set<ResourceLocation> getUnlockedAbilities();
+    String getUnlockedJutsusString();
+    void setUnlockedJutsusString(String jutsus);
 
     HashMap<String, CooldownTickEvent> getCooldownEvents();
 
@@ -45,3 +55,4 @@ public interface INinjaData extends INBTSerializable<Tag> {
 
     void scheduleDelayedTickEvent(Consumer<Player> consumer, int tickDelay);
 }
+

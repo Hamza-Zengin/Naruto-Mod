@@ -39,6 +39,9 @@ public class NarutoEntities {
     public static final RegistryObject<EntityType<FireballJutsuEntity>> FIREBALL_JUTSU = register("fireball_jutsu",
             EntityType.Builder.<FireballJutsuEntity>of(FireballJutsuEntity::new, MobCategory.MISC).sized(1.5F, 1.5F).clientTrackingRange(4).updateInterval(10));
 
+    public static final RegistryObject<EntityType<com.sekwah.narutomod.entity.projectile.SmokeBombEntity>> SMOKE_BOMB = register("smoke_bomb",
+            EntityType.Builder.<com.sekwah.narutomod.entity.projectile.SmokeBombEntity>of(com.sekwah.narutomod.entity.projectile.SmokeBombEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(10));
+
     public static final RegistryObject<EntityType<ShadowCloneEntity>> SHADOW_CLONE = register("shadow_clone",
             EntityType.Builder.<ShadowCloneEntity>of(ShadowCloneEntity::new, MobCategory.CREATURE).sized(0.6F, 1.8F).clientTrackingRange(8));
 

@@ -48,6 +48,12 @@ public class NarutoAbilities {
     public static final RegistryObject<SharinganAbility> SHARINGAN = ABILITY.register("sharingan", SharinganAbility::new);
     public static final RegistryObject<ByakuganAbility> BYAKUGAN = ABILITY.register("byakugan", ByakuganAbility::new);
 
+    // Advanced & Forbidden Jutsus
+    public static final RegistryObject<AmaterasuAbility> AMATERASU = ABILITY.register("amaterasu", AmaterasuAbility::new);
+    public static final RegistryObject<SusanooRibcageAbility> SUSANOO_RIBCAGE = ABILITY.register("susanoo_ribcage", SusanooRibcageAbility::new);
+    public static final RegistryObject<EightGatesAbility> EIGHT_GATES = ABILITY.register("eight_gates", EightGatesAbility::new);
+    public static final RegistryObject<KirinAbility> KIRIN = ABILITY.register("kirin", KirinAbility::new);
+
     public static void register(IEventBus eventBus) {
         ABILITY.register(eventBus);
     }

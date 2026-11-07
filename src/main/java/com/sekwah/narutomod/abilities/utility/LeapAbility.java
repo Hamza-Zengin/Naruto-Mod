@@ -18,6 +18,11 @@ public class LeapAbility extends Ability {
     }
 
     @Override
+    public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
+        return com.sekwah.narutomod.capabilities.NinjaRank.ACADEMY_STUDENT;
+    }
+
+    @Override
     public boolean logInChat() {
         return false;
     }

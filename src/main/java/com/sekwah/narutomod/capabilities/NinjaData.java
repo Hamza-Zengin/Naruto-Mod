@@ -43,10 +43,16 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private ResourceLocation clan;
 
     @Sync
+    private boolean clanLocked = false;
+
+    @Sync
     private String rank = "GENIN";
 
     @Sync
     private float chakraExp = 0;
+
+    @Sync
+    private String unlockedJutsus = "";
 
     @Sync(minTicks = 1)
     private ResourceLocation currentlyChanneled;
@@ -67,6 +73,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             this.chakra = this.maxChakra;
             this.stamina = this.maxStamina;
             this.clan = new ResourceLocation(NarutoMod.MOD_ID, "shinobi");
+            this.clanLocked = false;
+            this.unlockedJutsus = "";
         }
         this.toggleAbilityData = new ToggleAbilityData();
     }
@@ -96,8 +104,10 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private static final String MAX_CHAKRA_TAG = "maxChakra";
     private static final String MAX_STAMINA_TAG = "maxStamina";
     private static final String CLAN_TAG = "clan";
+    private static final String CLAN_LOCKED_TAG = "clanLocked";
     private static final String RANK_TAG = "rank";
     private static final String CHAKRA_EXP_TAG = "chakraExp";
+    private static final String UNLOCKED_JUTSUS_TAG = "unlockedJutsus";
 
     private final LazyOptional<INinjaData> holder = LazyOptional.of(() -> this);
 
@@ -150,7 +160,21 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public void setClan(ResourceLocation clan) {
+        // Clan cannot be changed once locked!
+        if (this.clanLocked) {
+            return;
+        }
         this.clan = clan;
+    }
+
+    @Override
+    public boolean isClanLocked() {
+        return this.clanLocked;
+    }
+
+    @Override
+    public void setClanLocked(boolean locked) {
+        this.clanLocked = locked;
     }
 
     @Override
@@ -161,6 +185,74 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Override
     public void setRank(String rank) {
         this.rank = rank;
+    }
+
+    @Override
+    public boolean isAbilityUnlocked(Ability ability) {
+        if (ability == null) return false;
+        return isAbilityUnlocked(ability.getRegistryName());
+    }
+
+    @Override
+    public boolean isAbilityUnlocked(ResourceLocation abilityId) {
+        if (abilityId == null) return false;
+        Ability ability = NarutoAbilities.getAbility(abilityId);
+        if (ability == null) return false;
+
+        // Basic utility always unlocked
+        if (ability.getRequiredRank() == NinjaRank.ACADEMY_STUDENT) {
+            return true;
+        }
+
+        // Unlocked explicitly via scroll or training
+        if (getUnlockedAbilities().contains(abilityId)) {
+            return true;
+        }
+
+        // Check if player rank meets or exceeds requirement
+        NinjaRank playerRank = NinjaRank.fromString(this.getRank());
+        if (playerRank.getLevel() >= ability.getRequiredRank().getLevel()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void unlockAbility(ResourceLocation abilityId) {
+        if (abilityId == null) return;
+        java.util.Set<ResourceLocation> unlocked = getUnlockedAbilities();
+        if (!unlocked.contains(abilityId)) {
+            if (this.unlockedJutsus == null || this.unlockedJutsus.isEmpty()) {
+                this.unlockedJutsus = abilityId.toString();
+            } else {
+                this.unlockedJutsus = this.unlockedJutsus + "," + abilityId.toString();
+            }
+        }
+    }
+
+    @Override
+    public java.util.Set<ResourceLocation> getUnlockedAbilities() {
+        java.util.HashSet<ResourceLocation> set = new java.util.HashSet<>();
+        if (this.unlockedJutsus != null && !this.unlockedJutsus.isEmpty()) {
+            String[] split = this.unlockedJutsus.split(",");
+            for (String s : split) {
+                if (!s.trim().isEmpty()) {
+                    set.add(new ResourceLocation(s.trim()));
+                }
+            }
+        }
+        return set;
+    }
+
+    @Override
+    public String getUnlockedJutsusString() {
+        return this.unlockedJutsus != null ? this.unlockedJutsus : "";
+    }
+
+    @Override
+    public void setUnlockedJutsusString(String jutsus) {
+        this.unlockedJutsus = jutsus != null ? jutsus : "";
     }
 
     @Override
@@ -320,8 +412,12 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         if (this.clan != null) {
             nbt.putString(CLAN_TAG, this.clan.toString());
         }
+        nbt.putBoolean(CLAN_LOCKED_TAG, this.clanLocked);
         nbt.putString(RANK_TAG, this.rank != null ? this.rank : "GENIN");
         nbt.putFloat(CHAKRA_EXP_TAG, this.chakraExp);
+        if (this.unlockedJutsus != null) {
+            nbt.putString(UNLOCKED_JUTSUS_TAG, this.unlockedJutsus);
+        }
         return nbt;
     }
 
@@ -339,11 +435,17 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             if (compoundTag.contains(CLAN_TAG)) {
                 this.clan = new ResourceLocation(compoundTag.getString(CLAN_TAG));
             }
+            if (compoundTag.contains(CLAN_LOCKED_TAG)) {
+                this.clanLocked = compoundTag.getBoolean(CLAN_LOCKED_TAG);
+            }
             if (compoundTag.contains(RANK_TAG)) {
                 this.rank = compoundTag.getString(RANK_TAG);
             }
             if (compoundTag.contains(CHAKRA_EXP_TAG)) {
                 this.chakraExp = compoundTag.getFloat(CHAKRA_EXP_TAG);
+            }
+            if (compoundTag.contains(UNLOCKED_JUTSUS_TAG)) {
+                this.unlockedJutsus = compoundTag.getString(UNLOCKED_JUTSUS_TAG);
             }
         }
     }

@@ -47,6 +47,7 @@ public class NarutoRenderEvents {
         event.registerEntityRenderer(NarutoEntities.SENBON.get(), SenbonRenderer::new);
         event.registerEntityRenderer(NarutoEntities.SHURIKEN.get(), ShurikenRenderer::new);
         event.registerEntityRenderer(NarutoEntities.PAPER_BOMB.get(), PaperBombRenderer::new);
+        event.registerEntityRenderer(NarutoEntities.SMOKE_BOMB.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
 
         event.registerEntityRenderer(NarutoEntities.FIREBALL_JUTSU.get(), FireballJutsuRenderer::new);
         event.registerEntityRenderer(NarutoEntities.SHADOW_CLONE.get(), (ctx) ->

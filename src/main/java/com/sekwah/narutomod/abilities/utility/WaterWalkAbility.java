@@ -23,6 +23,11 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
     }
 
     @Override
+    public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
+        return com.sekwah.narutomod.capabilities.NinjaRank.ACADEMY_STUDENT;
+    }
+
+    @Override
     public long defaultCombo() {
         return 3;
     }

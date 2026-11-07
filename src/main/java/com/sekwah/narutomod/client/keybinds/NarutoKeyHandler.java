@@ -42,12 +42,14 @@ public class NarutoKeyHandler {
     private static KeyBindingTickHeld JUTSU_C_KEY;
     private static KeyBindingTickHeld JUTSU_V_KEY;
     private static KeyBindingTickHeld JUTSU_B_KEY;
+    private static KeyBindingTickHeld NINJA_MENU_KEY;
 
     public static void registerKeyBinds() {
         LEAP_KEY = registerKeyBind("naruto.keys.leap", KeyEvent.VK_X);
         JUTSU_C_KEY = registerKeyBind("naruto.keys.key1", KeyEvent.VK_C);
         JUTSU_V_KEY = registerKeyBind("naruto.keys.key2", KeyEvent.VK_V);
         JUTSU_B_KEY = registerKeyBind("naruto.keys.key3", KeyEvent.VK_B);
+        NINJA_MENU_KEY = registerKeyBind("naruto.keys.ninja_menu", KeyEvent.VK_J);
 
         JUTSU_KEYS.add(LEAP_KEY);
         JUTSU_KEYS.add(JUTSU_C_KEY);
@@ -64,6 +66,13 @@ public class NarutoKeyHandler {
         JUTSU_C_KEY.registerClickConsumer(() -> handleJustuKey(1));
         JUTSU_V_KEY.registerClickConsumer(() -> handleJustuKey(2));
         JUTSU_B_KEY.registerClickConsumer(() -> handleJustuKey(3));
+
+        NINJA_MENU_KEY.registerClickConsumer(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null && mc.screen == null) {
+                mc.setScreen(new com.sekwah.narutomod.client.gui.NinjaMenuScreen());
+            }
+        });
     }
 
     public static KeyBindingTickHeld registerKeyBind(String name, int keyCode) {
@@ -80,6 +89,9 @@ public class NarutoKeyHandler {
         registerKeyBinds();
         for (KeyBindingTickHeld key : JUTSU_KEYS) {
             event.register(key);
+        }
+        if (NINJA_MENU_KEY != null) {
+            event.register(NINJA_MENU_KEY);
         }
     }
 
@@ -125,6 +137,9 @@ public class NarutoKeyHandler {
         for (KeyBindingTickHeld key : JUTSU_KEYS) {
             key.update();
         }
+        if (NINJA_MENU_KEY != null) {
+            NINJA_MENU_KEY.update();
+        }
     }
 
     private static void checkCharging(KeyBindingTickHeld currentKey, boolean isHoldingLastKey) {
@@ -164,5 +179,13 @@ public class NarutoKeyHandler {
             }
             resetJutsuCasting();
         }
+    }
+
+    public static long getCurrentJutsuCombo() {
+        return currentJutsuCombo;
+    }
+
+    public static int getTicksSinceLastKey() {
+        return ticksSinceLastKey;
     }
 }

@@ -23,6 +23,11 @@ public class ChakraDashAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
+        return com.sekwah.narutomod.capabilities.NinjaRank.ACADEMY_STUDENT;
+    }
+
+    @Override
     public long defaultCombo() {
         return 22;
     }

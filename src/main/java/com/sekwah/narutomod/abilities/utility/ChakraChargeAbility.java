@@ -15,6 +15,11 @@ public class ChakraChargeAbility extends Ability implements Ability.Channeled {
     }
 
     @Override
+    public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
+        return com.sekwah.narutomod.capabilities.NinjaRank.ACADEMY_STUDENT;
+    }
+
+    @Override
     public long defaultCombo() {
         return 1;
     }

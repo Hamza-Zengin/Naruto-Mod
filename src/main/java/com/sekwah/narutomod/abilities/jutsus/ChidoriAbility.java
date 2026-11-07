@@ -29,6 +29,11 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
+        return com.sekwah.narutomod.capabilities.NinjaRank.CHUNIN;
+    }
+
+    @Override
     public long defaultCombo() {
         return 213;
     }

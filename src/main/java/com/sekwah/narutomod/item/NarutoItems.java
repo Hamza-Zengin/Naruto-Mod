@@ -36,6 +36,15 @@ public class NarutoItems {
     public static final RegistryObject<Item> SHURIKEN = ITEMS.register("shuriken", ()
             -> new ShurikenItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> SMOKE_BOMB = ITEMS.register("smoke_bomb", ()
+            -> new com.sekwah.narutomod.item.weapons.SmokeBombItem(new Item.Properties().stacksTo(16)));
+
+    public static final RegistryObject<Item> MILITARY_RATIONS_PILL = ITEMS.register("military_rations_pill", ()
+            -> new MilitaryRationsPillItem(new Item.Properties().stacksTo(16)));
+
+    public static final RegistryObject<Item> JUTSU_SCROLL = ITEMS.register("jutsu_scroll", ()
+            -> new JutsuScrollItem(new Item.Properties().stacksTo(16)));
+
     // Armor
     public static final RegistryObject<Item> RED_ANBU_MASK = ITEMS.register("red_anbu_mask", ()
             -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
@@ -114,6 +123,9 @@ public class NarutoItems {
                         output.accept(SENBON.get());
                         output.accept(EXPLOSIVE_KUNAI.get());
                         output.accept(SHURIKEN.get());
+                        output.accept(SMOKE_BOMB.get());
+                        output.accept(MILITARY_RATIONS_PILL.get());
+                        output.accept(JUTSU_SCROLL.get());
                         output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
                         output.accept(NarutoBlocks.ITEM_BONSAI_TREE.get());
                     })
