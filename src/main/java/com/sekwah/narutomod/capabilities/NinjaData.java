@@ -205,7 +205,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         if (id == null) return false;
         String path = id.getPath();
         return path.equals("rasengan") || path.equals("chidori") || path.equals("shadow_clone")
-                || path.equals("kirin") || path.equals("amaterasu") || path.equals("susanoo_ribcage");
+                || path.equals("kirin") || path.equals("amaterasu") || path.equals("susanoo_ribcage")
+                || path.equals("eight_gates");
     }
 
     @Override
@@ -235,6 +236,11 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             // Mangekyo jutsus also strictly require Uchiha bloodline
             if (abilityId.getPath().equals("amaterasu") || abilityId.getPath().equals("susanoo_ribcage")) {
                 return this.clan != null && this.clan.getPath().equals("uchiha");
+            }
+            // Eight Gates also requires Jonin rank to withstand the forbidden strain
+            if (abilityId.getPath().equals("eight_gates")) {
+                NinjaRank playerRank = NinjaRank.fromString(this.getRank());
+                return playerRank.getLevel() >= NinjaRank.JONIN.getLevel();
             }
             return true;
         }

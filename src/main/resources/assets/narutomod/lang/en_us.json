@@ -125,6 +125,7 @@
   "item.narutomod.scroll_kirin": "Jutsu Scroll: Kirin",
   "item.narutomod.scroll_amaterasu": "Forbidden Scroll: Amaterasu",
   "item.narutomod.scroll_susanoo": "Forbidden Scroll: Susanoo",
+  "item.narutomod.scroll_eight_gates": "Forbidden Scroll: Eight Gates",
   "naruto.rank.promoted": "Congratulations! You have been promoted to %s!",
   "naruto.rank.not_ready": "You have not met the requirements for this rank exam yet!",
   "jutsu.scroll.fail_clan": "Your chakra pathways violently reject this secret scroll! You lack the %s bloodline!",
@@ -138,5 +139,6 @@
   "jutsu.scroll.rank": "Classification: %s",
   "jutsu.scroll.desc": "Secret ninja scroll containing forbidden and elemental jutsu.",
   "jutsu.scroll.instruction": "Right-click to decipher and master the technique.",
-  "jutsu.eight_gates.cannot_close": "The Gate of Death cannot be closed once opened! Your body will burn to the very last spark of chakra!"
+  "jutsu.eight_gates.cannot_close": "The Gate of Death cannot be closed once opened! Your body will burn to the very last spark of chakra!",
+  "jutsu.susanoo.exhaustion": "Your chakra has depleted! Susanoo shattered and strained your optic nerves!"
 }

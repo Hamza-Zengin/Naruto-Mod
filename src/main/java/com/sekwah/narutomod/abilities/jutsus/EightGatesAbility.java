@@ -32,12 +32,12 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
 
     @Override
     public NinjaRank getRequiredRank() {
-        return NinjaRank.CHUNIN;
+        return NinjaRank.JONIN;
     }
 
     @Override
     public long defaultCombo() {
-        return 233; // V - B - B
+        return 2331; // V - B - B - C
     }
 
     @Override
@@ -47,25 +47,25 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
 
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
-        // 3x Godlike Taijutsu Buffs
+        // Godlike Taijutsu Buffs
         player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 4, false, false, true)); // Speed V
         player.addEffect(new MobEffectInstance(MobEffects.JUMP, 40, 3, false, false, false)); // Jump IV
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 6, false, false, true)); // Strength VII (+28 damage)
+        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 7, false, false, true)); // Strength VIII (+24 damage per punch)
         player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 1, false, false, false)); // Resistance II (40% dmg reduction)
-        player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 40, 2, false, false, false)); // Haste III
+        player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 40, 3, false, false, false)); // Haste IV
 
-        // Balanced stamina consumption: 0.10f per tick (~2 stamina per second)
-        // Allows a glorious 30-50 second combat frenzy before the death toll begins
-        if (ninjaData.getStamina() > 0.10f) {
-            ninjaData.useStamina(0.10f, 30);
+        // Heavy stamina consumption: 0.25f per tick (5 stamina per second)
+        // Grants an intense 20-30 second combat window before the fatal death toll begins!
+        if (ninjaData.getStamina() > 0.25f) {
+            ninjaData.useStamina(0.25f, 30);
         } else {
             ninjaData.setStamina(0);
-            // STAMINA EXHAUSTED: Body begins burning into ash!
+            // STAMINA EXHAUSTED: Body incinerates from internal heat!
             if (ticksActive % 20 == 0 && player.level() instanceof ServerLevel serverLevel) {
                 player.displayClientMessage(Component.translatable("jutsu.eight_gates.hp_drain").withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
                 
-                // Relentless 3x death toll: 4.5 HP (2.25 full hearts) direct unblockable damage every second!
-                player.hurt(serverLevel.damageSources().magic(), 4.5f);
+                // Relentless fatal toll: 7.0 HP (3.5 full hearts) direct unblockable damage every second!
+                player.hurt(serverLevel.damageSources().magic(), 7.0f);
 
                 serverLevel.playSound(null, player.blockPosition(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1.2f, 0.7f);
                 serverLevel.playSound(null, player.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1.0f, 0.5f);

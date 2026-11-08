@@ -427,7 +427,9 @@ public class NinjaMenuScreen extends Screen {
             // Acquisition Type
             String reqType;
             if (id != null && (id.getPath().equals("amaterasu") || id.getPath().equals("susanoo_ribcage"))) {
-                reqType = "§c[Uchiha Parşömeni]";
+                reqType = "§c[Uchiha Parşömeni - Jōnin]";
+            } else if (id != null && id.getPath().equals("eight_gates")) {
+                reqType = "§4[Yasak Parşömen - Jōnin]";
             } else if (id != null && id.getPath().equals("sharingan")) {
                 reqType = "§c[Uchiha Doğuştan]";
             } else if (id != null && id.getPath().equals("byakugan")) {

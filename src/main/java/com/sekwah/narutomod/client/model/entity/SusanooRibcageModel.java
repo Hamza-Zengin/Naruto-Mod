@@ -36,44 +36,70 @@ public class SusanooRibcageModel<T extends LivingEntity> extends HumanoidModel<T
                 .addBox(-1.0F, 0.0F, -4.6F, 2.0F, 13.0F, 1.4F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
-        // Pair 1: Top Ribs (Upper Chest)
+        // Pair 1: Top Ribs (Upper Chest) - Hollow anatomical curved arch
         bodyPart.addOrReplaceChild("rib_top_left", CubeListBuilder.create()
                 .texOffs(16, 0)
-                .addBox(2.0F, 0.5F, -4.0F, 4.5F, 1.4F, 8.0F, CubeDeformation.NONE),
+                .addBox(3.8F, 0.5F, -2.8F, 1.2F, 1.2F, 5.6F, CubeDeformation.NONE) // Lateral flank
+                .addBox(0.8F, 0.5F, -3.8F, 3.2F, 1.2F, 1.2F, CubeDeformation.NONE) // Front arch to sternum
+                .addBox(0.8F, 0.5F, 2.6F, 3.2F, 1.2F, 1.2F, CubeDeformation.NONE), // Back arch to spine
                 PartPose.ZERO);
         bodyPart.addOrReplaceChild("rib_top_right", CubeListBuilder.create()
                 .texOffs(16, 0).mirror()
-                .addBox(-6.5F, 0.5F, -4.0F, 4.5F, 1.4F, 8.0F, CubeDeformation.NONE),
+                .addBox(-5.0F, 0.5F, -2.8F, 1.2F, 1.2F, 5.6F, CubeDeformation.NONE)
+                .addBox(-4.0F, 0.5F, -3.8F, 3.2F, 1.2F, 1.2F, CubeDeformation.NONE)
+                .addBox(-4.0F, 0.5F, 2.6F, 3.2F, 1.2F, 1.2F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
-        // Pair 2: Mid-Upper Ribs
+        // Pair 2: Mid-Upper Ribs - Expanded lateral curve
         bodyPart.addOrReplaceChild("rib_mid_left", CubeListBuilder.create()
                 .texOffs(16, 10)
-                .addBox(2.5F, 3.8F, -4.2F, 4.5F, 1.4F, 8.4F, CubeDeformation.NONE),
+                .addBox(4.2F, 3.8F, -3.0F, 1.2F, 1.2F, 6.0F, CubeDeformation.NONE)
+                .addBox(0.8F, 3.8F, -4.0F, 3.6F, 1.2F, 1.2F, CubeDeformation.NONE)
+                .addBox(0.8F, 3.8F, 2.8F, 3.6F, 1.2F, 1.2F, CubeDeformation.NONE),
                 PartPose.ZERO);
         bodyPart.addOrReplaceChild("rib_mid_right", CubeListBuilder.create()
                 .texOffs(16, 10).mirror()
-                .addBox(-7.0F, 3.8F, -4.2F, 4.5F, 1.4F, 8.4F, CubeDeformation.NONE),
+                .addBox(-5.4F, 3.8F, -3.0F, 1.2F, 1.2F, 6.0F, CubeDeformation.NONE)
+                .addBox(-4.4F, 3.8F, -4.0F, 3.6F, 1.2F, 1.2F, CubeDeformation.NONE)
+                .addBox(-4.4F, 3.8F, 2.8F, 3.6F, 1.2F, 1.2F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
         // Pair 3: Mid-Lower Ribs
         bodyPart.addOrReplaceChild("rib_bot_left", CubeListBuilder.create()
                 .texOffs(16, 20)
-                .addBox(2.5F, 7.2F, -4.0F, 4.5F, 1.4F, 8.0F, CubeDeformation.NONE),
+                .addBox(4.0F, 7.2F, -2.8F, 1.2F, 1.2F, 5.6F, CubeDeformation.NONE)
+                .addBox(0.8F, 7.2F, -3.8F, 3.4F, 1.2F, 1.2F, CubeDeformation.NONE)
+                .addBox(0.8F, 7.2F, 2.6F, 3.4F, 1.2F, 1.2F, CubeDeformation.NONE),
                 PartPose.ZERO);
         bodyPart.addOrReplaceChild("rib_bot_right", CubeListBuilder.create()
                 .texOffs(16, 20).mirror()
-                .addBox(-7.0F, 7.2F, -4.0F, 4.5F, 1.4F, 8.0F, CubeDeformation.NONE),
+                .addBox(-5.2F, 7.2F, -2.8F, 1.2F, 1.2F, 5.6F, CubeDeformation.NONE)
+                .addBox(-4.2F, 7.2F, -3.8F, 3.4F, 1.2F, 1.2F, CubeDeformation.NONE)
+                .addBox(-4.2F, 7.2F, 2.6F, 3.4F, 1.2F, 1.2F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
         // Pair 4: Lower Flank Ribs
         bodyPart.addOrReplaceChild("rib_low_left", CubeListBuilder.create()
                 .texOffs(16, 0)
-                .addBox(2.0F, 10.5F, -3.6F, 4.0F, 1.4F, 7.2F, CubeDeformation.NONE),
+                .addBox(3.6F, 10.4F, -2.4F, 1.2F, 1.2F, 4.8F, CubeDeformation.NONE)
+                .addBox(0.8F, 10.4F, -3.4F, 3.0F, 1.2F, 1.2F, CubeDeformation.NONE)
+                .addBox(0.8F, 10.4F, 2.2F, 3.0F, 1.2F, 1.2F, CubeDeformation.NONE),
                 PartPose.ZERO);
         bodyPart.addOrReplaceChild("rib_low_right", CubeListBuilder.create()
                 .texOffs(16, 0).mirror()
-                .addBox(-6.0F, 10.5F, -3.6F, 4.0F, 1.4F, 7.2F, CubeDeformation.NONE),
+                .addBox(-4.8F, 10.4F, -2.4F, 1.2F, 1.2F, 4.8F, CubeDeformation.NONE)
+                .addBox(-3.8F, 10.4F, -3.4F, 3.0F, 1.2F, 1.2F, CubeDeformation.NONE)
+                .addBox(-3.8F, 10.4F, 2.2F, 3.0F, 1.2F, 1.2F, CubeDeformation.NONE),
+                PartPose.ZERO);
+
+        // Shoulder horn crests (ethereal Susanoo pauldrons adding celestial warrior aesthetic)
+        bodyPart.addOrReplaceChild("crest_left", CubeListBuilder.create()
+                .texOffs(0, 0)
+                .addBox(3.4F, -1.8F, -0.6F, 1.4F, 2.4F, 1.6F, CubeDeformation.NONE),
+                PartPose.ZERO);
+        bodyPart.addOrReplaceChild("crest_right", CubeListBuilder.create()
+                .texOffs(0, 0).mirror()
+                .addBox(-4.8F, -1.8F, -0.6F, 1.4F, 2.4F, 1.6F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
         return LayerDefinition.create(mesh, 64, 32);

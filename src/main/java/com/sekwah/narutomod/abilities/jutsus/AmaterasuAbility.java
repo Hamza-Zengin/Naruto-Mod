@@ -42,12 +42,12 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 113; // C - C - B
+        return 1123; // C - C - V - B
     }
 
     @Override
     public int getCooldown() {
-        return 140; // 7 seconds cooldown
+        return 180; // 9 seconds cooldown
     }
 
     @Override
@@ -58,19 +58,19 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
             return false;
         }
 
-        if (ninjaData.getChakra() < 60) {
+        if (ninjaData.getChakra() < 110) {
             player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
                     Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
             return false;
         }
-        if (ninjaData.getStamina() < 40) {
+        if (ninjaData.getStamina() < 50) {
             player.displayClientMessage(Component.translatable("jutsu.fail.notenoughstamina",
                     Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
             return false;
         }
 
-        ninjaData.useChakra(60, 40);
-        ninjaData.useStamina(40, 40);
+        ninjaData.useChakra(110, 45);
+        ninjaData.useStamina(50, 45);
         return true;
     }
 
@@ -114,6 +114,10 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 1.2f, 0.6f);
         serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.2f, 0.5f);
 
+        // Mangekyo Ocular Bleeding visual: subtle crimson blood drop and dark spark from caster eye
+        serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE, eyePos.x, eyePos.y - 0.1, eyePos.z, 6, 0.05, 0.05, 0.05, 0.02);
+        serverLevel.sendParticles(ParticleTypes.DAMAGE_INDICATOR, eyePos.x, eyePos.y - 0.15, eyePos.z, 1, 0.0, 0.0, 0.0, 0.0);
+
         // Dark chakra burst at impact
         serverLevel.sendParticles(ParticleTypes.SQUID_INK, targetPos.x, targetPos.y + 0.6, targetPos.z, 20, 0.4, 0.4, 0.4, 0.08);
 
@@ -126,13 +130,13 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
             serverLevel.sendParticles(ParticleTypes.SMOKE, point.x, point.y, point.z, 1, 0.04, 0.04, 0.04, 0.01);
         }
 
-        // Direct Entity Target Impact
+        // Direct Entity Target Impact: 38.0f damage (19 full hearts!)
         if (directEntity != null) {
-            directEntity.hurt(serverLevel.damageSources().playerAttack(player), 20.0f); // 10 full hearts direct damage
-            directEntity.setRemainingFireTicks(240); // 12 seconds fire
-            directEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 160, 2)); // Wither III (inextinguishable black flames)
-            directEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 1));
-            directEntity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 120, 0));
+            directEntity.hurt(serverLevel.damageSources().playerAttack(player), 38.0f);
+            directEntity.setRemainingFireTicks(300); // 15 seconds fire
+            directEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 180, 3)); // Wither IV (inextinguishable black flames)
+            directEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 2)); // Slowness III
+            directEntity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 160, 0));
 
             serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
                     directEntity.getX(), directEntity.getY() + directEntity.getBbHeight() * 0.5, directEntity.getZ(),
@@ -142,17 +146,17 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
                     15, 0.3, 0.4, 0.3, 0.02);
         }
 
-        // Area Blast around target point
+        // Area Blast around target point: 18.0f splash damage (9 hearts)
         final LivingEntity finalDirectTarget = directEntity;
-        AABB hitBox = new AABB(targetPos.x - 3.5, targetPos.y - 2.5, targetPos.z - 3.5,
-                targetPos.x + 3.5, targetPos.y + 3.0, targetPos.z + 3.5);
+        AABB hitBox = new AABB(targetPos.x - 4.0, targetPos.y - 2.5, targetPos.z - 4.0,
+                targetPos.x + 4.0, targetPos.y + 3.0, targetPos.z + 4.0);
         List<LivingEntity> splashTargets = serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox, e -> e != player && e != finalDirectTarget && e.isAlive());
 
         for (LivingEntity splash : splashTargets) {
-            splash.hurt(serverLevel.damageSources().playerAttack(player), 12.0f);
-            splash.setRemainingFireTicks(160);
-            splash.addEffect(new MobEffectInstance(MobEffects.WITHER, 120, 1)); // Wither II
-            splash.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 0));
+            splash.hurt(serverLevel.damageSources().playerAttack(player), 18.0f);
+            splash.setRemainingFireTicks(200);
+            splash.addEffect(new MobEffectInstance(MobEffects.WITHER, 140, 1)); // Wither II
+            splash.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));
 
             serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
                     splash.getX(), splash.getY() + 1.0, splash.getZ(),

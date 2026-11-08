@@ -36,7 +36,7 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
 
     @Override
     public long defaultCombo() {
-        return 122; // C - V - V
+        return 1223; // C - V - V - B (cvvb)
     }
 
     @Override
@@ -47,20 +47,29 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
             return false;
         }
 
-        if (ninjaData.getChakra() < 0.6f) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
-            return false;
+        boolean isInitial = !ninjaData.getToggleAbilityData().hasToggleAbility(this.getRegistryName());
+        if (isInitial) {
+            if (ninjaData.getChakra() < 40.0f) {
+                player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
+                        Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
+                return false;
+            }
+            ninjaData.useChakra(40.0f, 30);
+            return true;
+        } else {
+            // Sustained ethereal skeleton drain: 1.0f per tick (20 chakra/second)
+            if (ninjaData.getChakra() < 1.0f) {
+                return false;
+            }
+            ninjaData.useChakra(1.0f, 30);
+            return true;
         }
-
-        ninjaData.useChakra(0.6f, 30);
-        return true;
     }
 
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
-        // High defense buffs
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 2, false, false, true)); // Resistance III (60% dmg reduction)
+        // Godlike Defense: Resistance IV (80% damage reduction) + Fire immunity
+        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 3, false, false, true));
         player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 40, 0, false, false, false));
 
         // Activation sound on first tick
@@ -78,13 +87,13 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
                     player.getZ() + (player.getRandom().nextDouble() - 0.5) * 1.5,
                     1, 0, 0.02, 0, 0.01);
 
-            // Knock back aggressive foes nearby
-            AABB auraBox = player.getBoundingBox().inflate(2.5);
+            // Repulsion shockwave aura: violently push back foes and deal 6.0f magic damage
+            AABB auraBox = player.getBoundingBox().inflate(3.0);
             List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, auraBox, e -> e != player && e.isAlive());
             for (LivingEntity enemy : enemies) {
-                Vec3 push = enemy.position().subtract(player.position()).normalize().scale(0.8);
-                enemy.push(push.x, 0.3, push.z);
-                enemy.hurt(serverLevel.damageSources().playerAttack(player), 3.0f);
+                Vec3 push = enemy.position().subtract(player.position()).normalize().scale(1.2);
+                enemy.push(push.x, 0.45, push.z);
+                enemy.hurt(serverLevel.damageSources().playerAttack(player), 6.0f);
             }
         }
     }
@@ -97,7 +106,14 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
     public void handleAbilityEnded(Player player, INinjaData ninjaData, int ticksActive) {
         if (!player.level().isClientSide()) {
             player.removeEffect(MobEffects.DAMAGE_RESISTANCE);
-            player.level().playSound(null, player.blockPosition(), SoundEvents.SHIELD_BREAK, SoundSource.PLAYERS, 1.0f, 0.8f);
+            player.level().playSound(null, player.blockPosition(), SoundEvents.SHIELD_BREAK, SoundSource.PLAYERS, 1.2f, 0.8f);
+
+            // Mangekyo ocular exhaustion if drained to empty
+            if (ninjaData.getChakra() <= 2.0f) {
+                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 1));
+                player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 80, 0));
+                player.displayClientMessage(Component.translatable("jutsu.susanoo.exhaustion").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), true);
+            }
         }
     }
 }

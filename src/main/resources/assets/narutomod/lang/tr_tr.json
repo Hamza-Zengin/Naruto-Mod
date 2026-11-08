@@ -125,6 +125,7 @@
   "item.narutomod.scroll_kirin": "Jutsu Parşömeni: Kirin",
   "item.narutomod.scroll_amaterasu": "Yasak Parşömen: Amaterasu",
   "item.narutomod.scroll_susanoo": "Yasak Parşömen: Susanoo",
+  "item.narutomod.scroll_eight_gates": "Yasak Parşömen: Sekiz Kapı",
   "naruto.rank.promoted": "Tebrikler! Sınavı başarıyla geçtiniz ve %s rütbesine terfi ettiniz!",
   "naruto.rank.not_ready": "Bu rütbe sınavı için gerekli şartları henüz karşılamadınız!",
   "jutsu.scroll.fail_clan": "Çakra kanallarınız bu gizli parşömeni şiddetle reddetti! %s soyundan değilsiniz!",
@@ -138,5 +139,6 @@
   "jutsu.scroll.rank": "Gereken Seviye: %s",
   "jutsu.scroll.desc": "Gizli ve kadim jutsu öğretilerini barındıran ninja parşömeni.",
   "jutsu.scroll.instruction": "Tekniği kalıcı olarak öğrenmek için Sağ Tıklayın.",
-  "jutsu.eight_gates.cannot_close": "Ölüm Kapısı bir kez açıldıktan sonra kapatılamaz! Bedenin son çakrasına kadar yanacak!"
+  "jutsu.eight_gates.cannot_close": "Ölüm Kapısı bir kez açıldıktan sonra kapatılamaz! Bedenin son çakrasına kadar yanacak!",
+  "jutsu.susanoo.exhaustion": "Çakranız tamamen tükendi! Susanoo parçalandı ve optik sinirleriniz aşırı zorlandı!"
 }

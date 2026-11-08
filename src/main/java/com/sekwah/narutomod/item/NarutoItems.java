@@ -61,6 +61,9 @@ public class NarutoItems {
     public static final RegistryObject<Item> SCROLL_SUSANOO = ITEMS.register("scroll_susanoo", ()
             -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.SUSANOO_RIBCAGE.getId(), "uchiha"));
 
+    public static final RegistryObject<Item> SCROLL_EIGHT_GATES = ITEMS.register("scroll_eight_gates", ()
+            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.EIGHT_GATES.getId()));
+
     // Armor
     public static final RegistryObject<Item> RED_ANBU_MASK = ITEMS.register("red_anbu_mask", ()
             -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
@@ -147,6 +150,7 @@ public class NarutoItems {
                         output.accept(SCROLL_KIRIN.get());
                         output.accept(SCROLL_AMATERASU.get());
                         output.accept(SCROLL_SUSANOO.get());
+                        output.accept(SCROLL_EIGHT_GATES.get());
                         output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
                         output.accept(NarutoBlocks.ITEM_BONSAI_TREE.get());
                     })
