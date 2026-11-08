@@ -11,6 +11,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
@@ -76,11 +77,21 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
                 }
             }
 
-            // Subtle indicator every 3 seconds for outside observers
-            if (ticksActive % 60 == 0) {
+            // Gentle crimson eye trails drifting backward from temples (visible in 3rd person and to onlookers, zero 1st-person blockage)
+            if (ticksActive % 10 == 0) {
+                Vec3 look = player.getLookAngle();
+                Vec3 up = new Vec3(0, 1, 0);
+                Vec3 right = look.cross(up).normalize().scale(0.26);
+                double eyeY = player.getEyeY() - 0.05;
+                Vec3 leftEyePos = player.position().add(0, eyeY - player.getY(), 0).subtract(right).subtract(look.scale(0.1));
+                Vec3 rightEyePos = player.position().add(0, eyeY - player.getY(), 0).add(right).subtract(look.scale(0.1));
+
                 serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
-                        player.getX(), player.getEyeY() + 0.1, player.getZ(),
-                        2, 0.2, 0.1, 0.2, 0.01);
+                        leftEyePos.x, leftEyePos.y, leftEyePos.z,
+                        1, -look.x * 0.03, 0.01, -look.z * 0.03, 0.01);
+                serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
+                        rightEyePos.x, rightEyePos.y, rightEyePos.z,
+                        1, -look.x * 0.03, 0.01, -look.z * 0.03, 0.01);
             }
 
             // Reflex field: Enemies within 8 blocks are perceived as slowed

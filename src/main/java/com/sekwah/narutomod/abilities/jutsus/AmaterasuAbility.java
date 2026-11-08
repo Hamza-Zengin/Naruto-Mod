@@ -109,9 +109,13 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         }
 
         // Play sinister ignition sound
-        serverLevel.playSound(null, player.blockPosition(), SoundEvents.GHAST_SHOOT, SoundSource.PLAYERS, 1.5f, 0.5f);
-        serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 2.0f, 0.6f);
-        serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 1.0f, 0.7f);
+        serverLevel.playSound(null, player.blockPosition(), SoundEvents.ENDERMAN_SCREAM, SoundSource.PLAYERS, 1.2f, 0.6f);
+        serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 2.0f, 0.5f);
+        serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 1.2f, 0.6f);
+        serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.2f, 0.5f);
+
+        // Dark chakra burst at impact
+        serverLevel.sendParticles(ParticleTypes.SQUID_INK, targetPos.x, targetPos.y + 0.6, targetPos.z, 20, 0.4, 0.4, 0.4, 0.08);
 
         // Black flame & smoke beam from caster's eye to target
         double dist = eyePos.distanceTo(targetPos);
@@ -132,7 +136,7 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
 
             serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
                     directEntity.getX(), directEntity.getY() + directEntity.getBbHeight() * 0.5, directEntity.getZ(),
-                    40, 0.4, 0.6, 0.4, 0.05);
+                    35, 0.4, 0.6, 0.4, 0.05);
             serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE,
                     directEntity.getX(), directEntity.getY() + directEntity.getBbHeight() * 0.5, directEntity.getZ(),
                     15, 0.3, 0.4, 0.3, 0.02);

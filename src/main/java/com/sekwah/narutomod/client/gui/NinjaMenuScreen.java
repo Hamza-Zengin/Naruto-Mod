@@ -286,7 +286,7 @@ public class NinjaMenuScreen extends Screen {
             String jText = reqJ ? "§a✔ Jutsu Pratiği: 10 / 10" : "§c✖ Jutsu Pratiği: " + Math.min(ninjaData.getJutsusCastCount(), 10) + " / 10";
             graphics.drawString(this.font, cText + "     " + jText, x + 6, examBoxY + 18, 0xFFFFFFFF);
 
-            String hint = ready ? "§a★ Bütün sınav şartları sağlandı! Terfi butonuna tıklayabilirsiniz." : "§7Temel jutsuları çalışarak çakranızı geliştirin.";
+            String hint = ready ? "§a✔ Sınav şartları hazır! Aşağıdan terfi edebilirsiniz." : "§7Temel jutsuları çalışarak çakranızı geliştirin.";
             graphics.drawString(this.font, hint, x + 6, examBoxY + 31, 0xFFAAAAAA);
 
         } else if (rank == NinjaRank.GENIN) {
@@ -303,7 +303,7 @@ public class NinjaMenuScreen extends Screen {
             String kText = reqK ? "§a✔ Düşman: 25 / 25" : "§c✖ Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), 25) + " / 25";
             graphics.drawString(this.font, cText + "     " + kText, x + 6, examBoxY + 18, 0xFFFFFFFF);
 
-            String hint = ready ? "§a★ Bütün sınav şartları sağlandı! Terfi butonuna tıklayabilirsiniz." : "§7Düşmanları yenin ve çakra kapasitenizi yükseltin.";
+            String hint = ready ? "§a✔ Sınav şartları hazır! Aşağıdan terfi edebilirsiniz." : "§7Düşmanları yenin ve çakra kapasitenizi yükseltin.";
             graphics.drawString(this.font, hint, x + 6, examBoxY + 31, 0xFFAAAAAA);
 
         } else if (rank == NinjaRank.CHUNIN) {
@@ -323,7 +323,7 @@ public class NinjaMenuScreen extends Screen {
             String sText = reqS ? "§a✔ Parşömen: 4/4" : "§c✖ Parşömen: " + Math.min(unlocked, 4) + "/4";
             graphics.drawString(this.font, cText + "  |  " + kText + "  |  " + sText, x + 6, examBoxY + 18, 0xFFFFFFFF);
 
-            String hint = ready ? "§a★ Tebrikler! Köy Konseyi sizi Jōnin rütbesine atamaya hazır." : "§7Gizli parşömenleri öğrenip elit seviyeye ulaşın.";
+            String hint = ready ? "§a✔ Konsey ataması hazır! Aşağıdan Jōnin rütbesine terfi edin." : "§7Gizli parşömenleri öğrenip elit seviyeye ulaşın.";
             graphics.drawString(this.font, hint, x + 6, examBoxY + 31, 0xFFAAAAAA);
 
         } else {
@@ -352,17 +352,23 @@ public class NinjaMenuScreen extends Screen {
         }
 
         String[] clans = {"uchiha", "hyuga", "uzumaki", "nara"};
-        String[] titles = {"Uchiha Klanı (Ateş & Sharingan)", "Hyūga Klanı (Nazik Yumruk & Byakugan)", "Uzumaki Klanı (Devasa Çakra Rezervi)", "Nara Klanı (Gölge & Hızlı Kondisyon)"};
+        String[] titles = {
+                "Uchiha Klanı (Ateş & Sharingan)",
+                "Hyūga Klanı (Nazik Yumruk & Byakugan)",
+                "Uzumaki Klanı (Devasa Çakra Rezervi)",
+                "Nara Klanı (Gölge & Hızlı Kondisyon)"
+        };
         String[] descs = {
-                "Ateş jutsularında ustalık, Sharingan ve Susanoo savunması.",
-                "360 derece Byakugan görüşü ve çakra darbeleri.",
-                "Muazzam çakra kapasitesi ve hızlı doğal çakra yenilenmesi.",
-                "Taktiksel gölge teknikleri ve %30 daha hızlı kondisyon dolumu."
+                "Ateş teknikleri, Sharingan ve Susanoo kalkanı.",
+                "360° Byakugan görüşü ve çakra darbe sanatı.",
+                "Büyük çakra havuzu ve yüksek doğal yenilenme.",
+                "Gölge teknikleri ve %30 daha hızlı kondisyon."
         };
 
         int cardStartY = boxY + 36;
         int cardH = 34;
         int cardGap = 4;
+        int maxTextW = BOX_WIDTH - 96; // Space before the [Klanı Seç] button
 
         for (int i = 0; i < clans.length; i++) {
             boolean isCurrent = ninjaData.getClan() != null && ninjaData.getClan().getPath().equalsIgnoreCase(clans[i]);
@@ -375,7 +381,12 @@ public class NinjaMenuScreen extends Screen {
             graphics.renderOutline(boxX, cardY, BOX_WIDTH, cardH, borderCol);
 
             graphics.drawString(this.font, "§6" + titles[i], boxX + 8, cardY + 5, 0xFFFFFFFF);
-            graphics.drawString(this.font, "§7" + descs[i], boxX + 8, cardY + 18, 0xFFAAAAAA);
+
+            String desc = descs[i];
+            if (this.font.width(desc) > maxTextW) {
+                desc = this.font.plainSubstrByWidth(desc, maxTextW - 8) + "...";
+            }
+            graphics.drawString(this.font, "§7" + desc, boxX + 8, cardY + 18, 0xFFAAAAAA);
         }
     }
 

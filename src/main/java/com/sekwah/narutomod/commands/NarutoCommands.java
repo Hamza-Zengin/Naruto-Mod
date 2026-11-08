@@ -214,8 +214,21 @@ public class NarutoCommands {
 
         for (ServerPlayer player : players) {
             player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                ability.performServer(player, data, 0);
-                source.sendSuccess(() -> Component.literal("Cast " + jutsuId + " on " + player.getScoreboardName()).withStyle(ChatFormatting.GREEN), true);
+                if (ability.activationType() == Ability.ActivationType.TOGGLE) {
+                    com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData tracker = data.getToggleAbilityData();
+                    if (tracker.hasToggleAbility(ability.getRegistryName())) {
+                        tracker.removeAbilityEnded(player, data, ability);
+                        source.sendSuccess(() -> Component.literal("Deactivated " + jutsuId + " for " + player.getScoreboardName()).withStyle(ChatFormatting.YELLOW), true);
+                    } else {
+                        tracker.addAbilityStarted(player, data, ability);
+                        data.addJutsuCast();
+                        source.sendSuccess(() -> Component.literal("Activated " + jutsuId + " for " + player.getScoreboardName()).withStyle(ChatFormatting.GREEN), true);
+                    }
+                } else {
+                    ability.performServer(player, data, 0);
+                    data.addJutsuCast();
+                    source.sendSuccess(() -> Component.literal("Cast " + jutsuId + " on " + player.getScoreboardName()).withStyle(ChatFormatting.GREEN), true);
+                }
             });
         }
         return players.size();

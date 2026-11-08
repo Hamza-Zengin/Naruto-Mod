@@ -88,6 +88,7 @@ public class NarutoRenderEvents {
             net.minecraft.client.renderer.entity.player.PlayerRenderer renderer = event.getSkin(skin);
             if (renderer != null) {
                 renderer.addLayer(new com.sekwah.narutomod.client.renderer.entity.layers.SusanooRibcageLayer(renderer, event.getEntityModels()));
+                renderer.addLayer(new com.sekwah.narutomod.client.renderer.entity.layers.SharinganEyesLayer(renderer));
             }
         }
     }

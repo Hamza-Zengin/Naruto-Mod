@@ -66,7 +66,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Sync(minTicks = 1)
     private int ticksChanneled;
 
-    @Sync
+    @Sync(minTicks = 1, syncGlobally = true)
     private ToggleAbilityData toggleAbilityData;
 
     private ArrayList<DelayedPlayerTickEvent> delayedTickEvents = new ArrayList<>();

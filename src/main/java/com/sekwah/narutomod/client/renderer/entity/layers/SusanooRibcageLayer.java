@@ -34,11 +34,11 @@ public class SusanooRibcageLayer extends RenderLayer<AbstractClientPlayer, Playe
             if (ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.SUSANOO_RIBCAGE.getId())) {
                 poseStack.pushPose();
                 this.getParentModel().copyPropertiesTo(this.ribcageModel);
-                this.ribcageModel.setupAnim(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+                this.ribcageModel.body.copyFrom(this.getParentModel().body);
 
                 VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(SUSANOO_TEXTURE));
-                // Glowing semi-transparent chakra bone with bright luminous emissive lighting
-                this.ribcageModel.renderToBuffer(poseStack, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 0.4F, 0.2F, 0.65F);
+                // Glowing semi-transparent fiery chakra bone with bright luminous emissive lighting
+                this.ribcageModel.renderToBuffer(poseStack, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 0.55F, 0.25F, 0.75F);
                 poseStack.popPose();
             }
         });

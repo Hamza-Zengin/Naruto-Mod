@@ -111,17 +111,30 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
         }
 
         // Thunderous boom and electric particles
-        serverLevel.playSound(null, targetBlock, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 5.0f, 0.8f);
-        serverLevel.playSound(null, targetBlock, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2.0f, 1.2f);
+        serverLevel.playSound(null, targetBlock, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 10.0f, 0.65f);
+        serverLevel.playSound(null, targetBlock, SoundEvents.WARDEN_SONIC_BOOM, SoundSource.WEATHER, 1.6f, 1.4f);
+        serverLevel.playSound(null, targetBlock, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2.5f, 0.9f);
 
         // Huge vertical electric dragon beam
         for (double y = targetPos.y; y < targetPos.y + 25; y += 0.5) {
             serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
                     targetPos.x, y, targetPos.z,
-                    8, 0.6, 0.2, 0.6, 0.1);
+                    6, 0.5, 0.2, 0.5, 0.08);
             serverLevel.sendParticles(ParticleTypes.FLASH,
                     targetPos.x, y, targetPos.z,
                     1, 0.1, 0.1, 0.1, 0.0);
+        }
+
+        // Expanding circular electric spark ring
+        for (int i = 0; i < 20; i++) {
+            double angle = (2 * Math.PI / 20) * i;
+            double vx = Math.cos(angle) * 0.35;
+            double vz = Math.sin(angle) * 0.35;
+            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
+                    targetPos.x + Math.cos(angle) * 1.5,
+                    targetPos.y + 0.2,
+                    targetPos.z + Math.sin(angle) * 1.5,
+                    1, vx, 0.04, vz, 0.12);
         }
 
         // Direct damage if mob directly struck

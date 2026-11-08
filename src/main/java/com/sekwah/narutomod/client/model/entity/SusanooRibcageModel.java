@@ -13,11 +13,8 @@ import net.minecraft.world.entity.LivingEntity;
  */
 public class SusanooRibcageModel<T extends LivingEntity> extends HumanoidModel<T> {
 
-    private final ModelPart body;
-
     public SusanooRibcageModel(ModelPart root) {
         super(root);
-        this.body = root.getChild("body");
     }
 
     public static LayerDefinition createLayer() {
@@ -30,49 +27,53 @@ public class SusanooRibcageModel<T extends LivingEntity> extends HumanoidModel<T
         // Spine along the back (slightly raised and thickened)
         bodyPart.addOrReplaceChild("spine", CubeListBuilder.create()
                 .texOffs(0, 0)
-                .addBox(-2.0F, -1.0F, 2.5F, 4.0F, 14.0F, 3.0F, new CubeDeformation(0.2F)),
+                .addBox(-2.5F, -1.0F, 2.5F, 5.0F, 15.0F, 3.0F, new CubeDeformation(0.2F)),
+                PartPose.ZERO);
+
+        // Front Sternum (Chest connector)
+        bodyPart.addOrReplaceChild("sternum", CubeListBuilder.create()
+                .texOffs(0, 18)
+                .addBox(-1.5F, 0.0F, -4.8F, 3.0F, 13.0F, 2.0F, new CubeDeformation(0.1F)),
                 PartPose.ZERO);
 
         // Pair 1: Top Ribs (Upper Chest)
         bodyPart.addOrReplaceChild("rib_top_left", CubeListBuilder.create()
-                .texOffs(14, 0)
-                .addBox(2.0F, 0.0F, -3.5F, 4.0F, 2.0F, 7.0F, new CubeDeformation(0.1F)),
+                .texOffs(16, 0)
+                .addBox(2.0F, 0.5F, -4.0F, 4.5F, 2.0F, 8.0F, new CubeDeformation(0.1F)),
                 PartPose.ZERO);
         bodyPart.addOrReplaceChild("rib_top_right", CubeListBuilder.create()
-                .texOffs(14, 0).mirror()
-                .addBox(-6.0F, 0.0F, -3.5F, 4.0F, 2.0F, 7.0F, new CubeDeformation(0.1F)),
-                PartPose.ZERO);
-        bodyPart.addOrReplaceChild("rib_top_front", CubeListBuilder.create()
-                .texOffs(0, 17)
-                .addBox(-4.0F, 0.0F, -4.5F, 8.0F, 2.0F, 2.0F, new CubeDeformation(0.1F)),
+                .texOffs(16, 0).mirror()
+                .addBox(-6.5F, 0.5F, -4.0F, 4.5F, 2.0F, 8.0F, new CubeDeformation(0.1F)),
                 PartPose.ZERO);
 
-        // Pair 2: Mid Ribs (Mid Chest)
+        // Pair 2: Mid-Upper Ribs
         bodyPart.addOrReplaceChild("rib_mid_left", CubeListBuilder.create()
-                .texOffs(14, 9)
-                .addBox(2.2F, 3.5F, -3.8F, 4.0F, 2.0F, 7.5F, new CubeDeformation(0.1F)),
+                .texOffs(16, 10)
+                .addBox(2.5F, 3.8F, -4.2F, 4.5F, 2.0F, 8.4F, new CubeDeformation(0.1F)),
                 PartPose.ZERO);
         bodyPart.addOrReplaceChild("rib_mid_right", CubeListBuilder.create()
-                .texOffs(14, 9).mirror()
-                .addBox(-6.2F, 3.5F, -3.8F, 4.0F, 2.0F, 7.5F, new CubeDeformation(0.1F)),
-                PartPose.ZERO);
-        bodyPart.addOrReplaceChild("rib_mid_front", CubeListBuilder.create()
-                .texOffs(0, 21)
-                .addBox(-4.5F, 3.5F, -4.8F, 9.0F, 2.0F, 2.0F, new CubeDeformation(0.1F)),
+                .texOffs(16, 10).mirror()
+                .addBox(-7.0F, 3.8F, -4.2F, 4.5F, 2.0F, 8.4F, new CubeDeformation(0.1F)),
                 PartPose.ZERO);
 
-        // Pair 3: Bottom Ribs (Lower Torso)
+        // Pair 3: Mid-Lower Ribs
         bodyPart.addOrReplaceChild("rib_bot_left", CubeListBuilder.create()
-                .texOffs(14, 18)
-                .addBox(2.0F, 7.0F, -3.5F, 4.0F, 2.0F, 7.0F, new CubeDeformation(0.1F)),
+                .texOffs(16, 20)
+                .addBox(2.5F, 7.2F, -4.0F, 4.5F, 2.0F, 8.0F, new CubeDeformation(0.1F)),
                 PartPose.ZERO);
         bodyPart.addOrReplaceChild("rib_bot_right", CubeListBuilder.create()
-                .texOffs(14, 18).mirror()
-                .addBox(-6.0F, 7.0F, -3.5F, 4.0F, 2.0F, 7.0F, new CubeDeformation(0.1F)),
+                .texOffs(16, 20).mirror()
+                .addBox(-7.0F, 7.2F, -4.0F, 4.5F, 2.0F, 8.0F, new CubeDeformation(0.1F)),
                 PartPose.ZERO);
-        bodyPart.addOrReplaceChild("rib_bot_front", CubeListBuilder.create()
-                .texOffs(0, 25)
-                .addBox(-4.0F, 7.0F, -4.5F, 8.0F, 2.0F, 2.0F, new CubeDeformation(0.1F)),
+
+        // Pair 4: Lower Flank Ribs
+        bodyPart.addOrReplaceChild("rib_low_left", CubeListBuilder.create()
+                .texOffs(16, 0)
+                .addBox(2.0F, 10.5F, -3.6F, 4.0F, 2.0F, 7.2F, new CubeDeformation(0.1F)),
+                PartPose.ZERO);
+        bodyPart.addOrReplaceChild("rib_low_right", CubeListBuilder.create()
+                .texOffs(16, 0).mirror()
+                .addBox(-6.0F, 10.5F, -3.6F, 4.0F, 2.0F, 7.2F, new CubeDeformation(0.1F)),
                 PartPose.ZERO);
 
         return LayerDefinition.create(mesh, 64, 32);
@@ -81,8 +82,10 @@ public class SusanooRibcageModel<T extends LivingEntity> extends HumanoidModel<T
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         poseStack.pushPose();
-        // Scale slightly around the torso for a grand ethereal presence
-        poseStack.scale(1.22F, 1.15F, 1.25F);
+        // Scale around torso center so it encompasses the player cleanly
+        poseStack.translate(0.0F, 0.35F, 0.0F);
+        poseStack.scale(1.28F, 1.15F, 1.30F);
+        poseStack.translate(0.0F, -0.35F, 0.0F);
         this.body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
         poseStack.popPose();
     }
