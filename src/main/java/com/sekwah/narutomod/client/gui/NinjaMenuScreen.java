@@ -134,16 +134,16 @@ public class NinjaMenuScreen extends Screen {
             boolean isLocked = ninjaData.isClanLocked();
 
             List<RegistryObject<Clan>> clans = getSelectableClans();
-            int cardStartY = boxY + 36;
-            int cardH = 34;
-            int cardGap = 4;
+            int cardStartY = boxY + 32;
+            int cardH = 38;
+            int cardGap = 3;
             int boxX = centerX - BOX_WIDTH / 2;
 
             for (int i = 0; i < clans.size(); i++) {
                 final RegistryObject<Clan> clanEntry = clans.get(i);
                 final ResourceLocation clanLoc = clanEntry.getId();
                 int cardY = cardStartY + i * (cardH + cardGap);
-                int btnY = cardY + 7;
+                int btnY = cardY + 9;
 
                 boolean isCurrentClan = ninjaData.getClan() != null && ninjaData.getClan().equals(clanLoc);
 
@@ -263,7 +263,7 @@ public class NinjaMenuScreen extends Screen {
         float cBonus = rank.getChakraBonus();
         float sBonus = rank.getStaminaBonus();
         String bonusNote = (cBonus > 0 || sBonus > 0) ? " §7(+" + (int)cBonus + " Çakra, +" + (int)sBonus + " Kondisyon)" : "";
-        graphics.drawString(this.font, "§bNinja Rütbesi: §f" + rank.getTurkishName() + " (" + rank.getEnglishName() + ")" + bonusNote, x, y, 0xFFFFFFFF);
+        graphics.drawString(this.font, "§bNinja Rütbesi: §f" + rank.getTurkishName() + bonusNote, x, y, 0xFFFFFFFF);
         y += 14;
 
         // 1. Stat Bar: Chakra
@@ -295,7 +295,7 @@ public class NinjaMenuScreen extends Screen {
 
         // Chakra EXP (Left)
         float chakraExp = ninjaData.getChakraExp();
-        float cNeededExp = 60.0f + (baseChakra - 100.0f) * 1.20f;
+        float cNeededExp = baseChakra < 150.0f ? (30.0f + (baseChakra - 100.0f) * 0.50f) : (55.0f + (baseChakra - 150.0f) * 1.10f);
         String cExpVal = baseChakra >= 500.0f ? "§aMAKS (500)" : String.format("§f%.0f / %.0f", chakraExp, cNeededExp);
         graphics.drawString(this.font, "§dÇakra Eğitimi", x, y, 0xFFFFFFFF);
         graphics.drawString(this.font, cExpVal, x + halfW - this.font.width(cExpVal), y, 0xFFFFFFFF);
@@ -318,7 +318,7 @@ public class NinjaMenuScreen extends Screen {
 
         if (rank == NinjaRank.ACADEMY_STUDENT) {
             boolean reqC = baseChakra >= 120.0f;
-            boolean reqJ = ninjaData.getJutsusCastCount() >= 10;
+            boolean reqJ = ninjaData.getJutsusCastCount() >= 8;
             boolean ready = reqC && reqJ;
 
             graphics.fill(x, examBoxY, x + contentW, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
@@ -327,7 +327,7 @@ public class NinjaMenuScreen extends Screen {
             graphics.drawString(this.font, "§e★ Mezuniyet Sınavı (Akademi ➔ Genin)", x + 6, examBoxY + 5, 0xFFFFAA00);
 
             String cText = (reqC ? "§a✔ " : "§c✖ ") + "Taban Çakra: " + (int)Math.min(baseChakra, 120) + " / 120";
-            String jText = (reqJ ? "§a✔ " : "§c✖ ") + "Jutsu Pratiği: " + Math.min(ninjaData.getJutsusCastCount(), 10) + " / 10";
+            String jText = (reqJ ? "§a✔ " : "§c✖ ") + "Jutsu Pratiği: " + Math.min(ninjaData.getJutsusCastCount(), 8) + " / 8";
             graphics.drawString(this.font, cText, x + 6, examBoxY + 18, 0xFFFFFFFF);
             graphics.drawString(this.font, jText, x + 160, examBoxY + 18, 0xFFFFFFFF);
 
@@ -335,9 +335,9 @@ public class NinjaMenuScreen extends Screen {
             graphics.drawString(this.font, hint, x + 6, examBoxY + 36, 0xFFAAAAAA);
 
         } else if (rank == NinjaRank.GENIN) {
-            boolean reqC = baseChakra >= 200.0f;
-            boolean reqS = baseStamina >= 150.0f;
-            boolean reqK = ninjaData.getEnemiesDefeated() >= 25;
+            boolean reqC = baseChakra >= 160.0f;
+            boolean reqS = baseStamina >= 130.0f;
+            boolean reqK = ninjaData.getEnemiesDefeated() >= 15;
             boolean ready = reqC && reqS && reqK;
 
             graphics.fill(x, examBoxY, x + contentW, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
@@ -345,9 +345,9 @@ public class NinjaMenuScreen extends Screen {
 
             graphics.drawString(this.font, "§e★ Chūnin Sınavı (Genin ➔ Chūnin)", x + 6, examBoxY + 5, 0xFFFFAA00);
 
-            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, 200) + "/200";
-            String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, 150) + "/150";
-            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), 25) + "/25";
+            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, 160) + "/160";
+            String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, 130) + "/130";
+            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), 15) + "/15";
             graphics.drawString(this.font, cText + "   " + sText, x + 6, examBoxY + 18, 0xFFFFFFFF);
             graphics.drawString(this.font, kText, x + 6, examBoxY + 30, 0xFFFFFFFF);
 
@@ -428,7 +428,7 @@ public class NinjaMenuScreen extends Screen {
             graphics.fill(x, examBoxY, x + contentW, examBoxY + examBoxH, 0x33FFAA00);
             graphics.renderOutline(x, examBoxY, contentW, examBoxH, 0xFFFFAA00);
 
-            graphics.drawString(this.font, "§6★ En Yüksek Rütbe – Köyün Lideri (Kage) ★", x + 6, examBoxY + 6, 0xFFFFAA00);
+            graphics.drawString(this.font, "§6★ En Yüksek Rütbe – Kage ★", x + 6, examBoxY + 6, 0xFFFFAA00);
 
             drawWrapped(this.font, graphics,
                     Component.literal("§aTebrikler! Köyün en yüce şinobisi ve efsanevi koruyucususunuz. Tüm sınav şartlarını tamamladınız, kudretiniz tüm dünyaya nam saldı!"),
@@ -454,9 +454,9 @@ public class NinjaMenuScreen extends Screen {
 
         List<RegistryObject<Clan>> clans = getSelectableClans();
 
-        int cardStartY = boxY + 36;
-        int cardH = 34;
-        int cardGap = 4;
+        int cardStartY = boxY + 32;
+        int cardH = 38;
+        int cardGap = 3;
         int maxTextW = BOX_WIDTH - 96;
 
         for (int i = 0; i < clans.size(); i++) {
@@ -473,13 +473,14 @@ public class NinjaMenuScreen extends Screen {
             graphics.renderOutline(boxX, cardY, BOX_WIDTH, cardH, borderCol);
 
             String title = clan != null ? clan.getName().getString() : clanLoc.getPath();
-            graphics.drawString(this.font, "§6" + title, boxX + 8, cardY + 5, 0xFFFFFFFF);
+            graphics.drawString(this.font, "§6" + title, boxX + 8, cardY + 4, 0xFFFFFFFF);
 
             String desc = clan != null ? clan.getDescription().getString() : "";
-            if (this.font.width(desc) > maxTextW) {
-                desc = this.font.plainSubstrByWidth(desc, maxTextW - 8) + "...";
+            int lineY = cardY + 16;
+            for (FormattedCharSequence line : this.font.split(Component.literal(desc), maxTextW)) {
+                graphics.drawString(this.font, line, boxX + 8, lineY, 0xFFAAAAAA);
+                lineY += this.font.lineHeight + 1;
             }
-            graphics.drawString(this.font, "§7" + desc, boxX + 8, cardY + 18, 0xFFAAAAAA);
         }
     }
 
@@ -514,8 +515,12 @@ public class NinjaMenuScreen extends Screen {
             graphics.drawString(this.font, "§f§l" + name, boxX + 8, cardY + 4, 0xFFFFFFFF);
 
             // Combo & Type Info
-            String comboText = formatCombo(ability.defaultCombo());
-            graphics.drawString(this.font, "§eMühür: §b" + comboText, boxX + 8, cardY + 15, 0xFFDDDDDD);
+            if (unlocked) {
+                String comboText = formatCombo(ability.defaultCombo());
+                graphics.drawString(this.font, "§eMühür: §b" + comboText, boxX + 8, cardY + 15, 0xFFDDDDDD);
+            } else {
+                graphics.drawString(this.font, "§eMühür: §7??? (Gizli)", boxX + 8, cardY + 15, 0xFFAAAAAA);
+            }
 
             // Acquisition Type
             String reqType;
@@ -524,9 +529,9 @@ public class NinjaMenuScreen extends Screen {
             } else if (id != null && id.getPath().equals("eight_gates")) {
                 reqType = "§4[Yasak Parşömen - Jōnin]";
             } else if (id != null && id.getPath().equals("sharingan")) {
-                reqType = "§c[Uchiha Doğuştan]";
+                reqType = "§c[Uchiha Klanı - Genin]";
             } else if (id != null && id.getPath().equals("byakugan")) {
-                reqType = "§f[Hyūga Doğuştan]";
+                reqType = "§f[Hyūga Klanı - Genin]";
             } else if (NinjaData.isScrollRequiredJutsu(id)) {
                 reqType = "§6[Parşömen Gerekir]";
             } else if (ability.getRequiredRank() == NinjaRank.ACADEMY_STUDENT) {

@@ -45,11 +45,8 @@ public class ServerAbilityActivatePacket {
                     Ability ability = NarutoAbilities.getAbility(msg.abilityId);
                     if (ability == null) return;
 
+                    // Silently ignore if player does not have the ability unlocked (no chat spam)
                     if (!ninjaData.isAbilityUnlocked(ability)) {
-                        player.sendSystemMessage(Component.translatable("jutsu.fail.locked",
-                                Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW),
-                                Component.literal(ability.getRequiredRank().getDisplayName()).withStyle(ChatFormatting.GOLD)
-                        ).withStyle(ChatFormatting.RED));
                         return;
                     }
 

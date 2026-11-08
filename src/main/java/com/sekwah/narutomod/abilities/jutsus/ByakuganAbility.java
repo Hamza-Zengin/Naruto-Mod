@@ -25,6 +25,11 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
     }
 
     @Override
+    public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
+        return com.sekwah.narutomod.capabilities.NinjaRank.GENIN;
+    }
+
+    @Override
     public long defaultCombo() {
         return 333;
     }

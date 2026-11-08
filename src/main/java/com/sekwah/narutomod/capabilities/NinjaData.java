@@ -280,12 +280,14 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             return true;
         }
 
-        // Innate Clan Dōjutsu
+        // Innate Clan Dōjutsu (Awakens upon reaching Genin rank)
         if (abilityId.getPath().equals("sharingan")) {
-            return this.clan != null && this.clan.getPath().equals("uchiha");
+            NinjaRank playerRank = NinjaRank.fromString(this.getRank());
+            return this.clan != null && this.clan.getPath().equals("uchiha") && playerRank.getLevel() >= NinjaRank.GENIN.getLevel();
         }
         if (abilityId.getPath().equals("byakugan")) {
-            return this.clan != null && this.clan.getPath().equals("hyuga");
+            NinjaRank playerRank = NinjaRank.fromString(this.getRank());
+            return this.clan != null && this.clan.getPath().equals("hyuga") && playerRank.getLevel() >= NinjaRank.GENIN.getLevel();
         }
 
         // Scroll-only advanced & secret jutsus
@@ -386,8 +388,12 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             this.chakraExp = 0;
             return;
         }
-        this.chakraExp += amount;
-        float neededExp = 60.0f + (this.maxChakra - 100.0f) * 1.20f;
+        float neededExp;
+        if (this.maxChakra < 150.0f) {
+            neededExp = 30.0f + (this.maxChakra - 100.0f) * 0.50f;
+        } else {
+            neededExp = 55.0f + (this.maxChakra - 150.0f) * 1.10f;
+        }
         if (this.chakraExp >= neededExp && this.maxChakra < 500f) {
             this.chakraExp -= neededExp;
             this.maxChakra = Math.min(this.maxChakra + 5.0f, 500.0f);
@@ -486,15 +492,15 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     public boolean canRankUp() {
         NinjaRank current = NinjaRank.fromString(this.getRank());
         if (current == NinjaRank.ACADEMY_STUDENT) {
-            return this.maxChakra >= 120.0f && this.getJutsusCastCount() >= 10;
+            return this.maxChakra >= 120.0f && this.getJutsusCastCount() >= 8;
         } else if (current == NinjaRank.GENIN) {
-            return this.maxChakra >= 200.0f && this.maxStamina >= 150.0f && this.getEnemiesDefeated() >= 25;
+            return this.maxChakra >= 160.0f && this.maxStamina >= 130.0f && this.getEnemiesDefeated() >= 15;
         } else if (current == NinjaRank.CHUNIN) {
-            return this.maxChakra >= 300.0f && this.maxStamina >= 200.0f && this.getEnemiesDefeated() >= 75 && this.getUnlockedAbilities().size() >= 3;
+            return this.maxChakra >= 260.0f && this.maxStamina >= 180.0f && this.getEnemiesDefeated() >= 60 && this.getUnlockedAbilities().size() >= 3;
         } else if (current == NinjaRank.JONIN) {
-            return this.maxChakra >= 400.0f && this.maxStamina >= 280.0f && this.getEnemiesDefeated() >= 150 && this.getUnlockedAbilities().size() >= 4;
+            return this.maxChakra >= 380.0f && this.maxStamina >= 260.0f && this.getEnemiesDefeated() >= 120 && this.getUnlockedAbilities().size() >= 4;
         } else if (current == NinjaRank.ANBU) {
-            return this.maxChakra >= 500.0f && this.maxStamina >= 350.0f && this.getEnemiesDefeated() >= 300 && this.getUnlockedAbilities().size() >= 5;
+            return this.maxChakra >= 500.0f && this.maxStamina >= 350.0f && this.getEnemiesDefeated() >= 250 && this.getUnlockedAbilities().size() >= 5;
         }
         return false;
     }
@@ -537,7 +543,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             this.chakra = Math.max(0f, this.chakra - amount);
         }
         this.chakraRegenInfo.cooldown = Math.max(cooldown, this.chakraRegenInfo.cooldown);
-        addChakraExp(amount * 0.04f);
+        addChakraExp(amount * 0.10f);
     }
 
     @Override

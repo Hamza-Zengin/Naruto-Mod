@@ -36,9 +36,13 @@ public class SusanooRibcageLayer extends RenderLayer<AbstractClientPlayer, Playe
                 this.getParentModel().copyPropertiesTo(this.ribcageModel);
                 this.ribcageModel.body.copyFrom(this.getParentModel().body);
 
+                // Imposing +18% scale to give Susanoo a majestic presence enveloping the player
+                poseStack.translate(0.0D, -0.06D, 0.0D);
+                poseStack.scale(1.18F, 1.18F, 1.18F);
+
                 VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(SUSANOO_TEXTURE));
-                // Glowing semi-transparent fiery chakra bone with bright luminous emissive lighting
-                this.ribcageModel.renderToBuffer(poseStack, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 0.55F, 0.25F, 0.75F);
+                // Luminous ethereal translucent chakra bone (alpha = 0.55F)
+                this.ribcageModel.renderToBuffer(poseStack, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 0.55F, 0.25F, 0.55F);
                 poseStack.popPose();
             }
         });

@@ -27,6 +27,11 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
     }
 
     @Override
+    public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
+        return com.sekwah.narutomod.capabilities.NinjaRank.GENIN;
+    }
+
+    @Override
     public long defaultCombo() {
         return 111;
     }
