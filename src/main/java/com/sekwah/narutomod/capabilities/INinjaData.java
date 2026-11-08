@@ -13,12 +13,16 @@ import java.util.function.Consumer;
 public interface INinjaData extends INBTSerializable<Tag> {
     float getChakra();
     float getMaxChakra();
+    float getBaseMaxChakra();
     float getStamina();
     float getMaxStamina();
+    float getBaseMaxStamina();
     void setChakra(float amount);
     void setStamina(float amount);
     void setMaxChakra(float amount);
     void setMaxStamina(float amount);
+    void setBaseMaxChakra(float amount);
+    void setBaseMaxStamina(float amount);
     void useChakra(float amount, int cooldown);
     void useStamina(float amount, int cooldown);
     void addChakra(float amount);
@@ -26,6 +30,7 @@ public interface INinjaData extends INBTSerializable<Tag> {
 
     ResourceLocation getClan();
     void setClan(ResourceLocation clan);
+    void forceSetClan(ResourceLocation clan);
 
     boolean isClanLocked();
     void setClanLocked(boolean locked);
@@ -35,6 +40,11 @@ public interface INinjaData extends INBTSerializable<Tag> {
 
     float getChakraExp();
     void addChakraExp(float amount);
+    void setChakraExp(float amount);
+
+    float getStaminaExp();
+    void addStaminaExp(float amount);
+    void setStaminaExp(float amount);
 
     int getEnemiesDefeated();
     void addEnemyDefeated();
@@ -44,8 +54,12 @@ public interface INinjaData extends INBTSerializable<Tag> {
     void addJutsuCast();
     void setJutsusCastCount(int count);
 
+    boolean isCreativeMode();
+    void setCreativeMode(boolean creative);
+
     boolean canRankUp();
     boolean rankUp();
+    void resetData();
 
     boolean isAbilityUnlocked(Ability ability);
     boolean isAbilityUnlocked(ResourceLocation abilityId);

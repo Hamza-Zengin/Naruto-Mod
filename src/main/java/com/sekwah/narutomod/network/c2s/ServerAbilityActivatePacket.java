@@ -69,6 +69,7 @@ public class ServerAbilityActivatePacket {
                                         player.getX(), player.getY(), player.getZ(), ability.castingSound(), SoundSource.PLAYERS, 0.5f, 1.0f);
                             }
                             ability.performServer(player, ninjaData);
+                            ninjaData.addJutsuCast();
 
                             if (ability instanceof Ability.Cooldown cooldownAbility) {
                                cooldownAbility.registerCooldown(ninjaData, ability.getTranslationKey());

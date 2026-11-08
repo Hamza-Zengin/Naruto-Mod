@@ -1,21 +1,25 @@
 package com.sekwah.narutomod.capabilities;
 
 public enum NinjaRank {
-    ACADEMY_STUDENT(0, "Academy Student", "Akademi Öğrencisi"),
-    GENIN(1, "Genin", "Genin"),
-    CHUNIN(2, "Chunin", "Chūnin"),
-    JONIN(3, "Jonin", "Jōnin"),
-    ANBU(4, "Anbu", "Anbu"),
-    KAGE(5, "Kage", "Kage");
+    ACADEMY_STUDENT(0, "Academy Student", "Akademi Öğrencisi", 0.0f, 0.0f),
+    GENIN(1, "Genin", "Genin", 25.0f, 20.0f),
+    CHUNIN(2, "Chunin", "Chūnin", 60.0f, 45.0f),
+    JONIN(3, "Jonin", "Jōnin", 110.0f, 80.0f),
+    ANBU(4, "Anbu", "Anbu", 160.0f, 110.0f),
+    KAGE(5, "Kage", "Kage", 250.0f, 160.0f);
 
     private final int level;
     private final String englishName;
     private final String turkishName;
+    private final float chakraBonus;
+    private final float staminaBonus;
 
-    NinjaRank(int level, String englishName, String turkishName) {
+    NinjaRank(int level, String englishName, String turkishName, float chakraBonus, float staminaBonus) {
         this.level = level;
         this.englishName = englishName;
         this.turkishName = turkishName;
+        this.chakraBonus = chakraBonus;
+        this.staminaBonus = staminaBonus;
     }
 
     public int getLevel() {
@@ -34,13 +38,41 @@ public enum NinjaRank {
         return englishName;
     }
 
+    public float getChakraBonus() {
+        return chakraBonus;
+    }
+
+    public float getStaminaBonus() {
+        return staminaBonus;
+    }
+
+    public NinjaRank next() {
+        int nextLevel = this.level + 1;
+        for (NinjaRank rank : values()) {
+            if (rank.level == nextLevel) {
+                return rank;
+            }
+        }
+        return null;
+    }
+
     public static NinjaRank fromString(String name) {
-        if (name == null) return GENIN;
+        if (name == null) return ACADEMY_STUDENT;
         for (NinjaRank rank : values()) {
             if (rank.name().equalsIgnoreCase(name) || rank.englishName.equalsIgnoreCase(name) || rank.turkishName.equalsIgnoreCase(name)) {
                 return rank;
             }
         }
-        return GENIN;
+        return ACADEMY_STUDENT;
+    }
+
+    public static NinjaRank parseExact(String name) {
+        if (name == null) return null;
+        for (NinjaRank rank : values()) {
+            if (rank.name().equalsIgnoreCase(name) || rank.englishName.equalsIgnoreCase(name) || rank.turkishName.equalsIgnoreCase(name)) {
+                return rank;
+            }
+        }
+        return null;
     }
 }

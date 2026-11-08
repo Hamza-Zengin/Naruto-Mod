@@ -66,6 +66,7 @@ public class ServerAbilityChannelPacket {
                         } else if (msg.status == ChannelStatus.STOP) {
                             if(ninjaData.getCurrentlyChanneledAbility() != null && ninjaData.getCurrentlyChanneledAbility().equals(ability.getRegistryName())) {
                                 ability.performServer(player, ninjaData, ninjaData.getCurrentlyChanneledTicks());
+                                ninjaData.addJutsuCast();
                                 ninjaData.setCurrentlyChanneledAbility(player, null);
                             }
                         } else if(msg.status == ChannelStatus.MIN_ACTIVATE) {

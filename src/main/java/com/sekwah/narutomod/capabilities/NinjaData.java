@@ -52,6 +52,9 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private float chakraExp = 0;
 
     @Sync
+    private float staminaExp = 0;
+
+    @Sync
     private int enemiesDefeated = 0;
 
     @Sync
@@ -59,6 +62,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Sync
     private String unlockedJutsus = "";
+
+    private boolean creativeMode = false;
 
     @Sync(minTicks = 1)
     private ResourceLocation currentlyChanneled;
@@ -76,11 +81,14 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         if (isServer) {
             this.maxChakra = NarutoConfig.maxChakra;
             this.maxStamina = NarutoConfig.maxStamina;
-            this.chakra = this.maxChakra;
-            this.stamina = this.maxStamina;
+            this.chakra = this.getMaxChakra();
+            this.stamina = this.getMaxStamina();
             this.clan = new ResourceLocation(NarutoMod.MOD_ID, "shinobi");
             this.clanLocked = false;
             this.unlockedJutsus = "";
+            this.rank = "ACADEMY_STUDENT";
+            this.chakraExp = 0;
+            this.staminaExp = 0;
         }
         this.toggleAbilityData = new ToggleAbilityData();
     }
@@ -113,6 +121,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private static final String CLAN_LOCKED_TAG = "clanLocked";
     private static final String RANK_TAG = "rank";
     private static final String CHAKRA_EXP_TAG = "chakraExp";
+    private static final String STAMINA_EXP_TAG = "staminaExp";
     private static final String ENEMIES_DEFEATED_TAG = "enemiesDefeated";
     private static final String JUTSUS_CAST_TAG = "jutsusCast";
     private static final String UNLOCKED_JUTSUS_TAG = "unlockedJutsus";
@@ -126,6 +135,16 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public float getMaxChakra() {
+        NinjaRank currentRank = NinjaRank.fromString(this.rank);
+        float total = this.maxChakra + currentRank.getChakraBonus();
+        if (this.clan != null && this.clan.getPath().equals("uzumaki")) {
+            total *= 1.25f; // Uzumaki clan's renowned boundless chakra reserve
+        }
+        return total;
+    }
+
+    @Override
+    public float getBaseMaxChakra() {
         return this.maxChakra;
     }
 
@@ -136,29 +155,49 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public float getMaxStamina() {
+        NinjaRank currentRank = NinjaRank.fromString(this.rank);
+        return this.maxStamina + currentRank.getStaminaBonus();
+    }
+
+    @Override
+    public float getBaseMaxStamina() {
         return this.maxStamina;
     }
 
     @Override
     public void setChakra(float chakra) {
-        this.chakra = Math.min(Math.max(chakra, 0), this.maxChakra);
+        float max = this.getMaxChakra();
+        this.chakra = Math.min(Math.max(chakra, 0), max);
     }
 
     @Override
     public void setStamina(float stamina) {
-        this.stamina = Math.min(Math.max(stamina, 0), this.maxStamina);
+        float max = this.getMaxStamina();
+        this.stamina = Math.min(Math.max(stamina, 0), max);
     }
 
     @Override
     public void setMaxChakra(float amount) {
-        this.maxChakra = Math.max(1, amount);
-        if (this.chakra > this.maxChakra) this.chakra = this.maxChakra;
+        setBaseMaxChakra(amount);
     }
 
     @Override
     public void setMaxStamina(float amount) {
-        this.maxStamina = Math.max(1, amount);
-        if (this.stamina > this.maxStamina) this.stamina = this.maxStamina;
+        setBaseMaxStamina(amount);
+    }
+
+    @Override
+    public void setBaseMaxChakra(float amount) {
+        this.maxChakra = Math.min(Math.max(100f, amount), 500f);
+        float max = this.getMaxChakra();
+        if (this.chakra > max) this.chakra = max;
+    }
+
+    @Override
+    public void setBaseMaxStamina(float amount) {
+        this.maxStamina = Math.min(Math.max(100f, amount), 400f);
+        float max = this.getMaxStamina();
+        if (this.stamina > max) this.stamina = max;
     }
 
     @Override
@@ -168,11 +207,17 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public void setClan(ResourceLocation clan) {
-        // Clan cannot be changed once locked!
+        // Clan cannot be changed once locked by player
         if (this.clanLocked) {
             return;
         }
         this.clan = clan;
+    }
+
+    @Override
+    public void forceSetClan(ResourceLocation clan) {
+        this.clan = clan;
+        this.clanLocked = true;
     }
 
     @Override
@@ -187,12 +232,27 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public String getRank() {
-        return this.rank != null ? this.rank : "GENIN";
+        return this.rank != null ? this.rank : "ACADEMY_STUDENT";
     }
 
     @Override
     public void setRank(String rank) {
         this.rank = rank;
+        // Clamp current stats if rank change adjusted max caps
+        float maxC = this.getMaxChakra();
+        float maxS = this.getMaxStamina();
+        if (this.chakra > maxC) this.chakra = maxC;
+        if (this.stamina > maxS) this.stamina = maxS;
+    }
+
+    @Override
+    public boolean isCreativeMode() {
+        return this.creativeMode;
+    }
+
+    @Override
+    public void setCreativeMode(boolean creative) {
+        this.creativeMode = creative;
     }
 
     @Override
@@ -316,16 +376,47 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
+    public void setChakraExp(float amount) {
+        this.chakraExp = Math.max(0f, amount);
+    }
+
+    @Override
     public void addChakraExp(float amount) {
         if (this.maxChakra >= 500f) {
             this.chakraExp = 0;
             return;
         }
         this.chakraExp += amount;
-        float neededExp = 100f + (this.maxChakra - 100f) * 3.5f;
+        float neededExp = 60.0f + (this.maxChakra - 100.0f) * 1.20f;
         if (this.chakraExp >= neededExp && this.maxChakra < 500f) {
             this.chakraExp -= neededExp;
-            this.maxChakra = Math.min(this.maxChakra + 5f, 500f);
+            this.maxChakra = Math.min(this.maxChakra + 5.0f, 500.0f);
+            if (this.chakra > this.getMaxChakra()) this.chakra = this.getMaxChakra();
+        }
+    }
+
+    @Override
+    public float getStaminaExp() {
+        return this.staminaExp;
+    }
+
+    @Override
+    public void setStaminaExp(float amount) {
+        this.staminaExp = Math.max(0f, amount);
+    }
+
+    @Override
+    public void addStaminaExp(float amount) {
+        if (this.maxStamina >= 400f) {
+            this.staminaExp = 0;
+            return;
+        }
+        this.staminaExp += amount;
+        float neededExp = 50.0f + (this.maxStamina - 100.0f) * 1.10f;
+        if (this.staminaExp >= neededExp && this.maxStamina < 400f) {
+            this.staminaExp -= neededExp;
+            this.maxStamina = Math.min(this.maxStamina + 5.0f, 400.0f);
+            if (this.stamina > this.getMaxStamina()) this.stamina = this.getMaxStamina();
         }
     }
 
@@ -336,6 +427,10 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             return Math.min(this.enemiesDefeated, 25);
         } else if (current == NinjaRank.CHUNIN) {
             return Math.min(this.enemiesDefeated, 75);
+        } else if (current == NinjaRank.JONIN) {
+            return Math.min(this.enemiesDefeated, 150);
+        } else if (current == NinjaRank.ANBU) {
+            return Math.min(this.enemiesDefeated, 300);
         }
         return this.enemiesDefeated;
     }
@@ -344,13 +439,15 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     public void addEnemyDefeated() {
         NinjaRank current = NinjaRank.fromString(this.getRank());
         if (current == NinjaRank.GENIN) {
-            if (this.enemiesDefeated < 25) {
-                this.enemiesDefeated++;
-            }
+            if (this.enemiesDefeated < 25) this.enemiesDefeated++;
         } else if (current == NinjaRank.CHUNIN) {
-            if (this.enemiesDefeated < 75) {
-                this.enemiesDefeated++;
-            }
+            if (this.enemiesDefeated < 75) this.enemiesDefeated++;
+        } else if (current == NinjaRank.JONIN) {
+            if (this.enemiesDefeated < 150) this.enemiesDefeated++;
+        } else if (current == NinjaRank.ANBU) {
+            if (this.enemiesDefeated < 300) this.enemiesDefeated++;
+        } else {
+            this.enemiesDefeated++;
         }
     }
 
@@ -375,6 +472,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             if (this.jutsusCastCount < 10) {
                 this.jutsusCastCount++;
             }
+        } else {
+            this.jutsusCastCount++;
         }
     }
 
@@ -387,11 +486,15 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     public boolean canRankUp() {
         NinjaRank current = NinjaRank.fromString(this.getRank());
         if (current == NinjaRank.ACADEMY_STUDENT) {
-            return this.maxChakra >= 100 && this.getJutsusCastCount() >= 10;
+            return this.maxChakra >= 120.0f && this.getJutsusCastCount() >= 10;
         } else if (current == NinjaRank.GENIN) {
-            return this.maxChakra >= 200 && this.getEnemiesDefeated() >= 25;
+            return this.maxChakra >= 200.0f && this.maxStamina >= 150.0f && this.getEnemiesDefeated() >= 25;
         } else if (current == NinjaRank.CHUNIN) {
-            return this.maxChakra >= 350 && this.getEnemiesDefeated() >= 75 && this.getUnlockedAbilities().size() >= 4;
+            return this.maxChakra >= 300.0f && this.maxStamina >= 200.0f && this.getEnemiesDefeated() >= 75 && this.getUnlockedAbilities().size() >= 3;
+        } else if (current == NinjaRank.JONIN) {
+            return this.maxChakra >= 400.0f && this.maxStamina >= 280.0f && this.getEnemiesDefeated() >= 150 && this.getUnlockedAbilities().size() >= 4;
+        } else if (current == NinjaRank.ANBU) {
+            return this.maxChakra >= 500.0f && this.maxStamina >= 350.0f && this.getEnemiesDefeated() >= 300 && this.getUnlockedAbilities().size() >= 5;
         }
         return false;
     }
@@ -400,47 +503,60 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     public boolean rankUp() {
         if (!canRankUp()) return false;
         NinjaRank current = NinjaRank.fromString(this.getRank());
-        if (current == NinjaRank.ACADEMY_STUDENT) {
-            setRank("GENIN");
-            this.jutsusCastCount = 0;
-            this.enemiesDefeated = 0;
-            return true;
-        } else if (current == NinjaRank.GENIN) {
-            setRank("CHUNIN");
-            this.jutsusCastCount = 0;
-            this.enemiesDefeated = 0;
-            return true;
-        } else if (current == NinjaRank.CHUNIN) {
-            setRank("JONIN");
-            this.jutsusCastCount = 0;
-            this.enemiesDefeated = 0;
-            return true;
-        }
-        return false;
+        NinjaRank next = current.next();
+        if (next == null) return false;
+
+        setRank(next.name());
+        this.jutsusCastCount = 0;
+        this.enemiesDefeated = 0;
+        // Refill to new higher maximum stats upon achieving new rank
+        this.chakra = this.getMaxChakra();
+        this.stamina = this.getMaxStamina();
+        return true;
+    }
+
+    @Override
+    public void resetData() {
+        this.maxChakra = NarutoConfig.maxChakra;
+        this.maxStamina = NarutoConfig.maxStamina;
+        this.rank = "ACADEMY_STUDENT";
+        this.clan = new ResourceLocation(NarutoMod.MOD_ID, "shinobi");
+        this.clanLocked = false;
+        this.chakraExp = 0;
+        this.staminaExp = 0;
+        this.enemiesDefeated = 0;
+        this.jutsusCastCount = 0;
+        this.unlockedJutsus = "";
+        this.chakra = this.getMaxChakra();
+        this.stamina = this.getMaxStamina();
     }
 
     @Override
     public void useChakra(float amount, int cooldown) {
-        this.chakra -= amount;
+        if (!this.creativeMode) {
+            this.chakra = Math.max(0f, this.chakra - amount);
+        }
         this.chakraRegenInfo.cooldown = Math.max(cooldown, this.chakraRegenInfo.cooldown);
-        addChakraExp(amount * 0.02f);
-        addJutsuCast();
+        addChakraExp(amount * 0.04f);
     }
 
     @Override
     public void useStamina(float amount, int cooldown) {
-        this.stamina -= amount;
+        if (!this.creativeMode) {
+            this.stamina = Math.max(0f, this.stamina - amount);
+        }
         this.staminaRegenInfo.cooldown = Math.max(cooldown, this.staminaRegenInfo.cooldown);
+        addStaminaExp(amount * 0.10f);
     }
 
     @Override
     public void addChakra(float amount) {
-        this.chakra = Math.min(Math.max(this.chakra + amount, 0), maxChakra);
+        this.chakra = Math.min(Math.max(this.chakra + amount, 0), this.getMaxChakra());
     }
 
     @Override
     public void addStamina(float amount) {
-        this.stamina = Math.min(Math.max(this.stamina + amount, 0), maxStamina);
+        this.stamina = Math.min(Math.max(this.stamina + amount, 0), this.getMaxStamina());
     }
 
     @Override
@@ -525,8 +641,10 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             }
             this.chakra += chakraRegen;
         }
-        this.stamina = Math.min(Math.max(this.stamina, 0), maxStamina);
-        this.chakra = Math.min(Math.max(this.chakra, 0), maxChakra);
+        float curMaxStamina = this.getMaxStamina();
+        float curMaxChakra = this.getMaxChakra();
+        this.stamina = Math.min(Math.max(this.stamina, 0), curMaxStamina);
+        this.chakra = Math.min(Math.max(this.chakra, 0), curMaxChakra);
 
         if (this.currentlyChanneled != null) {
             Ability ability = NarutoAbilities.getAbility(this.currentlyChanneled);
@@ -564,8 +682,9 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             nbt.putString(CLAN_TAG, this.clan.toString());
         }
         nbt.putBoolean(CLAN_LOCKED_TAG, this.clanLocked);
-        nbt.putString(RANK_TAG, this.rank != null ? this.rank : "GENIN");
+        nbt.putString(RANK_TAG, this.rank != null ? this.rank : "ACADEMY_STUDENT");
         nbt.putFloat(CHAKRA_EXP_TAG, this.chakraExp);
+        nbt.putFloat(STAMINA_EXP_TAG, this.staminaExp);
         nbt.putInt(ENEMIES_DEFEATED_TAG, this.enemiesDefeated);
         nbt.putInt(JUTSUS_CAST_TAG, this.jutsusCastCount);
         if (this.unlockedJutsus != null) {
@@ -593,9 +712,14 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             }
             if (compoundTag.contains(RANK_TAG)) {
                 this.rank = compoundTag.getString(RANK_TAG);
+            } else {
+                this.rank = "ACADEMY_STUDENT";
             }
             if (compoundTag.contains(CHAKRA_EXP_TAG)) {
                 this.chakraExp = compoundTag.getFloat(CHAKRA_EXP_TAG);
+            }
+            if (compoundTag.contains(STAMINA_EXP_TAG)) {
+                this.staminaExp = compoundTag.getFloat(STAMINA_EXP_TAG);
             }
             if (compoundTag.contains(ENEMIES_DEFEATED_TAG)) {
                 this.enemiesDefeated = compoundTag.getInt(ENEMIES_DEFEATED_TAG);
@@ -610,6 +734,10 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
                 if (this.enemiesDefeated > 25) this.enemiesDefeated = 25;
             } else if (current == NinjaRank.CHUNIN) {
                 if (this.enemiesDefeated > 75) this.enemiesDefeated = 75;
+            } else if (current == NinjaRank.JONIN) {
+                if (this.enemiesDefeated > 150) this.enemiesDefeated = 150;
+            } else if (current == NinjaRank.ANBU) {
+                if (this.enemiesDefeated > 300) this.enemiesDefeated = 300;
             }
             if (compoundTag.contains(UNLOCKED_JUTSUS_TAG)) {
                 this.unlockedJutsus = compoundTag.getString(UNLOCKED_JUTSUS_TAG);

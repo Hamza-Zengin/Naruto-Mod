@@ -33,11 +33,11 @@ public class NinjaCapabilityHandler {
         if(event.phase.equals(TickEvent.Phase.END)) {
             Player player = event.player;
             player.getCapability(NINJA_DATA).ifPresent(data -> {
-                if(player.isCreative()) {
-                    data.setChakra(data.getMaxChakra());
-                    data.setStamina(data.getMaxStamina());
-                }
+                data.setCreativeMode(player.isCreative());
                 if(event.side.isServer()) {
+                    if (player.isSprinting() && player.onGround() && player.getDeltaMovement().horizontalDistanceSqr() > 0.001) {
+                        data.addStaminaExp(0.03f);
+                    }
                     data.updateServerData(player);
                 }
                 data.getToggleAbilityData().getAbilitiesHashSet().forEach(abilityName -> {

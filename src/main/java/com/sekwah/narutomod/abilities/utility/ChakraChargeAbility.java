@@ -44,7 +44,7 @@ public class ChakraChargeAbility extends Ability implements Ability.Channeled {
            ninjaData.addChakra(1f);
            // Meditation: If crouching quietly, focus chakra pathways and train chakra control
            if (player.isCrouching()) {
-               ninjaData.addChakraExp(0.04f);
+               ninjaData.addChakraExp(0.06f);
                if (ticksChanneled % 10 == 0 && player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
                    serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.ENCHANT,
                            player.getX(), player.getY() + 0.5, player.getZ(),
