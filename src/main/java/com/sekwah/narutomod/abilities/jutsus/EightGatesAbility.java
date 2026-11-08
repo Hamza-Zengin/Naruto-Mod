@@ -72,25 +72,27 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
 
                 serverLevel.sendParticles(ParticleTypes.DAMAGE_INDICATOR,
                         player.getX(), player.getY() + 1.2, player.getZ(),
-                        6, 0.2, 0.2, 0.2, 0.05);
+                        2, 0.15, 0.15, 0.15, 0.02);
                 serverLevel.sendParticles(ParticleTypes.LAVA,
                         player.getX(), player.getY() + 0.8, player.getZ(),
-                        5, 0.3, 0.4, 0.3, 0.02);
+                        2, 0.2, 0.3, 0.2, 0.01);
             }
         }
 
-        // Fierce Red and Crimson Steam bursting from every pore
+        // Minimalist subtle Crimson Steam aura
         if (player.level() instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(ParticleTypes.CRIT,
-                    player.getX(), player.getY() + 0.8, player.getZ(),
-                    4, 0.3, 0.5, 0.3, 0.08);
-            if (ticksActive % 3 == 0) {
+            if (ticksActive % 2 == 0) {
+                serverLevel.sendParticles(ParticleTypes.CRIT,
+                        player.getX(), player.getY() + 0.8, player.getZ(),
+                        2, 0.25, 0.4, 0.25, 0.03);
+            }
+            if (ticksActive % 6 == 0) {
                 serverLevel.sendParticles(ParticleTypes.DRAGON_BREATH,
                         player.getX(), player.getY() + 0.2, player.getZ(),
-                        3, 0.2, 0.4, 0.2, 0.02);
+                        1, 0.15, 0.3, 0.15, 0.01);
                 serverLevel.sendParticles(ParticleTypes.FLAME,
-                        player.getX(), player.getY() + 1.0, player.getZ(),
-                        2, 0.25, 0.3, 0.25, 0.01);
+                        player.getX(), player.getY() + 0.9, player.getZ(),
+                        1, 0.2, 0.25, 0.2, 0.005);
             }
         }
     }

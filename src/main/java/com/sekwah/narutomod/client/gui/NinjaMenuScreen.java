@@ -19,6 +19,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import com.sekwah.narutomod.clans.Clan;
+import com.sekwah.narutomod.clans.NarutoClans;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,6 +116,16 @@ public class NinjaMenuScreen extends Screen {
         });
     }
 
+    private List<RegistryObject<Clan>> getSelectableClans() {
+        List<RegistryObject<Clan>> list = new ArrayList<>();
+        for (RegistryObject<Clan> entry : NarutoClans.CLANS.getEntries()) {
+            if (!entry.getId().getPath().equalsIgnoreCase("shinobi")) {
+                list.add(entry);
+            }
+        }
+        return list;
+    }
+
     private void initClanTab(int centerX, int boxY) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
@@ -120,19 +133,19 @@ public class NinjaMenuScreen extends Screen {
         mc.player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
             boolean isLocked = ninjaData.isClanLocked();
 
-            String[] clans = {"uchiha", "hyuga", "uzumaki", "nara"};
+            List<RegistryObject<Clan>> clans = getSelectableClans();
             int cardStartY = boxY + 36;
             int cardH = 34;
             int cardGap = 4;
             int boxX = centerX - BOX_WIDTH / 2;
 
-            for (int i = 0; i < clans.length; i++) {
-                final String clanKey = clans[i];
-                final ResourceLocation clanLoc = new ResourceLocation(NarutoMod.MOD_ID, clanKey);
+            for (int i = 0; i < clans.size(); i++) {
+                final RegistryObject<Clan> clanEntry = clans.get(i);
+                final ResourceLocation clanLoc = clanEntry.getId();
                 int cardY = cardStartY + i * (cardH + cardGap);
                 int btnY = cardY + 7;
 
-                boolean isCurrentClan = ninjaData.getClan() != null && ninjaData.getClan().getPath().equalsIgnoreCase(clanKey);
+                boolean isCurrentClan = ninjaData.getClan() != null && ninjaData.getClan().equals(clanLoc);
 
                 String label;
                 if (isCurrentClan) {
@@ -224,12 +237,13 @@ public class NinjaMenuScreen extends Screen {
         int contentW = BOX_WIDTH - 24;
 
         // Clan Badge & Lock calculation
-        String clanPath = ninjaData.getClan() != null ? ninjaData.getClan().getPath() : "shinobi";
+        ResourceLocation clanLoc = ninjaData.getClan();
         String clanStatusStr;
-        if (clanPath.equals("shinobi")) {
+        if (clanLoc == null || clanLoc.getPath().equalsIgnoreCase("shinobi")) {
             clanStatusStr = "§eKlan: §7Klansız §6[Seçilmedi]";
         } else {
-            String clanDisplay = clanPath.substring(0, 1).toUpperCase() + clanPath.substring(1) + " Klanı";
+            Clan clan = NarutoClans.getClan(clanLoc);
+            String clanDisplay = clan != null ? clan.getName().getString() : (clanLoc.getPath().substring(0, 1).toUpperCase(java.util.Locale.ROOT) + clanLoc.getPath().substring(1) + " Klanı");
             String lockBadge = ninjaData.isClanLocked() ? "§2[Mühürlü]" : "§e[Değiştirilebilir]";
             clanStatusStr = "§eKlan: §f" + clanDisplay + " " + lockBadge;
         }
@@ -438,27 +452,18 @@ public class NinjaMenuScreen extends Screen {
             graphics.drawCenteredString(this.font, "§fKlanınızı dikkatli seçiniz; seçim kalıcı olarak mühürlenir.", centerX, boxY + 15, 0xFFFFFFFF);
         }
 
-        String[] clans = {"uchiha", "hyuga", "uzumaki", "nara"};
-        String[] titles = {
-                "Uchiha Klanı (Ateş & Sharingan)",
-                "Hyūga Klanı (Nazik Yumruk & Byakugan)",
-                "Uzumaki Klanı (Devasa Çakra Rezervi)",
-                "Nara Klanı (Gölge & Hızlı Kondisyon)"
-        };
-        String[] descs = {
-                "Ateş teknikleri, Sharingan ve Susanoo kalkanı.",
-                "360° Byakugan görüşü ve çakra darbe sanatı.",
-                "Toplam maksimum çakrada +%25 devasa havuz ve x2 doğal yenilenme.",
-                "Gölge teknikleri ve %30 daha hızlı kondisyon dolumu."
-        };
+        List<RegistryObject<Clan>> clans = getSelectableClans();
 
         int cardStartY = boxY + 36;
         int cardH = 34;
         int cardGap = 4;
         int maxTextW = BOX_WIDTH - 96;
 
-        for (int i = 0; i < clans.length; i++) {
-            boolean isCurrent = ninjaData.getClan() != null && ninjaData.getClan().getPath().equalsIgnoreCase(clans[i]);
+        for (int i = 0; i < clans.size(); i++) {
+            RegistryObject<Clan> clanEntry = clans.get(i);
+            ResourceLocation clanLoc = clanEntry.getId();
+            Clan clan = clanEntry.get();
+            boolean isCurrent = ninjaData.getClan() != null && ninjaData.getClan().equals(clanLoc);
             int bgCol = isCurrent ? 0xCC113311 : 0xCC111116;
             int borderCol = isCurrent ? 0xFF22AA22 : 0xFF444455;
 
@@ -467,9 +472,10 @@ public class NinjaMenuScreen extends Screen {
             graphics.fill(boxX, cardY, boxX + BOX_WIDTH, cardY + cardH, bgCol);
             graphics.renderOutline(boxX, cardY, BOX_WIDTH, cardH, borderCol);
 
-            graphics.drawString(this.font, "§6" + titles[i], boxX + 8, cardY + 5, 0xFFFFFFFF);
+            String title = clan != null ? clan.getName().getString() : clanLoc.getPath();
+            graphics.drawString(this.font, "§6" + title, boxX + 8, cardY + 5, 0xFFFFFFFF);
 
-            String desc = descs[i];
+            String desc = clan != null ? clan.getDescription().getString() : "";
             if (this.font.width(desc) > maxTextW) {
                 desc = this.font.plainSubstrByWidth(desc, maxTextW - 8) + "...";
             }

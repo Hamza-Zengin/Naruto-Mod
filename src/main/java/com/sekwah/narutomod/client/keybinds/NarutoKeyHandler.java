@@ -174,7 +174,7 @@ public class NarutoKeyHandler {
             if(mc.player != null) {
                 NarutoMod.LOGGER.debug("Casting jutsu {}", currentJutsuCombo);
                 if(!NarutoAbilities.triggerAbility(currentJutsuCombo)) {
-                    mc.player.sendSystemMessage(Component.translatable("jutsu.error.notfound", currentJutsuCombo).withStyle(ChatFormatting.RED));
+                    NarutoMod.LOGGER.debug("No jutsu found for combo {}", currentJutsuCombo);
                 }
             }
             resetJutsuCasting();

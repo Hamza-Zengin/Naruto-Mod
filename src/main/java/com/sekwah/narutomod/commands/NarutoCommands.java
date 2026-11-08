@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class NarutoCommands {
 
     private static final SuggestionProvider<CommandSourceStack> SUGGEST_RANKS = (ctx, builder) -> {
         List<String> rankNames = new ArrayList<>();
         for (NinjaRank r : NinjaRank.values()) {
-            rankNames.add(r.name().toLowerCase());
-            rankNames.add(r.getEnglishName().toLowerCase());
+            rankNames.add(r.name().toLowerCase(Locale.ROOT));
         }
         return SharedSuggestionProvider.suggest(rankNames, builder);
     };

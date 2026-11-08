@@ -56,23 +56,23 @@ public enum NinjaRank {
         return null;
     }
 
-    public static NinjaRank fromString(String name) {
-        if (name == null) return ACADEMY_STUDENT;
-        for (NinjaRank rank : values()) {
-            if (rank.name().equalsIgnoreCase(name) || rank.englishName.equalsIgnoreCase(name) || rank.turkishName.equalsIgnoreCase(name)) {
-                return rank;
-            }
-        }
-        return ACADEMY_STUDENT;
-    }
-
     public static NinjaRank parseExact(String name) {
         if (name == null) return null;
+        String clean = name.trim().replace('ı', 'i').replace('İ', 'I').toLowerCase(java.util.Locale.ROOT);
         for (NinjaRank rank : values()) {
-            if (rank.name().equalsIgnoreCase(name) || rank.englishName.equalsIgnoreCase(name) || rank.turkishName.equalsIgnoreCase(name)) {
+            if (rank.name().toLowerCase(java.util.Locale.ROOT).equals(clean)
+                    || rank.englishName.toLowerCase(java.util.Locale.ROOT).replace(" ", "_").equals(clean)
+                    || rank.englishName.toLowerCase(java.util.Locale.ROOT).equals(clean)
+                    || rank.turkishName.toLowerCase(java.util.Locale.ROOT).replace('ı', 'i').replace('İ', 'I').replace(" ", "_").equals(clean)
+                    || rank.turkishName.toLowerCase(java.util.Locale.ROOT).replace('ı', 'i').replace('İ', 'I').equals(clean)) {
                 return rank;
             }
         }
         return null;
+    }
+
+    public static NinjaRank fromString(String name) {
+        NinjaRank exact = parseExact(name);
+        return exact != null ? exact : ACADEMY_STUDENT;
     }
 }

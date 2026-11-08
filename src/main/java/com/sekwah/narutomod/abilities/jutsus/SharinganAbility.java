@@ -66,34 +66,34 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
                         net.minecraft.sounds.SoundEvents.BEACON_ACTIVATE, net.minecraft.sounds.SoundSource.PLAYERS, 0.5f, 1.8f);
 
                 double eyeY = player.getEyeY();
-                // 360-degree subtle 8-point crimson chakra halo radiating outward at eye level
-                for (int i = 0; i < 8; i++) {
-                    double angle = (2 * Math.PI / 8) * i;
-                    double vx = Math.cos(angle) * 0.12;
-                    double vz = Math.sin(angle) * 0.12;
+                // Minimalist 4-point subtle crimson awakening shimmer at eye level
+                for (int i = 0; i < 4; i++) {
+                    double angle = (Math.PI / 2) * i;
+                    double vx = Math.cos(angle) * 0.05;
+                    double vz = Math.sin(angle) * 0.05;
                     serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
-                            player.getX() + Math.cos(angle) * 0.35,
+                            player.getX() + Math.cos(angle) * 0.25,
                             eyeY,
-                            player.getZ() + Math.sin(angle) * 0.35,
-                            1, vx, 0.02, vz, 0.02);
+                            player.getZ() + Math.sin(angle) * 0.25,
+                            1, vx, 0.01, vz, 0.01);
                 }
             }
 
-            // Gentle crimson eye trails drifting backward from temples (halved particle frequency: 1/sec)
-            if (ticksActive % 20 == 0) {
+            // Minimalist subtle crimson eye trail drifting backward from temples (once every 2 seconds)
+            if (ticksActive % 40 == 0) {
                 Vec3 look = player.getLookAngle();
                 Vec3 up = new Vec3(0, 1, 0);
-                Vec3 right = look.cross(up).normalize().scale(0.26);
+                Vec3 right = look.cross(up).normalize().scale(0.24);
                 double eyeY = player.getEyeY() - 0.05;
                 Vec3 leftEyePos = player.position().add(0, eyeY - player.getY(), 0).subtract(right).subtract(look.scale(0.1));
                 Vec3 rightEyePos = player.position().add(0, eyeY - player.getY(), 0).add(right).subtract(look.scale(0.1));
 
                 serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
                         leftEyePos.x, leftEyePos.y, leftEyePos.z,
-                        1, -look.x * 0.025, 0.01, -look.z * 0.025, 0.01);
+                        1, -look.x * 0.012, 0.005, -look.z * 0.012, 0.005);
                 serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
                         rightEyePos.x, rightEyePos.y, rightEyePos.z,
-                        1, -look.x * 0.025, 0.01, -look.z * 0.025, 0.01);
+                        1, -look.x * 0.012, 0.005, -look.z * 0.012, 0.005);
             }
 
             // Reflex field: Enemies within 8 blocks are perceived as slowed
