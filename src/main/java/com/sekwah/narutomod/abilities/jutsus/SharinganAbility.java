@@ -56,29 +56,31 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
         player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 0, false, false, false));
 
         if (player.level() instanceof ServerLevel serverLevel) {
-            // On initial activation: play awakening sound and spawn an eye-level subtle crimson ring
+            // On initial activation: play crisp, mystical ocular awakening sound and subtle 8-point halo
             if (ticksActive == 1) {
                 serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
-                        net.minecraft.sounds.SoundEvents.ENDER_EYE_DEATH, net.minecraft.sounds.SoundSource.PLAYERS, 0.8f, 1.6f);
+                        net.minecraft.sounds.SoundEvents.ENCHANTMENT_TABLE_USE, net.minecraft.sounds.SoundSource.PLAYERS, 1.0f, 1.7f);
                 serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
-                        net.minecraft.sounds.SoundEvents.BEACON_ACTIVATE, net.minecraft.sounds.SoundSource.PLAYERS, 0.5f, 2.0f);
+                        net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_RESONATE, net.minecraft.sounds.SoundSource.PLAYERS, 0.8f, 1.3f);
+                serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
+                        net.minecraft.sounds.SoundEvents.BEACON_ACTIVATE, net.minecraft.sounds.SoundSource.PLAYERS, 0.5f, 1.8f);
 
                 double eyeY = player.getEyeY();
-                // 360-degree subtle crimson chakra halo radiating outward at eye level
-                for (int i = 0; i < 16; i++) {
-                    double angle = (2 * Math.PI / 16) * i;
-                    double vx = Math.cos(angle) * 0.15;
-                    double vz = Math.sin(angle) * 0.15;
+                // 360-degree subtle 8-point crimson chakra halo radiating outward at eye level
+                for (int i = 0; i < 8; i++) {
+                    double angle = (2 * Math.PI / 8) * i;
+                    double vx = Math.cos(angle) * 0.12;
+                    double vz = Math.sin(angle) * 0.12;
                     serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
-                            player.getX() + Math.cos(angle) * 0.4,
+                            player.getX() + Math.cos(angle) * 0.35,
                             eyeY,
-                            player.getZ() + Math.sin(angle) * 0.4,
+                            player.getZ() + Math.sin(angle) * 0.35,
                             1, vx, 0.02, vz, 0.02);
                 }
             }
 
-            // Gentle crimson eye trails drifting backward from temples (visible in 3rd person and to onlookers, zero 1st-person blockage)
-            if (ticksActive % 10 == 0) {
+            // Gentle crimson eye trails drifting backward from temples (halved particle frequency: 1/sec)
+            if (ticksActive % 20 == 0) {
                 Vec3 look = player.getLookAngle();
                 Vec3 up = new Vec3(0, 1, 0);
                 Vec3 right = look.cross(up).normalize().scale(0.26);
@@ -88,10 +90,10 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
 
                 serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
                         leftEyePos.x, leftEyePos.y, leftEyePos.z,
-                        1, -look.x * 0.03, 0.01, -look.z * 0.03, 0.01);
+                        1, -look.x * 0.025, 0.01, -look.z * 0.025, 0.01);
                 serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
                         rightEyePos.x, rightEyePos.y, rightEyePos.z,
-                        1, -look.x * 0.03, 0.01, -look.z * 0.03, 0.01);
+                        1, -look.x * 0.025, 0.01, -look.z * 0.025, 0.01);
             }
 
             // Reflex field: Enemies within 8 blocks are perceived as slowed

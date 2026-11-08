@@ -63,17 +63,19 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
         player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 2, false, false, true)); // Resistance III (60% dmg reduction)
         player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 40, 0, false, false, false));
 
-        if (ticksActive % 10 == 0 && player.level() instanceof ServerLevel serverLevel) {
-            // Gentle ethereal chakra embers spiraling at base of ribs
+        // Activation sound on first tick
+        if (ticksActive == 1 && player.level() instanceof ServerLevel serverLevel) {
+            serverLevel.playSound(null, player.blockPosition(), SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.PLAYERS, 0.85f, 0.75f);
+            serverLevel.playSound(null, player.blockPosition(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.9f, 0.85f);
+            serverLevel.playSound(null, player.blockPosition(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 0.6f, 0.6f);
+        }
+
+        if (ticksActive % 20 == 0 && player.level() instanceof ServerLevel serverLevel) {
+            // Minimal, elegant ethereal chakra ember at base (halved particle presence)
             serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
                     player.getX() + (player.getRandom().nextDouble() - 0.5) * 1.5,
-                    player.getY() + 0.2 + player.getRandom().nextDouble() * 0.8,
+                    player.getY() + 0.15,
                     player.getZ() + (player.getRandom().nextDouble() - 0.5) * 1.5,
-                    2, 0, 0.03, 0, 0.01);
-            serverLevel.sendParticles(ParticleTypes.FLAME,
-                    player.getX() + (player.getRandom().nextDouble() - 0.5) * 1.2,
-                    player.getY() + 0.1,
-                    player.getZ() + (player.getRandom().nextDouble() - 0.5) * 1.2,
                     1, 0, 0.02, 0, 0.01);
 
             // Knock back aggressive foes nearby

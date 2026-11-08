@@ -70,6 +70,9 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
+        // Summoning sound at caster position: crackling thunder from the sky
+        serverLevel.playSound(null, player.blockPosition(), SoundEvents.TRIDENT_THUNDER, SoundSource.PLAYERS, 2.0f, 0.85f);
+
         double maxRange = 36.0D;
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookDir = player.getViewVector(1.0F);
@@ -110,10 +113,10 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
             serverLevel.addFreshEntity(lightningBolt);
         }
 
-        // Thunderous boom and electric particles
-        serverLevel.playSound(null, targetBlock, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 10.0f, 0.65f);
-        serverLevel.playSound(null, targetBlock, SoundEvents.WARDEN_SONIC_BOOM, SoundSource.WEATHER, 1.6f, 1.4f);
-        serverLevel.playSound(null, targetBlock, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2.5f, 0.9f);
+        // Thunderous boom and electric particles (majestic, fitting, crisp audio)
+        serverLevel.playSound(null, targetBlock, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 3.5f, 0.75f);
+        serverLevel.playSound(null, targetBlock, SoundEvents.TRIDENT_RIPTIDE_3, SoundSource.WEATHER, 1.8f, 0.6f);
+        serverLevel.playSound(null, targetBlock, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.4f, 1.1f);
 
         // Huge vertical electric dragon beam
         for (double y = targetPos.y; y < targetPos.y + 25; y += 0.5) {
