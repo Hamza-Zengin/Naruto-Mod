@@ -605,14 +605,26 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public void updateServerData(Player player) {
+        if (player.isDeadOrDying()) {
+            if (this.currentlyChanneled != null) {
+                this.setCurrentlyChanneledAbility(player, null);
+            }
+            return;
+        }
+
+        // Safe delayed tick execution: collect events to run, then execute outside iterator
+        ArrayList<DelayedPlayerTickEvent> toRun = new ArrayList<>();
         Iterator<DelayedPlayerTickEvent> iterator = this.delayedTickEvents.iterator();
         while (iterator.hasNext()) {
             DelayedPlayerTickEvent event = iterator.next();
             event.tick();
             if (event.shouldRun()) {
-                event.run(player);
+                toRun.add(event);
                 iterator.remove();
             }
+        }
+        for (DelayedPlayerTickEvent event : toRun) {
+            event.run(player);
         }
 
         ArrayList<String> completeList = new ArrayList<>(cooldownTickEvents.keySet());
@@ -656,11 +668,12 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
                 } else {
                     if (this.ticksChanneled > 0) {
                         ability.performServer(player, this, this.ticksChanneled - 1);
-                        this.setCurrentlyChanneledAbility(player, null);
                     }
+                    this.setCurrentlyChanneledAbility(player, null);
                 }
             } else {
                 NarutoMod.LOGGER.error("Somehow non channeled ability has been set to ninja data {}", this.currentlyChanneled);
+                this.setCurrentlyChanneledAbility(player, null);
             }
             this.ticksChanneled++;
         }

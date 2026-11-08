@@ -261,7 +261,7 @@ public class NinjaMenuScreen extends Screen {
         graphics.drawString(this.font, "§9Çakra", x, y, 0xFFFFFFFF);
         graphics.drawString(this.font, chakraValStr, boxX + BOX_WIDTH - 12 - this.font.width(chakraValStr), y, 0xFFFFFFFF);
         y += 10;
-        renderBar(graphics, x, y, contentW, 5, chakra / maxChakra, 0xFF2255FF, 0xFF001144);
+        renderBar(graphics, x, y, contentW, 5, maxChakra > 0 ? chakra / maxChakra : 0f, 0xFF2255FF, 0xFF001144);
         y += 8;
 
         // 2. Stat Bar: Stamina
@@ -272,7 +272,7 @@ public class NinjaMenuScreen extends Screen {
         graphics.drawString(this.font, "§aKondisyon", x, y, 0xFFFFFFFF);
         graphics.drawString(this.font, staminaValStr, boxX + BOX_WIDTH - 12 - this.font.width(staminaValStr), y, 0xFFFFFFFF);
         y += 10;
-        renderBar(graphics, x, y, contentW, 5, stamina / maxStamina, 0xFF22DD44, 0xFF003311);
+        renderBar(graphics, x, y, contentW, 5, maxStamina > 0 ? stamina / maxStamina : 0f, 0xFF22DD44, 0xFF003311);
         y += 8;
 
         // 3 & 4. Training EXP Bars (Side by Side)
@@ -294,8 +294,8 @@ public class NinjaMenuScreen extends Screen {
         graphics.drawString(this.font, sExpVal, rightColX + halfW - this.font.width(sExpVal), y, 0xFFFFFFFF);
         y += 10;
 
-        renderBar(graphics, x, y, halfW, 5, baseChakra >= 500f ? 1f : (chakraExp / cNeededExp), 0xFFAA22EE, 0xFF330044);
-        renderBar(graphics, rightColX, y, halfW, 5, baseStamina >= 400f ? 1f : (staminaExp / sNeededExp), 0xFF22AA66, 0xFF003318);
+        renderBar(graphics, x, y, halfW, 5, baseChakra >= 500f ? 1f : (cNeededExp > 0 ? chakraExp / cNeededExp : 0f), 0xFFAA22EE, 0xFF330044);
+        renderBar(graphics, rightColX, y, halfW, 5, baseStamina >= 400f ? 1f : (sNeededExp > 0 ? staminaExp / sNeededExp : 0f), 0xFF22AA66, 0xFF003318);
         y += 11;
 
         // Exam & Progression Card

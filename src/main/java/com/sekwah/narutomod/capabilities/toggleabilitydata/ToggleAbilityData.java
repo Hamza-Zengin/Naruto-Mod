@@ -52,6 +52,10 @@ public class ToggleAbilityData {
         return abilities;
     }
 
+    public java.util.List<ResourceLocation> getAbilitiesSnapshot() {
+        return this.abilities != null ? new java.util.ArrayList<>(this.abilities) : new java.util.ArrayList<>();
+    }
+
     public boolean hasToggleAbility(ResourceLocation ability) {
         return this.abilities != null && this.abilities.contains(ability);
     }

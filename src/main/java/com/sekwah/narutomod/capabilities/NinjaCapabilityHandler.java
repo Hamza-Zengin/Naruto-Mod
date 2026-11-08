@@ -40,9 +40,12 @@ public class NinjaCapabilityHandler {
                     }
                     data.updateServerData(player);
                 }
-                data.getToggleAbilityData().getAbilitiesHashSet().forEach(abilityName -> {
+                for (ResourceLocation abilityName : data.getToggleAbilityData().getAbilitiesSnapshot()) {
+                    if (!data.getToggleAbilityData().hasToggleAbility(abilityName)) {
+                        continue;
+                    }
                     Ability ability = NarutoAbilities.getAbility(abilityName);
-                    if(ability == null) return;
+                    if(ability == null) continue;
                     if(event.side.isServer()) {
                         if(ability.handleCost(player, data)) {
                             ability.performServer(player, data);
@@ -52,7 +55,7 @@ public class NinjaCapabilityHandler {
                     } else {
                         if(ability instanceof Ability.Toggled toggleAbility) toggleAbility.performToggleClient(player, data);
                     }
-                });
+                }
             });
         }
 
@@ -63,14 +66,25 @@ public class NinjaCapabilityHandler {
         event.getOriginal().getCapability(NINJA_DATA).ifPresent(original -> {
             event.getEntity().getCapability(NINJA_DATA).ifPresent(future -> {
                 future.deserializeNBT(original.serializeNBT());
+                if (event.isWasDeath()) {
+                    future.setChakra(future.getMaxChakra());
+                    future.setStamina(future.getMaxStamina());
+                }
             });
         });
     }
 
     @SubscribeEvent
     public static void onLivingDeath(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
-        if (event.getSource().getEntity() instanceof Player player) {
-            player.getCapability(NINJA_DATA).ifPresent(INinjaData::addEnemyDefeated);
+        if (event.getEntity() instanceof Player player) {
+            player.getCapability(NINJA_DATA).ifPresent(ninjaData -> {
+                if (ninjaData.getCurrentlyChanneledAbility() != null) {
+                    ninjaData.setCurrentlyChanneledAbility(player, null);
+                }
+            });
+        }
+        if (event.getSource().getEntity() instanceof Player killer) {
+            killer.getCapability(NINJA_DATA).ifPresent(INinjaData::addEnemyDefeated);
         }
     }
 
