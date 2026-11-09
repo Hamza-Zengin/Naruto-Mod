@@ -28,6 +28,7 @@ jobs:
           python3 scripts/check_model_parts.py
           python3 scripts/check_lang.py
           python3 scripts/check_sounds.py
+          python3 scripts/check_item_models.py
 
       - uses: dorny/paths-filter@v3
         id: filter

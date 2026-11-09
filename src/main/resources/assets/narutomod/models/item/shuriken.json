@@ -1,6 +1,17 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "narutomod:item/weapons/shuriken"
+  "loader": "forge:separate_transforms",
+  "base": {
+    "parent": "narutomod:item/weapons/shuriken_3d"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "narutomod:item/weapons/shuriken_gui"
+    },
+    "ground": {
+      "parent": "narutomod:item/weapons/shuriken_gui"
+    },
+    "fixed": {
+      "parent": "narutomod:item/weapons/shuriken_gui"
+    }
   }
 }

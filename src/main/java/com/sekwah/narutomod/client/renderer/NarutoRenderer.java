@@ -74,6 +74,9 @@ public class NarutoRenderer extends BlockEntityWithoutLevelRenderer {
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_PRIDE, "textures/models/armor/headband/headband_pride.png");
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_YOUTUBE, "textures/models/armor/headband/headband_youtube.png");
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_LAVA, "textures/models/armor/headband/headband_lavavillage.png");
+
+        FirstPersonJutsuRenderer.resetModels();
+        FirstPersonWorldRenderer.resetModels();
     }
 
     private void setHeadbandRenderer(EntityModelSet modelSet, RegistryObject<Item> item, String texture) {

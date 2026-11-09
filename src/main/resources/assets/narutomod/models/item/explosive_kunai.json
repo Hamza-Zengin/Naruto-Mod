@@ -1,6 +1,17 @@
 {
-  "parent": "minecraft:item/handheld",
-  "textures": {
-    "layer0": "narutomod:item/weapons/explosive_kunai"
+  "loader": "forge:separate_transforms",
+  "base": {
+    "parent": "narutomod:item/weapons/explosive_kunai_3d"
+  },
+  "perspectives": {
+    "gui": {
+      "parent": "narutomod:item/weapons/explosive_kunai_gui"
+    },
+    "ground": {
+      "parent": "narutomod:item/weapons/explosive_kunai_gui"
+    },
+    "fixed": {
+      "parent": "narutomod:item/weapons/explosive_kunai_gui"
+    }
   }
 }
