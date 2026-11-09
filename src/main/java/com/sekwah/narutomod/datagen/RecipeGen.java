@@ -26,7 +26,7 @@ public class RecipeGen extends RecipeProvider {
                 .pattern("WRW")
                 .pattern("WWW")
                 .pattern(" W ")
-                .unlockedBy("has_rose_red", has(Items.RED_DYE))
+                .unlockedBy("has_red_dye", has(Items.RED_DYE))
                 .unlockedBy("has_white_terracotta", has(Items.WHITE_TERRACOTTA))
                 .save(recipeConsumer);
 
@@ -56,7 +56,7 @@ public class RecipeGen extends RecipeProvider {
                 .pattern("WGW")
                 .pattern("WWW")
                 .pattern(" W ")
-                .unlockedBy("has_blue_dye", has(Items.GREEN_DYE))
+                .unlockedBy("has_green_dye", has(Items.GREEN_DYE))
                 .unlockedBy("has_white_terracotta", has(Items.WHITE_TERRACOTTA))
                 .save(recipeConsumer);
 
@@ -66,7 +66,7 @@ public class RecipeGen extends RecipeProvider {
                 .pattern("WWW")
                 .pattern("WRW")
                 .pattern(" W ")
-                .unlockedBy("has_rose_red", has(Items.RED_DYE))
+                .unlockedBy("has_red_dye", has(Items.RED_DYE))
                 .unlockedBy("has_white_terracotta", has(Items.WHITE_TERRACOTTA))
                 .save(recipeConsumer);
 

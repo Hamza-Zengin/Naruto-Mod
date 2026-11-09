@@ -19,9 +19,7 @@ public class TripWireBlockMixin {
 
     @Inject(method = "shouldConnectTo", at = @At("HEAD"), cancellable = true)
     public void shouldConnectTo(BlockState state, Direction direction, CallbackInfoReturnable<Boolean> callback) {
-        boolean shouldCheck = callback.getReturnValueZ();
-        Block block = state.getBlock();
-        if(!shouldCheck && block == NarutoBlocks.PAPER_BOMB.get()) {
+        if(state.getBlock() == NarutoBlocks.PAPER_BOMB.get()) {
             callback.setReturnValue(true);
         }
     }
@@ -41,7 +39,7 @@ public class TripWireBlockMixin {
                             worldIn.removeBlock(blockpos, false);
 
                             ((PaperBombBlock) NarutoBlocks.PAPER_BOMB.get()).spawnPaperbomb(blockStateOpposite, worldIn, checkOpposite, null, true);
-                            worldIn.removeBlock(blockpos, false);
+                            worldIn.removeBlock(checkOpposite, false);
                         }
                         if (!blockStateOpposite.is((Block)(Object)this)) {
                             break mainCheckLoop;
