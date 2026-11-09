@@ -41,17 +41,21 @@ public class LangParityTest {
         Map<String, String> enKeys = parseSimpleJson(enPath);
         Assertions.assertFalse(enKeys.isEmpty(), "en_us.json should not be empty!");
 
-        String[] targetLangs = {"de_de.json", "fr_fr.json", "ru_ru.json", "tr_tr.json"};
-        for (String lang : targetLangs) {
-            Path langPath = LANG_DIR.resolve(lang);
-            Assertions.assertTrue(Files.exists(langPath), lang + " must exist!");
+        try (var stream = Files.list(LANG_DIR)) {
+            List<Path> langFiles = stream
+                .filter(p -> p.toString().endsWith(".json") && !p.getFileName().toString().equals("en_us.json"))
+                .toList();
 
-            Map<String, String> targetKeys = parseSimpleJson(langPath);
-            Set<String> missing = new HashSet<>(enKeys.keySet());
-            missing.removeAll(targetKeys.keySet());
+            Assertions.assertFalse(langFiles.isEmpty(), "At least one additional language file must be present!");
 
-            Assertions.assertTrue(missing.isEmpty(),
-                "Language file " + lang + " is missing " + missing.size() + " keys: " + missing);
+            for (Path langPath : langFiles) {
+                Map<String, String> targetKeys = parseSimpleJson(langPath);
+                Set<String> missing = new HashSet<>(enKeys.keySet());
+                missing.removeAll(targetKeys.keySet());
+
+                Assertions.assertTrue(missing.isEmpty(),
+                    "Language file " + langPath.getFileName() + " is missing " + missing.size() + " keys: " + missing);
+            }
         }
     }
 }

@@ -46,6 +46,9 @@ This mod relies on **SekCLib** (`com.sekwah.sekclib`) for capability tracking an
 All translation keys are 100% synchronized across all supported languages:
 - 🇺🇸 **English** (`en_us`) — Reference
 - 🇹🇷 **Türkçe** (`tr_tr`) — Complete
+- 🇪🇸 **Español** (`es_es`) — Complete
+- 🇧🇷 **Português (Brasil)** (`pt_br`) — Complete
+- 🇯🇵 **日本語 (Japanese)** (`ja_jp`) — Complete
 - 🇩🇪 **Deutsch** (`de_de`) — Complete
 - 🇫🇷 **Français** (`fr_fr`) — Complete
 - 🇷🇺 **Русский** (`ru_ru`) — Complete
