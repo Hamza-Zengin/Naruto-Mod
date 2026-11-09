@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CCC",
+    "CDC",
+    " B "
+  ],
+  "key": {
+    "C": {
+      "item": "narutomod:chakra_metal"
+    },
+    "D": {
+      "item": "minecraft:diamond_sword"
+    },
+    "B": {
+      "item": "minecraft:prismarine_shard"
+    }
+  },
+  "result": {
+    "item": "narutomod:samehada",
+    "count": 1
+  }
+}

@@ -2,6 +2,7 @@ package com.sekwah.narutomod.client.renderer;
 
 import com.sekwah.narutomod.client.model.item.model.AnbuMaskModel;
 import com.sekwah.narutomod.client.model.item.model.HeadbandModel;
+import com.sekwah.narutomod.client.model.item.model.ShinobiArmorModel;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.item.armor.NarutoArmorItem;
 import net.minecraft.client.Minecraft;
@@ -19,6 +20,16 @@ public class NarutoRenderer extends BlockEntityWithoutLevelRenderer {
 
     public void onResourceManagerReload(ResourceManager resourceManager) {
         EntityModelSet modelSet = Minecraft.getInstance().getEntityModels();
+
+        ((NarutoArmorItem) NarutoItems.CHUNIN_VEST.get())
+                .setArmorModel(new ShinobiArmorModel<>(modelSet.bakeLayer(NarutoRenderEvents.CHUNIN_VEST_LAYER)))
+                .setArmorTexture("textures/models/armor/chunin_vest.png");
+        ((NarutoArmorItem) NarutoItems.ANBU_ARMOR.get())
+                .setArmorModel(new ShinobiArmorModel<>(modelSet.bakeLayer(NarutoRenderEvents.ANBU_ARMOR_LAYER)))
+                .setArmorTexture("textures/models/armor/anbu_armor.png");
+        ((NarutoArmorItem) NarutoItems.AKATSUKI_CLOAK.get())
+                .setArmorModel(new ShinobiArmorModel<>(modelSet.bakeLayer(NarutoRenderEvents.AKATSUKI_CLOAK_LAYER)))
+                .setArmorTexture("textures/models/armor/akatsuki_cloak.png");
 
         ((NarutoArmorItem) NarutoItems.RED_ANBU_MASK.get())
                 .setArmorModel(new AnbuMaskModel(modelSet.bakeLayer(NarutoRenderEvents.ANBU_MASK_LAYER)))

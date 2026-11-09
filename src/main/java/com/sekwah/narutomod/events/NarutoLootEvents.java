@@ -38,13 +38,21 @@ public class NarutoLootEvents {
                             .apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0F, 12.0F))))
                     .add(LootItem.lootTableItem(NarutoItems.SHURIKEN.get()).setWeight(25)
                             .apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0F, 16.0F))))
+                    .add(LootItem.lootTableItem(NarutoItems.FUMA_SHURIKEN.get()).setWeight(10)
+                            .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F))))
+                    .add(LootItem.lootTableItem(NarutoItems.ICHIRAKU_RAMEN.get()).setWeight(15)
+                            .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F))))
+                    .add(LootItem.lootTableItem(NarutoItems.CHAKRA_METAL.get()).setWeight(14)
+                            .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 4.0F))))
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_RASENGAN.get()).setWeight(5))
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_CHIDORI.get()).setWeight(5))
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_SHADOW_CLONE.get()).setWeight(5))
+                    .add(LootItem.lootTableItem(NarutoItems.SCROLL_SHADOW_POSSESSION.get()).setWeight(4))
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_KIRIN.get()).setWeight(3))
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_AMATERASU.get()).setWeight(2))
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_SUSANOO.get()).setWeight(2))
-                    .add(LootItem.lootTableItem(NarutoItems.SCROLL_EIGHT_GATES.get()).setWeight(2));
+                    .add(LootItem.lootTableItem(NarutoItems.SCROLL_EIGHT_GATES.get()).setWeight(2))
+                    .add(LootItem.lootTableItem(NarutoItems.SCROLL_RASENSHURIKEN.get()).setWeight(2));
 
             event.getTable().addPool(ninjaLootPool.build());
         }

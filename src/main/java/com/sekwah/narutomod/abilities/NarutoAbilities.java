@@ -53,6 +53,10 @@ public class NarutoAbilities {
     public static final RegistryObject<SusanooRibcageAbility> SUSANOO_RIBCAGE = ABILITY.register("susanoo_ribcage", SusanooRibcageAbility::new);
     public static final RegistryObject<EightGatesAbility> EIGHT_GATES = ABILITY.register("eight_gates", EightGatesAbility::new);
     public static final RegistryObject<KirinAbility> KIRIN = ABILITY.register("kirin", KirinAbility::new);
+    public static final RegistryObject<WoodPrisonAbility> WOOD_PRISON = ABILITY.register("wood_prison", WoodPrisonAbility::new);
+    public static final RegistryObject<BoneDanceAbility> BONE_DANCE = ABILITY.register("bone_dance", BoneDanceAbility::new);
+    public static final RegistryObject<ShadowPossessionAbility> SHADOW_POSSESSION = ABILITY.register("shadow_possession", ShadowPossessionAbility::new);
+    public static final RegistryObject<RasenshurikenAbility> RASENSHURIKEN = ABILITY.register("rasenshuriken", RasenshurikenAbility::new);
 
     public static void register(IEventBus eventBus) {
         ABILITY.register(eventBus);

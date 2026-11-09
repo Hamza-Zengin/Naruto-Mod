@@ -2,11 +2,15 @@ package com.sekwah.narutomod.client.renderer;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.block.NarutoBlocks;
+import com.sekwah.narutomod.client.model.item.model.ShinobiArmorModel;
 import com.sekwah.narutomod.client.model.jutsu.FireballJutsuModel;
+import com.sekwah.narutomod.client.model.jutsu.FumaShurikenModel;
+import com.sekwah.narutomod.client.model.jutsu.RasenshurikenModel;
 import com.sekwah.narutomod.client.renderer.entity.*;
 import com.sekwah.narutomod.client.model.item.model.AnbuMaskModel;
 import com.sekwah.narutomod.client.model.item.model.HeadbandModel;
 import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.FireballJutsuRenderer;
+import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.RasenshurikenRenderer;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -40,6 +44,21 @@ public class NarutoRenderEvents {
     public static final ModelLayerLocation FIREBALL_LAYER =
             new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "fireball"), "main");
 
+    public static final ModelLayerLocation RASENSHURIKEN_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "rasenshuriken"), "main");
+
+    public static final ModelLayerLocation FUMA_SHURIKEN_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "fuma_shuriken"), "main");
+
+    public static final ModelLayerLocation CHUNIN_VEST_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "chunin_vest"), "main");
+
+    public static final ModelLayerLocation ANBU_ARMOR_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "anbu_armor"), "main");
+
+    public static final ModelLayerLocation AKATSUKI_CLOAK_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "akatsuki_cloak"), "main");
+
     public static final ModelLayerLocation SUSANOO_RIBCAGE_LAYER =
             new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "susanoo_ribcage"), "main");
 
@@ -49,10 +68,13 @@ public class NarutoRenderEvents {
         event.registerEntityRenderer(NarutoEntities.EXPLOSIVE_KUNAI.get(), ExplosiveKunaiRenderer::new);
         event.registerEntityRenderer(NarutoEntities.SENBON.get(), SenbonRenderer::new);
         event.registerEntityRenderer(NarutoEntities.SHURIKEN.get(), ShurikenRenderer::new);
+        event.registerEntityRenderer(NarutoEntities.FUMA_SHURIKEN.get(), FumaShurikenRenderer::new);
         event.registerEntityRenderer(NarutoEntities.PAPER_BOMB.get(), PaperBombRenderer::new);
         event.registerEntityRenderer(NarutoEntities.SMOKE_BOMB.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
 
         event.registerEntityRenderer(NarutoEntities.FIREBALL_JUTSU.get(), FireballJutsuRenderer::new);
+        event.registerEntityRenderer(NarutoEntities.RASENSHURIKEN.get(), RasenshurikenRenderer::new);
+
         event.registerEntityRenderer(NarutoEntities.SHADOW_CLONE.get(), (ctx) ->
                 new net.minecraft.client.renderer.entity.HumanoidMobRenderer<>(ctx, new net.minecraft.client.model.HumanoidModel<>(ctx.bakeLayer(net.minecraft.client.model.geom.ModelLayers.PLAYER)), 0.5f) {
                     @Override
@@ -60,6 +82,9 @@ public class NarutoRenderEvents {
                         return new ResourceLocation("minecraft", "textures/entity/player/slim/alex.png");
                     }
                 });
+
+        event.registerEntityRenderer(NarutoEntities.ROGUE_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "rogue_ninja"));
+        event.registerEntityRenderer(NarutoEntities.AKATSUKI_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "akatsuki_ninja"));
     }
 
     public static void registerRenderTypes() {
@@ -78,6 +103,11 @@ public class NarutoRenderEvents {
         event.registerLayerDefinition(ANBU_MASK_WITHOUT_EARS_LAYER, () -> AnbuMaskModel.createLayer(false));
         event.registerLayerDefinition(HEADBAND_LAYER, HeadbandModel::createLayer);
         event.registerLayerDefinition(FIREBALL_LAYER, FireballJutsuModel::createLayer);
+        event.registerLayerDefinition(RASENSHURIKEN_LAYER, RasenshurikenModel::createLayer);
+        event.registerLayerDefinition(FUMA_SHURIKEN_LAYER, FumaShurikenModel::createLayer);
+        event.registerLayerDefinition(CHUNIN_VEST_LAYER, ShinobiArmorModel::createChuninVestLayer);
+        event.registerLayerDefinition(ANBU_ARMOR_LAYER, ShinobiArmorModel::createAnbuArmorLayer);
+        event.registerLayerDefinition(AKATSUKI_CLOAK_LAYER, ShinobiArmorModel::createAkatsukiCloakLayer);
         event.registerLayerDefinition(SUSANOO_RIBCAGE_LAYER, com.sekwah.narutomod.client.model.entity.SusanooRibcageModel::createLayer);
     }
 

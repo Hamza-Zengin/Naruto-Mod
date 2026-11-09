@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "L L",
+    "GCG",
+    "LLL"
+  ],
+  "key": {
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "G": {
+      "item": "minecraft:green_dye"
+    },
+    "C": {
+      "item": "narutomod:chakra_metal"
+    }
+  },
+  "result": {
+    "item": "narutomod:chunin_vest",
+    "count": 1
+  }
+}

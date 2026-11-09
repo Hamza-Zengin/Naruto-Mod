@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C C",
+    "III",
+    "CKC"
+  ],
+  "key": {
+    "C": {
+      "item": "narutomod:chakra_metal"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "K": {
+      "item": "narutomod:kunai"
+    }
+  },
+  "result": {
+    "item": "narutomod:anbu_armor",
+    "count": 1
+  }
+}

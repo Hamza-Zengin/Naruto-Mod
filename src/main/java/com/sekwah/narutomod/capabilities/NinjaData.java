@@ -388,6 +388,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             this.chakraExp = 0;
             return;
         }
+        this.chakraExp += amount;
         float neededExp;
         if (this.maxChakra < 150.0f) {
             neededExp = 30.0f + (this.maxChakra - 100.0f) * 0.50f;
@@ -644,10 +645,17 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             }
         }
 
+        net.minecraft.world.item.Item chestItem = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).getItem();
+
         if (this.staminaRegenInfo.canRegen()) {
             float staminaRegen = staminaRegenInfo.regenRate;
             if (this.clan != null && this.clan.getPath().equals("nara")) {
                 staminaRegen *= 1.3f;
+            }
+            if (chestItem == com.sekwah.narutomod.item.NarutoItems.CHUNIN_VEST.get()) {
+                staminaRegen *= 1.25f;
+            } else if (chestItem == com.sekwah.narutomod.item.NarutoItems.ANBU_ARMOR.get()) {
+                staminaRegen *= 1.15f;
             }
             this.stamina += staminaRegen;
         }
@@ -656,8 +664,20 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             float chakraRegen = chakraRegenInfo.regenRate;
             if (this.clan != null && this.clan.getPath().equals("uzumaki")) {
                 chakraRegen *= 2.0f;
+            } else if (this.clan != null && this.clan.getPath().equals("senju")) {
+                chakraRegen *= 1.4f;
+            }
+            if (chestItem == com.sekwah.narutomod.item.NarutoItems.AKATSUKI_CLOAK.get()) {
+                chakraRegen *= 1.35f;
+            } else if (chestItem == com.sekwah.narutomod.item.NarutoItems.ANBU_ARMOR.get()) {
+                chakraRegen *= 1.15f;
             }
             this.chakra += chakraRegen;
+        }
+
+        // Senju Clan natural vitality regeneration
+        if (this.clan != null && this.clan.getPath().equals("senju") && player.tickCount % 80 == 0 && player.getHealth() < player.getMaxHealth()) {
+            player.heal(1.0F);
         }
         float curMaxStamina = this.getMaxStamina();
         float curMaxChakra = this.getMaxChakra();

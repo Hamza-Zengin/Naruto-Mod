@@ -52,6 +52,20 @@ public class NarutoArmorItem extends ArmorItem implements IShouldHideNameplate {
         return this.forceHideName;
     }
 
+    private String tooltipKey = null;
+
+    public NarutoArmorItem setTooltipKey(String tooltipKey) {
+        this.tooltipKey = tooltipKey;
+        return this;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+        if (this.tooltipKey != null) {
+            tooltip.add(net.minecraft.network.chat.Component.translatable(this.tooltipKey).withStyle(net.minecraft.ChatFormatting.GOLD));
+        }
+    }
+
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         super.initializeClient(consumer);

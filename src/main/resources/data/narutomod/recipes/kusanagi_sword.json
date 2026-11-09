@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    " C ",
+    " D "
+  ],
+  "key": {
+    "C": {
+      "item": "narutomod:chakra_metal"
+    },
+    "D": {
+      "item": "minecraft:diamond_sword"
+    }
+  },
+  "result": {
+    "item": "narutomod:kusanagi_sword",
+    "count": 1
+  }
+}

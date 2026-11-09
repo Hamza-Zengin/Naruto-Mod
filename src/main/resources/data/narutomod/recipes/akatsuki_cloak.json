@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "B B",
+    "RCR",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:black_wool"
+    },
+    "R": {
+      "item": "minecraft:red_dye"
+    },
+    "C": {
+      "item": "narutomod:chakra_metal"
+    }
+  },
+  "result": {
+    "item": "narutomod:akatsuki_cloak",
+    "count": 1
+  }
+}

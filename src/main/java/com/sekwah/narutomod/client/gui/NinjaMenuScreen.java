@@ -29,6 +29,8 @@ import java.util.List;
 public class NinjaMenuScreen extends Screen {
 
     private int activeTab = 0; // 0: Profil, 1: Klan Seçimi, 2: Jutsu Kitabı
+    private int clanPage = 0;
+    private static final int CLANS_PER_PAGE = 4;
     private int jutsuPage = 0;
     private static final int JUTSUS_PER_PAGE = 4;
 
@@ -82,6 +84,7 @@ public class NinjaMenuScreen extends Screen {
 
     private void switchTab(int tab) {
         this.activeTab = tab;
+        this.clanPage = 0;
         this.jutsuPage = 0;
         this.init();
     }
@@ -134,15 +137,21 @@ public class NinjaMenuScreen extends Screen {
             boolean isLocked = ninjaData.isClanLocked();
 
             List<RegistryObject<Clan>> clans = getSelectableClans();
+            int maxPages = Math.max(1, (int) Math.ceil((double) clans.size() / CLANS_PER_PAGE));
+            if (this.clanPage >= maxPages) this.clanPage = maxPages - 1;
+
+            int startIndex = this.clanPage * CLANS_PER_PAGE;
+            int endIndex = Math.min(startIndex + CLANS_PER_PAGE, clans.size());
+
             int cardStartY = boxY + 32;
             int cardH = 38;
             int cardGap = 3;
             int boxX = centerX - BOX_WIDTH / 2;
 
-            for (int i = 0; i < clans.size(); i++) {
+            for (int i = startIndex; i < endIndex; i++) {
                 final RegistryObject<Clan> clanEntry = clans.get(i);
                 final ResourceLocation clanLoc = clanEntry.getId();
-                int cardY = cardStartY + i * (cardH + cardGap);
+                int cardY = cardStartY + (i - startIndex) * (cardH + cardGap);
                 int btnY = cardY + 9;
 
                 boolean isCurrentClan = ninjaData.getClan() != null && ninjaData.getClan().equals(clanLoc);
@@ -171,6 +180,20 @@ public class NinjaMenuScreen extends Screen {
 
                 clanBtn.active = !isLocked && !isCurrentClan;
                 this.addRenderableWidget(clanBtn);
+            }
+
+            int navBtnY = Math.min(boxY + BOX_HEIGHT + 4, this.height - 24);
+            if (this.clanPage > 0) {
+                this.addRenderableWidget(Button.builder(Component.literal("< Önceki"), b -> {
+                    this.clanPage--;
+                    this.init();
+                }).bounds(centerX - 150, navBtnY, 75, 20).build());
+            }
+            if (this.clanPage < maxPages - 1) {
+                this.addRenderableWidget(Button.builder(Component.literal("Sonraki >"), b -> {
+                    this.clanPage++;
+                    this.init();
+                }).bounds(centerX + 75, navBtnY, 75, 20).build());
             }
         });
     }
@@ -453,13 +476,16 @@ public class NinjaMenuScreen extends Screen {
         }
 
         List<RegistryObject<Clan>> clans = getSelectableClans();
+        int maxPages = Math.max(1, (int) Math.ceil((double) clans.size() / CLANS_PER_PAGE));
+        int startIndex = this.clanPage * CLANS_PER_PAGE;
+        int endIndex = Math.min(startIndex + CLANS_PER_PAGE, clans.size());
 
         int cardStartY = boxY + 32;
         int cardH = 38;
         int cardGap = 3;
         int maxTextW = BOX_WIDTH - 96;
 
-        for (int i = 0; i < clans.size(); i++) {
+        for (int i = startIndex; i < endIndex; i++) {
             RegistryObject<Clan> clanEntry = clans.get(i);
             ResourceLocation clanLoc = clanEntry.getId();
             Clan clan = clanEntry.get();
@@ -467,7 +493,7 @@ public class NinjaMenuScreen extends Screen {
             int bgCol = isCurrent ? 0xCC113311 : 0xCC111116;
             int borderCol = isCurrent ? 0xFF22AA22 : 0xFF444455;
 
-            int cardY = cardStartY + i * (cardH + cardGap);
+            int cardY = cardStartY + (i - startIndex) * (cardH + cardGap);
 
             graphics.fill(boxX, cardY, boxX + BOX_WIDTH, cardY + cardH, bgCol);
             graphics.renderOutline(boxX, cardY, BOX_WIDTH, cardH, borderCol);
@@ -482,6 +508,9 @@ public class NinjaMenuScreen extends Screen {
                 lineY += this.font.lineHeight + 1;
             }
         }
+
+        int navTextY = Math.min(boxY + BOX_HEIGHT + 10, this.height - 18);
+        graphics.drawCenteredString(this.font, String.format("§eKlan Sayfası %d / %d", this.clanPage + 1, maxPages), centerX, navTextY, 0xFFFFFF88);
     }
 
     private void renderJutsuTab(GuiGraphics graphics, INinjaData ninjaData, int centerX, int boxY) {
@@ -528,10 +557,18 @@ public class NinjaMenuScreen extends Screen {
                 reqType = "§c[Uchiha Parşömeni - Jōnin]";
             } else if (id != null && id.getPath().equals("eight_gates")) {
                 reqType = "§4[Yasak Parşömen - Jōnin]";
+            } else if (id != null && id.getPath().equals("rasenshuriken")) {
+                reqType = "§b[S-Seviye Parşömen - Jōnin]";
             } else if (id != null && id.getPath().equals("sharingan")) {
                 reqType = "§c[Uchiha Klanı - Genin]";
             } else if (id != null && id.getPath().equals("byakugan")) {
                 reqType = "§f[Hyūga Klanı - Genin]";
+            } else if (id != null && id.getPath().equals("wood_prison")) {
+                reqType = "§2[Senju Klanı - Genin]";
+            } else if (id != null && id.getPath().equals("bone_dance")) {
+                reqType = "§f[Kaguya Klanı - Genin]";
+            } else if (id != null && id.getPath().equals("shadow_possession")) {
+                reqType = "§8[Nara Klanı - Genin / Parşömen]";
             } else if (NinjaData.isScrollRequiredJutsu(id)) {
                 reqType = "§6[Parşömen Gerekir]";
             } else if (ability.getRequiredRank() == NinjaRank.ACADEMY_STUDENT) {

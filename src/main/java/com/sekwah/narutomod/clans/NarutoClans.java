@@ -32,6 +32,12 @@ public class NarutoClans {
     public static final RegistryObject<Clan> NARA = registerClan("nara",
             () -> new Clan(Component.translatable("clan.narutomod.nara"), Component.translatable("clan.narutomod.nara.desc")));
 
+    public static final RegistryObject<Clan> SENJU = registerClan("senju",
+            () -> new Clan(Component.translatable("clan.narutomod.senju"), Component.translatable("clan.narutomod.senju.desc")));
+
+    public static final RegistryObject<Clan> KAGUYA = registerClan("kaguya",
+            () -> new Clan(Component.translatable("clan.narutomod.kaguya"), Component.translatable("clan.narutomod.kaguya.desc")));
+
     private static <T extends Clan> RegistryObject<T> registerClan(String name, java.util.function.Supplier<T> clanSupplier) {
         RegistryObject<T> obj = CLANS.register(name, clanSupplier);
         return obj;

@@ -2,7 +2,11 @@ package com.sekwah.narutomod.entity;
 
 import com.sekwah.narutomod.entity.item.PaperBombEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
+import com.sekwah.narutomod.entity.jutsuprojectile.RasenshurikenEntity;
+import com.sekwah.narutomod.entity.mob.AkatsukiNinjaEntity;
+import com.sekwah.narutomod.entity.mob.RogueNinjaEntity;
 import com.sekwah.narutomod.entity.projectile.ExplosiveKunaiEntity;
+import com.sekwah.narutomod.entity.projectile.FumaShurikenEntity;
 import com.sekwah.narutomod.entity.projectile.KunaiEntity;
 import com.sekwah.narutomod.entity.projectile.SenbonEntity;
 import com.sekwah.narutomod.entity.projectile.ShurikenEntity;
@@ -33,17 +37,29 @@ public class NarutoEntities {
     public static final RegistryObject<EntityType<ShurikenEntity>> SHURIKEN = register("shuriken",
             EntityType.Builder.<ShurikenEntity>of(ShurikenEntity::new, MobCategory.MISC).sized(0.5F, 0.5F).setTrackingRange(8));
 
+    public static final RegistryObject<EntityType<FumaShurikenEntity>> FUMA_SHURIKEN = register("fuma_shuriken",
+            EntityType.Builder.<FumaShurikenEntity>of(FumaShurikenEntity::new, MobCategory.MISC).sized(0.9F, 0.4F).setTrackingRange(10));
+
     public static final RegistryObject<EntityType<PaperBombEntity>> PAPER_BOMB = register("paper_bomb",
             EntityType.Builder.<PaperBombEntity>of(PaperBombEntity::new, MobCategory.MISC).fireImmune().sized(0.5F, 0.5F).setTrackingRange(10).clientTrackingRange(10));
 
     public static final RegistryObject<EntityType<FireballJutsuEntity>> FIREBALL_JUTSU = register("fireball_jutsu",
             EntityType.Builder.<FireballJutsuEntity>of(FireballJutsuEntity::new, MobCategory.MISC).sized(1.5F, 1.5F).clientTrackingRange(4).updateInterval(10));
 
+    public static final RegistryObject<EntityType<RasenshurikenEntity>> RASENSHURIKEN = register("rasenshuriken",
+            EntityType.Builder.<RasenshurikenEntity>of(RasenshurikenEntity::new, MobCategory.MISC).sized(1.6F, 0.8F).clientTrackingRange(8).updateInterval(5));
+
     public static final RegistryObject<EntityType<com.sekwah.narutomod.entity.projectile.SmokeBombEntity>> SMOKE_BOMB = register("smoke_bomb",
             EntityType.Builder.<com.sekwah.narutomod.entity.projectile.SmokeBombEntity>of(com.sekwah.narutomod.entity.projectile.SmokeBombEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(10));
 
     public static final RegistryObject<EntityType<ShadowCloneEntity>> SHADOW_CLONE = register("shadow_clone",
             EntityType.Builder.<ShadowCloneEntity>of(ShadowCloneEntity::new, MobCategory.CREATURE).sized(0.6F, 1.8F).clientTrackingRange(8));
+
+    public static final RegistryObject<EntityType<RogueNinjaEntity>> ROGUE_NINJA = register("rogue_ninja",
+            EntityType.Builder.<RogueNinjaEntity>of(RogueNinjaEntity::new, MobCategory.MONSTER).sized(0.6F, 1.95F).clientTrackingRange(8));
+
+    public static final RegistryObject<EntityType<AkatsukiNinjaEntity>> AKATSUKI_NINJA = register("akatsuki_ninja",
+            EntityType.Builder.<AkatsukiNinjaEntity>of(AkatsukiNinjaEntity::new, MobCategory.MONSTER).sized(0.6F, 1.95F).clientTrackingRange(10));
 
     private static <T extends Entity> RegistryObject<EntityType<T>> register(String key, EntityType.Builder<T> builder) {
         return ENTITIES.register(key, () -> builder.build(key));
@@ -56,5 +72,7 @@ public class NarutoEntities {
 
     public static void entityAttributes(EntityAttributeCreationEvent event) {
         event.put(SHADOW_CLONE.get(), ShadowCloneEntity.createAttributes().build());
+        event.put(ROGUE_NINJA.get(), RogueNinjaEntity.createAttributes().build());
+        event.put(AKATSUKI_NINJA.get(), AkatsukiNinjaEntity.createAttributes().build());
     }
 }

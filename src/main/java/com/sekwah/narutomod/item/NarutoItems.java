@@ -2,16 +2,15 @@ package com.sekwah.narutomod.item;
 
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.block.NarutoBlocks;
+import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.item.armor.NarutoArmorItem;
 import com.sekwah.narutomod.item.armor.NarutoArmorMaterial;
-import com.sekwah.narutomod.item.weapons.ExplosiveKunaiItem;
-import com.sekwah.narutomod.item.weapons.KunaiItem;
-import com.sekwah.narutomod.item.weapons.SenbonItem;
-import com.sekwah.narutomod.item.weapons.ShurikenItem;
+import com.sekwah.narutomod.item.weapons.*;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -37,12 +36,31 @@ public class NarutoItems {
     public static final RegistryObject<Item> SHURIKEN = ITEMS.register("shuriken", ()
             -> new ShurikenItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> FUMA_SHURIKEN = ITEMS.register("fuma_shuriken", ()
+            -> new FumaShurikenItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> KUSANAGI_SWORD = ITEMS.register("kusanagi_sword", ()
+            -> new KusanagiSwordItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> SAMEHADA = ITEMS.register("samehada", ()
+            -> new SamehadaItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> BONE_SWORD = ITEMS.register("bone_sword", ()
+            -> new BoneSwordItem(new Item.Properties()));
+
     public static final RegistryObject<Item> SMOKE_BOMB = ITEMS.register("smoke_bomb", ()
             -> new com.sekwah.narutomod.item.weapons.SmokeBombItem(new Item.Properties().stacksTo(16)));
 
     public static final RegistryObject<Item> MILITARY_RATIONS_PILL = ITEMS.register("military_rations_pill", ()
             -> new MilitaryRationsPillItem(new Item.Properties().stacksTo(16)));
 
+    public static final RegistryObject<Item> ICHIRAKU_RAMEN = ITEMS.register("ichiraku_ramen", ()
+            -> new IchirakuRamenItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> CHAKRA_METAL = ITEMS.register("chakra_metal", ()
+            -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+
+    // Jutsu Scrolls
     public static final RegistryObject<Item> SCROLL_RASENGAN = ITEMS.register("scroll_rasengan", ()
             -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.RASENGAN.getId()));
 
@@ -64,6 +82,19 @@ public class NarutoItems {
     public static final RegistryObject<Item> SCROLL_EIGHT_GATES = ITEMS.register("scroll_eight_gates", ()
             -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.EIGHT_GATES.getId()));
 
+    public static final RegistryObject<Item> SCROLL_RASENSHURIKEN = ITEMS.register("scroll_rasenshuriken", ()
+            -> new JutsuScrollItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), NarutoAbilities.RASENSHURIKEN.getId()));
+
+    public static final RegistryObject<Item> SCROLL_SHADOW_POSSESSION = ITEMS.register("scroll_shadow_possession", ()
+            -> new JutsuScrollItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE), NarutoAbilities.SHADOW_POSSESSION.getId()));
+
+    // Spawn Eggs
+    public static final RegistryObject<Item> ROGUE_NINJA_SPAWN_EGG = ITEMS.register("rogue_ninja_spawn_egg", ()
+            -> new ForgeSpawnEggItem(NarutoEntities.ROGUE_NINJA, 0x222831, 0x768A96, new Item.Properties()));
+
+    public static final RegistryObject<Item> AKATSUKI_NINJA_SPAWN_EGG = ITEMS.register("akatsuki_ninja_spawn_egg", ()
+            -> new ForgeSpawnEggItem(NarutoEntities.AKATSUKI_NINJA, 0x151519, 0xCC1122, new Item.Properties()));
+
     // Armor
     public static final RegistryObject<Item> RED_ANBU_MASK = ITEMS.register("red_anbu_mask", ()
             -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
@@ -84,6 +115,18 @@ public class NarutoItems {
     public static final RegistryObject<Item> MIST_ANBU_MASK = ITEMS.register("mist_anbu_mask", ()
             -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
             .setShouldHideNameplate(true));
+
+    public static final RegistryObject<Item> CHUNIN_VEST = ITEMS.register("chunin_vest", ()
+            -> new NarutoArmorItem(NarutoArmorMaterial.CHUNIN_MAT, ArmorItem.Type.CHESTPLATE, new Item.Properties())
+            .setTooltipKey("item.narutomod.chunin_vest.desc"));
+
+    public static final RegistryObject<Item> ANBU_ARMOR = ITEMS.register("anbu_armor", ()
+            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.CHESTPLATE, new Item.Properties())
+            .setTooltipKey("item.narutomod.anbu_armor.desc"));
+
+    public static final RegistryObject<Item> AKATSUKI_CLOAK = ITEMS.register("akatsuki_cloak", ()
+            -> new NarutoArmorItem(NarutoArmorMaterial.AKATSUKI_MAT, ArmorItem.Type.CHESTPLATE, new Item.Properties().rarity(Rarity.RARE))
+            .setTooltipKey("item.narutomod.akatsuki_cloak.desc"));
 
     public static final RegistryObject<Item> LONELY_MARCH = ITEMS.register("lonely_march", ()
             -> new RecordItem(14, NarutoSounds.LONELY_MARCH, new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 41 * 20));
@@ -136,21 +179,31 @@ public class NarutoItems {
     public static final RegistryObject<CreativeModeTab> NINJA_WEAPONS_TAB = CREATIVE_MODE_TABS.register("narutomod_weapons", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.narutomod_weapons"))
-                    .icon(() -> new ItemStack(KUNAI.get()))
+                    .icon(() -> new ItemStack(KUSANAGI_SWORD.get()))
                     .displayItems((parameters, output) -> {
                         output.accept(KUNAI.get());
                         output.accept(SENBON.get());
                         output.accept(EXPLOSIVE_KUNAI.get());
                         output.accept(SHURIKEN.get());
+                        output.accept(FUMA_SHURIKEN.get());
+                        output.accept(KUSANAGI_SWORD.get());
+                        output.accept(SAMEHADA.get());
+                        output.accept(BONE_SWORD.get());
                         output.accept(SMOKE_BOMB.get());
                         output.accept(MILITARY_RATIONS_PILL.get());
+                        output.accept(ICHIRAKU_RAMEN.get());
+                        output.accept(CHAKRA_METAL.get());
                         output.accept(SCROLL_RASENGAN.get());
                         output.accept(SCROLL_CHIDORI.get());
                         output.accept(SCROLL_SHADOW_CLONE.get());
+                        output.accept(SCROLL_SHADOW_POSSESSION.get());
                         output.accept(SCROLL_KIRIN.get());
                         output.accept(SCROLL_AMATERASU.get());
                         output.accept(SCROLL_SUSANOO.get());
                         output.accept(SCROLL_EIGHT_GATES.get());
+                        output.accept(SCROLL_RASENSHURIKEN.get());
+                        output.accept(ROGUE_NINJA_SPAWN_EGG.get());
+                        output.accept(AKATSUKI_NINJA_SPAWN_EGG.get());
                         output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
                         output.accept(NarutoBlocks.ITEM_BONSAI_TREE.get());
                     })
@@ -161,6 +214,9 @@ public class NarutoItems {
                     .title(Component.translatable("itemGroup.narutomod_armor"))
                     .icon(() -> new ItemStack(RED_ANBU_MASK.get()))
                     .displayItems((parameters, output) -> {
+                        output.accept(CHUNIN_VEST.get());
+                        output.accept(ANBU_ARMOR.get());
+                        output.accept(AKATSUKI_CLOAK.get());
                         output.accept(RED_ANBU_MASK.get());
                         output.accept(YELLOW_ANBU_MASK.get());
                         output.accept(GREEN_ANBU_MASK.get());

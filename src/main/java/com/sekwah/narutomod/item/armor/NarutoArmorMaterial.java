@@ -11,13 +11,17 @@ import net.minecraft.util.LazyLoadedValue;
 
 import java.util.function.Supplier;
 
+import net.minecraft.sounds.SoundEvents;
+
 /**
  * Balance against {@link net.minecraft.world.item.ArmorMaterial}
  */
 public enum NarutoArmorMaterial implements ArmorMaterial {
 
-    ANBU_MAT("anbu", 35, new int[]{2, 8, 5, 2}, 8, null, 2.1F, 0.0F, () -> null),
-    HEADBAND("headband", 35, new int[]{2, 8, 5, 2}, 8, null, 2.1F, 0.0F, () -> null),
+    ANBU_MAT("anbu", 38, new int[]{3, 8, 7, 3}, 12, SoundEvents.ARMOR_EQUIP_IRON, 2.5F, 0.05F, () -> Ingredient.EMPTY),
+    HEADBAND("headband", 35, new int[]{2, 8, 5, 2}, 8, SoundEvents.ARMOR_EQUIP_LEATHER, 2.1F, 0.0F, () -> Ingredient.EMPTY),
+    CHUNIN_MAT("chunin", 35, new int[]{2, 7, 6, 2}, 10, SoundEvents.ARMOR_EQUIP_LEATHER, 2.0F, 0.0F, () -> Ingredient.EMPTY),
+    AKATSUKI_MAT("akatsuki", 42, new int[]{3, 8, 8, 3}, 15, SoundEvents.ARMOR_EQUIP_LEATHER, 3.0F, 0.1F, () -> Ingredient.EMPTY),
     ;
 
     private static final int[] HEALTH_PER_SLOT = new int[]{13, 15, 16, 11};

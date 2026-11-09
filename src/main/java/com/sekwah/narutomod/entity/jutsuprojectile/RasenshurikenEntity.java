@@ -1,0 +1,175 @@
+package com.sekwah.narutomod.entity.jutsuprojectile;
+
+import com.sekwah.narutomod.damagesource.NarutoDamageSource;
+import com.sekwah.narutomod.entity.NarutoEntities;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+
+/**
+ * Fūton: Rasenshuriken 3D Projectile Entity
+ * High-speed spinning 4-bladed wind chakra shuriken that expands into a cellular vortex dome upon impact.
+ */
+public class RasenshurikenEntity extends AbstractHurtingProjectile {
+
+    public int time;
+    public int lifeSpan = 80;
+    private boolean impacted = false;
+    private int vortexTicks = 0;
+
+    public RasenshurikenEntity(EntityType<RasenshurikenEntity> entityConstructor, Level level) {
+        super(entityConstructor, level);
+        this.time = 0;
+    }
+
+    public RasenshurikenEntity(EntityType<? extends AbstractHurtingProjectile> type, double x, double y, double z, double xVel, double yVel, double zVel, Level level) {
+        super(type, level);
+        this.moveTo(x, y, z, this.getYRot(), this.getXRot());
+        this.reapplyPosition();
+        double d0 = Math.sqrt(xVel * xVel + yVel * yVel + zVel * zVel);
+        if (d0 != 0.0D) {
+            this.xPower = xVel / d0 * 0.32D;
+            this.yPower = yVel / d0 * 0.32D;
+            this.zPower = zVel / d0 * 0.32D;
+        }
+    }
+
+    public RasenshurikenEntity(LivingEntity shooter, double xVel, double yVel, double zVel) {
+        this(NarutoEntities.RASENSHURIKEN.get(), shooter.getX(), shooter.getEyeY() - 0.1f, shooter.getZ(), xVel, yVel, zVel, shooter.level());
+        this.setOwner(shooter);
+        this.setRot(shooter.getYRot(), shooter.getXRot());
+    }
+
+    @Override
+    public void tick() {
+        if (this.impacted) {
+            this.setDeltaMovement(Vec3.ZERO);
+            this.time++;
+            this.vortexTicks++;
+            if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+                double radius = 5.5D;
+                // Spiral wind dome particles
+                for (int i = 0; i < 12; i++) {
+                    double angle = (this.vortexTicks * 0.45) + (i * Math.PI / 6.0);
+                    double r = 1.5 + (i % 3) * 1.4;
+                    double px = this.getX() + Math.cos(angle) * r;
+                    double pz = this.getZ() + Math.sin(angle) * r;
+                    double py = this.getY() + (this.random.nextDouble() - 0.3) * 2.5;
+                    serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK, px, py, pz, 1, 0.1, 0.1, 0.1, 0.0);
+                    serverLevel.sendParticles(ParticleTypes.CLOUD, px, py, pz, 2, 0.15, 0.15, 0.15, 0.02);
+                }
+
+                // Multi-hit cellular wind blades & pull towards vortex center
+                if (this.vortexTicks % 4 == 0) {
+                    Entity owner = this.getOwner();
+                    AABB box = this.getBoundingBox().inflate(radius);
+                    List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, box,
+                            e -> e.isAlive() && e != owner);
+                    for (LivingEntity target : targets) {
+                        Vec3 pull = this.position().subtract(target.position()).normalize().scale(0.35);
+                        target.setDeltaMovement(pull.x, 0.12, pull.z);
+                        target.hurtMarked = true;
+                        target.invulnerableTime = 0;
+                        target.hurt(NarutoDamageSource.jutsuProjectile(this, owner), 5.5f);
+                        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2));
+                    }
+                    serverLevel.playSound(null, this.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.4f, 1.6f);
+                }
+
+                if (this.vortexTicks >= 28) {
+                    serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0);
+                    serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2.5f, 1.2f);
+                    this.discard();
+                }
+            }
+            return;
+        }
+
+        super.tick();
+        ++this.time;
+
+        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+            if (this.time % 2 == 0) {
+                serverLevel.sendParticles(ParticleTypes.CLOUD, this.getX(), this.getY() + 0.3, this.getZ(), 3, 0.4, 0.1, 0.4, 0.02);
+                serverLevel.sendParticles(ParticleTypes.END_ROD, this.getX(), this.getY() + 0.3, this.getZ(), 2, 0.3, 0.1, 0.3, 0.01);
+            }
+            if (this.time % 5 == 0) {
+                serverLevel.playSound(null, this.blockPosition(), SoundEvents.ELYTRA_FLYING, SoundSource.PLAYERS, 0.6f, 1.8f);
+            }
+        }
+
+        if (this.lifeSpan-- <= 0) {
+            this.discard();
+        }
+    }
+
+    @Override
+    protected void onHit(HitResult hitResult) {
+        if (!this.impacted) {
+            this.impacted = true;
+            this.vortexTicks = 0;
+            this.setDeltaMovement(Vec3.ZERO);
+            if (!this.level().isClientSide) {
+                this.playSound(SoundEvents.TRIDENT_THUNDER, 2.0f, 1.5f);
+            }
+        }
+    }
+
+    public boolean isImpacted() {
+        return this.impacted;
+    }
+
+    public int getVortexTicks() {
+        return this.vortexTicks;
+    }
+
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        return false;
+    }
+
+    @Override
+    protected ParticleOptions getTrailParticle() {
+        return ParticleTypes.CLOUD;
+    }
+
+    @Override
+    public boolean isPickable() {
+        return false;
+    }
+
+    @Override
+    protected boolean shouldBurn() {
+        return false;
+    }
+
+    @Override
+    public void recreateFromPacket(ClientboundAddEntityPacket packet) {
+        super.recreateFromPacket(packet);
+        double d0 = packet.getXa();
+        double d1 = packet.getYa();
+        double d2 = packet.getZa();
+        double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
+        if (d3 != 0.0D) {
+            this.xPower = d0 / d3 * 0.32D;
+            this.yPower = d1 / d3 * 0.32D;
+            this.zPower = d2 / d3 * 0.32D;
+        }
+    }
+}
