@@ -2,8 +2,6 @@ package com.sekwah.narutomod.client.keybinds;
 
 import net.minecraft.client.KeyMapping;
 
-// TODO add a way to store or handle what the value was when the key was released
-
 /**
  * If a click consumer is added then update will automatically consume the clicks.
  */
