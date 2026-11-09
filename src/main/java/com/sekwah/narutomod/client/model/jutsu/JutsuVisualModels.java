@@ -261,8 +261,6 @@ public class JutsuVisualModels {
         private final ModelPart core;
         private final ModelPart innerShell;
         private final ModelPart outerShell;
-        private final ModelPart spiralRingA;
-        private final ModelPart spiralRingB;
 
         public RasenganSphereModel(ModelPart part) {
             super(RenderType::entityTranslucent);
@@ -270,8 +268,6 @@ public class JutsuVisualModels {
             this.core = part.getChild("core");
             this.innerShell = part.getChild("inner_shell");
             this.outerShell = part.getChild("outer_shell");
-            this.spiralRingA = part.getChild("spiral_ring_a");
-            this.spiralRingB = part.getChild("spiral_ring_b");
         }
 
         public static LayerDefinition createLayer() {
