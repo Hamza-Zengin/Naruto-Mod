@@ -54,6 +54,8 @@
   "jutsu.fail.notenoughstamina": "You do not have enough stamina to use %s",
   "jutsu.fail.notenoughchakra": "You do not have enough chakra to use %s",
   "jutsu.fail.notclan": "You must belong to the %s Clan to awaken this technique!",
+  "jutsu.rasengan.ready": "Rasengan Ready! Left-Click to Strike!",
+  "jutsu.chidori.ready": "Chidori Ready! Left-Click to Dash & Strike!",
   "jutsu.leap": "Leap",
   "jutsu.waterwalk": "Water Walking",
   "jutsu.cast.debug": "Combo entered: %s",

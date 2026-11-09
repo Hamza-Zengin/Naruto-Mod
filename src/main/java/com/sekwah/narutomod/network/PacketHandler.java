@@ -36,6 +36,7 @@ public class PacketHandler {
         NARUTO_CHANNEL.registerMessage(103, ServerAbilityChannelPacket.class, ServerAbilityChannelPacket::encode, ServerAbilityChannelPacket::decode, ServerAbilityChannelPacket.Handler::handle);
         NARUTO_CHANNEL.registerMessage(104, com.sekwah.narutomod.network.c2s.ServerSelectClanPacket.class, com.sekwah.narutomod.network.c2s.ServerSelectClanPacket::encode, com.sekwah.narutomod.network.c2s.ServerSelectClanPacket::decode, com.sekwah.narutomod.network.c2s.ServerSelectClanPacket.Handler::handle);
         NARUTO_CHANNEL.registerMessage(105, com.sekwah.narutomod.network.c2s.ServerRankUpPacket.class, com.sekwah.narutomod.network.c2s.ServerRankUpPacket::encode, com.sekwah.narutomod.network.c2s.ServerRankUpPacket::decode, com.sekwah.narutomod.network.c2s.ServerRankUpPacket.Handler::handle);
+        NARUTO_CHANNEL.registerMessage(106, com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket.class, com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket::encode, com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket::decode, com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket.Handler::handle);
     }
 
 

@@ -294,16 +294,6 @@ public class JutsuVisualModels {
                             .texOffs(0, 36).addBox(-7.5F, -7.5F, -7.5F, 15, 15, 15),
                     PartPose.ZERO);
 
-            root.addOrReplaceChild("spiral_ring_a",
-                    CubeListBuilder.create()
-                            .texOffs(0, 48).addBox(-9.5F, -1.0F, -9.5F, 19, 2, 19),
-                    PartPose.rotation(0.45F, 0.0F, 0.45F));
-
-            root.addOrReplaceChild("spiral_ring_b",
-                    CubeListBuilder.create()
-                            .texOffs(0, 48).addBox(-9.5F, -1.0F, -9.5F, 19, 2, 19),
-                    PartPose.rotation(-0.45F, 0.0F, -0.45F));
-
             return LayerDefinition.create(mesh, 64, 64);
         }
 
@@ -314,8 +304,6 @@ public class JutsuVisualModels {
             this.innerShell.zRot = age * 0.44F;
             this.outerShell.xRot = age * 0.38F;
             this.outerShell.yRot = age * 0.48F;
-            this.spiralRingA.yRot = age * 0.85F;
-            this.spiralRingB.yRot = -age * 0.85F;
         }
 
         @Override
@@ -348,24 +336,24 @@ public class JutsuVisualModels {
 
             root.addOrReplaceChild("core",
                     CubeListBuilder.create()
-                            .texOffs(0, 0).addBox(-3.5F, -3.5F, -3.5F, 7, 7, 7),
+                            .texOffs(0, 0).addBox(-3.0F, -3.0F, -3.0F, 6, 6, 6),
                     PartPose.ZERO);
 
             PartDefinition arcsA = root.addOrReplaceChild("arcs_a", CubeListBuilder.create(), PartPose.ZERO);
             PartDefinition arcsB = root.addOrReplaceChild("arcs_b", CubeListBuilder.create(), PartPose.ZERO);
 
-            for (int i = 0; i < 6; i++) {
-                float rx = (i * 1.05F);
+            for (int i = 0; i < 4; i++) {
+                float rx = (i * 0.95F);
                 float ry = (i * 1.57F);
                 float rz = (i * 0.78F);
                 arcsA.addOrReplaceChild("bolt_a_" + i,
                         CubeListBuilder.create()
-                                .texOffs(0, 16).addBox(-1.0F, -1.0F, -16.0F, 2, 2, 32)
-                                .texOffs(0, 50).addBox(-12.0F, -0.5F, -1.0F, 24, 1, 2),
+                                .texOffs(0, 16).addBox(-0.5F, -0.5F, -10.0F, 1, 1, 20)
+                                .texOffs(0, 38).addBox(-6.0F, -0.5F, -0.5F, 12, 1, 1),
                         PartPose.rotation(rx, ry, rz));
                 arcsB.addOrReplaceChild("bolt_b_" + i,
                         CubeListBuilder.create()
-                                .texOffs(0, 16).addBox(-1.0F, -1.0F, -14.0F, 2, 2, 28),
+                                .texOffs(0, 16).addBox(-0.5F, -0.5F, -8.0F, 1, 1, 16),
                         PartPose.rotation(-ry, rx, -rz));
             }
 
@@ -519,18 +507,19 @@ public class JutsuVisualModels {
 
             PartDefinition inner = root.addOrReplaceChild("inner_pillars",
                     CubeListBuilder.create()
-                            .texOffs(0, 0).addBox(-6.0F, -24.0F, -6.0F, 12, 24, 12),
+                            .texOffs(0, 0).addBox(-3.0F, -22.0F, -3.0F, 6, 22, 6)
+                            .texOffs(24, 0).addBox(-2.0F, -26.0F, -2.0F, 4, 26, 4),
                     PartPose.ZERO);
 
             PartDefinition outer = root.addOrReplaceChild("outer_pillars", CubeListBuilder.create(), PartPose.ZERO);
-            for (int i = 0; i < 6; i++) {
-                float angle = (float) (i * Math.PI * 2.0 / 6.0);
-                float rx = Mth.cos(angle) * 10.0F;
-                float rz = Mth.sin(angle) * 10.0F;
+            for (int i = 0; i < 5; i++) {
+                float angle = (float) (i * Math.PI * 2.0 / 5.0);
+                float rx = Mth.cos(angle) * 8.0F;
+                float rz = Mth.sin(angle) * 8.0F;
                 outer.addOrReplaceChild("flame_" + i,
                         CubeListBuilder.create()
-                                .texOffs(0, 36).addBox(-3.0F, -26.0F, -1.5F, 6, 26, 3),
-                        PartPose.offsetAndRotation(rx, 0.0F, rz, 0.18F, -angle + (float) (Math.PI / 2.0), 0.12F));
+                                .texOffs(0, 36).addBox(-2.5F, -20.0F, -1.0F, 5, 20, 2),
+                        PartPose.offsetAndRotation(rx, 0.0F, rz, 0.15F, -angle + (float) (Math.PI / 2.0), 0.10F));
             }
 
             return LayerDefinition.create(mesh, 64, 64);
@@ -601,7 +590,7 @@ public class JutsuVisualModels {
     }
 
     // =========================================================================
-    // 10. DOTON: DORYŪHEKI — 3D Sculpted Shinobi Earth Bulwark & Buttresses
+    // 10. DOTON: DORYŪHEKI — 3D Sculpted Shinobi Earth Bulwark
     // =========================================================================
     public static class EarthWallModel extends Model {
         private final ModelPart root;
@@ -617,25 +606,11 @@ public class JutsuVisualModels {
             MeshDefinition mesh = new MeshDefinition();
             PartDefinition root = mesh.getRoot();
 
-            PartDefinition wall = root.addOrReplaceChild("wall_body",
+            // Solid 3-block wide, 3-block tall, 12-pixel thick stone bulwark
+            root.addOrReplaceChild("wall_body",
                     CubeListBuilder.create()
-                            // Sculpted Front Relief Crest & Battlement Spires
-                            .texOffs(0, 0).addBox(-24.0F, -48.0F, -9.5F, 8, 48, 3)
-                            .texOffs(0, 0).addBox(16.0F, -48.0F, -9.5F, 8, 48, 3)
-                            .texOffs(22, 0).addBox(-12.0F, -42.0F, -9.2F, 24, 34, 2)
-                            // Top Jagged Rock Battlements
-                            .texOffs(0, 51).addBox(-20.0F, -54.0F, -8.0F, 8, 6, 6)
-                            .texOffs(0, 51).addBox(-4.0F, -55.0F, -8.0F, 8, 7, 6)
-                            .texOffs(0, 51).addBox(12.0F, -54.0F, -8.0F, 8, 6, 6),
+                            .texOffs(0, 0).addBox(-24.0F, -48.0F, -6.0F, 48, 48, 12),
                     PartPose.ZERO);
-
-            // Angled 3D Stone Buttress Pillars on Front & Back
-            wall.addOrReplaceChild("buttress_fl",
-                    CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -36.0F, -4.0F, 6, 38, 6),
-                    PartPose.offsetAndRotation(-20.0F, 0.0F, -10.0F, -0.22F, 0.0F, 0.0F));
-            wall.addOrReplaceChild("buttress_fr",
-                    CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -36.0F, -4.0F, 6, 38, 6),
-                    PartPose.offsetAndRotation(20.0F, 0.0F, -10.0F, -0.22F, 0.0F, 0.0F));
 
             return LayerDefinition.create(mesh, 128, 64);
         }

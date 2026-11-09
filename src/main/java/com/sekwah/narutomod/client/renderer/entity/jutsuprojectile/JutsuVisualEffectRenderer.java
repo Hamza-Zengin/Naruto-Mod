@@ -76,7 +76,8 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - entity.getEffectYaw()));
 
         float fadeOut = progress > 0.82F ? (1.0F - ((progress - 0.82F) / 0.18F)) : 1.0F;
-        int fullBright = 15728880;
+        int fullBright = 15728880; // 0x00F000F0 (Block 15, Sky 15)
+        int solidLight = Math.max(packedLight, 12583104); // Block 12, Sky 12 minimum ambient baseline
 
         switch (type) {
             case JutsuVisualEffectEntity.TYPE_KIRIN_DRAGON -> {
@@ -89,13 +90,13 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
                 float scale = 1.25F;
                 poseStack.scale(-scale, -scale, scale);
                 this.woodModel.setupAnim(age, progress);
-                this.woodModel.renderToBuffer(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                this.woodModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
             }
             case JutsuVisualEffectEntity.TYPE_BONE_FOREST -> {
                 float scale = 1.2F;
                 poseStack.scale(-scale, -scale, scale);
                 this.boneModel.setupAnim(age);
-                this.boneModel.renderToBuffer(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                this.boneModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
             }
             case JutsuVisualEffectEntity.TYPE_RASENGAN_SPHERE -> {
                 poseStack.translate(0.0D, 1.0D, 0.0D);
@@ -135,13 +136,13 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
                 float scale = 1.1F;
                 poseStack.scale(-scale, -scale, scale);
                 this.shadowModel.setupAnim(age, progress);
-                this.shadowModel.renderToBuffer(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.92F * fadeOut);
+                this.shadowModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.92F * fadeOut);
             }
             case JutsuVisualEffectEntity.TYPE_EARTH_WALL -> {
                 float scale = 1.0F;
                 poseStack.scale(-scale, -scale, scale);
                 this.earthModel.setupAnim(progress);
-                this.earthModel.renderToBuffer(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                this.earthModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
             }
         }
 
@@ -155,7 +156,8 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
         if (type == JutsuVisualEffectEntity.TYPE_KIRIN_DRAGON
                 || type == JutsuVisualEffectEntity.TYPE_RASENGAN_SPHERE
                 || type == JutsuVisualEffectEntity.TYPE_CHIDORI_BURST
-                || type == JutsuVisualEffectEntity.TYPE_AMATERASU_PILLAR) {
+                || type == JutsuVisualEffectEntity.TYPE_AMATERASU_PILLAR
+                || type == JutsuVisualEffectEntity.TYPE_EARTH_WALL) {
             return 15;
         }
         return super.getBlockLightLevel(entity, pos);

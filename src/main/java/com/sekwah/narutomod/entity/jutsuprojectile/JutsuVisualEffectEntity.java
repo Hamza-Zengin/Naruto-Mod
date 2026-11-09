@@ -1,23 +1,37 @@
 package com.sekwah.narutomod.entity.jutsuprojectile;
 
 import com.sekwah.narutomod.entity.NarutoEntities;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 /**
- * Unified 3D Jutsu Visual & Projectile Effect Entity.
- * Renders custom multi-part 3D models (Kirin Dragon, Mokuton Root Dome, Kaguya Bone Forest,
- * Rasengan Sphere, Chidori Lightning Cage, Suiton Water Vortex, Fuuton Wind Funnel,
- * Amaterasu Black Flame Pillar, Kage Mane Shadow Bind, and Doton Earth Bulwark).
+ * Functional 3D Jutsu Visual & Physical Combat Entity.
+ * Renders custom multi-part 3D models while executing authentic server-side physics,
+ * projectile collisions, physical barrier defense, and combat mechanics.
  */
 public class JutsuVisualEffectEntity extends Entity {
 
@@ -40,6 +54,8 @@ public class JutsuVisualEffectEntity extends Entity {
             SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_YAW =
             SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Optional<UUID>> DATA_CASTER_UUID =
+            SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
     public JutsuVisualEffectEntity(EntityType<? extends JutsuVisualEffectEntity> type, Level level) {
         super(type, level);
@@ -54,6 +70,9 @@ public class JutsuVisualEffectEntity extends Entity {
         entity.setMaxLife(maxLife);
         entity.setEffectYaw(yaw);
         entity.setYRot(yaw);
+        if (visualType == TYPE_EARTH_WALL) {
+            entity.noPhysics = false;
+        }
         return entity;
     }
 
@@ -63,13 +82,56 @@ public class JutsuVisualEffectEntity extends Entity {
         this.entityData.define(DATA_MAX_LIFE, 40);
         this.entityData.define(DATA_TARGET_ID, -1);
         this.entityData.define(DATA_YAW, 0.0F);
+        this.entityData.define(DATA_CASTER_UUID, Optional.empty());
+    }
+
+    @Override
+    public EntityDimensions getDimensions(Pose pose) {
+        if (this.getVisualType() == TYPE_EARTH_WALL) {
+            return EntityDimensions.scalable(3.2F, 2.8F);
+        }
+        return super.getDimensions(pose);
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return this.getVisualType() == TYPE_EARTH_WALL;
+    }
+
+    @Override
+    public boolean isPickable() {
+        return this.getVisualType() == TYPE_EARTH_WALL;
+    }
+
+    @Override
+    public boolean canCollideWith(Entity other) {
+        return this.getVisualType() == TYPE_EARTH_WALL && other != this;
+    }
+
+    public Optional<UUID> getCasterUUID() {
+        return this.entityData.get(DATA_CASTER_UUID);
+    }
+
+    public void setCasterUUID(UUID uuid) {
+        this.entityData.set(DATA_CASTER_UUID, Optional.ofNullable(uuid));
+    }
+
+    public Player getCasterPlayer() {
+        Optional<UUID> uuidOpt = this.getCasterUUID();
+        if (uuidOpt.isPresent() && this.level() instanceof ServerLevel serverLevel) {
+            return serverLevel.getServer().getPlayerList().getPlayer(uuidOpt.get());
+        }
+        return null;
     }
 
     @Override
     public void tick() {
         super.tick();
 
+        int type = this.getVisualType();
         int targetId = this.getTargetId();
+
+        // 1. Position tracking or movement velocity
         if (targetId >= 0) {
             Entity tracked = this.level().getEntity(targetId);
             if (tracked != null && tracked.isAlive()) {
@@ -82,8 +144,150 @@ public class JutsuVisualEffectEntity extends Entity {
             }
         }
 
-        if (!this.level().isClientSide && this.tickCount >= this.getMaxLife()) {
-            this.discard();
+        // 2. Server-side Jutsu Combat & Physical Functionality
+        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+            Player caster = this.getCasterPlayer();
+
+            switch (type) {
+                // --- DOTON: 3D EARTH WALL (Real Physical Barrier & Projectile Shield) ---
+                case TYPE_EARTH_WALL -> {
+                    AABB wallBox = this.getBoundingBox().inflate(0.3D, 0.0D, 0.3D);
+                    List<Entity> inside = serverLevel.getEntities(this, wallBox);
+                    for (Entity e : inside) {
+                        if (e instanceof LivingEntity living) {
+                            Vec3 pushDir = e.position().subtract(this.position());
+                            Vec3 horiz = new Vec3(pushDir.x, 0, pushDir.z).normalize().scale(0.35D);
+                            living.setDeltaMovement(living.getDeltaMovement().add(horiz.x, 0.05D, horiz.z));
+                            living.hurtMarked = true;
+                        } else if (e instanceof Projectile projectile) {
+                            // Deflect all incoming projectiles
+                            projectile.setDeltaMovement(projectile.getDeltaMovement().scale(-0.5D));
+                            serverLevel.playSound(null, this.blockPosition(), SoundEvents.STONE_HIT, SoundSource.PLAYERS, 1.2F, 0.85F);
+                        }
+                    }
+                }
+
+                // --- SUITON: 3D WATER VORTEX TORPEDO (Active Projectile Strike) ---
+                case TYPE_WATER_VORTEX -> {
+                    AABB hitBox = this.getBoundingBox().inflate(0.8D);
+                    List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox,
+                            e -> e.isAlive() && (caster == null || e != caster));
+                    if (!enemies.isEmpty()) {
+                        for (LivingEntity enemy : enemies) {
+                            enemy.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().drown(), 14.0F);
+                            enemy.clearFire();
+                            Vec3 push = this.getDeltaMovement().normalize().scale(1.4D).add(0, 0.35D, 0);
+                            enemy.setDeltaMovement(push);
+                            enemy.hurtMarked = true;
+                        }
+                        serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_SPLASH, SoundSource.PLAYERS, 1.5F, 1.0F);
+                        serverLevel.sendParticles(ParticleTypes.SPLASH, this.getX(), this.getY() + 0.8, this.getZ(), 25, 0.5, 0.5, 0.5, 0.15);
+                        this.discard();
+                        return;
+                    }
+                    // Burst if it hits solid terrain
+                    if (serverLevel.getBlockState(this.blockPosition()).isSolidRender(serverLevel, this.blockPosition())) {
+                        serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_SPLASH, SoundSource.PLAYERS, 1.2F, 1.1F);
+                        serverLevel.sendParticles(ParticleTypes.SPLASH, this.getX(), this.getY() + 0.5, this.getZ(), 15, 0.4, 0.4, 0.4, 0.1);
+                        this.discard();
+                        return;
+                    }
+                }
+
+                // --- FŪTON: 3D WIND SHOCKWAVE FUNNEL (Piercing Gust & Deflection) ---
+                case TYPE_WIND_SHOCKWAVE -> {
+                    float progress = (float) this.tickCount / (float) Math.max(1, this.getMaxLife());
+                    double radius = 1.2D + progress * 1.8D;
+                    AABB gustBox = this.getBoundingBox().inflate(radius, 1.2D, radius);
+
+                    List<Entity> entities = serverLevel.getEntities(this, gustBox);
+                    for (Entity e : entities) {
+                        if (e instanceof LivingEntity living && living.isAlive() && (caster == null || living != caster)) {
+                            living.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().generic(), 10.0F);
+                            Vec3 push = this.getDeltaMovement().normalize().scale(2.2D).add(0, 0.45D, 0);
+                            living.setDeltaMovement(push);
+                            living.hurtMarked = true;
+                        } else if (e instanceof Projectile projectile) {
+                            projectile.setDeltaMovement(this.getDeltaMovement().scale(1.8D));
+                        }
+                    }
+                }
+
+                // --- MOKUTON: 3D WOOD PRISON (Physical Entanglement & Life Siphon) ---
+                case TYPE_WOOD_PRISON -> {
+                    if (this.tickCount % 14 == 0) {
+                        AABB cageBox = this.getBoundingBox().inflate(4.5D, 2.0D, 4.5D);
+                        List<LivingEntity> trapped = serverLevel.getEntitiesOfClass(LivingEntity.class, cageBox,
+                                e -> e.isAlive() && (caster == null || e != caster));
+                        for (LivingEntity target : trapped) {
+                            // Constrict towards center
+                            Vec3 pull = this.position().subtract(target.position()).scale(0.28D);
+                            target.setDeltaMovement(pull.x, -0.2D, pull.z);
+                            target.hurtMarked = true;
+                            target.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().magic(), 4.0F);
+                            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 4));
+                            if (caster != null) {
+                                caster.heal(1.0F);
+                            }
+                        }
+                    }
+                }
+
+                // --- SHIKOTSUMYAKU: 3D BONE FOREST (Expanding Spire Trap) ---
+                case TYPE_BONE_FOREST -> {
+                    if (this.tickCount <= 22 && this.tickCount % 7 == 0) {
+                        double currentRadius = (this.tickCount / 7) * 2.2D + 1.2D;
+                        AABB ringBox = this.getBoundingBox().inflate(currentRadius, 1.5D, currentRadius);
+                        List<LivingEntity> victims = serverLevel.getEntitiesOfClass(LivingEntity.class, ringBox,
+                                e -> e.isAlive() && (caster == null || e != caster));
+                        for (LivingEntity v : victims) {
+                            v.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().generic(), 7.0F);
+                            v.setDeltaMovement(v.getDeltaMovement().x, 0.48D, v.getDeltaMovement().z);
+                            v.hurtMarked = true;
+                            v.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 50, 1));
+                        }
+                    }
+                }
+
+                // --- AMATERASU: 3D BLACK FLAME PILLAR (Inextinguishable Inferno Zone) ---
+                case TYPE_AMATERASU_PILLAR -> {
+                    if (this.tickCount % 10 == 0) {
+                        AABB flameBox = this.getBoundingBox().inflate(1.8D, 1.2D, 1.8D);
+                        List<LivingEntity> burning = serverLevel.getEntitiesOfClass(LivingEntity.class, flameBox,
+                                e -> e.isAlive() && (caster == null || e != caster));
+                        for (LivingEntity b : burning) {
+                            b.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().inFire(), 5.0F);
+                            b.setRemainingFireTicks(240);
+                            b.addEffect(new MobEffectInstance(MobEffects.WITHER, 100, 2));
+                        }
+                    }
+                }
+
+                // --- RAITON: 3D KIRIN LIGHTNING DRAGON (Timed Thunderous Ground Slam) ---
+                case TYPE_KIRIN_DRAGON -> {
+                    if (this.tickCount == 6) {
+                        // Ground slam moment
+                        serverLevel.playSound(null, this.blockPosition(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 3.5F, 0.75F);
+                        serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.6F, 1.0F);
+
+                        AABB slamBox = this.getBoundingBox().inflate(6.5D, 3.0D, 6.5D);
+                        List<LivingEntity> struck = serverLevel.getEntitiesOfClass(LivingEntity.class, slamBox,
+                                e -> e.isAlive() && (caster == null || e != caster));
+                        for (LivingEntity s : struck) {
+                            s.hurt(serverLevel.damageSources().lightningBolt(), 32.0F);
+                            Vec3 blast = s.position().subtract(this.position()).normalize().scale(2.2D);
+                            s.push(blast.x, 0.75D, blast.z);
+                            s.setRemainingFireTicks(100);
+                            s.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 2));
+                        }
+                    }
+                }
+            }
+
+            // Expiration
+            if (this.tickCount >= this.getMaxLife()) {
+                this.discard();
+            }
         }
     }
 
@@ -93,6 +297,9 @@ public class JutsuVisualEffectEntity extends Entity {
 
     public void setVisualType(int type) {
         this.entityData.set(DATA_VISUAL_TYPE, type);
+        if (type == TYPE_EARTH_WALL) {
+            this.noPhysics = false;
+        }
     }
 
     public int getMaxLife() {
@@ -121,7 +328,7 @@ public class JutsuVisualEffectEntity extends Entity {
 
     @Override
     public boolean shouldRenderAtSqrDistance(double distance) {
-        return distance < 16384.0D; // Visible up to 128 blocks away
+        return distance < 16384.0D;
     }
 
     @Override
@@ -129,6 +336,9 @@ public class JutsuVisualEffectEntity extends Entity {
         this.setVisualType(tag.getInt("VisualType"));
         this.setMaxLife(tag.getInt("MaxLife"));
         this.setEffectYaw(tag.getFloat("EffectYaw"));
+        if (tag.hasUUID("CasterUUID")) {
+            this.setCasterUUID(tag.getUUID("CasterUUID"));
+        }
     }
 
     @Override
@@ -136,6 +346,8 @@ public class JutsuVisualEffectEntity extends Entity {
         tag.putInt("VisualType", this.getVisualType());
         tag.putInt("MaxLife", this.getMaxLife());
         tag.putFloat("EffectYaw", this.getEffectYaw());
+        Optional<UUID> uuidOpt = this.getCasterUUID();
+        uuidOpt.ifPresent(uuid -> tag.putUUID("CasterUUID", uuid));
     }
 
     @Override

@@ -36,4 +36,27 @@ public class RenderEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onLeftClickEmpty(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickEmpty event) {
+        Player player = event.getEntity();
+        player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+            if (ninjaData.getActiveHandJutsuTicks() > 0 && !ninjaData.getActiveHandJutsu().isEmpty()) {
+                com.sekwah.narutomod.network.PacketHandler.sendToServer(new com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket(-1));
+            }
+        });
+    }
+
+    @SubscribeEvent
+    public static void onLeftClickBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock event) {
+        Player player = event.getEntity();
+        player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+            if (ninjaData.getActiveHandJutsuTicks() > 0 && !ninjaData.getActiveHandJutsu().isEmpty()) {
+                if (event.getLevel().isClientSide()) {
+                    com.sekwah.narutomod.network.PacketHandler.sendToServer(new com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket(-1));
+                }
+                event.setCanceled(true);
+            }
+        });
+    }
+
 }

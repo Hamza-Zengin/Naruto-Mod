@@ -47,12 +47,12 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
 
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
-        // Godlike Taijutsu Buffs
-        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 4, false, false, true)); // Speed V
-        player.addEffect(new MobEffectInstance(MobEffects.JUMP, 40, 3, false, false, false)); // Jump IV
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 7, false, false, true)); // Strength VIII (+24 damage per punch)
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 1, false, false, false)); // Resistance II (40% dmg reduction)
-        player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 40, 3, false, false, false)); // Haste IV
+        // Godlike Taijutsu Buffs (invisible potion particles)
+        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 4, false, false, false));
+        player.addEffect(new MobEffectInstance(MobEffects.JUMP, 40, 3, false, false, false));
+        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 7, false, false, false));
+        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 1, false, false, false));
+        player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 40, 3, false, false, false));
 
         // Heavy stamina consumption: 0.25f per tick (5 stamina per second)
         // Grants an intense 20-30 second combat window before the fatal death toll begins!
@@ -69,30 +69,15 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
 
                 serverLevel.playSound(null, player.blockPosition(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1.2f, 0.7f);
                 serverLevel.playSound(null, player.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1.0f, 0.5f);
-
-                serverLevel.sendParticles(ParticleTypes.DAMAGE_INDICATOR,
-                        player.getX(), player.getY() + 1.2, player.getZ(),
-                        2, 0.15, 0.15, 0.15, 0.02);
-                serverLevel.sendParticles(ParticleTypes.LAVA,
-                        player.getX(), player.getY() + 0.8, player.getZ(),
-                        2, 0.2, 0.3, 0.2, 0.01);
             }
         }
 
-        // Minimalist subtle Crimson Steam aura
+        // Minimalist subtle Crimson Steam: 1 faint spore every second (20 ticks)
         if (player.level() instanceof ServerLevel serverLevel) {
-            if (ticksActive % 2 == 0) {
-                serverLevel.sendParticles(ParticleTypes.CRIT,
-                        player.getX(), player.getY() + 0.8, player.getZ(),
-                        2, 0.25, 0.4, 0.25, 0.03);
-            }
-            if (ticksActive % 6 == 0) {
-                serverLevel.sendParticles(ParticleTypes.DRAGON_BREATH,
-                        player.getX(), player.getY() + 0.2, player.getZ(),
-                        1, 0.15, 0.3, 0.15, 0.01);
-                serverLevel.sendParticles(ParticleTypes.FLAME,
+            if (ticksActive % 20 == 0) {
+                serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
                         player.getX(), player.getY() + 0.9, player.getZ(),
-                        1, 0.2, 0.25, 0.2, 0.005);
+                        1, 0.15, 0.2, 0.15, 0.01);
             }
         }
     }

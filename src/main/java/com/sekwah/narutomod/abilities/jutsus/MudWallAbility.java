@@ -13,12 +13,11 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 
 /**
- * Doton: Mud Wall (Doryuheki)
- * Raises a temporary protective stone/mud barrier in front of the caster.
+ * Doton: Mud Wall (Doryūheki - 土遁·土流壁)
+ * Raises a solid, sculpted 3D Shinobi Earth Bulwark that physically deflects
+ * enemies, attacks, and projectiles without clumsy block placement or visual clipping.
  */
 public class MudWallAbility extends Ability implements Ability.Cooldown {
 
@@ -29,7 +28,7 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 321;
+        return 321; // B - V - C
     }
 
     @Override
@@ -47,45 +46,27 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
         Direction direction = player.getDirection();
-        Direction perpendicular = direction.getClockWise();
         BlockPos basePos = player.blockPosition().relative(direction, 2);
 
-        BlockState mudState = Blocks.MUD_BRICKS.defaultBlockState();
+        serverLevel.playSound(null, basePos, SoundEvents.STONE_PLACE, SoundSource.PLAYERS, 1.8f, 0.75f);
+        serverLevel.playSound(null, basePos, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.8f, 0.6f);
 
-        serverLevel.playSound(null, basePos, SoundEvents.STONE_PLACE, SoundSource.PLAYERS, 1.5f, 0.8f);
-        serverLevel.playSound(null, basePos, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.7f, 0.55f);
+        // Ground eruption particles
+        BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState());
+        for (int i = 0; i < 16; i++) {
+            double rx = basePos.getX() + 0.5 + (player.getRandom().nextDouble() - 0.5) * 2.5;
+            double rz = basePos.getZ() + 0.5 + (player.getRandom().nextDouble() - 0.5) * 2.5;
+            serverLevel.sendParticles(rockParticle, rx, basePos.getY() + 0.2, rz, 4, 0.2, 0.3, 0.2, 0.08);
+        }
 
-        // Erupt 3D Sculpted Shinobi Earth Bulwark & Stone Buttresses
+        // Erupt 3D Sculpted Shinobi Earth Bulwark Entity (Physical Solid Barrier)
         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity earthWall3D =
                 com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
                         serverLevel, basePos.getX() + 0.5, basePos.getY(), basePos.getZ() + 0.5,
                         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_EARTH_WALL,
                         160, direction.toYRot());
+        earthWall3D.setCasterUUID(player.getUUID());
         serverLevel.addFreshEntity(earthWall3D);
-
-        java.util.List<BlockPos> placedBlocks = new java.util.ArrayList<>();
-        for (int width = -1; width <= 1; width++) {
-            for (int height = 0; height <= 2; height++) {
-                BlockPos targetPos = basePos.relative(perpendicular, width).above(height);
-                if (serverLevel.getBlockState(targetPos).isAir()) {
-                    serverLevel.setBlockAndUpdate(targetPos, mudState);
-                    placedBlocks.add(targetPos);
-                    serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, mudState),
-                            targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5,
-                            10, 0.3, 0.3, 0.3, 0.1);
-                }
-            }
-        }
-
-        // Crumble temporary earth wall blocks cleanly when the 3D bulwark expires
-        ninjaData.scheduleDelayedTickEvent(p -> {
-            if (!(p.level() instanceof ServerLevel sLevel)) return;
-            for (BlockPos pos : placedBlocks) {
-                if (sLevel.getBlockState(pos).is(Blocks.MUD_BRICKS)) {
-                    sLevel.destroyBlock(pos, false);
-                }
-            }
-        }, 160);
     }
 
     @Override

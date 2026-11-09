@@ -52,47 +52,64 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
-        // Give high-speed burst effect
-        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 5 * 20, 2, false, false, true));
+        // Activate 5-second hand holding window (100 ticks)
+        ninjaData.setActiveHandJutsu("chidori", 100);
+
+        // Give high-speed burst effect for the 5-second window
+        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100, 2, false, false, true));
 
         // Sound effect
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CHIDORI.get(), SoundSource.PLAYERS, 1.2f, 1.0f);
+        player.displayClientMessage(Component.translatable("jutsu.chidori.ready").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD), true);
+    }
 
-        // Burst in look direction
+    public static void executeStrike(Player player, INinjaData ninjaData, LivingEntity target) {
+        if (!(player.level() instanceof ServerLevel serverLevel)) return;
+
         Vec3 look = player.getLookAngle();
-        player.setDeltaMovement(look.x * 2.2, 0.2, look.z * 2.2);
+        // High velocity forward thrust
+        player.setDeltaMovement(look.x * 2.4, 0.22, look.z * 2.4);
+        player.hurtMarked = true;
 
-        // Visual lightning sparks
-        for (int i = 0; i < 30; i++) {
-            double ox = (player.getRandom().nextDouble() - 0.5) * 1.5;
-            double oy = player.getRandom().nextDouble() * 1.8;
-            double oz = (player.getRandom().nextDouble() - 0.5) * 1.5;
-            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                    player.getX() + ox, player.getY() + oy, player.getZ() + oz,
-                    2, 0, 0, 0, 0.2);
-        }
+        Vec3 strikePos = target != null ? target.position().add(0, target.getBbHeight() * 0.5, 0)
+                : player.position().add(look.scale(2.2)).add(0, player.getEyeHeight() * 0.7, 0);
 
-        // Deal lightning damage to entities directly in front
-        Vec3 forward = player.position().add(look.scale(2.2));
-        AABB box = new AABB(forward.x - 1.5, forward.y - 1.0, forward.z - 1.5,
-                forward.x + 1.5, forward.y + 2.0, forward.z + 1.5);
-
+        // Spawn 3D Chidori Burst Entity
         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity chidori3D =
                 com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
-                        serverLevel, forward.x, player.getY(), forward.z,
+                        serverLevel, strikePos.x, player.getY(), strikePos.z,
                         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_CHIDORI_BURST,
-                        25, player.getYRot());
+                        20, player.getYRot());
 
-        List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, box, e -> e != player && e.isAlive());
-        if (!enemies.isEmpty()) {
-            chidori3D.setTargetId(enemies.get(0).getId());
+        List<LivingEntity> hitEnemies = new java.util.ArrayList<>();
+        if (target != null && target.isAlive()) {
+            hitEnemies.add(target);
+            chidori3D.setTargetId(target.getId());
+        } else {
+            AABB box = new AABB(strikePos.x - 1.8, strikePos.y - 1.2, strikePos.z - 1.8,
+                    strikePos.x + 1.8, strikePos.y + 2.0, strikePos.z + 1.8);
+            hitEnemies.addAll(serverLevel.getEntitiesOfClass(LivingEntity.class, box, e -> e != player && e.isAlive()));
         }
         serverLevel.addFreshEntity(chidori3D);
 
-        for (LivingEntity enemy : enemies) {
-            enemy.hurt(player.damageSources().lightningBolt(), 22.0f);
+        for (LivingEntity enemy : hitEnemies) {
+            enemy.hurt(player.damageSources().lightningBolt(), 26.0f);
             serverLevel.sendParticles(ParticleTypes.FLASH, enemy.getX(), enemy.getY() + 1.0, enemy.getZ(), 1, 0, 0, 0, 0);
         }
+
+        // Minimalist lightning spark discharge
+        for (int i = 0; i < 15; i++) {
+            double ox = (player.getRandom().nextDouble() - 0.5) * 1.2;
+            double oy = player.getRandom().nextDouble() * 1.5;
+            double oz = (player.getRandom().nextDouble() - 0.5) * 1.2;
+            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
+                    strikePos.x + ox, strikePos.y + oy, strikePos.z + oz,
+                    1, 0, 0, 0, 0.15);
+        }
+        serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CHIDORI.get(), SoundSource.PLAYERS, 1.4f, 1.2f);
+
+        player.removeEffect(MobEffects.MOVEMENT_SPEED);
+        ninjaData.clearActiveHandJutsu();
     }
 
     @Override

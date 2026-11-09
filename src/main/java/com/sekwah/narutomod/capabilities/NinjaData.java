@@ -74,6 +74,12 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Sync(minTicks = 1, syncGlobally = true)
     private ToggleAbilityData toggleAbilityData;
 
+    @Sync(minTicks = 1, syncGlobally = true)
+    private String activeHandJutsu = "";
+
+    @Sync(minTicks = 1, syncGlobally = true)
+    private int activeHandJutsuTicks = 0;
+
     private ArrayList<DelayedPlayerTickEvent> delayedTickEvents = new ArrayList<>();
     private HashMap<String, CooldownTickEvent> cooldownTickEvents = new HashMap<>();
 
@@ -125,6 +131,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private static final String ENEMIES_DEFEATED_TAG = "enemiesDefeated";
     private static final String JUTSUS_CAST_TAG = "jutsusCast";
     private static final String UNLOCKED_JUTSUS_TAG = "unlockedJutsus";
+    private static final String ACTIVE_HAND_JUTSU_TAG = "activeHandJutsu";
+    private static final String ACTIVE_HAND_JUTSU_TICKS_TAG = "activeHandJutsuTicks";
 
     private final LazyOptional<INinjaData> holder = LazyOptional.of(() -> this);
 
@@ -616,7 +624,21 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             if (this.currentlyChanneled != null) {
                 this.setCurrentlyChanneledAbility(player, null);
             }
+            if (this.activeHandJutsuTicks > 0) {
+                this.clearActiveHandJutsu();
+            }
             return;
+        }
+
+        // Countdown active hand jutsu (Rasengan/Chidori 5-second window)
+        if (this.activeHandJutsuTicks > 0) {
+            this.activeHandJutsuTicks--;
+            if (this.activeHandJutsuTicks == 0) {
+                if ("chidori".equals(this.activeHandJutsu)) {
+                    player.removeEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED);
+                }
+                this.activeHandJutsu = "";
+            }
         }
 
         // Safe delayed tick execution: collect events to run, then execute outside iterator
@@ -729,6 +751,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         if (this.unlockedJutsus != null) {
             nbt.putString(UNLOCKED_JUTSUS_TAG, this.unlockedJutsus);
         }
+        nbt.putString(ACTIVE_HAND_JUTSU_TAG, this.activeHandJutsu != null ? this.activeHandJutsu : "");
+        nbt.putInt(ACTIVE_HAND_JUTSU_TICKS_TAG, this.activeHandJutsuTicks);
         return nbt;
     }
 
@@ -781,7 +805,35 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             if (compoundTag.contains(UNLOCKED_JUTSUS_TAG)) {
                 this.unlockedJutsus = compoundTag.getString(UNLOCKED_JUTSUS_TAG);
             }
+            if (compoundTag.contains(ACTIVE_HAND_JUTSU_TAG)) {
+                this.activeHandJutsu = compoundTag.getString(ACTIVE_HAND_JUTSU_TAG);
+            }
+            if (compoundTag.contains(ACTIVE_HAND_JUTSU_TICKS_TAG)) {
+                this.activeHandJutsuTicks = compoundTag.getInt(ACTIVE_HAND_JUTSU_TICKS_TAG);
+            }
         }
+    }
+
+    @Override
+    public String getActiveHandJutsu() {
+        return this.activeHandJutsu != null ? this.activeHandJutsu : "";
+    }
+
+    @Override
+    public int getActiveHandJutsuTicks() {
+        return this.activeHandJutsuTicks;
+    }
+
+    @Override
+    public void setActiveHandJutsu(String jutsu, int ticks) {
+        this.activeHandJutsu = jutsu != null ? jutsu : "";
+        this.activeHandJutsuTicks = ticks;
+    }
+
+    @Override
+    public void clearActiveHandJutsu() {
+        this.activeHandJutsu = "";
+        this.activeHandJutsuTicks = 0;
     }
 
     @Nonnull

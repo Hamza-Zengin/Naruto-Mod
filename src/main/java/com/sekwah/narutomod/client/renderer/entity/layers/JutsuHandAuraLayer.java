@@ -45,43 +45,42 @@ public class JutsuHandAuraLayer extends RenderLayer<AbstractClientPlayer, Player
         player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
             int fullBright = 15728880;
 
-            // 1. Chidori 3D Hand Lightning Blade (active during Chidori Speed III burst)
-            MobEffectInstance speedEffect = player.getEffect(MobEffects.MOVEMENT_SPEED);
-            boolean hasEightGates = ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.EIGHT_GATES.getId());
-            if (speedEffect != null && speedEffect.getAmplifier() == 2 && !hasEightGates) {
+            // 1. Chidori 3D Hand Lightning Blade (active while holding Chidori)
+            if ("chidori".equalsIgnoreCase(ninjaData.getActiveHandJutsu())) {
                 poseStack.pushPose();
                 this.getParentModel().rightArm.translateAndRotate(poseStack);
                 poseStack.translate(-0.06D, 0.68D, -0.12D);
-                poseStack.scale(0.38F, 0.38F, 0.38F);
+                poseStack.scale(0.32F, 0.32F, 0.32F);
                 this.chidoriHandModel.setupAnim(ageInTicks);
                 VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_CHIDORI));
                 this.chidoriHandModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.90F);
                 poseStack.popPose();
             }
 
-            // 2. 3D Swirling Chakra Sphere in hand while channeling Chakra
-            if (ninjaData.getCurrentlyChanneledAbility() != null
-                    && ninjaData.getCurrentlyChanneledAbility().equals(NarutoAbilities.CHAKRA_CHARGE.getId())) {
+            // 2. 3D Swirling Chakra / Rasengan Sphere in hand (active while holding Rasengan or Chakra Charge)
+            if ("rasengan".equalsIgnoreCase(ninjaData.getActiveHandJutsu())
+                    || (ninjaData.getCurrentlyChanneledAbility() != null
+                    && ninjaData.getCurrentlyChanneledAbility().equals(NarutoAbilities.CHAKRA_CHARGE.getId()))) {
                 poseStack.pushPose();
                 this.getParentModel().rightArm.translateAndRotate(poseStack);
                 poseStack.translate(-0.06D, 0.65D, -0.15D);
-                poseStack.scale(0.32F, 0.32F, 0.32F);
+                poseStack.scale(0.28F, 0.28F, 0.28F);
                 this.rasenganHandModel.setupAnim(ageInTicks);
                 VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_RASENGAN));
-                this.rasenganHandModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.82F);
+                this.rasenganHandModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.85F);
                 poseStack.popPose();
             }
 
-            // 3. Eight Gates (Hachimon Tonkō) 3D Crimson/Emerald Chakra Vapor Rings around torso
+            // 3. Eight Gates (Hachimon Tonkō) Minimalist Subtle Crimson Steam Ring at ground level
+            boolean hasEightGates = ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.EIGHT_GATES.getId());
             if (hasEightGates) {
                 poseStack.pushPose();
-                this.getParentModel().body.translateAndRotate(poseStack);
-                poseStack.translate(0.0D, 0.35D, 0.0D);
-                poseStack.scale(0.75F, 0.75F, 0.75F);
-                poseStack.mulPose(com.mojang.math.Axis.XP.rotationDegrees(90.0F));
-                this.gatesAuraModel.setupAnim(ageInTicks * 1.4F);
+                poseStack.translate(0.0D, 1.45D, 0.0D);
+                poseStack.scale(0.38F, 0.08F, 0.38F);
+                poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(ageInTicks * 2.0F));
+                this.gatesAuraModel.setupAnim(ageInTicks * 0.8F);
                 VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND));
-                this.gatesAuraModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 0.25F, 0.20F, 0.65F);
+                this.gatesAuraModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 0.15F, 0.15F, 0.28F);
                 poseStack.popPose();
             }
 

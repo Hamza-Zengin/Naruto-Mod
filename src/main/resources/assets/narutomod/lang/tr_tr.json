@@ -54,6 +54,8 @@
   "jutsu.fail.notenoughstamina": "%s için yeterli kondisyonunuz (stamina) yok!",
   "jutsu.fail.notenoughchakra": "%s için yeterli çakranız yok!",
   "jutsu.fail.notclan": "Bu tekniği uyandırabilmek için %s Klanına mensup olmalısınız!",
+  "jutsu.rasengan.ready": "Rasengan Hazır! Vurmak için Sol Tıkla!",
+  "jutsu.chidori.ready": "Chidori Hazır! Hücum etmek için Sol Tıkla!",
   "jutsu.leap": "Ninja Sıçraması",
   "jutsu.waterwalk": "Su Yürüyüşü",
   "jutsu.cast.debug": "Girilen kombo: %s",

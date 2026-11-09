@@ -80,5 +80,10 @@ public interface INinjaData extends INBTSerializable<Tag> {
     void updateServerData(Player player);
 
     void scheduleDelayedTickEvent(Consumer<Player> consumer, int tickDelay);
+
+    String getActiveHandJutsu();
+    int getActiveHandJutsuTicks();
+    void setActiveHandJutsu(String jutsu, int ticks);
+    void clearActiveHandJutsu();
 }
 

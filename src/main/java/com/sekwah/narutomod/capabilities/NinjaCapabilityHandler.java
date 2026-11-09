@@ -88,6 +88,26 @@ public class NinjaCapabilityHandler {
         }
     }
 
+    @SubscribeEvent
+    public static void onAttackEntity(net.minecraftforge.event.entity.player.AttackEntityEvent event) {
+        Player player = event.getEntity();
+        if (player.level().isClientSide()) return;
+        player.getCapability(NINJA_DATA).ifPresent(ninjaData -> {
+            String activeJutsu = ninjaData.getActiveHandJutsu();
+            if (ninjaData.getActiveHandJutsuTicks() > 0 && !activeJutsu.isEmpty()) {
+                Entity target = event.getTarget();
+                net.minecraft.world.entity.LivingEntity livingTarget = (target instanceof net.minecraft.world.entity.LivingEntity l) ? l : null;
+                if ("rasengan".equalsIgnoreCase(activeJutsu)) {
+                    com.sekwah.narutomod.abilities.jutsus.RasenganAbility.executeStrike(player, ninjaData, livingTarget);
+                    event.setCanceled(true);
+                } else if ("chidori".equalsIgnoreCase(activeJutsu)) {
+                    com.sekwah.narutomod.abilities.jutsus.ChidoriAbility.executeStrike(player, ninjaData, livingTarget);
+                    event.setCanceled(true);
+                }
+            }
+        });
+    }
+
     //public static final EntitySize STANDING_SIZE = EntitySize.flexible(0.1F, 0.1F);
 
     // For things like the transformation jutsus (make sure to trigger it manually when you change)
