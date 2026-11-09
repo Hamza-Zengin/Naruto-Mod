@@ -1,3 +1,40 @@
+# v12.2 (2026-11-09)
+
+#### 🚀 Features & Fixes
+- **8 Gates**: Fixed horizontal aura rings rendering and particle effects.
+- **Weapons**: Polished 2D GUI inventory icons, 3D held models, and third-person grip angles.
+- **Overlays**: Added 2048x2048 HD Sharingan and Byakugan eye overlays.
+
+# v12.1 (2026-11-09)
+
+#### 🐛 Bug Fixes
+- **Models**: Resolved `RasenganSphereModel.getChild` runtime crash.
+- **Auditing**: Added automated pre-compile audit script for model parts and layer definitions.
+
+# v12.0 (2026-11-09)
+
+#### 🚀 Enhancement
+- **3D Weapons**: Minimalist 3D rendered models for kunai, shuriken, and swords.
+- **Jutsus**: Hand-ready Rasengan and Chidori 5-second activation timers with strike effects.
+- **Eight Gates**: Minimalist aura and visual effects.
+
+# v11.0 (2026-11-09)
+
+#### 🚀 Enhancement
+- **Armor**: 3D armor UV texture overhaul.
+- **Susanoo**: Symmetrical Susanoo Ribcage rendering.
+- **Visuals**: 3D in-flight jutsu models and Rasenshuriken renaming.
+
+# v10.0 (2026-11-09)
+
+#### 🚀 Grand Shinobi Expansion
+- **Clans**: Added Senju Clan (Wood Style, vitality regen) and Kaguya Clan (Shikotsumyaku bone arts).
+- **Jutsus**: Added 3D Rasenshuriken, Mokuton Wood Prison, Bone Dance, and Shadow Possession Jutsu.
+- **Weapons**: Added Sword of Kusanagi, Samehada, 3D Fūma Shuriken, and Kaguya Bone Sword.
+- **Armor**: Added Chūnin Tactical Vest, ANBU Battle Armor with 3D Back Tantō, and Akatsuki Cloak.
+- **Mobs**: Added Rogue Ninja (Nukenin) and Akatsuki S-Rank Rogue Shinobi boss entities.
+- **Items**: Added Ichiraku Ramen and Chakra Conductive Metal.
+
 # v1.0.0 (Mon Jan 03 2022)
 
 #### 🚀 Enhancement
