@@ -1,17 +1,6 @@
 {
-  "loader": "forge:separate_transforms",
-  "base": {
-    "parent": "narutomod:item/weapons/kunai_3d"
-  },
-  "perspectives": {
-    "gui": {
-      "parent": "narutomod:item/weapons/kunai_gui"
-    },
-    "ground": {
-      "parent": "narutomod:item/weapons/kunai_gui"
-    },
-    "fixed": {
-      "parent": "narutomod:item/weapons/kunai_gui"
-    }
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "narutomod:item/weapons/kunai"
   }
 }

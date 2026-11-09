@@ -5,8 +5,8 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.ChidoriBurstModel;
+import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.EightGatesAuraModel;
 import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.RasenganSphereModel;
-import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.WindShockwaveModel;
 import com.sekwah.narutomod.client.renderer.NarutoRenderEvents;
 import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.JutsuVisualEffectRenderer;
 import net.minecraft.client.model.PlayerModel;
@@ -30,13 +30,13 @@ public class JutsuHandAuraLayer extends RenderLayer<AbstractClientPlayer, Player
 
     private final RasenganSphereModel rasenganHandModel;
     private final ChidoriBurstModel chidoriHandModel;
-    private final WindShockwaveModel gatesAuraModel;
+    private final EightGatesAuraModel gatesAuraModel;
 
     public JutsuHandAuraLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent, EntityModelSet modelSet) {
         super(parent);
         this.rasenganHandModel = new RasenganSphereModel(modelSet.bakeLayer(NarutoRenderEvents.RASENGAN_SPHERE_LAYER));
         this.chidoriHandModel = new ChidoriBurstModel(modelSet.bakeLayer(NarutoRenderEvents.CHIDORI_BURST_LAYER));
-        this.gatesAuraModel = new WindShockwaveModel(modelSet.bakeLayer(NarutoRenderEvents.WIND_SHOCKWAVE_LAYER));
+        this.gatesAuraModel = new EightGatesAuraModel(modelSet.bakeLayer(NarutoRenderEvents.EIGHT_GATES_AURA_LAYER));
     }
 
     @Override
@@ -71,16 +71,15 @@ public class JutsuHandAuraLayer extends RenderLayer<AbstractClientPlayer, Player
                 poseStack.popPose();
             }
 
-            // 3. Eight Gates (Hachimon Tonkō) Minimalist Subtle Crimson Steam Ring at ground level
+            // 3. Eight Gates (Hachimon Tonkō) Horizontal Crimson Steam Ring at ground level
             boolean hasEightGates = ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.EIGHT_GATES.getId());
             if (hasEightGates) {
                 poseStack.pushPose();
-                poseStack.translate(0.0D, 1.45D, 0.0D);
-                poseStack.scale(0.38F, 0.08F, 0.38F);
-                poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(ageInTicks * 2.0F));
-                this.gatesAuraModel.setupAnim(ageInTicks * 0.8F);
+                poseStack.translate(0.0D, 1.48D, 0.0D);
+                poseStack.scale(0.55F, 0.55F, 0.55F);
+                this.gatesAuraModel.setupAnim(ageInTicks);
                 VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND));
-                this.gatesAuraModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 0.15F, 0.15F, 0.28F);
+                this.gatesAuraModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 0.15F, 0.15F, 0.35F);
                 poseStack.popPose();
             }
 

@@ -1,141 +1,349 @@
 {
-  "credit": "NarutoMod V12 Minimalist 3D Weapons",
+  "credit": "NarutoMod V12.2 Kimimaro Bone Sword 3D Model",
   "textures": {
-    "texture": "narutomod:item/weapons/bone_sword_3d"
+    "texture": "narutomod:item/weapons/bone_sword_3d",
+    "particle": "narutomod:item/weapons/bone_sword"
   },
   "elements": [
     {
-      "name": "handle",
+      "name": "condyle_pommel_l",
       "from": [
-        7.4,
-        -2.0,
-        7.4
-      ],
-      "to": [
-        8.6,
-        6.0,
-        8.6
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            8,
-            0,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            8,
-            0,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            8,
-            0,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            8,
-            0,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            8,
-            0,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            8,
-            0,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "guard",
-      "from": [
-        6.8,
-        6.0,
+        6.7,
+        -1.8,
         6.8
       ],
       "to": [
-        9.2,
-        7.2,
+        8.0,
+        -0.2,
         9.2
       ],
       "faces": {
         "north": {
           "uv": [
-            8,
             4,
-            16,
-            12
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "condyle_pommel_r",
+      "from": [
+        8.0,
+        -1.8,
+        6.8
+      ],
+      "to": [
+        9.3,
+        -0.2,
+        9.2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "bone_grip",
+      "from": [
+        7.3,
+        -0.2,
+        7.3
+      ],
+      "to": [
+        8.7,
+        5.5,
+        8.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8,
+            0,
+            12,
+            8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
             8,
-            4,
-            16,
-            12
+            0,
+            12,
+            8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
             8,
-            4,
-            16,
-            12
+            0,
+            12,
+            8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
             8,
-            4,
-            16,
-            12
+            0,
+            12,
+            8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
             8,
-            4,
-            16,
-            12
+            0,
+            12,
+            8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
             8,
+            0,
+            12,
+            8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "vertebra_guard",
+      "from": [
+        6.4,
+        5.5,
+        6.2
+      ],
+      "to": [
+        9.6,
+        6.8,
+        9.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
             4,
-            16,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "spine_blade_lower",
+      "from": [
+        7.4,
+        6.8,
+        7.0
+      ],
+      "to": [
+        8.6,
+        16.0,
+        9.0
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            12
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            12
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            12
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            12
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            12
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
             12
           ],
           "texture": "#texture"
@@ -143,15 +351,153 @@
       }
     },
     {
-      "name": "blade_lower",
+      "name": "vertebra_ring_1",
       "from": [
-        7.5,
-        7.2,
+        7.1,
+        10.0,
+        6.7
+      ],
+      "to": [
+        8.9,
+        11.2,
+        9.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "vertebra_ring_2",
+      "from": [
+        7.15,
+        14.0,
+        6.75
+      ],
+      "to": [
+        8.85,
+        15.2,
+        9.25
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "spine_blade_upper",
+      "from": [
+        7.55,
+        16.0,
         7.2
       ],
       "to": [
-        8.5,
-        18.0,
+        8.45,
+        25.5,
         8.8
       ],
       "faces": {
@@ -159,8 +505,8 @@
           "uv": [
             0,
             0,
-            8,
-            16
+            4,
+            12
           ],
           "texture": "#texture"
         },
@@ -168,8 +514,8 @@
           "uv": [
             0,
             0,
-            8,
-            16
+            4,
+            12
           ],
           "texture": "#texture"
         },
@@ -177,8 +523,8 @@
           "uv": [
             0,
             0,
-            8,
-            16
+            4,
+            12
           ],
           "texture": "#texture"
         },
@@ -186,8 +532,8 @@
           "uv": [
             0,
             0,
-            8,
-            16
+            4,
+            12
           ],
           "texture": "#texture"
         },
@@ -195,8 +541,8 @@
           "uv": [
             0,
             0,
-            8,
-            16
+            4,
+            12
           ],
           "texture": "#texture"
         },
@@ -204,352 +550,145 @@
           "uv": [
             0,
             0,
-            8,
-            16
+            4,
+            12
           ],
           "texture": "#texture"
         }
       }
     },
     {
-      "name": "blade_upper",
+      "name": "vertebra_ring_3",
       "from": [
-        7.6,
-        18.0,
-        7.4
+        7.25,
+        18.5,
+        6.85
       ],
       "to": [
-        8.4,
-        27.0,
-        8.6
+        8.75,
+        19.6,
+        9.15
       ],
       "faces": {
         "north": {
           "uv": [
-            0,
             4,
+            0,
             8,
-            16
+            4
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            0,
             4,
+            0,
             8,
-            16
+            4
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            0,
             4,
+            0,
             8,
-            16
+            4
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            0,
             4,
+            0,
             8,
-            16
+            4
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            0,
             4,
+            0,
             8,
-            16
+            4
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            0,
             4,
+            0,
             8,
-            16
+            4
           ],
           "texture": "#texture"
         }
       }
     },
     {
-      "name": "blade_tip",
+      "name": "bone_tip",
       "from": [
         7.7,
-        27.0,
-        7.6
+        25.5,
+        7.5
       ],
       "to": [
         8.3,
-        31.0,
-        8.4
+        29.2,
+        8.5
       ],
       "faces": {
         "north": {
           "uv": [
             2,
-            8,
-            8,
-            16
+            0,
+            4,
+            8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
             2,
-            8,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            2,
-            8,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            2,
-            8,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            2,
-            8,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            2,
-            8,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "barb_1",
-      "from": [
-        7.6,
-        12.0,
-        8.8
-      ],
-      "to": [
-        8.4,
-        14.0,
-        10.2
-      ],
-      "faces": {
-        "north": {
-          "uv": [
             0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            8,
+            4,
             8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
+            2,
             0,
-            0,
-            8,
+            4,
             8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
+            2,
             0,
-            0,
-            8,
+            4,
             8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
+            2,
             0,
-            0,
-            8,
+            4,
             8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
+            2,
             0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "barb_2",
-      "from": [
-        7.6,
-        17.0,
-        8.8
-      ],
-      "to": [
-        8.4,
-        19.0,
-        10.2
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "barb_3",
-      "from": [
-        7.6,
-        22.0,
-        8.8
-      ],
-      "to": [
-        8.4,
-        24.0,
-        10.0
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            8,
-            8
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            8,
+            4,
             8
           ],
           "texture": "#texture"
@@ -562,7 +701,7 @@
       "rotation": [
         0,
         -90,
-        55
+        10
       ],
       "translation": [
         0,
@@ -579,7 +718,7 @@
       "rotation": [
         0,
         90,
-        -55
+        -10
       ],
       "translation": [
         0,
@@ -596,7 +735,7 @@
       "rotation": [
         0,
         -90,
-        25
+        -20
       ],
       "translation": [
         1.13,
@@ -604,16 +743,16 @@
         1.13
       ],
       "scale": [
-        0.72,
-        0.72,
-        0.72
+        0.68,
+        0.68,
+        0.68
       ]
     },
     "firstperson_lefthand": {
       "rotation": [
         0,
         90,
-        -25
+        20
       ],
       "translation": [
         1.13,
@@ -621,9 +760,60 @@
         1.13
       ],
       "scale": [
-        0.72,
-        0.72,
-        0.72
+        0.68,
+        0.68,
+        0.68
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        45
+      ],
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "gui": {
+      "rotation": [
+        0,
+        0,
+        -45
+      ],
+      "translation": [
+        0,
+        -2,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        180,
+        -45
+      ],
+      "translation": [
+        0,
+        -2,
+        0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
       ]
     }
   }

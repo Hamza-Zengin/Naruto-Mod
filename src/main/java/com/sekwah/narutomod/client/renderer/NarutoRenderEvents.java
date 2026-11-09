@@ -82,6 +82,8 @@ public class NarutoRenderEvents {
             new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "shadow_bind"), "main");
     public static final ModelLayerLocation EARTH_WALL_LAYER =
             new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "earth_wall"), "main");
+    public static final ModelLayerLocation EIGHT_GATES_AURA_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "eight_gates_aura"), "main");
 
     @SubscribeEvent
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
@@ -142,6 +144,7 @@ public class NarutoRenderEvents {
         event.registerLayerDefinition(AMATERASU_FLAME_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.AmaterasuFlameModel::createLayer);
         event.registerLayerDefinition(SHADOW_BIND_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.ShadowBindModel::createLayer);
         event.registerLayerDefinition(EARTH_WALL_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.EarthWallModel::createLayer);
+        event.registerLayerDefinition(EIGHT_GATES_AURA_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.EightGatesAuraModel::createLayer);
     }
 
     @SubscribeEvent

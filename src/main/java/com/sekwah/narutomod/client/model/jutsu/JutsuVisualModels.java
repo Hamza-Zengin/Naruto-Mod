@@ -622,4 +622,56 @@ public class JutsuVisualModels {
             this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
         }
     }
+
+    // =========================================================================
+    // 11. HACHIMON TONKŌ: EIGHT GATES — 3D Horizontal Ground Chakra Vapor Rings
+    // =========================================================================
+    public static class EightGatesAuraModel extends Model {
+        private final ModelPart root;
+        private final ModelPart innerRing;
+        private final ModelPart outerRing;
+
+        public EightGatesAuraModel(ModelPart part) {
+            super(RenderType::entityTranslucent);
+            this.root = part;
+            this.innerRing = part.getChild("inner_ring");
+            this.outerRing = part.getChild("outer_ring");
+        }
+
+        public static LayerDefinition createLayer() {
+            MeshDefinition mesh = new MeshDefinition();
+            PartDefinition root = mesh.getRoot();
+
+            // Concentric flat circular rings lying horizontally on the XZ ground plane (Y thickness = 1)
+            root.addOrReplaceChild("inner_ring",
+                    CubeListBuilder.create()
+                            .texOffs(0, 0).addBox(-12.0F, -0.5F, -12.0F, 24, 1, 24),
+                    PartPose.ZERO);
+
+            root.addOrReplaceChild("outer_ring",
+                    CubeListBuilder.create()
+                            .texOffs(0, 26).addBox(-18.0F, -0.5F, -18.0F, 36, 1, 36),
+                    PartPose.ZERO);
+
+            return LayerDefinition.create(mesh, 128, 64);
+        }
+
+        public void setupAnim(float age) {
+            // Strictly rotate horizontally around the vertical Y axis (yRot)
+            this.innerRing.yRot = age * 0.12F;
+            this.innerRing.xRot = 0.0F;
+            this.innerRing.zRot = 0.0F;
+
+            this.outerRing.yRot = -age * 0.08F;
+            this.outerRing.xRot = 0.0F;
+            this.outerRing.zRot = 0.0F;
+        }
+
+        @Override
+        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
+                                   float r, float g, float b, float a) {
+            this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
+        }
+    }
 }
+

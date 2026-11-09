@@ -30,13 +30,16 @@ public class SharinganEyesLayer extends RenderLayer<AbstractClientPlayer, Player
     @Override
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player,
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+        if (player.isInvisible()) {
+            return;
+        }
         player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
             if (ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.SHARINGAN.getId())) {
-                VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.eyes(SHARINGAN_EYES_TEXTURE));
-                this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 15728640, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(SHARINGAN_EYES_TEXTURE));
+                this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
             } else if (ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.BYAKUGAN.getId())) {
-                VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.eyes(BYAKUGAN_EYES_TEXTURE));
-                this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 15728640, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(BYAKUGAN_EYES_TEXTURE));
+                this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
             }
         });
     }
