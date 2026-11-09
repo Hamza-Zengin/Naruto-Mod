@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WWW",
+    "WRW",
+    " W "
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:white_terracotta"
+    },
+    "R": {
+      "item": "minecraft:red_dye"
+    }
+  },
+  "result": {
+    "item": "narutomod:mist_anbu_mask",
+    "count": 1
+  }
+}

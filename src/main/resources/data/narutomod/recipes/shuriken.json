@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " F ",
+    "FIF",
+    " F "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "F": {
+      "item": "minecraft:flint"
+    }
+  },
+  "result": {
+    "item": "narutomod:shuriken",
+    "count": 16
+  }
+}

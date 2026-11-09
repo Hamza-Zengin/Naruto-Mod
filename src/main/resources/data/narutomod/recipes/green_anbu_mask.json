@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WGW",
+    "WWW",
+    " W "
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:white_terracotta"
+    },
+    "G": {
+      "item": "minecraft:green_dye"
+    }
+  },
+  "result": {
+    "item": "narutomod:green_anbu_mask",
+    "count": 1
+  }
+}

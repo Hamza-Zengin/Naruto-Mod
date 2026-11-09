@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WYW",
+    "WWW",
+    " W "
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:white_terracotta"
+    },
+    "Y": {
+      "item": "minecraft:yellow_dye"
+    }
+  },
+  "result": {
+    "item": "narutomod:yellow_anbu_mask",
+    "count": 1
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " P ",
+    "GCG",
+    " P "
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "G": {
+      "item": "minecraft:gunpowder"
+    },
+    "C": {
+      "item": "minecraft:coal"
+    }
+  },
+  "result": {
+    "item": "narutomod:smoke_bomb",
+    "count": 4
+  }
+}
