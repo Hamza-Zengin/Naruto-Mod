@@ -64,5 +64,29 @@
       "narutomod:abilities/leap2"
     ],
     "subtitle": "narutomod.subtitle.leap"
+  },
+  "chidori": {
+    "category": "player",
+    "sounds": [
+      "minecraft:entity.lightning_bolt.thunder",
+      "narutomod:jutsu/jutsu_cast"
+    ],
+    "subtitle": "narutomod.subtitle.chidori"
+  },
+  "rasengan": {
+    "category": "player",
+    "sounds": [
+      "minecraft:entity.player.attack.sweep",
+      "narutomod:jutsu/jutsu_cast"
+    ],
+    "subtitle": "narutomod.subtitle.rasengan"
+  },
+  "clone_poof": {
+    "category": "player",
+    "sounds": [
+      "minecraft:block.fire.extinguish",
+      "minecraft:entity.generic.explode"
+    ],
+    "subtitle": "narutomod.subtitle.clone_poof"
   }
 }
