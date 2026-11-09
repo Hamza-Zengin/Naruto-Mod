@@ -15,7 +15,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+'
         //classpath group: 'me.sizableshrimp.parchmenttest', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath "org.spongepowered:mixingradle:0.7+"
         classpath "org.apache.httpcomponents:httpmime:4.5.13"
@@ -145,28 +145,16 @@ dependencies {
     implementation 'org.spongepowered:mixin:0.8.5'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
+    // SekCLib core dependency (deobfuscated forge 1.20.1 library)
     implementation fg.deobf(files("libs/SekCLib-1.20.1-1.0.2-deobf.jar"))
-    // Trick intellij to allow for better editing in here for the discord task
-    // compile "org.apache.httpcomponents:httpmime:4.5.13"
-    //compileOnly fg.deobf("curse.maven:jei-238222:4711617")
-    //compileOnly fg.deobf("curse.maven:configured-457570:4462832")
 
-    //implementation fg.deobf("curse.maven:hwyla:${project.hwyla_fileid}")
+    // Unit testing
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+}
 
-    //include('org.ow2.asm:asm-debug-all:5.2')
-
-    // You may put jars on which you depend on in ./libs or you may define them like so..
-    // compile "some.group:artifact:version:classifier"
-    // compile "some.group:artifact:version"
-
-    // Real examples
-    // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    // compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // For more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-
+test {
+    useJUnitPlatform()
 }
 
 mixin {
