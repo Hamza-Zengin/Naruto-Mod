@@ -50,9 +50,6 @@ public class NarutoConfig {
     private static final ForgeConfigSpec.IntValue CONFIG_CHAKRA_BAR_DESIGN;
     public static int chakraBarDesign;
 
-    //private static final ForgeConfigSpec.BooleanValue CONFIG_STARTS_AS_NINJA;
-    //public static boolean startsAsNinja;
-
     static {
         ForgeConfigSpec.Builder configBuilder = new ForgeConfigSpec.Builder();
 
@@ -62,9 +59,6 @@ public class NarutoConfig {
         configBuilder.comment("Server based settings").push(SERVER);
 
         configBuilder.comment("Player settings").push(CATEGORY_PLAYER);
-
-//        CONFIG_STARTS_AS_NINJA = configBuilder.comment("Does the player start as a ninja by default?")
-//                .define("startsAsNinja", true);
 
         configBuilder.comment("Stuff such as regen rates and maximum (will likely change with updates, e.g. stats system)").push(ENERGY_BARS);
 
@@ -108,7 +102,7 @@ public class NarutoConfig {
         configBuilder.comment("Client based settings").push(CLIENT);
 
         configBuilder.comment("Variables for UI").push(CATEGORY_UI);
-        CONFIG_CHAKRA_BAR_DESIGN = configBuilder.comment("Design for the chara bar")
+        CONFIG_CHAKRA_BAR_DESIGN = configBuilder.comment("Design for the chakra bar")
                 .defineInRange("chakraBarDesign", 0, 0,  BarDesigns.BarInfo.values().length);
 
         configBuilder.pop();
@@ -122,7 +116,6 @@ public class NarutoConfig {
         maxChakra = CONFIG_MAX_CHAKRA.get().floatValue();
         maxStamina = CONFIG_MAX_STAMINA.get().floatValue();
         kunaiBlockDamage = CONFIG_KUNAI_BLOCK_DAMAGE.get();
-        kunaiBlockDamage = CONFIG_KUNAI_BLOCK_DAMAGE.get();
         kunaiExplosionRadius = CONFIG_KUNAI_EXPLOSION_RADIUS.get().floatValue();
         paperbombExplosionRadius = CONFIG_PAPERBOMB_EXPLOSION_RADIUS.get().floatValue();
         paperbombBlockDamage = CONFIG_PAPERBOMB_BLOCK_DAMAGE.get();
@@ -130,7 +123,6 @@ public class NarutoConfig {
         chakraBarDesign = CONFIG_CHAKRA_BAR_DESIGN.get();
         jutsuCastDelay = CONFIG_JUTSU_CAST_DELAY
                 .get();
-        //startsAsNinja = CONFIG_STARTS_AS_NINJA.get();
     }
 
     @SubscribeEvent

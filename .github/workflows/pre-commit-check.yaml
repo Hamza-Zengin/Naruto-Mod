@@ -10,15 +10,26 @@ concurrency:
 
 jobs:
   pre-commit-check:
-    name: Run pre-commit checks
-    runs-on: ubuntu-20.04
+    name: Run pre-commit and resource checks
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: dorny/paths-filter@v2
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Model, Sound, and Language Audits
+        run: |
+          python3 scripts/check_model_parts.py
+          python3 scripts/check_lang.py
+          python3 scripts/check_sounds.py
+
+      - uses: dorny/paths-filter@v3
         id: filter
         with:
           list-files: shell
@@ -28,14 +39,14 @@ jobs:
 
       # run only if changed files were detected
       - name: Run against changes
-        uses: pre-commit/action@v2.0.3
+        uses: pre-commit/action@v3.0.1
         if: steps.filter.outputs.addedOrModified == 'true'
         with:
           extra_args: --files ${{ steps.filter.outputs.addedOrModified_files }}
 
       # run if no changed files were detected (e.g. workflow_dispatch on master branch)
       - name: Run against all files
-        uses: pre-commit/action@v2.0.3
+        uses: pre-commit/action@v3.0.1
         if: steps.filter.outputs.addedOrModified != 'true'
         with:
           extra_args: --all-files

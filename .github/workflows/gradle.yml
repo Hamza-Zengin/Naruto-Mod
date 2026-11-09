@@ -27,10 +27,11 @@ jobs:
         run: |
           git fetch --unshallow --tags || true
           yarn install --immutable
-      - name: Run Model and Language Audits
+      - name: Run Model, Language, and Sound Audits
         run: |
           python3 scripts/check_model_parts.py
           python3 scripts/check_lang.py
+          python3 scripts/check_sounds.py
       - name: Download MC assets
         run: ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets)
       - name: Run DataGen
