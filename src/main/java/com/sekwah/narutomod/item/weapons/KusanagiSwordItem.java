@@ -53,6 +53,14 @@ public class KusanagiSwordItem extends SwordItem {
                 serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + 1.0, player.getZ(),
                         28, 1.5, 0.6, 1.5, 0.12);
 
+                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity nagashi3D =
+                        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
+                                serverLevel, player.getX(), player.getY(), player.getZ(),
+                                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_CHIDORI_BURST,
+                                20, player.getYRot());
+                nagashi3D.setTargetId(player.getId());
+                serverLevel.addFreshEntity(nagashi3D);
+
                 AABB area = player.getBoundingBox().inflate(4.5D, 2.0D, 4.5D);
                 List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, area,
                         e -> e.isAlive() && e != player);

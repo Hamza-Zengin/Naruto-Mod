@@ -54,9 +54,16 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
         Vec3 look = player.getLookAngle();
         Vec3 forwardPos = player.position().add(look.scale(1.8)).add(0, player.getEyeHeight() * 0.7, 0);
 
+        // Spawn 3D Multi-Shell Swirling Rasengan Chakra Sphere
+        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity rasengan3D =
+                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
+                        serverLevel, forwardPos.x, player.getY(), forwardPos.z,
+                        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_RASENGAN_SPHERE,
+                        24, player.getYRot());
+
         // Visual swirl effect
         serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK, forwardPos.x, forwardPos.y, forwardPos.z, 5, 0.4, 0.4, 0.4, 0.05);
-        serverLevel.sendParticles(ParticleTypes.CLOUD, forwardPos.x, forwardPos.y, forwardPos.z, 20, 0.3, 0.3, 0.3, 0.08);
+        serverLevel.sendParticles(ParticleTypes.CLOUD, forwardPos.x, forwardPos.y, forwardPos.z, 12, 0.3, 0.3, 0.3, 0.08);
 
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.RASENGAN.get(), SoundSource.PLAYERS, 1.2f, 1.0f);
 
@@ -65,6 +72,11 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
                 forwardPos.x + 2.0, forwardPos.y + 1.5, forwardPos.z + 2.0);
 
         List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox, e -> e != player && e.isAlive());
+        if (!targets.isEmpty()) {
+            rasengan3D.setPos(targets.get(0).getX(), targets.get(0).getY(), targets.get(0).getZ());
+        }
+        serverLevel.addFreshEntity(rasengan3D);
+
         for (LivingEntity target : targets) {
             // Apply damage
             target.hurt(player.damageSources().playerAttack(player), 18.0f);

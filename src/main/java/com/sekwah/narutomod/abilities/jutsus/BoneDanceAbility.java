@@ -83,6 +83,14 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
         Vec3 origin = player.position();
         BlockParticleOption boneParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.defaultBlockState());
 
+        // Erupt 3D Calcified Bone Spire Forest in 3 concentric shockwave rings
+        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity boneForest =
+                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
+                        serverLevel, origin.x, origin.y, origin.z,
+                        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_BONE_FOREST,
+                        65, player.getYRot());
+        serverLevel.addFreshEntity(boneForest);
+
         for (int ring = 1; ring <= 3; ring++) {
             final int rIndex = ring;
             ninjaData.scheduleDelayedTickEvent(p -> {

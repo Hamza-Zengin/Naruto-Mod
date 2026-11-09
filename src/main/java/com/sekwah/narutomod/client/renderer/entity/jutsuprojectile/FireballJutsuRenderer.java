@@ -2,7 +2,6 @@ package com.sekwah.narutomod.client.renderer.entity.jutsuprojectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import com.sekwah.narutomod.client.model.jutsu.FireballJutsuModel;
 import com.sekwah.narutomod.client.renderer.NarutoRenderEvents;
 import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
@@ -25,32 +24,36 @@ public class FireballJutsuRenderer extends EntityRenderer<FireballJutsuEntity> {
    }
 
    @Override
-   public void render(FireballJutsuEntity fireballJutsuEntity, float p_114486_, float partial, PoseStack poseStack, MultiBufferSource multiBufferSource, int p_114490_) {
+   public void render(FireballJutsuEntity fireballJutsuEntity, float entityYaw, float partial, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
       VertexConsumer vertexconsumer = multiBufferSource.getBuffer(RENDER_TYPE);
       poseStack.pushPose();
-      poseStack.translate(0,fireballJutsuEntity.getBbHeight() / 2f,0);
-      float time = (fireballJutsuEntity.time + partial) * 10.0F;
-      float scaleTime = FireballJutsuEntity.GROW_TIME * 10;
-      if(time < scaleTime) {
-         float scale = FireballJutsuEntity.INITIAL_SCALE
-                 + (FireballJutsuEntity.GROW_SCALE - (FireballJutsuEntity.GROW_SCALE * ((scaleTime - time) / scaleTime)));
-         poseStack.scale(scale, scale, scale);
+      poseStack.translate(0, fireballJutsuEntity.getBbHeight() / 2f, 0);
+      float age = fireballJutsuEntity.time + partial;
+      float scale = 1.0F;
+      if (fireballJutsuEntity.isImpacted()) {
+         scale = 1.15F + (fireballJutsuEntity.getImpactTicks() + partial) * 0.14F;
+      } else if (age < FireballJutsuEntity.GROW_TIME) {
+         scale = FireballJutsuEntity.INITIAL_SCALE
+                 + (FireballJutsuEntity.GROW_SCALE * (age / FireballJutsuEntity.GROW_TIME));
       }
-      poseStack.mulPose(Axis.XP.rotationDegrees(time * 1.5f));
-      poseStack.mulPose(Axis.YP.rotationDegrees(time * 1.5f));
-      this.model.renderToBuffer(poseStack, vertexconsumer, p_114490_, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+      poseStack.scale(scale, scale, scale);
+      this.model.setAnimationAngles(age);
+      float alpha = fireballJutsuEntity.isImpacted()
+              ? Math.max(0.15F, 0.92F - (fireballJutsuEntity.getImpactTicks() + partial) * 0.042F)
+              : 0.92F;
+      this.model.renderToBuffer(poseStack, vertexconsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
       poseStack.popPose();
-      super.render(fireballJutsuEntity, p_114486_, partial, poseStack, multiBufferSource, p_114490_);
+      super.render(fireballJutsuEntity, entityYaw, partial, poseStack, multiBufferSource, packedLight);
    }
 
    @Override
-   protected int getBlockLightLevel(FireballJutsuEntity p_114087_, BlockPos p_114088_) {
+   protected int getBlockLightLevel(FireballJutsuEntity entity, BlockPos pos) {
       return 15;
    }
 
    @Override
-   public ResourceLocation getTextureLocation(FireballJutsuEntity p_114482_) {
+   public ResourceLocation getTextureLocation(FireballJutsuEntity entity) {
       return FIREBALL_TEX;
    }
-
 }
+

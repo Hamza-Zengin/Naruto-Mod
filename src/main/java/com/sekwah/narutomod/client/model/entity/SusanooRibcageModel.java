@@ -10,6 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 
 /**
  * 3D Skeletal Chakra Ribcage of Susanoo enveloping the shinobi.
+ * Engineered with 100% mathematical left/right symmetry and balanced front-to-back chest depth.
  */
 public class SusanooRibcageModel<T extends LivingEntity> extends HumanoidModel<T> {
 
@@ -24,104 +25,114 @@ public class SusanooRibcageModel<T extends LivingEntity> extends HumanoidModel<T
         // Attach ribcage structure to the body part so it moves, rotates, and bends with player torso
         PartDefinition bodyPart = root.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.ZERO);
 
-        // Spine along the back (centered, connects rear rib arches)
+        // Central Dorsal Spine along the back (Z = +6.4F to +8.0F) with vertebral ridges
         bodyPart.addOrReplaceChild("spine", CubeListBuilder.create()
                 .texOffs(0, 0)
-                .addBox(-1.2F, -2.0F, 5.2F, 2.4F, 16.0F, 1.4F, CubeDeformation.NONE),
+                .addBox(-1.3F, -2.5F, 6.4F, 2.6F, 16.5F, 1.6F, CubeDeformation.NONE)
+                // Dorsal vertebral spikes along the spine center
+                .texOffs(9, 0)
+                .addBox(-0.7F, -1.5F, 7.8F, 1.4F, 2.0F, 1.0F, CubeDeformation.NONE)
+                .addBox(-0.7F, 2.5F, 7.8F, 1.4F, 2.0F, 1.0F, CubeDeformation.NONE)
+                .addBox(-0.7F, 6.5F, 7.8F, 1.4F, 2.0F, 1.0F, CubeDeformation.NONE)
+                .addBox(-0.7F, 10.5F, 7.8F, 1.4F, 2.0F, 1.0F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
-        // NO sternum - front center remains open for visibility and freedom of movement
-
-        // Pair 1: Top Ribs (Upper Chest) - y = -0.5F
-        bodyPart.addOrReplaceChild("rib_top_left", CubeListBuilder.create()
-                .texOffs(16, 0)
-                .addBox(10.0F, -0.5F, -3.5F, 1.2F, 1.2F, 7.0F, CubeDeformation.NONE) // Lateral flank (clears arm)
-                .addBox(8.0F, -0.5F, -5.0F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)  // Front-diagonal
-                .addBox(2.5F, -0.5F, -6.0F, 5.5F, 1.2F, 1.2F, CubeDeformation.NONE)  // Front arch (stops at x=2.5)
-                .addBox(8.0F, -0.5F, 3.5F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)   // Back-diagonal
-                .addBox(1.2F, -0.5F, 5.0F, 6.8F, 1.2F, 1.2F, CubeDeformation.NONE),  // Back arch to spine
+        // Lateral Vertical Rib Stabilizer Pillars (connecting the 4 ribs along the back-flank)
+        bodyPart.addOrReplaceChild("pillar_left", CubeListBuilder.create()
+                .texOffs(0, 18)
+                .addBox(9.2F, -1.0F, -0.8F, 1.2F, 13.8F, 1.6F, CubeDeformation.NONE),
                 PartPose.ZERO);
-        bodyPart.addOrReplaceChild("rib_top_right", CubeListBuilder.create()
-                .texOffs(16, 0).mirror()
-                .addBox(-11.2F, -0.5F, -3.5F, 1.2F, 1.2F, 7.0F, CubeDeformation.NONE)
-                .addBox(-10.0F, -0.5F, -5.0F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)
-                .addBox(-8.0F, -0.5F, -6.0F, 5.5F, 1.2F, 1.2F, CubeDeformation.NONE)
-                .addBox(-10.0F, -0.5F, 3.5F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)
-                .addBox(-8.0F, -0.5F, 5.0F, 6.8F, 1.2F, 1.2F, CubeDeformation.NONE),
+        bodyPart.addOrReplaceChild("pillar_right", CubeListBuilder.create()
+                .texOffs(0, 18)
+                .addBox(-10.4F, -1.0F, -0.8F, 1.2F, 13.8F, 1.6F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
-        // Pair 2: Mid-Upper Ribs - y = 3.5F
-        bodyPart.addOrReplaceChild("rib_mid_left", CubeListBuilder.create()
-                .texOffs(16, 10)
-                .addBox(10.2F, 3.5F, -3.5F, 1.2F, 1.2F, 7.0F, CubeDeformation.NONE)
-                .addBox(8.0F, 3.5F, -5.2F, 2.2F, 1.2F, 1.7F, CubeDeformation.NONE)
-                .addBox(2.5F, 3.5F, -6.2F, 5.5F, 1.2F, 1.2F, CubeDeformation.NONE)
-                .addBox(8.0F, 3.5F, 3.5F, 2.2F, 1.2F, 1.7F, CubeDeformation.NONE)
-                .addBox(1.2F, 3.5F, 5.0F, 6.8F, 1.2F, 1.2F, CubeDeformation.NONE),
-                PartPose.ZERO);
-        bodyPart.addOrReplaceChild("rib_mid_right", CubeListBuilder.create()
-                .texOffs(16, 10).mirror()
-                .addBox(-11.4F, 3.5F, -3.5F, 1.2F, 1.2F, 7.0F, CubeDeformation.NONE)
-                .addBox(-10.2F, 3.5F, -5.2F, 2.2F, 1.2F, 1.7F, CubeDeformation.NONE)
-                .addBox(-8.0F, 3.5F, -6.2F, 5.5F, 1.2F, 1.2F, CubeDeformation.NONE)
-                .addBox(-10.2F, 3.5F, 3.5F, 2.2F, 1.2F, 1.7F, CubeDeformation.NONE)
-                .addBox(-8.0F, 3.5F, 5.0F, 6.8F, 1.2F, 1.2F, CubeDeformation.NONE),
-                PartPose.ZERO);
+        // Build 4 Symmetric Rib Pairs with balanced front/back depth (Width ~21.2, Depth ~15.8)
+        addSymmetricRibPair(bodyPart, "rib_1", -0.5F, 10.4F, 7.6F, 6.8F, 0);
+        addSymmetricRibPair(bodyPart, "rib_2", 3.5F, 10.7F, 8.0F, 7.0F, 8);
+        addSymmetricRibPair(bodyPart, "rib_3", 7.5F, 10.4F, 7.6F, 6.8F, 16);
+        addSymmetricRibPair(bodyPart, "rib_4", 11.5F, 9.8F, 7.0F, 6.5F, 24);
 
-        // Pair 3: Mid-Lower Ribs - y = 7.5F
-        bodyPart.addOrReplaceChild("rib_bot_left", CubeListBuilder.create()
-                .texOffs(16, 20)
-                .addBox(10.0F, 7.5F, -3.5F, 1.2F, 1.2F, 7.0F, CubeDeformation.NONE)
-                .addBox(8.0F, 7.5F, -5.0F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)
-                .addBox(2.5F, 7.5F, -6.0F, 5.5F, 1.2F, 1.2F, CubeDeformation.NONE)
-                .addBox(8.0F, 7.5F, 3.5F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)
-                .addBox(1.2F, 7.5F, 5.0F, 6.8F, 1.2F, 1.2F, CubeDeformation.NONE),
-                PartPose.ZERO);
-        bodyPart.addOrReplaceChild("rib_bot_right", CubeListBuilder.create()
-                .texOffs(16, 20).mirror()
-                .addBox(-11.2F, 7.5F, -3.5F, 1.2F, 1.2F, 7.0F, CubeDeformation.NONE)
-                .addBox(-10.0F, 7.5F, -5.0F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)
-                .addBox(-8.0F, 7.5F, -6.0F, 5.5F, 1.2F, 1.2F, CubeDeformation.NONE)
-                .addBox(-10.0F, 7.5F, 3.5F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)
-                .addBox(-8.0F, 7.5F, 5.0F, 6.8F, 1.2F, 1.2F, CubeDeformation.NONE),
-                PartPose.ZERO);
-
-        // Pair 4: Lower Flank Ribs - y = 11.5F
-        bodyPart.addOrReplaceChild("rib_low_left", CubeListBuilder.create()
-                .texOffs(16, 0)
-                .addBox(9.6F, 11.5F, -3.0F, 1.2F, 1.2F, 6.0F, CubeDeformation.NONE)
-                .addBox(7.6F, 11.5F, -4.5F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)
-                .addBox(2.5F, 11.5F, -5.5F, 5.1F, 1.2F, 1.2F, CubeDeformation.NONE)
-                .addBox(7.6F, 11.5F, 3.0F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)
-                .addBox(1.2F, 11.5F, 5.0F, 6.4F, 1.2F, 1.2F, CubeDeformation.NONE),
-                PartPose.ZERO);
-        bodyPart.addOrReplaceChild("rib_low_right", CubeListBuilder.create()
-                .texOffs(16, 0).mirror()
-                .addBox(-10.8F, 11.5F, -3.0F, 1.2F, 1.2F, 6.0F, CubeDeformation.NONE)
-                .addBox(-9.6F, 11.5F, -4.5F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)
-                .addBox(-7.6F, 11.5F, -5.5F, 5.1F, 1.2F, 1.2F, CubeDeformation.NONE)
-                .addBox(-9.6F, 11.5F, 3.0F, 2.0F, 1.2F, 1.5F, CubeDeformation.NONE)
-                .addBox(-7.6F, 11.5F, 5.0F, 6.4F, 1.2F, 1.2F, CubeDeformation.NONE),
-                PartPose.ZERO);
-
-        // Shoulder horn crests (ethereal Susanoo pauldrons rising above the shoulders)
+        // Symmetric Shoulder Horn Crests (ethereal Susanoo pauldrons rising above the shoulders)
         bodyPart.addOrReplaceChild("crest_left", CubeListBuilder.create()
-                .texOffs(0, 0)
-                .addBox(9.8F, -3.5F, -1.0F, 1.4F, 3.2F, 2.0F, CubeDeformation.NONE),
-                PartPose.ZERO);
+                .texOffs(48, 0)
+                .addBox(-0.8F, -3.6F, -1.2F, 1.6F, 3.6F, 2.4F, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(10.0F, -0.2F, 0.0F, 0.0F, 0.0F, 0.22F));
         bodyPart.addOrReplaceChild("crest_right", CubeListBuilder.create()
-                .texOffs(0, 0).mirror()
-                .addBox(-11.2F, -3.5F, -1.0F, 1.4F, 3.2F, 2.0F, CubeDeformation.NONE),
-                PartPose.ZERO);
+                .texOffs(48, 0)
+                .addBox(-0.8F, -3.6F, -1.2F, 1.6F, 3.6F, 2.4F, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(-10.0F, -0.2F, 0.0F, 0.0F, 0.0F, -0.22F));
 
         return LayerDefinition.create(mesh, 64, 32);
+    }
+
+    /**
+     * Creates a 100% mathematically symmetric left (+X) and right (-X) rib arch at height Y,
+     * curving smoothly from the dorsal spine (+backZ) around the lateral flank (±outerX)
+     * to the open front chest (-frontZ).
+     */
+    private static void addSymmetricRibPair(PartDefinition bodyPart, String prefix, float y,
+                                            float outerX, float frontZ, float backZ, int texY) {
+        float thickness = 1.4F;
+        float halfT = thickness * 0.5F;
+        float innerX = outerX - thickness;
+
+        // 1. Lateral Flank Bars (strictly identical on +X and -X)
+        bodyPart.addOrReplaceChild(prefix + "_flank_l", CubeListBuilder.create()
+                .texOffs(16, texY)
+                .addBox(innerX, y, -3.8F, thickness, thickness, 7.6F, CubeDeformation.NONE),
+                PartPose.ZERO);
+        bodyPart.addOrReplaceChild(prefix + "_flank_r", CubeListBuilder.create()
+                .texOffs(16, texY)
+                .addBox(-outerX, y, -3.8F, thickness, thickness, 7.6F, CubeDeformation.NONE),
+                PartPose.ZERO);
+
+        // 2. Front-Lateral Angled Curve (bridges flank at Z=-3.8F forward to Z=-frontZ+0.8F)
+        bodyPart.addOrReplaceChild(prefix + "_fcurve_l", CubeListBuilder.create()
+                .texOffs(34, texY)
+                .addBox(-2.4F, -halfT, -halfT, 4.8F, thickness, thickness, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(outerX - 2.0F, y + halfT, -5.4F, 0.0F, -0.68F, 0.0F));
+        bodyPart.addOrReplaceChild(prefix + "_fcurve_r", CubeListBuilder.create()
+                .texOffs(34, texY)
+                .addBox(-2.4F, -halfT, -halfT, 4.8F, thickness, thickness, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(-(outerX - 2.0F), y + halfT, -5.4F, 0.0F, 0.68F, 0.0F));
+
+        // 3. Front Chest Arch (curves gently to the front sternum gap at X = ±2.4F, Z = -frontZ)
+        bodyPart.addOrReplaceChild(prefix + "_farch_l", CubeListBuilder.create()
+                .texOffs(16, texY)
+                .addBox(-2.8F, -halfT, -halfT, 5.6F, thickness, thickness, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(5.0F, y + halfT, -frontZ, 0.0F, -0.18F, 0.0F));
+        bodyPart.addOrReplaceChild(prefix + "_farch_r", CubeListBuilder.create()
+                .texOffs(16, texY)
+                .addBox(-2.8F, -halfT, -halfT, 5.6F, thickness, thickness, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(-5.0F, y + halfT, -frontZ, 0.0F, 0.18F, 0.0F));
+
+        // 4. Back-Lateral Angled Curve (bridges flank at Z=+3.8F backward to Z=+backZ-0.6F)
+        bodyPart.addOrReplaceChild(prefix + "_bcurve_l", CubeListBuilder.create()
+                .texOffs(34, texY)
+                .addBox(-2.4F, -halfT, -halfT, 4.8F, thickness, thickness, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(outerX - 2.0F, y + halfT, 5.1F, 0.0F, 0.65F, 0.0F));
+        bodyPart.addOrReplaceChild(prefix + "_bcurve_r", CubeListBuilder.create()
+                .texOffs(34, texY)
+                .addBox(-2.4F, -halfT, -halfT, 4.8F, thickness, thickness, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(-(outerX - 2.0F), y + halfT, 5.1F, 0.0F, -0.65F, 0.0F));
+
+        // 5. Back Dorsal Arch (connects securely into the central spine at Z = +backZ)
+        bodyPart.addOrReplaceChild(prefix + "_barch_l", CubeListBuilder.create()
+                .texOffs(16, texY)
+                .addBox(-3.4F, -halfT, -halfT, 6.8F, thickness, thickness, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(4.4F, y + halfT, backZ, 0.0F, 0.15F, 0.0F));
+        bodyPart.addOrReplaceChild(prefix + "_barch_r", CubeListBuilder.create()
+                .texOffs(16, texY)
+                .addBox(-3.4F, -halfT, -halfT, 6.8F, thickness, thickness, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(-4.4F, y + halfT, backZ, 0.0F, -0.15F, 0.0F));
     }
 
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         poseStack.pushPose();
-        // The model geometry is naturally defined with exact clearance around the player's arms and torso.
         this.body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
         poseStack.popPose();
     }
 }
+

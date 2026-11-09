@@ -148,7 +148,7 @@
   "narutomod:wood_prison": "Mokuton: Jukai Kōtan",
   "narutomod:bone_dance": "Shikotsumyaku: Sawarabi no Mai",
   "narutomod:shadow_possession": "Kage Mane no Jutsu",
-  "narutomod:rasenshuriken": "Fūton: Rasenshuriken",
+  "narutomod:rasenshuriken": "Rasenshuriken",
   "item.narutomod.kusanagi_sword": "Kusanagi Kılıcı",
   "item.narutomod.kusanagi_sword.desc": "Efsanevi çakra iletken katana.",
   "item.narutomod.kusanagi_sword.ability": "Sağ Tık: Chidori Kusanagi Akımı (Alan şoku ve geri itme).",
@@ -162,7 +162,7 @@
   "item.narutomod.ichiraku_ramen": "Ichiraku Ramen",
   "item.narutomod.ichiraku_ramen.desc": "Konoha'nın efsanevi lezzeti! +4 Kalp, +60 Çakra ve +60 Kondisyon yeniler.",
   "item.narutomod.chakra_metal": "Çakra İletken Metal",
-  "item.narutomod.scroll_rasenshuriken": "S-Seviye Parşömen: Fūton: Rasenshuriken",
+  "item.narutomod.scroll_rasenshuriken": "S-Seviye Parşömen: Rasenshuriken",
   "item.narutomod.scroll_shadow_possession": "Jutsu Parşömeni: Kage Mane no Jutsu",
   "item.narutomod.chunin_vest": "Chūnin Taktik Yeleği",
   "item.narutomod.chunin_vest.desc": "Pasif Bonus: +%25 Kondisyon Yenilenmesi.",
@@ -174,6 +174,6 @@
   "item.narutomod.akatsuki_ninja_spawn_egg": "Akatsuki Savaşçısı Çağırma Yumurtası",
   "entity.narutomod.rogue_ninja": "Kaçak Ninja (Nukenin)",
   "entity.narutomod.akatsuki_ninja": "Akatsuki S-Seviye Kaçak Shinobi",
-  "entity.narutomod.rasenshuriken": "Fūton: Rasenshuriken",
+  "entity.narutomod.rasenshuriken": "Rasenshuriken",
   "entity.narutomod.fuma_shuriken": "Fūma Shuriken"
 }

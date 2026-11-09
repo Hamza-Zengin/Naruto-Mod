@@ -111,6 +111,14 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
 
         BlockPos targetBlock = BlockPos.containing(targetPos);
 
+        // Spawn Colossal 3D Lightning Dragon descending from the sky
+        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity kirinDragon =
+                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
+                        serverLevel, targetPos.x, targetPos.y, targetPos.z,
+                        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_KIRIN_DRAGON,
+                        38, player.getYRot());
+        serverLevel.addFreshEntity(kirinDragon);
+
         // Lightning strike
         LightningBolt lightningBolt = EntityType.LIGHTNING_BOLT.create(serverLevel);
         if (lightningBolt != null) {

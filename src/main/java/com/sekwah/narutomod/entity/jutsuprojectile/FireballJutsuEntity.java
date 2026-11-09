@@ -17,18 +17,30 @@ import net.minecraft.world.phys.HitResult;
 
 public class FireballJutsuEntity extends AbstractHurtingProjectile {
 
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> DATA_IMPACTED =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(FireballJutsuEntity.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Integer> DATA_IMPACT_TICKS =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(FireballJutsuEntity.class, net.minecraft.network.syncher.EntityDataSerializers.INT);
+
     public int time;
     public int lifeSpan = 70;
     public float explosionPower = 2;
 
-    public static final float INITIAL_SCALE = 0.1f;
+    public static final float INITIAL_SCALE = 0.25f;
     public static final float GROW_SCALE = 1 - INITIAL_SCALE;
-    public static final float GROW_TIME = 2 * 20;
+    public static final float GROW_TIME = 12.0f;
     public static final float ENTITY_SIZE = 1.5f;
 
     public FireballJutsuEntity(EntityType<FireballJutsuEntity> entityConstructor, Level level) {
         super(entityConstructor, level);
         this.time = 0;
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DATA_IMPACTED, false);
+        this.entityData.define(DATA_IMPACT_TICKS, 0);
     }
 
     public FireballJutsuEntity(EntityType<? extends AbstractHurtingProjectile> p_36817_, double p_36818_, double p_36819_, double p_36820_, double p_36821_, double p_36822_, double p_36823_, Level p_36824_) {
@@ -37,9 +49,9 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
         this.reapplyPosition();
         double d0 = Math.sqrt(p_36821_ * p_36821_ + p_36822_ * p_36822_ + p_36823_ * p_36823_);
         if (d0 != 0.0D) {
-            this.xPower = p_36821_ / d0 * 0.2D;
-            this.yPower = p_36822_ / d0 * 0.2D;
-            this.zPower = p_36823_ / d0 * 0.2D;
+            this.xPower = p_36821_ / d0 * 0.24D;
+            this.yPower = p_36822_ / d0 * 0.24D;
+            this.zPower = p_36823_ / d0 * 0.24D;
         }
     }
 
@@ -56,9 +68,37 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
 
     @Override
     public void tick() {
+        if (this.isImpacted()) {
+            this.setDeltaMovement( net.minecraft.world.phys.Vec3.ZERO);
+            this.time++;
+            int it = this.getImpactTicks() + 1;
+            if (!this.level().isClientSide) {
+                this.entityData.set(DATA_IMPACT_TICKS, it);
+                if (this.level() instanceof ServerLevel serverLevel) {
+                    for (int i = 0; i < 8; i++) {
+                        double angle = (it * 0.5) + (i * Math.PI / 4.0);
+                        double r = 1.2 + (it * 0.18);
+                        serverLevel.sendParticles(ParticleTypes.FLAME,
+                                this.getX() + Math.cos(angle) * r,
+                                this.getY() + 0.5 + (this.random.nextDouble() - 0.3) * 1.8,
+                                this.getZ() + Math.sin(angle) * r,
+                                2, 0.15, 0.15, 0.15, 0.03);
+                    }
+                    if (it >= 18) {
+                        this.discard();
+                    }
+                }
+            }
+            return;
+        }
+
         super.tick();
         ++this.time;
         this.refreshDimensions();
+
+        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel && this.time % 2 == 0) {
+            serverLevel.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + 0.5, this.getZ(), 5, 0.35, 0.35, 0.35, 0.03);
+        }
 
         if (this.isInWaterOrRain()) {
             lifeSpan--;
@@ -73,7 +113,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
                         this.getX(),
                         this.getY() + this.getBbHeight() + 1,
                         this.getZ(),
-                        100,
+                        40,
                         0.5, 0.2, 0.5, 0);
             }
             this.playSound(SoundEvents.FIRE_EXTINGUISH, 1F, 1.0F);
@@ -83,23 +123,24 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
 
     @Override
     protected void onHit(HitResult hitResult) {
+        if (this.isImpacted()) return;
         super.onHit(hitResult);
+        this.entityData.set(DATA_IMPACTED, true);
+        this.entityData.set(DATA_IMPACT_TICKS, 0);
+        this.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
 
         if(this.level() instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ParticleTypes.FLAME,
-                    this.getX() + (double) (this.random.nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(),
-                    this.getY() + this.getBbHeight() / 2 + (double) (this.random.nextFloat() * this.getBbHeight()),
-                    this.getZ() + (double) (this.random.nextFloat() * this.getBbWidth() * 2.0F) - (double) this.getBbWidth(),
-                    200,
-                    this.getBbWidth(), this.getBbWidth(), this.getBbHeight(), 1);
+                    this.getX(), this.getY() + this.getBbHeight() / 2, this.getZ(),
+                    85, 1.2, 1.0, 1.2, 0.15);
         }
 
         if (!this.level().isClientSide) {
-            int flameRadius = 12;
+            int flameRadius = 8;
             this.level().getEntities(this, this.getBoundingBox().inflate(flameRadius, flameRadius, flameRadius)).forEach(entity -> {
                 double distance = this.position().distanceToSqr(entity.position());
                 float fireSecs = (float) (8f - (distance / 6f)) * 20;
-                float fireDamage = (float) (12f - (distance / 4f));
+                float fireDamage = (float) (15f - (distance / 4f));
                 if(fireDamage > 0) {
                     Entity entity1 = this.getOwner();
                     entity.hurt(NarutoDamageSource.fireball(this, entity1), fireDamage);
@@ -128,9 +169,16 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
                 }
             }
 
-            this.playSound(SoundEvents.GENERIC_EXPLODE, 4f, 1.0f);
-            this.discard();
+            this.playSound(SoundEvents.GENERIC_EXPLODE, 3.0f, 0.9f);
         }
+    }
+
+    public boolean isImpacted() {
+        return this.entityData.get(DATA_IMPACTED);
+    }
+
+    public int getImpactTicks() {
+        return this.entityData.get(DATA_IMPACT_TICKS);
     }
 
     @Override

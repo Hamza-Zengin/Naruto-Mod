@@ -148,7 +148,7 @@
   "narutomod:wood_prison": "Mokuton: Jukai Kōtan",
   "narutomod:bone_dance": "Shikotsumyaku: Sawarabi no Mai",
   "narutomod:shadow_possession": "Kage Mane no Jutsu",
-  "narutomod:rasenshuriken": "Fūton: Rasenshuriken",
+  "narutomod:rasenshuriken": "Rasenshuriken",
   "item.narutomod.kusanagi_sword": "Sword of Kusanagi",
   "item.narutomod.kusanagi_sword.desc": "Legendary chakra-conductive katana.",
   "item.narutomod.kusanagi_sword.ability": "Right-Click: Chidori Kusanagi Current (AoE lightning shock & knockback).",
@@ -162,7 +162,7 @@
   "item.narutomod.ichiraku_ramen": "Ichiraku Ramen",
   "item.narutomod.ichiraku_ramen.desc": "Konoha's legendary meal! Restores +4 Hearts, +60 Chakra, and +60 Stamina.",
   "item.narutomod.chakra_metal": "Chakra Conductive Metal",
-  "item.narutomod.scroll_rasenshuriken": "S-Rank Scroll: Fūton: Rasenshuriken",
+  "item.narutomod.scroll_rasenshuriken": "S-Rank Scroll: Rasenshuriken",
   "item.narutomod.scroll_shadow_possession": "Jutsu Scroll: Kage Mane no Jutsu",
   "item.narutomod.chunin_vest": "Chūnin Tactical Vest",
   "item.narutomod.chunin_vest.desc": "Passive Bonus: +25% Stamina Regeneration.",
@@ -174,6 +174,6 @@
   "item.narutomod.akatsuki_ninja_spawn_egg": "Akatsuki Shinobi Spawn Egg",
   "entity.narutomod.rogue_ninja": "Rogue Ninja (Nukenin)",
   "entity.narutomod.akatsuki_ninja": "Akatsuki S-Rank Rogue Shinobi",
-  "entity.narutomod.rasenshuriken": "Fūton: Rasenshuriken",
+  "entity.narutomod.rasenshuriken": "Rasenshuriken",
   "entity.narutomod.fuma_shuriken": "Fūma Shuriken"
 }

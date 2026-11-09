@@ -49,6 +49,10 @@ public class NarutoEntities {
     public static final RegistryObject<EntityType<RasenshurikenEntity>> RASENSHURIKEN = register("rasenshuriken",
             EntityType.Builder.<RasenshurikenEntity>of(RasenshurikenEntity::new, MobCategory.MISC).sized(1.6F, 0.8F).clientTrackingRange(8).updateInterval(5));
 
+    public static final RegistryObject<EntityType<com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity>> JUTSU_VISUAL_EFFECT = register("jutsu_visual_effect",
+            EntityType.Builder.<com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity>of(com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity::new, MobCategory.MISC)
+                    .fireImmune().sized(1.5F, 1.5F).clientTrackingRange(12).updateInterval(2));
+
     public static final RegistryObject<EntityType<com.sekwah.narutomod.entity.projectile.SmokeBombEntity>> SMOKE_BOMB = register("smoke_bomb",
             EntityType.Builder.<com.sekwah.narutomod.entity.projectile.SmokeBombEntity>of(com.sekwah.narutomod.entity.projectile.SmokeBombEntity::new, MobCategory.MISC).sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(10));
 

@@ -77,7 +77,18 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
         AABB box = new AABB(forward.x - 1.5, forward.y - 1.0, forward.z - 1.5,
                 forward.x + 1.5, forward.y + 2.0, forward.z + 1.5);
 
+        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity chidori3D =
+                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
+                        serverLevel, forward.x, player.getY(), forward.z,
+                        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_CHIDORI_BURST,
+                        25, player.getYRot());
+
         List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, box, e -> e != player && e.isAlive());
+        if (!enemies.isEmpty()) {
+            chidori3D.setTargetId(enemies.get(0).getId());
+        }
+        serverLevel.addFreshEntity(chidori3D);
+
         for (LivingEntity enemy : enemies) {
             enemy.hurt(player.damageSources().lightningBolt(), 22.0f);
             serverLevel.sendParticles(ParticleTypes.FLASH, enemy.getX(), enemy.getY() + 1.0, enemy.getZ(), 1, 0, 0, 0, 0);

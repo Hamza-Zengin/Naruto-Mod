@@ -84,6 +84,14 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
         serverLevel.playSound(null, BlockPos.containing(center), SoundEvents.ROOTED_DIRT_BREAK, SoundSource.PLAYERS, 1.8f, 0.6f);
         serverLevel.playSound(null, BlockPos.containing(center), SoundEvents.CHERRY_WOOD_PLACE, SoundSource.PLAYERS, 1.8f, 0.7f);
 
+        // Erupt 3D Intertwined Wood Prison Root Dome & Pillars
+        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity woodDome =
+                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
+                        serverLevel, center.x, center.y, center.z,
+                        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_WOOD_PRISON,
+                        75, player.getYRot());
+        serverLevel.addFreshEntity(woodDome);
+
         BlockParticleOption woodParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.MANGROVE_WOOD.defaultBlockState());
         BlockParticleOption leafParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.AZALEA_LEAVES.defaultBlockState());
 

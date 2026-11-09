@@ -62,6 +62,27 @@ public class NarutoRenderEvents {
     public static final ModelLayerLocation SUSANOO_RIBCAGE_LAYER =
             new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "susanoo_ribcage"), "main");
 
+    public static final ModelLayerLocation KIRIN_DRAGON_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "kirin_dragon"), "main");
+    public static final ModelLayerLocation WOOD_PRISON_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "wood_prison"), "main");
+    public static final ModelLayerLocation BONE_FOREST_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "bone_forest"), "main");
+    public static final ModelLayerLocation RASENGAN_SPHERE_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "rasengan_sphere"), "main");
+    public static final ModelLayerLocation CHIDORI_BURST_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "chidori_burst"), "main");
+    public static final ModelLayerLocation WATER_VORTEX_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "water_vortex"), "main");
+    public static final ModelLayerLocation WIND_SHOCKWAVE_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "wind_shockwave"), "main");
+    public static final ModelLayerLocation AMATERASU_FLAME_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "amaterasu_flame"), "main");
+    public static final ModelLayerLocation SHADOW_BIND_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "shadow_bind"), "main");
+    public static final ModelLayerLocation EARTH_WALL_LAYER =
+            new ModelLayerLocation(new ResourceLocation(NarutoMod.MOD_ID, "earth_wall"), "main");
+
     @SubscribeEvent
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(NarutoEntities.KUNAI.get(), KunaiRenderer::new);
@@ -74,6 +95,7 @@ public class NarutoRenderEvents {
 
         event.registerEntityRenderer(NarutoEntities.FIREBALL_JUTSU.get(), FireballJutsuRenderer::new);
         event.registerEntityRenderer(NarutoEntities.RASENSHURIKEN.get(), RasenshurikenRenderer::new);
+        event.registerEntityRenderer(NarutoEntities.JUTSU_VISUAL_EFFECT.get(), com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.JutsuVisualEffectRenderer::new);
 
         event.registerEntityRenderer(NarutoEntities.SHADOW_CLONE.get(), (ctx) ->
                 new net.minecraft.client.renderer.entity.HumanoidMobRenderer<>(ctx, new net.minecraft.client.model.HumanoidModel<>(ctx.bakeLayer(net.minecraft.client.model.geom.ModelLayers.PLAYER)), 0.5f) {
@@ -109,6 +131,17 @@ public class NarutoRenderEvents {
         event.registerLayerDefinition(ANBU_ARMOR_LAYER, ShinobiArmorModel::createAnbuArmorLayer);
         event.registerLayerDefinition(AKATSUKI_CLOAK_LAYER, ShinobiArmorModel::createAkatsukiCloakLayer);
         event.registerLayerDefinition(SUSANOO_RIBCAGE_LAYER, com.sekwah.narutomod.client.model.entity.SusanooRibcageModel::createLayer);
+
+        event.registerLayerDefinition(KIRIN_DRAGON_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.KirinDragonModel::createLayer);
+        event.registerLayerDefinition(WOOD_PRISON_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.WoodPrisonModel::createLayer);
+        event.registerLayerDefinition(BONE_FOREST_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.BoneForestModel::createLayer);
+        event.registerLayerDefinition(RASENGAN_SPHERE_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.RasenganSphereModel::createLayer);
+        event.registerLayerDefinition(CHIDORI_BURST_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.ChidoriBurstModel::createLayer);
+        event.registerLayerDefinition(WATER_VORTEX_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.WaterVortexModel::createLayer);
+        event.registerLayerDefinition(WIND_SHOCKWAVE_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.WindShockwaveModel::createLayer);
+        event.registerLayerDefinition(AMATERASU_FLAME_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.AmaterasuFlameModel::createLayer);
+        event.registerLayerDefinition(SHADOW_BIND_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.ShadowBindModel::createLayer);
+        event.registerLayerDefinition(EARTH_WALL_LAYER, com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.EarthWallModel::createLayer);
     }
 
     @SubscribeEvent
@@ -119,6 +152,7 @@ public class NarutoRenderEvents {
             if (renderer != null) {
                 renderer.addLayer(new com.sekwah.narutomod.client.renderer.entity.layers.SusanooRibcageLayer(renderer, event.getEntityModels()));
                 renderer.addLayer(new com.sekwah.narutomod.client.renderer.entity.layers.SharinganEyesLayer(renderer));
+                renderer.addLayer(new com.sekwah.narutomod.client.renderer.entity.layers.JutsuHandAuraLayer(renderer, event.getEntityModels()));
             }
         }
     }

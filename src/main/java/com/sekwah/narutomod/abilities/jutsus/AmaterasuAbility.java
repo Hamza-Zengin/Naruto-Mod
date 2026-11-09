@@ -130,6 +130,17 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
             serverLevel.sendParticles(ParticleTypes.SMOKE, point.x, point.y, point.z, 1, 0.04, 0.04, 0.04, 0.01);
         }
 
+        // Spawn 3D Inextinguishable Black-Flame Shroud & Pillars at focal target
+        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity amaterasu3D =
+                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
+                        serverLevel, targetPos.x, targetPos.y, targetPos.z,
+                        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_AMATERASU_PILLAR,
+                        90, player.getYRot());
+        if (directEntity != null) {
+            amaterasu3D.setTargetId(directEntity.getId());
+        }
+        serverLevel.addFreshEntity(amaterasu3D);
+
         // Direct Entity Target Impact: 38.0f damage (19 full hearts!)
         if (directEntity != null) {
             directEntity.hurt(serverLevel.damageSources().playerAttack(player), 38.0f);

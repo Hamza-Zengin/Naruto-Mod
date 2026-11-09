@@ -28,14 +28,24 @@ import java.util.List;
  */
 public class RasenshurikenEntity extends AbstractHurtingProjectile {
 
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> DATA_IMPACTED =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(RasenshurikenEntity.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Integer> DATA_VORTEX_TICKS =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(RasenshurikenEntity.class, net.minecraft.network.syncher.EntityDataSerializers.INT);
+
     public int time;
     public int lifeSpan = 80;
-    private boolean impacted = false;
-    private int vortexTicks = 0;
 
     public RasenshurikenEntity(EntityType<RasenshurikenEntity> entityConstructor, Level level) {
         super(entityConstructor, level);
         this.time = 0;
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DATA_IMPACTED, false);
+        this.entityData.define(DATA_VORTEX_TICKS, 0);
     }
 
     public RasenshurikenEntity(EntityType<? extends AbstractHurtingProjectile> type, double x, double y, double z, double xVel, double yVel, double zVel, Level level) {
@@ -58,15 +68,18 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile {
 
     @Override
     public void tick() {
-        if (this.impacted) {
+        if (this.isImpacted()) {
             this.setDeltaMovement(Vec3.ZERO);
             this.time++;
-            this.vortexTicks++;
+            int vt = this.getVortexTicks() + 1;
+            if (!this.level().isClientSide) {
+                this.entityData.set(DATA_VORTEX_TICKS, vt);
+            }
             if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
                 double radius = 5.5D;
                 // Spiral wind dome particles
                 for (int i = 0; i < 12; i++) {
-                    double angle = (this.vortexTicks * 0.45) + (i * Math.PI / 6.0);
+                    double angle = (vt * 0.45) + (i * Math.PI / 6.0);
                     double r = 1.5 + (i % 3) * 1.4;
                     double px = this.getX() + Math.cos(angle) * r;
                     double pz = this.getZ() + Math.sin(angle) * r;
@@ -76,7 +89,7 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile {
                 }
 
                 // Multi-hit cellular wind blades & pull towards vortex center
-                if (this.vortexTicks % 4 == 0) {
+                if (vt % 4 == 0) {
                     Entity owner = this.getOwner();
                     AABB box = this.getBoundingBox().inflate(radius);
                     List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, box,
@@ -92,7 +105,7 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile {
                     serverLevel.playSound(null, this.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.4f, 1.6f);
                 }
 
-                if (this.vortexTicks >= 28) {
+                if (vt >= 28) {
                     serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0);
                     serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2.5f, 1.2f);
                     this.discard();
@@ -121,9 +134,9 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile {
 
     @Override
     protected void onHit(HitResult hitResult) {
-        if (!this.impacted) {
-            this.impacted = true;
-            this.vortexTicks = 0;
+        if (!this.isImpacted()) {
+            this.entityData.set(DATA_IMPACTED, true);
+            this.entityData.set(DATA_VORTEX_TICKS, 0);
             this.setDeltaMovement(Vec3.ZERO);
             if (!this.level().isClientSide) {
                 this.playSound(SoundEvents.TRIDENT_THUNDER, 2.0f, 1.5f);
@@ -132,11 +145,11 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile {
     }
 
     public boolean isImpacted() {
-        return this.impacted;
+        return this.entityData.get(DATA_IMPACTED);
     }
 
     public int getVortexTicks() {
-        return this.vortexTicks;
+        return this.entityData.get(DATA_VORTEX_TICKS);
     }
 
     @Override

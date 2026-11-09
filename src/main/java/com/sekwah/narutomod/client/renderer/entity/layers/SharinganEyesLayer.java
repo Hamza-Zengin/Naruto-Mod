@@ -21,6 +21,7 @@ import net.minecraft.resources.ResourceLocation;
 public class SharinganEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
 
     private static final ResourceLocation SHARINGAN_EYES_TEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/sharingan_eyes.png");
+    private static final ResourceLocation BYAKUGAN_EYES_TEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/byakugan_eyes.png");
 
     public SharinganEyesLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent) {
         super(parent);
@@ -32,6 +33,9 @@ public class SharinganEyesLayer extends RenderLayer<AbstractClientPlayer, Player
         player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
             if (ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.SHARINGAN.getId())) {
                 VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.eyes(SHARINGAN_EYES_TEXTURE));
+                this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 15728640, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+            } else if (ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.BYAKUGAN.getId())) {
+                VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.eyes(BYAKUGAN_EYES_TEXTURE));
                 this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 15728640, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
             }
         });

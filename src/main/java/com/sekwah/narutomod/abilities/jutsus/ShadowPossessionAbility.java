@@ -93,10 +93,28 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
             }
         }
 
-        if (capturedTarget == null) return;
+        if (capturedTarget == null) {
+            Vec3 endSpot = player.position().add(horizDir.scale(5.5));
+            com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity missShadow =
+                    com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
+                            serverLevel, endSpot.x, player.getY(), endSpot.z,
+                            com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_SHADOW_BIND,
+                            24, player.getYRot());
+            serverLevel.addFreshEntity(missShadow);
+            return;
+        }
 
         final LivingEntity boundEntity = capturedTarget;
         final double initialDist = Math.max(2.5D, Math.min(player.distanceTo(boundEntity), 12.0D));
+
+        // Spawn 3D Shadow Bind Claws & Ribbon locked onto captured target
+        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity shadowBind3D =
+                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
+                        serverLevel, boundEntity.getX(), boundEntity.getY(), boundEntity.getZ(),
+                        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_SHADOW_BIND,
+                        100, player.getYRot());
+        shadowBind3D.setTargetId(boundEntity.getId());
+        serverLevel.addFreshEntity(shadowBind3D);
 
         serverLevel.playSound(null, boundEntity.blockPosition(), SoundEvents.WARDEN_TENDRIL_CLICKS, SoundSource.PLAYERS, 1.5f, 0.8f);
         boundEntity.hurt(player.damageSources().magic(), 4.0f);
