@@ -45,13 +45,9 @@ public class RasenshurikenAbility extends Ability implements Ability.Cooldown {
         if (checkCooldown(player, ninjaData, this.getTranslationKey())) {
             return false;
         }
-        float cost = 55.0f;
-        if (ninjaData.getChakra() < cost) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
+        if (!tryConsume(player, ninjaData, 55.0f, 0, 60)) {
             return false;
         }
-        ninjaData.useChakra(cost, 60);
         registerCooldown(ninjaData, this.getTranslationKey());
         return true;
     }

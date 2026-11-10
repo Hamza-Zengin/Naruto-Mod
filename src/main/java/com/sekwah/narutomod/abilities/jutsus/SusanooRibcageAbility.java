@@ -49,13 +49,7 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
 
         boolean isInitial = !ninjaData.getToggleAbilityData().hasToggleAbility(this.getRegistryName());
         if (isInitial) {
-            if (ninjaData.getChakra() < 40.0f) {
-                player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                        Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
-                return false;
-            }
-            ninjaData.useChakra(40.0f, 30);
-            return true;
+            return tryConsume(player, ninjaData, 40.0f, 0, 30);
         } else {
             // Sustained ethereal skeleton drain: 1.0f per tick (20 chakra/second)
             if (ninjaData.getChakra() < 1.0f) {

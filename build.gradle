@@ -146,7 +146,7 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // SekCLib core dependency (deobfuscated forge 1.20.1 library)
-    implementation fg.deobf(files("libs/SekCLib-1.20.1-1.0.2-deobf.jar"))
+    implementation fg.deobf(files("libs/SekCLib-1.20.1-${project.sekclib_version}-deobf.jar"))
 
     // Unit testing
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
@@ -327,8 +327,29 @@ task checkModelParts(type: Exec) {
     commandLine 'python3', 'scripts/check_model_parts.py'
 }
 
+task checkLang(type: Exec) {
+    commandLine 'python3', 'scripts/check_lang.py'
+}
+
+task checkSounds(type: Exec) {
+    commandLine 'python3', 'scripts/check_sounds.py'
+}
+
+task checkItemModels(type: Exec) {
+    commandLine 'python3', 'scripts/check_item_models.py'
+}
+
+task checkUnusedTextures(type: Exec) {
+    commandLine 'python3', 'scripts/check_unused_textures.py'
+}
+
+task checkAllAssets {
+    dependsOn 'checkModelParts', 'checkLang', 'checkSounds', 'checkItemModels', 'checkUnusedTextures'
+}
+
+check.dependsOn 'checkAllAssets'
 compileJava.dependsOn 'cleanbuildfolder'
-compileJava.dependsOn 'checkModelParts'
+compileJava.dependsOn 'checkAllAssets'
 
 // Publish rules
 // Current behavior seems to be canary or release. Though pre-releases may break this pattern.

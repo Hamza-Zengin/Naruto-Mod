@@ -40,12 +40,7 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        if (ninjaData.getChakra() < 45) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra", Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
-            return false;
-        }
-        ninjaData.useChakra(45, 40);
-        return true;
+        return tryConsume(player, ninjaData, 45.0f, 0, 40);
     }
 
     @Override

@@ -58,20 +58,7 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
             return false;
         }
 
-        if (ninjaData.getChakra() < 110) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
-            return false;
-        }
-        if (ninjaData.getStamina() < 50) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughstamina",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
-            return false;
-        }
-
-        ninjaData.useChakra(110, 45);
-        ninjaData.useStamina(50, 45);
-        return true;
+        return tryConsume(player, ninjaData, 110.0f, 50.0f, 45);
     }
 
     @Override

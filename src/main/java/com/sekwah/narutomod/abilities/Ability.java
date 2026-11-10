@@ -59,6 +59,26 @@ public abstract class Ability {
         return handleCost(player, ninjaData, 0);
     }
 
+    /**
+     * Reusable helper to check and consume chakra and stamina with standard user notifications.
+     */
+    public boolean tryConsume(Player player, INinjaData ninjaData, float chakraCost, float staminaCost, int regenDelay) {
+        if (ninjaData.getChakra() < chakraCost) {
+            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
+                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
+            return false;
+        }
+        if (ninjaData.getStamina() < staminaCost) {
+            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughstamina",
+                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
+            return false;
+        }
+
+        if (chakraCost > 0) ninjaData.useChakra(chakraCost, regenDelay);
+        if (staminaCost > 0) ninjaData.useStamina(staminaCost, regenDelay);
+        return true;
+    }
+
     public boolean logInChat() {
         return true;
     }

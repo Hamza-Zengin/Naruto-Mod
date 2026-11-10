@@ -35,12 +35,7 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        if (ninjaData.getChakra() < 25) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra", Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
-            return false;
-        }
-        ninjaData.useChakra(25, 25);
-        return true;
+        return tryConsume(player, ninjaData, 25.0f, 0, 25);
     }
 
     @Override

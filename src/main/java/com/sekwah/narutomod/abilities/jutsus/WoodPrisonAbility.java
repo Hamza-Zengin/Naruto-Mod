@@ -61,13 +61,9 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
         if (checkCooldown(player, ninjaData, this.getTranslationKey())) {
             return false;
         }
-        float cost = 28.0f; // Discounted by Senju natural mastery
-        if (ninjaData.getChakra() < cost) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
+        if (!tryConsume(player, ninjaData, 28.0f, 0, 40)) {
             return false;
         }
-        ninjaData.useChakra(cost, 40);
         registerCooldown(ninjaData, this.getTranslationKey());
         return true;
     }

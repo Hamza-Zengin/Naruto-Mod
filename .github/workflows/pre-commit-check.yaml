@@ -29,6 +29,7 @@ jobs:
           python3 scripts/check_lang.py
           python3 scripts/check_sounds.py
           python3 scripts/check_item_models.py
+          python3 scripts/check_unused_textures.py
 
       - uses: dorny/paths-filter@v3
         id: filter

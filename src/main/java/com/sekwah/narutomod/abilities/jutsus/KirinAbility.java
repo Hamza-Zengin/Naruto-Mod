@@ -56,20 +56,7 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
         float chakraCost = isStormy ? 85.0f : 130.0f; // 35% natural lightning storm discount
         float staminaCost = isStormy ? 45.0f : 60.0f;
 
-        if (ninjaData.getChakra() < chakraCost) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
-            return false;
-        }
-        if (ninjaData.getStamina() < staminaCost) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughstamina",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
-            return false;
-        }
-
-        ninjaData.useChakra(chakraCost, 45);
-        ninjaData.useStamina(staminaCost, 45);
-        return true;
+        return tryConsume(player, ninjaData, chakraCost, staminaCost, 45);
     }
 
     @Override

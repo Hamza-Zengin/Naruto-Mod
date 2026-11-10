@@ -55,12 +55,9 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
         }
         boolean isNara = ninjaData.getClan() != null && ninjaData.getClan().getPath().equalsIgnoreCase("nara");
         float cost = isNara ? 22.0f : 32.0f;
-        if (ninjaData.getChakra() < cost) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
+        if (!tryConsume(player, ninjaData, cost, 0, 40)) {
             return false;
         }
-        ninjaData.useChakra(cost, 40);
         registerCooldown(ninjaData, this.getTranslationKey());
         return true;
     }

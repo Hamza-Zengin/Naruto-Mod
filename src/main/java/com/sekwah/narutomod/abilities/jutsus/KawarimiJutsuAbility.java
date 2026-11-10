@@ -36,12 +36,7 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        if (ninjaData.getChakra() < 20) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra", Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
-            return false;
-        }
-        ninjaData.useChakra(20, 20);
-        return true;
+        return tryConsume(player, ninjaData, 20.0f, 0, 20);
     }
 
     @Override

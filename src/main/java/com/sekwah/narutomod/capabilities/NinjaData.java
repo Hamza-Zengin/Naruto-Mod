@@ -85,8 +85,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     public NinjaData(boolean isServer) {
         if (isServer) {
-            this.maxChakra = NarutoConfig.maxChakra;
-            this.maxStamina = NarutoConfig.maxStamina;
+            this.maxChakra = NarutoConfig.maxChakra > 0 ? NarutoConfig.maxChakra : 100.0f;
+            this.maxStamina = NarutoConfig.maxStamina > 0 ? NarutoConfig.maxStamina : 100.0f;
             this.chakra = this.getMaxChakra();
             this.stamina = this.getMaxStamina();
             this.clan = new ResourceLocation(NarutoMod.MOD_ID, "shinobi");
@@ -116,8 +116,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         }
     }
 
-    private RegenInfo chakraRegenInfo = new RegenInfo(0.05f);
-    private RegenInfo staminaRegenInfo = new RegenInfo(0.4f);
+    private RegenInfo chakraRegenInfo = new RegenInfo(NarutoConfig.chakraRegenRate > 0 ? NarutoConfig.chakraRegenRate : 0.05f);
+    private RegenInfo staminaRegenInfo = new RegenInfo(NarutoConfig.staminaRegenRate > 0 ? NarutoConfig.staminaRegenRate : 0.4f);
 
     private static final String CHAKRA_TAG = "chakra";
     private static final String STAMINA_TAG = "stamina";

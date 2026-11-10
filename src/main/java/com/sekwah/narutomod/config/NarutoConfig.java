@@ -24,31 +24,37 @@ public class NarutoConfig {
     public static final ForgeConfigSpec MOD_CONFIG;
 
     private static final ForgeConfigSpec.DoubleValue CONFIG_MAX_CHAKRA;
-    public static float maxChakra;
+    public static float maxChakra = 100.0f;
 
     private static final ForgeConfigSpec.DoubleValue CONFIG_MAX_STAMINA;
-    public static float maxStamina;
+    public static float maxStamina = 100.0f;
+
+    private static final ForgeConfigSpec.DoubleValue CONFIG_CHAKRA_REGEN_RATE;
+    public static float chakraRegenRate = 0.05f;
+
+    private static final ForgeConfigSpec.DoubleValue CONFIG_STAMINA_REGEN_RATE;
+    public static float staminaRegenRate = 0.4f;
 
     private static final ForgeConfigSpec.BooleanValue CONFIG_KUNAI_BLOCK_DAMAGE;
-    public static boolean kunaiBlockDamage;
+    public static boolean kunaiBlockDamage = true;
 
     private static final ForgeConfigSpec.DoubleValue CONFIG_KUNAI_EXPLOSION_RADIUS;
-    public static float kunaiExplosionRadius;
+    public static float kunaiExplosionRadius = 3.0f;
 
     private static final ForgeConfigSpec.DoubleValue CONFIG_PAPERBOMB_EXPLOSION_RADIUS;
-    public static float paperbombExplosionRadius;
+    public static float paperbombExplosionRadius = 4.0f;
 
     private static final ForgeConfigSpec.BooleanValue CONFIG_PAPERBOMB_BLOCK_DAMAGE;
-    public static boolean paperbombBlockDamage;
+    public static boolean paperbombBlockDamage = true;
 
     private static final ForgeConfigSpec.IntValue CONFIG_JUTSU_KEYBIND_HOLD_THRESHOLD;
-    public static int jutsuKeybindHoldThreshold;
+    public static int jutsuKeybindHoldThreshold = 15;
 
     private static final ForgeConfigSpec.IntValue CONFIG_JUTSU_CAST_DELAY;
-    public static int jutsuCastDelay;
+    public static int jutsuCastDelay = 20;
 
     private static final ForgeConfigSpec.IntValue CONFIG_CHAKRA_BAR_DESIGN;
-    public static int chakraBarDesign;
+    public static int chakraBarDesign = 0;
 
     static {
         ForgeConfigSpec.Builder configBuilder = new ForgeConfigSpec.Builder();
@@ -67,6 +73,12 @@ public class NarutoConfig {
 
         CONFIG_MAX_STAMINA = configBuilder.comment("Max Stamina")
                 .defineInRange("maxStamina",  100F ,  0d, Integer.MAX_VALUE);
+
+        CONFIG_CHAKRA_REGEN_RATE = configBuilder.comment("Chakra regeneration per tick")
+                .defineInRange("chakraRegenRate", 0.05d, 0.001d, 100d);
+
+        CONFIG_STAMINA_REGEN_RATE = configBuilder.comment("Stamina regeneration per tick")
+                .defineInRange("staminaRegenRate", 0.4d, 0.001d, 100d);
 
         configBuilder.pop();
 
@@ -115,6 +127,8 @@ public class NarutoConfig {
     public static void loadVariables() {
         maxChakra = CONFIG_MAX_CHAKRA.get().floatValue();
         maxStamina = CONFIG_MAX_STAMINA.get().floatValue();
+        chakraRegenRate = CONFIG_CHAKRA_REGEN_RATE.get().floatValue();
+        staminaRegenRate = CONFIG_STAMINA_REGEN_RATE.get().floatValue();
         kunaiBlockDamage = CONFIG_KUNAI_BLOCK_DAMAGE.get();
         kunaiExplosionRadius = CONFIG_KUNAI_EXPLOSION_RADIUS.get().floatValue();
         paperbombExplosionRadius = CONFIG_PAPERBOMB_EXPLOSION_RADIUS.get().floatValue();

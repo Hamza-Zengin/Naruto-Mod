@@ -46,7 +46,10 @@ public class ServerTriggerHandJutsuPacket {
                     if (msg.targetEntityId >= 0) {
                         Entity entity = player.level().getEntity(msg.targetEntityId);
                         if (entity instanceof LivingEntity living && living.isAlive() && living != player) {
-                            target = living;
+                            // Validate maximum melee reach distance (6.0 blocks / 36.0 sq blocks) to prevent packet reach exploits
+                            if (player.distanceToSqr(living) <= 36.0D) {
+                                target = living;
+                            }
                         }
                     }
 

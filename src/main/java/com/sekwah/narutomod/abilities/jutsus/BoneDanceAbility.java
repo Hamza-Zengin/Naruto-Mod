@@ -59,13 +59,9 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
         if (checkCooldown(player, ninjaData, this.getTranslationKey())) {
             return false;
         }
-        float cost = 32.0f;
-        if (ninjaData.getChakra() < cost) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
+        if (!tryConsume(player, ninjaData, 32.0f, 0, 45)) {
             return false;
         }
-        ninjaData.useChakra(cost, 45);
         registerCooldown(ninjaData, this.getTranslationKey());
         return true;
     }
