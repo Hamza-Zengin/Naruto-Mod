@@ -3,7 +3,7 @@ package com.sekwah.narutomod.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.config.NarutoConfig;
-import com.sekwah.narutomod.util.ColorUtil;
+import com.sekwah.sekclib.util.ColorUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;

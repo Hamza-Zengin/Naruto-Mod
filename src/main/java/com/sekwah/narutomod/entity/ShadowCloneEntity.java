@@ -18,10 +18,19 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.UUID;
 
 public class ShadowCloneEntity extends PathfinderMob {
+
+    private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER_UUID =
+            SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
     @Nullable
     private UUID ownerUUID;
@@ -29,6 +38,12 @@ public class ShadowCloneEntity extends PathfinderMob {
 
     public ShadowCloneEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DATA_OWNER_UUID, Optional.empty());
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -55,8 +70,36 @@ public class ShadowCloneEntity extends PathfinderMob {
     public void setOwner(Player player) {
         if (player != null) {
             this.ownerUUID = player.getUUID();
+            this.entityData.set(DATA_OWNER_UUID, Optional.of(player.getUUID()));
             this.setCustomName(player.getName());
             this.setCustomNameVisible(true);
+        }
+    }
+
+    @Nullable
+    public UUID getOwnerUUID() {
+        return this.entityData.get(DATA_OWNER_UUID).orElse(this.ownerUUID);
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
+        if (this.getOwnerUUID() != null) {
+            compound.putUUID("Owner", this.getOwnerUUID());
+        }
+        compound.putInt("LifeTicks", this.lifeTicks);
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+        if (compound.hasUUID("Owner")) {
+            UUID uuid = compound.getUUID("Owner");
+            this.ownerUUID = uuid;
+            this.entityData.set(DATA_OWNER_UUID, Optional.of(uuid));
+        }
+        if (compound.contains("LifeTicks")) {
+            this.lifeTicks = compound.getInt("LifeTicks");
         }
     }
 

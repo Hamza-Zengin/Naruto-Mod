@@ -2,7 +2,7 @@ package com.sekwah.narutomod.client.model.item.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.sekwah.narutomod.util.ModelUtils;
+import com.sekwah.sekclib.util.ModelUtils;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;

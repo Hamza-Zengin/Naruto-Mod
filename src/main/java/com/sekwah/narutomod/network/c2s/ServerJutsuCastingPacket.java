@@ -30,10 +30,22 @@ public class ServerJutsuCastingPacket {
     }
 
     public static class Handler {
+        private static final java.util.Map<java.util.UUID, Long> LAST_SEAL_TIME = new java.util.concurrent.ConcurrentHashMap<>();
+
         public static void handle(ServerJutsuCastingPacket msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
                 ServerPlayer player = ctx.get().getSender();
                 if(player != null) {
+                    long now = System.currentTimeMillis();
+                    Long last = LAST_SEAL_TIME.get(player.getUUID());
+                    if (last != null && (now - last) < 60) {
+                        return; // Rate limit: drop packet spam to prevent audio flooding
+                    }
+                    LAST_SEAL_TIME.put(player.getUUID(), now);
+                    if (LAST_SEAL_TIME.size() > 500) {
+                        LAST_SEAL_TIME.entrySet().removeIf(e -> (now - e.getValue()) > 60000);
+                    }
+
                     SoundEvent playSound = switch (msg.jutsuKey) {
                         case 1 -> NarutoSounds.SEAL_A.get();
                         case 2 -> NarutoSounds.SEAL_B.get();

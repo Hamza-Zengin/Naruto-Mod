@@ -500,18 +500,16 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Override
     public boolean canRankUp() {
         NinjaRank current = NinjaRank.fromString(this.getRank());
-        if (current == NinjaRank.ACADEMY_STUDENT) {
-            return this.maxChakra >= 120.0f && this.getJutsusCastCount() >= 8;
-        } else if (current == NinjaRank.GENIN) {
-            return this.maxChakra >= 160.0f && this.maxStamina >= 130.0f && this.getEnemiesDefeated() >= 15;
-        } else if (current == NinjaRank.CHUNIN) {
-            return this.maxChakra >= 260.0f && this.maxStamina >= 180.0f && this.getEnemiesDefeated() >= 60 && this.getUnlockedAbilities().size() >= 3;
-        } else if (current == NinjaRank.JONIN) {
-            return this.maxChakra >= 380.0f && this.maxStamina >= 260.0f && this.getEnemiesDefeated() >= 120 && this.getUnlockedAbilities().size() >= 4;
-        } else if (current == NinjaRank.ANBU) {
-            return this.maxChakra >= 500.0f && this.maxStamina >= 350.0f && this.getEnemiesDefeated() >= 250 && this.getUnlockedAbilities().size() >= 5;
-        }
-        return false;
+        if (current.next() == null) return false;
+        boolean chakraOk = this.maxChakra >= current.getRequiredChakraToAdvance();
+        boolean staminaOk = this.maxStamina >= current.getRequiredStaminaToAdvance();
+        boolean enemiesOk = this.getEnemiesDefeated() >= current.getRequiredEnemiesToAdvance();
+        boolean jutsusOk = switch (current) {
+            case ACADEMY_STUDENT -> this.getJutsusCastCount() >= current.getRequiredJutsusToAdvance();
+            case CHUNIN, JONIN, ANBU -> this.getUnlockedAbilities().size() >= current.getRequiredJutsusToAdvance();
+            default -> true;
+        };
+        return chakraOk && staminaOk && enemiesOk && jutsusOk;
     }
 
     @Override

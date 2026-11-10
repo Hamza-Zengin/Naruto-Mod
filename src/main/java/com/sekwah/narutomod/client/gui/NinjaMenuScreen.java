@@ -53,13 +53,21 @@ public class NinjaMenuScreen extends Screen {
 
         // Modern Tab Navigation Buttons
         int tabBtnW = 100;
-        this.addRenderableWidget(Button.builder(Component.literal(this.activeTab == 0 ? "§6§l[ Profil ]" : "Profil"), b -> switchTab(0))
+        Component profileTitle = Component.translatable("naruto.gui.ninja_menu.tab.profile");
+        Component clansTitle = Component.translatable("naruto.gui.ninja_menu.tab.clans");
+        Component jutsusTitle = Component.translatable("naruto.gui.ninja_menu.tab.jutsus");
+
+        Component tab0 = this.activeTab == 0 ? Component.literal("§6§l[ ").append(profileTitle).append(" ]") : profileTitle;
+        Component tab1 = this.activeTab == 1 ? Component.literal("§6§l[ ").append(clansTitle).append(" ]") : clansTitle;
+        Component tab2 = this.activeTab == 2 ? Component.literal("§6§l[ ").append(jutsusTitle).append(" ]") : jutsusTitle;
+
+        this.addRenderableWidget(Button.builder(tab0, b -> switchTab(0))
                 .bounds(centerX - 155, topY, tabBtnW, 20).build());
 
-        this.addRenderableWidget(Button.builder(Component.literal(this.activeTab == 1 ? "§6§l[ Klan Seçimi ]" : "Klan Seçimi"), b -> switchTab(1))
+        this.addRenderableWidget(Button.builder(tab1, b -> switchTab(1))
                 .bounds(centerX - 50, topY, tabBtnW, 20).build());
 
-        this.addRenderableWidget(Button.builder(Component.literal(this.activeTab == 2 ? "§6§l[ Jutsu Kitabı ]" : "Jutsu Kitabı"), b -> switchTab(2))
+        this.addRenderableWidget(Button.builder(tab2, b -> switchTab(2))
                 .bounds(centerX + 55, topY, tabBtnW, 20).build());
 
         // Cache abilities
@@ -98,16 +106,16 @@ public class NinjaMenuScreen extends Screen {
             if (rank.getLevel() < NinjaRank.KAGE.getLevel()) {
                 boolean canRank = ninjaData.canRankUp();
                 NinjaRank next = rank.next();
-                String btnText;
+                Component btnText;
                 if (canRank && next != null) {
-                    btnText = "★ " + next.getTurkishName() + " Rütbesine Terfi Et! ★";
+                    btnText = Component.translatable("naruto.gui.ninja_menu.btn.rank_up", Component.translatable(next.getTranslationKey()));
                 } else {
-                    btnText = "Sınav Şartları Henüz Karşılanmadı";
+                    btnText = Component.translatable("naruto.gui.ninja_menu.btn.not_ready");
                 }
 
                 int btnY = boxY + BOX_HEIGHT - 24;
 
-                Button rankBtn = Button.builder(Component.literal(btnText), b -> {
+                Button rankBtn = Button.builder(btnText, b -> {
                     PacketHandler.sendToServer(new ServerRankUpPacket());
                     ninjaData.rankUp();
                     this.init();
@@ -156,17 +164,17 @@ public class NinjaMenuScreen extends Screen {
 
                 boolean isCurrentClan = ninjaData.getClan() != null && ninjaData.getClan().equals(clanLoc);
 
-                String label;
+                Component label;
                 if (isCurrentClan) {
-                    label = "§a✔ Klanınız";
+                    label = Component.literal("§a").append(Component.translatable("naruto.gui.ninja_menu.clan.current"));
                 } else if (isLocked) {
-                    label = "§8Mühürlü";
+                    label = Component.literal("§8").append(Component.translatable("naruto.gui.ninja_menu.clan.locked"));
                 } else {
-                    label = "§eKlanı Seç";
+                    label = Component.literal("§e").append(Component.translatable("naruto.gui.ninja_menu.clan.select"));
                 }
 
                 Button clanBtn = Button.builder(
-                                Component.literal(label),
+                                label,
                                 b -> {
                                     if (!ninjaData.isClanLocked()) {
                                         PacketHandler.sendToServer(new ServerSelectClanPacket(clanLoc));
@@ -184,13 +192,13 @@ public class NinjaMenuScreen extends Screen {
 
             int navBtnY = Math.min(boxY + BOX_HEIGHT + 4, this.height - 24);
             if (this.clanPage > 0) {
-                this.addRenderableWidget(Button.builder(Component.literal("< Önceki"), b -> {
+                this.addRenderableWidget(Button.builder(Component.translatable("naruto.gui.ninja_menu.btn.previous"), b -> {
                     this.clanPage--;
                     this.init();
                 }).bounds(centerX - 150, navBtnY, 75, 20).build());
             }
             if (this.clanPage < maxPages - 1) {
-                this.addRenderableWidget(Button.builder(Component.literal("Sonraki >"), b -> {
+                this.addRenderableWidget(Button.builder(Component.translatable("naruto.gui.ninja_menu.btn.next"), b -> {
                     this.clanPage++;
                     this.init();
                 }).bounds(centerX + 75, navBtnY, 75, 20).build());
@@ -203,14 +211,14 @@ public class NinjaMenuScreen extends Screen {
         int btnY = Math.min(boxY + BOX_HEIGHT + 4, this.height - 24);
 
         if (this.jutsuPage > 0) {
-            this.addRenderableWidget(Button.builder(Component.literal("< Önceki"), b -> {
+            this.addRenderableWidget(Button.builder(Component.translatable("naruto.gui.ninja_menu.btn.previous"), b -> {
                 this.jutsuPage--;
                 this.init();
             }).bounds(centerX - 150, btnY, 75, 20).build());
         }
 
         if (this.jutsuPage < maxPages - 1) {
-            this.addRenderableWidget(Button.builder(Component.literal("Sonraki >"), b -> {
+            this.addRenderableWidget(Button.builder(Component.translatable("naruto.gui.ninja_menu.btn.next"), b -> {
                 this.jutsuPage++;
                 this.init();
             }).bounds(centerX + 75, btnY, 75, 20).build());
@@ -225,7 +233,7 @@ public class NinjaMenuScreen extends Screen {
         int topY = 10;
 
         // Header Title
-        graphics.drawCenteredString(this.font, Component.literal("★ SHINOBI GELİŞİM VE REHBER SİSTEMİ ★").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), centerX, topY, 0xFFFFAA00);
+        graphics.drawCenteredString(this.font, Component.translatable("naruto.gui.ninja_menu.header").copy().withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), centerX, topY, 0xFFFFAA00);
 
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
@@ -263,7 +271,7 @@ public class NinjaMenuScreen extends Screen {
         ResourceLocation clanLoc = ninjaData.getClan();
         String clanStatusStr;
         if (clanLoc == null || clanLoc.getPath().equalsIgnoreCase("shinobi")) {
-            clanStatusStr = "§eKlan: §7Klansız §6[Seçilmedi]";
+            clanStatusStr = "§eKlan: §7" + Component.translatable("naruto.gui.ninja_menu.clan.unselected").getString();
         } else {
             Clan clan = NarutoClans.getClan(clanLoc);
             String clanDisplay = clan != null ? clan.getName().getString() : (clanLoc.getPath().substring(0, 1).toUpperCase(java.util.Locale.ROOT) + clanLoc.getPath().substring(1) + " Klanı");
@@ -286,7 +294,7 @@ public class NinjaMenuScreen extends Screen {
         float cBonus = rank.getChakraBonus();
         float sBonus = rank.getStaminaBonus();
         String bonusNote = (cBonus > 0 || sBonus > 0) ? " §7(+" + (int)cBonus + " Çakra, +" + (int)sBonus + " Kondisyon)" : "";
-        graphics.drawString(this.font, "§bNinja Rütbesi: §f" + rank.getTurkishName() + bonusNote, x, y, 0xFFFFFFFF);
+        graphics.drawString(this.font, Component.literal("§bNinja Rütbesi: §f").append(Component.translatable(rank.getTranslationKey())).append(Component.literal(bonusNote)), x, y, 0xFFFFFFFF);
         y += 14;
 
         // 1. Stat Bar: Chakra
@@ -340,17 +348,19 @@ public class NinjaMenuScreen extends Screen {
         int examBoxH = (rank == NinjaRank.KAGE) ? 68 : 56;
 
         if (rank == NinjaRank.ACADEMY_STUDENT) {
-            boolean reqC = baseChakra >= 120.0f;
-            boolean reqJ = ninjaData.getJutsusCastCount() >= 8;
-            boolean ready = reqC && reqJ;
+            int needC = (int) rank.getRequiredChakraToAdvance();
+            int needJ = rank.getRequiredJutsusToAdvance();
+            boolean reqC = baseChakra >= needC;
+            boolean reqJ = ninjaData.getJutsusCastCount() >= needJ;
+            boolean ready = ninjaData.canRankUp();
 
             graphics.fill(x, examBoxY, x + contentW, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
             graphics.renderOutline(x, examBoxY, contentW, examBoxH, ready ? 0xFF33CC33 : 0xFF555566);
 
             graphics.drawString(this.font, "§e★ Mezuniyet Sınavı (Akademi ➔ Genin)", x + 6, examBoxY + 5, 0xFFFFAA00);
 
-            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Taban Çakra: " + (int)Math.min(baseChakra, 120) + " / 120";
-            String jText = (reqJ ? "§a✔ " : "§c✖ ") + "Jutsu Pratiği: " + Math.min(ninjaData.getJutsusCastCount(), 8) + " / 8";
+            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Taban Çakra: " + (int)Math.min(baseChakra, needC) + " / " + needC;
+            String jText = (reqJ ? "§a✔ " : "§c✖ ") + "Jutsu Pratiği: " + Math.min(ninjaData.getJutsusCastCount(), needJ) + " / " + needJ;
             graphics.drawString(this.font, cText, x + 6, examBoxY + 18, 0xFFFFFFFF);
             graphics.drawString(this.font, jText, x + 160, examBoxY + 18, 0xFFFFFFFF);
 
@@ -358,19 +368,22 @@ public class NinjaMenuScreen extends Screen {
             graphics.drawString(this.font, hint, x + 6, examBoxY + 36, 0xFFAAAAAA);
 
         } else if (rank == NinjaRank.GENIN) {
-            boolean reqC = baseChakra >= 160.0f;
-            boolean reqS = baseStamina >= 130.0f;
-            boolean reqK = ninjaData.getEnemiesDefeated() >= 15;
-            boolean ready = reqC && reqS && reqK;
+            int needC = (int) rank.getRequiredChakraToAdvance();
+            int needS = (int) rank.getRequiredStaminaToAdvance();
+            int needK = rank.getRequiredEnemiesToAdvance();
+            boolean reqC = baseChakra >= needC;
+            boolean reqS = baseStamina >= needS;
+            boolean reqK = ninjaData.getEnemiesDefeated() >= needK;
+            boolean ready = ninjaData.canRankUp();
 
             graphics.fill(x, examBoxY, x + contentW, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
             graphics.renderOutline(x, examBoxY, contentW, examBoxH, ready ? 0xFF33CC33 : 0xFF555566);
 
             graphics.drawString(this.font, "§e★ Chūnin Sınavı (Genin ➔ Chūnin)", x + 6, examBoxY + 5, 0xFFFFAA00);
 
-            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, 160) + "/160";
-            String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, 130) + "/130";
-            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), 15) + "/15";
+            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, needC) + "/" + needC;
+            String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, needS) + "/" + needS;
+            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), needK) + "/" + needK;
             graphics.drawString(this.font, cText + "   " + sText, x + 6, examBoxY + 18, 0xFFFFFFFF);
             graphics.drawString(this.font, kText, x + 6, examBoxY + 30, 0xFFFFFFFF);
 
@@ -378,22 +391,26 @@ public class NinjaMenuScreen extends Screen {
             graphics.drawString(this.font, hint, x + 6, examBoxY + 43, 0xFFAAAAAA);
 
         } else if (rank == NinjaRank.CHUNIN) {
-            boolean reqC = baseChakra >= 300.0f;
-            boolean reqS = baseStamina >= 200.0f;
-            boolean reqK = ninjaData.getEnemiesDefeated() >= 75;
+            int needC = (int) rank.getRequiredChakraToAdvance();
+            int needS = (int) rank.getRequiredStaminaToAdvance();
+            int needK = rank.getRequiredEnemiesToAdvance();
+            int needJ = rank.getRequiredJutsusToAdvance();
+            boolean reqC = baseChakra >= needC;
+            boolean reqS = baseStamina >= needS;
+            boolean reqK = ninjaData.getEnemiesDefeated() >= needK;
             int unlocked = ninjaData.getUnlockedAbilities().size();
-            boolean reqJ = unlocked >= 3;
-            boolean ready = reqC && reqS && reqK && reqJ;
+            boolean reqJ = unlocked >= needJ;
+            boolean ready = ninjaData.canRankUp();
 
             graphics.fill(x, examBoxY, x + contentW, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
             graphics.renderOutline(x, examBoxY, contentW, examBoxH, ready ? 0xFF33CC33 : 0xFF555566);
 
             graphics.drawString(this.font, "§e★ Jōnin Değerlendirmesi (Chūnin ➔ Jōnin)", x + 6, examBoxY + 5, 0xFFFFAA00);
 
-            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, 300) + "/300";
-            String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, 200) + "/200";
-            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), 75) + "/75";
-            String jText = (reqJ ? "§a✔ " : "§c✖ ") + "Parşömen: " + Math.min(unlocked, 3) + "/3";
+            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, needC) + "/" + needC;
+            String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, needS) + "/" + needS;
+            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), needK) + "/" + needK;
+            String jText = (reqJ ? "§a✔ " : "§c✖ ") + "Parşömen: " + Math.min(unlocked, needJ) + "/" + needJ;
             graphics.drawString(this.font, cText + "   " + sText, x + 6, examBoxY + 18, 0xFFFFFFFF);
             graphics.drawString(this.font, kText + "   " + jText, x + 6, examBoxY + 30, 0xFFFFFFFF);
 
@@ -401,22 +418,26 @@ public class NinjaMenuScreen extends Screen {
             graphics.drawString(this.font, hint, x + 6, examBoxY + 43, 0xFFAAAAAA);
 
         } else if (rank == NinjaRank.JONIN) {
-            boolean reqC = baseChakra >= 400.0f;
-            boolean reqS = baseStamina >= 280.0f;
-            boolean reqK = ninjaData.getEnemiesDefeated() >= 150;
+            int needC = (int) rank.getRequiredChakraToAdvance();
+            int needS = (int) rank.getRequiredStaminaToAdvance();
+            int needK = rank.getRequiredEnemiesToAdvance();
+            int needJ = rank.getRequiredJutsusToAdvance();
+            boolean reqC = baseChakra >= needC;
+            boolean reqS = baseStamina >= needS;
+            boolean reqK = ninjaData.getEnemiesDefeated() >= needK;
             int unlocked = ninjaData.getUnlockedAbilities().size();
-            boolean reqJ = unlocked >= 4;
-            boolean ready = reqC && reqS && reqK && reqJ;
+            boolean reqJ = unlocked >= needJ;
+            boolean ready = ninjaData.canRankUp();
 
             graphics.fill(x, examBoxY, x + contentW, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
             graphics.renderOutline(x, examBoxY, contentW, examBoxH, ready ? 0xFF33CC33 : 0xFF555566);
 
             graphics.drawString(this.font, "§e★ ANBU Özel Kuvvet Sınavı (Jōnin ➔ ANBU)", x + 6, examBoxY + 5, 0xFFFFAA00);
 
-            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, 400) + "/400";
-            String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, 280) + "/280";
-            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), 150) + "/150";
-            String jText = (reqJ ? "§a✔ " : "§c✖ ") + "Parşömen: " + Math.min(unlocked, 4) + "/4";
+            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, needC) + "/" + needC;
+            String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, needS) + "/" + needS;
+            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), needK) + "/" + needK;
+            String jText = (reqJ ? "§a✔ " : "§c✖ ") + "Parşömen: " + Math.min(unlocked, needJ) + "/" + needJ;
             graphics.drawString(this.font, cText + "   " + sText, x + 6, examBoxY + 18, 0xFFFFFFFF);
             graphics.drawString(this.font, kText + "   " + jText, x + 6, examBoxY + 30, 0xFFFFFFFF);
 
@@ -424,22 +445,26 @@ public class NinjaMenuScreen extends Screen {
             graphics.drawString(this.font, hint, x + 6, examBoxY + 43, 0xFFAAAAAA);
 
         } else if (rank == NinjaRank.ANBU) {
-            boolean reqC = baseChakra >= 500.0f;
-            boolean reqS = baseStamina >= 350.0f;
-            boolean reqK = ninjaData.getEnemiesDefeated() >= 300;
+            int needC = (int) rank.getRequiredChakraToAdvance();
+            int needS = (int) rank.getRequiredStaminaToAdvance();
+            int needK = rank.getRequiredEnemiesToAdvance();
+            int needJ = rank.getRequiredJutsusToAdvance();
+            boolean reqC = baseChakra >= needC;
+            boolean reqS = baseStamina >= needS;
+            boolean reqK = ninjaData.getEnemiesDefeated() >= needK;
             int unlocked = ninjaData.getUnlockedAbilities().size();
-            boolean reqJ = unlocked >= 5;
-            boolean ready = reqC && reqS && reqK && reqJ;
+            boolean reqJ = unlocked >= needJ;
+            boolean ready = ninjaData.canRankUp();
 
             graphics.fill(x, examBoxY, x + contentW, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
             graphics.renderOutline(x, examBoxY, contentW, examBoxH, ready ? 0xFF33CC33 : 0xFF555566);
 
             graphics.drawString(this.font, "§e★ Kage Seçim Adaylığı (ANBU ➔ Kage)", x + 6, examBoxY + 5, 0xFFFFAA00);
 
-            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, 500) + "/500";
-            String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, 350) + "/350";
-            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), 300) + "/300";
-            String jText = (reqJ ? "§a✔ " : "§c✖ ") + "Parşömen: " + Math.min(unlocked, 5) + "/5";
+            String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, needC) + "/" + needC;
+            String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, needS) + "/" + needS;
+            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), needK) + "/" + needK;
+            String jText = (reqJ ? "§a✔ " : "§c✖ ") + "Parşömen: " + Math.min(unlocked, needJ) + "/" + needJ;
             graphics.drawString(this.font, cText + "   " + sText, x + 6, examBoxY + 18, 0xFFFFFFFF);
             graphics.drawString(this.font, kText + "   " + jText, x + 6, examBoxY + 30, 0xFFFFFFFF);
 
@@ -454,7 +479,7 @@ public class NinjaMenuScreen extends Screen {
             graphics.drawString(this.font, "§6★ En Yüksek Rütbe – Kage ★", x + 6, examBoxY + 6, 0xFFFFAA00);
 
             drawWrapped(this.font, graphics,
-                    Component.literal("§aTebrikler! Köyün en yüce şinobisi ve efsanevi koruyucususunuz. Tüm sınav şartlarını tamamladınız, kudretiniz tüm dünyaya nam saldı!"),
+                    Component.translatable("naruto.gui.ninja_menu.kage_congrats").copy().withStyle(ChatFormatting.GREEN),
                     x + 6, examBoxY + 20, contentW - 12, 0xFFFFFFFF);
         }
     }

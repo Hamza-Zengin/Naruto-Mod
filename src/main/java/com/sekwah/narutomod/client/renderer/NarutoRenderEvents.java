@@ -103,7 +103,13 @@ public class NarutoRenderEvents {
                 new net.minecraft.client.renderer.entity.HumanoidMobRenderer<>(ctx, new net.minecraft.client.model.HumanoidModel<>(ctx.bakeLayer(net.minecraft.client.model.geom.ModelLayers.PLAYER)), 0.5f) {
                     @Override
                     public ResourceLocation getTextureLocation(com.sekwah.narutomod.entity.ShadowCloneEntity entity) {
-                        return new ResourceLocation("minecraft", "textures/entity/player/slim/alex.png");
+                        java.util.UUID ownerUUID = entity.getOwnerUUID();
+                        if (ownerUUID != null) {
+                            String ownerName = entity.getCustomName() != null ? entity.getCustomName().getString() : "ShadowClone";
+                            return net.minecraft.client.Minecraft.getInstance().getSkinManager()
+                                    .getInsecureSkinLocation(new com.mojang.authlib.GameProfile(ownerUUID, ownerName));
+                        }
+                        return net.minecraft.client.resources.DefaultPlayerSkin.getDefaultSkin();
                     }
                 });
 

@@ -49,7 +49,7 @@ public class ServerSelectClanPacket {
 
                     // Validate clan exists
                     if (NarutoClans.getClan(msg.clanId) == null) {
-                        player.sendSystemMessage(Component.literal("Geçersiz klan!").withStyle(ChatFormatting.RED));
+                        player.sendSystemMessage(Component.translatable("clan.narutomod.invalid").withStyle(ChatFormatting.RED));
                         return;
                     }
 

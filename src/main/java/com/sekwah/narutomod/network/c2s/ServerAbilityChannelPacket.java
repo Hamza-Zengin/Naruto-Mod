@@ -39,7 +39,11 @@ public class ServerAbilityChannelPacket {
     public static ServerAbilityChannelPacket decode(FriendlyByteBuf inBuffer) {
         ResourceLocation abilityId = inBuffer.readResourceLocation();
         int status = inBuffer.readInt();
-        return new ServerAbilityChannelPacket(abilityId, ChannelStatus.values()[status]);
+        ChannelStatus[] statuses = ChannelStatus.values();
+        if (status < 0 || status >= statuses.length) {
+            status = 0;
+        }
+        return new ServerAbilityChannelPacket(abilityId, statuses[status]);
     }
 
     public static class Handler {

@@ -3,6 +3,8 @@
 [![Build and Release](https://github.com/Hamza-Zengin/Naruto-Mod/actions/workflows/gradle.yml/badge.svg)](https://github.com/Hamza-Zengin/Naruto-Mod/actions/workflows/gradle.yml)
 [![Minecraft 1.20.1](https://img.shields.io/badge/Minecraft-1.20.1%20Forge-orange.svg?style=for-the-badge&logo=curseforge&logoColor=white)](https://github.com/Hamza-Zengin/Naruto-Mod)
 [![Java 17](https://img.shields.io/badge/Java-17-blue.svg?style=for-the-badge&logo=openjdk&logoColor=white)](https://github.com/Hamza-Zengin/Naruto-Mod)
+[![Curios API](https://img.shields.io/badge/Curios_API-Compatible-purple.svg?style=for-the-badge)](https://github.com/Hamza-Zengin/Naruto-Mod)
+[![Better Combat](https://img.shields.io/badge/Better_Combat-Compatible-red.svg?style=for-the-badge)](https://github.com/Hamza-Zengin/Naruto-Mod)
 [![License: All rights reserved](https://img.shields.io/badge/License-All_Rights_Reserved-red.svg?style=for-the-badge)](LICENSE)
 
 Kapsamlı bir **Minecraft 1.20.1 Forge** modu. Naruto shinobi evrenini Minecraft dünyasına taşıyarak; 18'den fazla imza jutsu, 7 ninja klanı ve kan bağı, 3D animasyonlu ninja silahları, taktiksel zırhlar, chakra sistemi, akıcı hareket mekanikleri ve özgün ses/efektler sunar.
@@ -50,11 +52,15 @@ Ninja Menüsü (`J` tuşu) üzerinden klanınızı seçin ve shinobi mirasınız
 - **Tüketilebilirler**: Ichiraku Ramen ve Askeri Erzak Hapları (Ration Pills).
 - **Varlıklar ve Bosslar**: Kaçak Ninjalar (Nukenin) ve Akatsuki S-Rank düşmanları.
 
+### 🧩 Ekosistem & Mod Uyumluluğu (Modpack Integrations)
+- **Curios API**: 27 köy alın koruyucusu ve 5 ANBU maskesi `head` slotuna, Chūnin yeleği, ANBU zırhı ve Akatsuki pelerini `body` slotuna zırh yuvasını işgal etmeden takılabilir.
+- **Better Combat**: Kunai, Kusanagi Kılıcı, Samehada, Kemik Kılıcı ve Fūma Shuriken akıcı kombo zincirleri ve vuruş animasyonlarıyla tam uyumludur.
+
 ---
 
 ## 📦 Kütüphane Bağımlılığı (SekCLib)
 
-Mod, yetenek takibi ve veri senkronizasyonu için **SekCLib** (`com.sekwah.sekclib`) kütüphanesini kullanır. Forge 1.20.1 için deobfuscate edilmiş sürüm [`libs/SekCLib-1.20.1-1.0.2-deobf.jar`](libs/SekCLib-1.20.1-1.0.2-deobf.jar) içerisinde hazır bulunmaktadır.
+Mod, yetenek takibi ve veri senkronizasyonu için **SekCLib** (`com.sekwah.sekclib`) kütüphanesini kullanır. Forge 1.20.1 için deobfuscate edilmiş sürüm [`libs/SekCLib-1.20.1-1.1.0-deobf.jar`](libs/SekCLib-1.20.1-1.1.0-deobf.jar) içerisinde hazır bulunmaktadır.
 
 ---
 

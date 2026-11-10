@@ -56,6 +56,54 @@ public enum NinjaRank {
         return null;
     }
 
+    public String getTranslationKey() {
+        return "rank.narutomod." + this.name().toLowerCase(java.util.Locale.ROOT);
+    }
+
+    public float getRequiredChakraToAdvance() {
+        return switch (this) {
+            case ACADEMY_STUDENT -> 120.0f;
+            case GENIN -> 160.0f;
+            case CHUNIN -> 260.0f;
+            case JONIN -> 380.0f;
+            case ANBU -> 500.0f;
+            case KAGE -> 0.0f;
+        };
+    }
+
+    public float getRequiredStaminaToAdvance() {
+        return switch (this) {
+            case ACADEMY_STUDENT -> 100.0f;
+            case GENIN -> 130.0f;
+            case CHUNIN -> 180.0f;
+            case JONIN -> 260.0f;
+            case ANBU -> 350.0f;
+            case KAGE -> 0.0f;
+        };
+    }
+
+    public int getRequiredEnemiesToAdvance() {
+        return switch (this) {
+            case ACADEMY_STUDENT -> 0;
+            case GENIN -> 15;
+            case CHUNIN -> 60;
+            case JONIN -> 120;
+            case ANBU -> 250;
+            case KAGE -> 0;
+        };
+    }
+
+    public int getRequiredJutsusToAdvance() {
+        return switch (this) {
+            case ACADEMY_STUDENT -> 8; // jutsus cast count
+            case GENIN -> 0;
+            case CHUNIN -> 3; // unlocked jutsus count
+            case JONIN -> 4;
+            case ANBU -> 5;
+            case KAGE -> 0;
+        };
+    }
+
     public static NinjaRank parseExact(String name) {
         if (name == null) return null;
         String clean = name.trim().replace('ı', 'i').replace('İ', 'I').toLowerCase(java.util.Locale.ROOT);

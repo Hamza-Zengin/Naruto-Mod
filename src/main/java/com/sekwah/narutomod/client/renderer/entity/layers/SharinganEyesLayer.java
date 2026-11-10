@@ -35,10 +35,10 @@ public class SharinganEyesLayer extends RenderLayer<AbstractClientPlayer, Player
         }
         player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
             if (ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.SHARINGAN.getId())) {
-                VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(SHARINGAN_EYES_TEXTURE));
+                VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.eyes(SHARINGAN_EYES_TEXTURE));
                 this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
             } else if (ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.BYAKUGAN.getId())) {
-                VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(BYAKUGAN_EYES_TEXTURE));
+                VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.eyes(BYAKUGAN_EYES_TEXTURE));
                 this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
             }
         });

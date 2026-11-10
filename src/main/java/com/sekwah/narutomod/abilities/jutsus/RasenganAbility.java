@@ -82,8 +82,12 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
         for (LivingEntity hit : hitTargets) {
             hit.hurt(player.damageSources().playerAttack(player), 22.0f);
             Vec3 knockback = look.scale(2.5).add(0, 0.6, 0);
-            hit.setDeltaMovement(knockback);
-            hit.hurtMarked = true;
+            if (hit instanceof Player targetPlayer) {
+                com.sekwah.sekclib.util.PlayerUtil.setVelocity(targetPlayer, knockback, true);
+            } else {
+                hit.setDeltaMovement(knockback);
+                hit.hurtMarked = true;
+            }
             serverLevel.sendParticles(ParticleTypes.EXPLOSION, hit.getX(), hit.getY() + 1.0, hit.getZ(), 1, 0, 0, 0, 0);
         }
 

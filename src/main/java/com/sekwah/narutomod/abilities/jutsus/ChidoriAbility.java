@@ -62,8 +62,8 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
         Vec3 look = player.getLookAngle();
-        // High velocity forward thrust
-        player.setDeltaMovement(look.x * 2.4, 0.22, look.z * 2.4);
+        // High velocity forward thrust with client-side prediction and ground drag avoidance
+        com.sekwah.sekclib.util.PlayerUtil.setVelocity(player, look.x * 2.4, 0.22, look.z * 2.4, true);
         player.hurtMarked = true;
 
         Vec3 strikePos = target != null ? target.position().add(0, target.getBbHeight() * 0.5, 0)

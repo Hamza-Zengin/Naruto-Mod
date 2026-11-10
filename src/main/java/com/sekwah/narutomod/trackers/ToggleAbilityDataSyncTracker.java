@@ -19,9 +19,12 @@ public class ToggleAbilityDataSyncTracker implements SyncTrackerSerializer<Toggl
     @Override
     public ToggleAbilityData decode(FriendlyByteBuf inBuffer) {
         final int size = inBuffer.readInt();
+        if (size < 0 || size > 256) {
+            return new ToggleAbilityData(0);
+        }
         ToggleAbilityData data = new ToggleAbilityData(size);
         for(int i = 0; i < size; i++) {
-            data.getAbilitiesHashSet().add(new ResourceLocation(inBuffer.readUtf()));
+            data.getAbilitiesHashSet().add(new ResourceLocation(inBuffer.readUtf(256)));
         }
         return data;
     }
