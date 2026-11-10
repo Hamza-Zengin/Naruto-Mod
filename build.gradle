@@ -284,8 +284,7 @@ curseforge {
         changelog = "${project.github}/blob/${branch}/CHANGELOG.md"
         changelogType = 'markdown'
         releaseType = 'release'
-        addGameVersion '1.18'
-        addGameVersion '1.18.1'
+        addGameVersion '1.20.1'
 
         mainArtifact(jar){
 

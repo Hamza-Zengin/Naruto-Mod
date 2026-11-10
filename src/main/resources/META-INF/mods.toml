@@ -6,12 +6,13 @@ license="All rights reserved"
     modId="narutomod"
     version="${file.jarVersion}"
     displayName="Naruto Mod"
-    updateJSONURL="https://www.sekwah.com/modversions/narutomod.json"
+    updateJSONURL="https://raw.githubusercontent.com/Hamza-Zengin/Naruto-Mod/master/docs/forgeupdatefile/narutomod.json"
     displayURL="https://github.com/Hamza-Zengin/Naruto-Mod"
-    authors="Sekwah41, Hamza Zengin"
+    authors="Hamza Zengin, Sekwah41 (Original 1.16 Author)"
     logoFile="narutologo.png"
     description='''
-A mod that adds new items and other features to the game that are from/based on the Naruto manga.
+A comprehensive Naruto Shinobi Universe mod for Minecraft 1.20.1 Forge.
+Features 18+ signature jutsus, 7 ninja clan bloodlines (Uchiha, Hyūga, Uzumaki, Senju, Nara, Kaguya, Wandering Shinobi), 3D weapons (Kunai, Shuriken, Fūma Shuriken, Samehada, Kusanagi), tactical armors, chakra system, custom animations, sounds, and rogue shinobi entities.
 '''
 
 [[dependencies.narutomod]]

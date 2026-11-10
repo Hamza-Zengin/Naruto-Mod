@@ -1,95 +1,109 @@
 # Naruto-Mod (Minecraft 1.20.1 Forge)
 
 [![Build and Release](https://github.com/Hamza-Zengin/Naruto-Mod/actions/workflows/gradle.yml/badge.svg)](https://github.com/Hamza-Zengin/Naruto-Mod/actions/workflows/gradle.yml)
-[![Discord](https://img.shields.io/discord/168282484037910528.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/fAJ3xJg)
-[![License: All rights reserved](https://img.shields.io/badge/License-All_Rights_Reserved-blue.svg?style=for-the-badge)](LICENSE)
+[![Minecraft 1.20.1](https://img.shields.io/badge/Minecraft-1.20.1%20Forge-orange.svg?style=for-the-badge&logo=curseforge&logoColor=white)](https://github.com/Hamza-Zengin/Naruto-Mod)
+[![Java 17](https://img.shields.io/badge/Java-17-blue.svg?style=for-the-badge&logo=openjdk&logoColor=white)](https://github.com/Hamza-Zengin/Naruto-Mod)
+[![License: All rights reserved](https://img.shields.io/badge/License-All_Rights_Reserved-red.svg?style=for-the-badge)](LICENSE)
 
-An extensive Minecraft 1.20.1 Forge mod introducing the rich shinobi universe of Naruto into Minecraft. Features 18+ signature jutsus, clan bloodlines, 3D animated ninja weapons, tactical armors, rogue ninja mobs, and custom sound/particle effects.
-
----
-
-## 🌟 Key Features
-
-### 🥋 Ninja Clans & Bloodlines
-Choose and seal your shinobi heritage via the Ninja Menu (`J` key):
-- **Wandering Shinobi**: Balanced chakra and stamina for flexible play.
-- **Uchiha Clan**: Fire style mastery, Sharingan awakening, and Susanoo armor.
-- **Hyūga Clan**: Byakugan vision and Gentle Fist combat.
-- **Uzumaki Clan**: +25% massive chakra capacity and 2x faster chakra recovery.
-- **Nara Clan**: 30% faster stamina recovery and shadow manipulation techniques.
-- **Senju Clan**: Wood Style mastery, vitality regeneration, and enhanced reserves.
-- **Kaguya Clan**: Shikotsumyaku bone arts, bonus piercing damage, and damage resistance.
-
-### 🌀 18+ Ninjutsu, Genjutsu & Taijutsu Techniques
-- **Chakra Basics**: Ninja Leap (`X`), Chakra Dash, Water Walking, and Chakra Charging.
-- **Ninjutsu**: Fireball Jutsu (*Katon: Gōkakyū*), Water Bullet (*Suiton: Suidanha*), Wind Breaker (*Fuuton: Daitoppa*), Mud Wall (*Doton: Doryūheki*).
-- **Master Techniques**: Rasengan, Chidori (with hand-ready strike mode), Rasenshuriken, Shadow Clone (*Kage Bunshin*), Kawarimi (*Body Replacement*), Shadow Possession (*Kage Mane*), Wood Prison (*Mokuton: Jukai Kōtan*), Bone Dance (*Sawarabi no Mai*).
-- **Kekkei Genkai & Forbidden Arts**: Sharingan, Byakugan, Amaterasu, Susanoo Ribcage, Kirin, and the Eight Inner Gates (*Hachimon*).
-
-### ⚔️ 3D Weapons & Tactical Gear
-- **Ninja Weapons**: Kunai, Explosive Kunai, Shuriken, Senbon, 3D Fūma Shuriken, Smoke Bombs, and Paper Bombs.
-- **Legendary Swords**: Sword of Kusanagi (AoE Chidori current), Samehada (chakra and heart drain), Kaguya Bone Sword.
-- **Armors & Attire**: Village Headbands (Leaf, Sand, Mist, Cloud, Rock, Sound, Rain, etc.), ANBU Battle Armor with 3D Back Tantō, Chūnin Tactical Vest, Akatsuki Cloak, and ANBU Masks.
-- **Consumables**: Ichiraku Ramen and Military Rations Pills.
-- **Entities & Bosses**: Rogue Ninjas (Nukenin) and Akatsuki S-Rank Rogue Shinobi.
+Kapsamlı bir **Minecraft 1.20.1 Forge** modu. Naruto shinobi evrenini Minecraft dünyasına taşıyarak; 18'den fazla imza jutsu, 7 ninja klanı ve kan bağı, 3D animasyonlu ninja silahları, taktiksel zırhlar, chakra sistemi, akıcı hareket mekanikleri ve özgün ses/efektler sunar.
 
 ---
 
-## 📦 SekCLib Dependency
+## 🌟 Öne Çıkan Özellikler / Key Features
 
-This mod relies on **SekCLib** (`com.sekwah.sekclib`) for capability tracking and network data synchronization. A pre-compiled, deobfuscated release for Forge 1.20.1 is bundled inside [`libs/SekCLib-1.20.1-1.0.2-deobf.jar`](libs/SekCLib-1.20.1-1.0.2-deobf.jar).
+### 🥋 Ninja Klanları ve Kan Bağları (Clans & Bloodlines)
+Ninja Menüsü (`J` tuşu) üzerinden klanınızı seçin ve shinobi mirasınızı uyandırın:
+- **Wandering Shinobi (Gezgin Shinobi)**: Esnek oyun için dengeli chakra ve stamina.
+- **Uchiha Klanı**: Ateş elementi ustalığı, Sharingan uyanışı ve Susanoo zırhı.
+- **Hyūga Klanı**: Byakugan görüşü ve Yumuşak Yumruk (Gentle Fist) dövüş stili.
+- **Uzumaki Klanı**: +%25 devasa chakra kapasitesi ve 2 kat daha hızlı chakra yenilenmesi.
+- **Nara Klanı**: %30 daha hızlı stamina toparlanması ve gölge manipülasyon teknikleri.
+- **Senju Klanı**: Tahta Tarzı (Wood Style) ustalığı, yaşamsal yenilenme ve artırılmış rezervler.
+- **Kaguya Klanı**: Shikotsumyaku kemik sanatları, delici hasar bonusu ve yüksek savunma direnci.
+
+### 🌀 18+ Ninjutsu, Genjutsu ve Taijutsu Yetenekleri
+- **Temel Chakra Mekanikleri**: Ninja Sıçraması (`X`), Chakra Hızlanması (Dash), Suda Yürüme ve Chakra Odaklanması.
+- **Elementel Ninjutsu**: 
+  - Ateş Topu Tekniği (*Katon: Gōkakyū*)
+  - Su Mermisi (*Suiton: Suidanha*)
+  - Rüzgar Patlaması (*Fūton: Daitoppa*)
+  - Çamur Duvarı (*Doton: Doryūheki*)
+- **Usta Seviye Teknikler**:
+  - Rasengan & Rasenshuriken
+  - Chidori (ve elde tutularak vuruşa hazır yıldırım modu)
+  - Gölge Klonu (*Kage Bunshin no Jutsu*)
+  - Yer Değiştirme (*Kawarimi no Jutsu*)
+  - Gölge Taklit Tekniği (*Kage Mane no Jutsu*)
+  - Tahta Hapishanesi (*Mokuton: Jukai Kōtan*)
+  - Kemik Dansı (*Sawarabi no Mai*)
+- **Kekkei Genkai ve Yasak Sanatlar**:
+  - Sharingan & Byakugan (HD 2048x2048 göz küresi dokuları)
+  - Amaterasu (sönmeyen siyah alevler)
+  - Susanoo Kaburga Kalkanı (Susanoo Ribcage)
+  - Kirin (Gök gürültüsü ejderhası)
+  - Sekiz İç Kapı (*Hachimon Tonkō - 1'den 8'e kadar tüm kapılar, yatay chakra halkaları ve auralar*)
+
+### ⚔️ 3D Silahlar ve Taktiksel Ekipmanlar
+- **Fırlatılabilir & Yakın Dövüş Silahları**: Kunai, Patlayıcı Kunai, Shuriken, Senbon, 3D Fūma Shuriken, Sis Bombaları ve Patlayıcı Mühürler.
+- **Efsanevi Kılıçlar**: Kusanagi Kılıcı (AoE Chidori akımı), Samehada (chakra ve can emme), Kaguya Kemik Kılıcı.
+- **Zırhlar & Kıyafetler**: Köy Alın Koruyucuları (Yaprak, Kum, Sis, Bulut, Taş, Ses, Yağmur vb.), Sırtta 3D Kılıçlı ANBU Zırhı, Chūnin Yeleği, Akatsuki Pelerini ve ANBU Maskeleri.
+- **Tüketilebilirler**: Ichiraku Ramen ve Askeri Erzak Hapları (Ration Pills).
+- **Varlıklar ve Bosslar**: Kaçak Ninjalar (Nukenin) ve Akatsuki S-Rank düşmanları.
 
 ---
 
-## 🌐 Localization Parity
+## 📦 Kütüphane Bağımlılığı (SekCLib)
 
-All translation keys are 100% synchronized across all supported languages:
-- 🇺🇸 **English** (`en_us`) — Reference
-- 🇹🇷 **Türkçe** (`tr_tr`) — Complete
-- 🇪🇸 **Español** (`es_es`) — Complete
-- 🇧🇷 **Português (Brasil)** (`pt_br`) — Complete
-- 🇯🇵 **日本語 (Japanese)** (`ja_jp`) — Complete
-- 🇩🇪 **Deutsch** (`de_de`) — Complete
-- 🇫🇷 **Français** (`fr_fr`) — Complete
-- 🇷🇺 **Русский** (`ru_ru`) — Complete
+Mod, yetenek takibi ve veri senkronizasyonu için **SekCLib** (`com.sekwah.sekclib`) kütüphanesini kullanır. Forge 1.20.1 için deobfuscate edilmiş sürüm [`libs/SekCLib-1.20.1-1.0.2-deobf.jar`](libs/SekCLib-1.20.1-1.0.2-deobf.jar) içerisinde hazır bulunmaktadır.
 
-To verify language file parity:
+---
+
+## 🌐 Çoklu Dil Desteği (Localization Parity)
+
+Tüm dil dosyaları %100 senkronize durumdadır:
+- 🇹🇷 **Türkçe** (`tr_tr`) — Eksiksiz
+- 🇺🇸 **English** (`en_us`) — Referans
+- 🇪🇸 **Español** (`es_es`) — Eksiksiz
+- 🇧🇷 **Português (Brasil)** (`pt_br`) — Eksiksiz
+- 🇯🇵 **日本語 (Japanese)** (`ja_jp`) — Eksiksiz
+- 🇩🇪 **Deutsch** (`de_de`) — Eksiksiz
+- 🇫🇷 **Français** (`fr_fr`) — Eksiksiz
+- 🇷🇺 **Русский** (`ru_ru`) — Eksiksiz
+
+Dil bütünlüğünü kontrol etmek için:
 ```bash
 python3 scripts/check_lang.py
 ```
 
 ---
 
-## 🛠️ Building & Developing
+## 🛠️ Projeyi Derleme & Geliştirme (Building)
 
-### Requirements
-- **JDK 17** (e.g. Eclipse Temurin or Zulu)
-- Python 3.8+ (for model and lang verification scripts)
+### Gereksinimler
+- **JDK 17** (örn. Eclipse Temurin veya Azul Zulu)
+- Python 3.8+ (model, ses ve dil denetim betikleri için)
 
-### Commands
+### Komutlar
 ```bash
-# Verify language files and model part names
-python3 scripts/check_lang.py
+# Model, ses, dil ve eşya modeli bütünlük testleri:
 python3 scripts/check_model_parts.py
+python3 scripts/check_lang.py
+python3 scripts/check_sounds.py
+python3 scripts/check_item_models.py
 
-# Run automated tests
+# Otomatik testleri çalıştırma:
 ./gradlew test
 
-# Build production JAR
+# Üretim JAR dosyasını derleme (build/libs altına çıkar):
 ./gradlew build
 
-# Run client in development
+# Geliştirme ortamında Minecraft istemcisini başlatma:
 ./gradlew runClient
 ```
 
 ---
 
-## 🤝 Contributing
+## 👥 Geliştiriciler & Teşekkür (Authors)
 
-Contributions are welcome! Please adhere to [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/):
-- `feat`: New features (abilities, weapons, armors)
-- `fix`: Bug fixes
-- `test`: Adding or updating tests
-- `docs`: Documentation updates
-- `build` / `ci`: Build system or GitHub Actions adjustments
-- `refactor`: Code improvements without behavior changes
+- **Hamza Zengin** — *Lead Developer & Maintainer (1.20.1 Forge Port, 18+ Jutsu, Klan Sistemleri, 3D Silahlar & Tam Revizyon)*
+- **Alastair Hawkes (Sekwah41)** — *Orijinal Naruto Mod & SekCLib fikir babası (Eski 1.16 ve öncesi sürümler)*

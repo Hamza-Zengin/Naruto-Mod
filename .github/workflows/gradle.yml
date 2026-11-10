@@ -53,15 +53,4 @@ jobs:
           name: NarutoMod-1.20.1-v12.2
           path: build/libs/*.jar
 
-      - name: Create Release (if credentials configured)
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push' && env.CURSE_API != ''
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CURSE_API: ${{ secrets.CURSE_API }}
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-        run: |
-          yarn install --immutable
-          yarn run auto shipit -v
+
