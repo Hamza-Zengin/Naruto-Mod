@@ -14,15 +14,39 @@ import static com.sekwah.narutomod.NarutoMod.MOD_ID;
 
 public class NarutoDataSerialisers {
 
-    public static final EntityDataSerializer<AttachFace> ATTACH_FACE = EntityDataSerializer.simple(
-            (buf, value) -> buf.writeByte(StateUtils.faceToByte(value)),
-            buf -> StateUtils.byteToFace(buf.readByte())
-    );
+    public static final EntityDataSerializer<AttachFace> ATTACH_FACE = new EntityDataSerializer<AttachFace>() {
+        @Override
+        public void write(FriendlyByteBuf buf, AttachFace value) {
+            buf.writeByte(StateUtils.faceToByte(value));
+        }
 
-    public static final EntityDataSerializer<Direction> BLOCK_DIRECTION = EntityDataSerializer.simple(
-            (buf, value) -> buf.writeByte(value.get2DDataValue()),
-            buf -> Direction.from2DDataValue(buf.readByte())
-    );
+        @Override
+        public AttachFace read(FriendlyByteBuf buf) {
+            return StateUtils.byteToFace(buf.readByte());
+        }
+
+        @Override
+        public AttachFace copy(AttachFace value) {
+            return value;
+        }
+    };
+
+    public static final EntityDataSerializer<Direction> BLOCK_DIRECTION = new EntityDataSerializer<Direction>() {
+        @Override
+        public void write(FriendlyByteBuf buf, Direction value) {
+            buf.writeByte(value.get2DDataValue());
+        }
+
+        @Override
+        public Direction read(FriendlyByteBuf buf) {
+            return Direction.from2DDataValue(buf.readByte());
+        }
+
+        @Override
+        public Direction copy(Direction value) {
+            return value;
+        }
+    };
 
     private static final DeferredRegister<EntityDataSerializer<?>> DATA_SERIALIZERS = DeferredRegister.create(ForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS, MOD_ID);
 

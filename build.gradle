@@ -167,7 +167,7 @@ mixin {
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
     finalizedBy 'reobfJar'
-    archiveClassifier = 'universal'
+    archiveClassifier = ''
     manifest {
         attributes([
                 "Specification-Title": project.modid,

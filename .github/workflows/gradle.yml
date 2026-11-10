@@ -48,10 +48,21 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Upload Mod Artifacts
+      - name: Upload Playable Mod Jar
         uses: actions/upload-artifact@v4
         with:
           name: NarutoMod-1.20.1-v12.2
-          path: build/libs/*.jar
+          path: |
+            build/libs/NarutoMod-*.jar
+            !build/libs/*-deobf.jar
+            !build/libs/*-sources.jar
+
+      - name: Upload Dev & Source Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: NarutoMod-1.20.1-v12.2-dev
+          path: |
+            build/libs/*-deobf.jar
+            build/libs/*-sources.jar
 
 
