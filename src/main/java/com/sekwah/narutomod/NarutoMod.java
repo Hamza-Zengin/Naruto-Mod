@@ -18,6 +18,9 @@ import com.sekwah.narutomod.registries.NarutoRegistries;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import com.sekwah.sekclib.SekCLib;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.RegisterCapabilitySyncEvent;
+import com.sekwah.sekclib.capabilitysync.capabilitysync.RegisterSyncTrackerTypeEvent;
+import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
+import com.sekwah.narutomod.trackers.ToggleAbilityDataSyncTracker;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -53,6 +56,7 @@ public class NarutoMod {
         eventBus.addListener(NarutoKeyHandler::onRegisterKeyMappings);
         eventBus.addListener(this::setup);
         eventBus.addListener(this::registerCapabilities);
+        eventBus.addListener(this::registerSyncTrackers);
         eventBus.addListener(this::registerCapabilitySync);
         eventBus.addListener(NarutoRegistries::init);
 
@@ -83,6 +87,10 @@ public class NarutoMod {
     @SubscribeEvent
     public static void onServerStarting(RegisterCommandsEvent event) {
         NarutoCommands.register(event.getDispatcher());
+    }
+
+    public void registerSyncTrackers(RegisterSyncTrackerTypeEvent event) {
+        event.registerSyncTracker(ToggleAbilityData.class, new ToggleAbilityDataSyncTracker());
     }
 
     public void registerCapabilitySync(RegisterCapabilitySyncEvent event) {

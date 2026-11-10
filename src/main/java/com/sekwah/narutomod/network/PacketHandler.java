@@ -3,9 +3,10 @@ package com.sekwah.narutomod.network;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.network.c2s.ServerAbilityActivatePacket;
 import com.sekwah.narutomod.network.c2s.ServerAbilityChannelPacket;
-import com.sekwah.narutomod.network.s2c.ClientTestPacket;
 import com.sekwah.narutomod.network.c2s.ServerJutsuCastingPacket;
-import com.sekwah.narutomod.network.c2s.ServerTestPacket;
+import com.sekwah.narutomod.network.c2s.ServerRankUpPacket;
+import com.sekwah.narutomod.network.c2s.ServerSelectClanPacket;
+import com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -26,19 +27,14 @@ public class PacketHandler {
             .simpleChannel();
 
     public static void init() {
-        // Server to client packs
-        NARUTO_CHANNEL.registerMessage(0, ClientTestPacket.class, ClientTestPacket::encode, ClientTestPacket::decode, ClientTestPacket.Handler::handle);
-
         // Client to server packets
-        NARUTO_CHANNEL.registerMessage(100, ServerTestPacket.class, ServerTestPacket::encode, ServerTestPacket::decode, ServerTestPacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(101, ServerJutsuCastingPacket.class, ServerJutsuCastingPacket::encode, ServerJutsuCastingPacket::decode, ServerJutsuCastingPacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(102, ServerAbilityActivatePacket.class, ServerAbilityActivatePacket::encode, ServerAbilityActivatePacket::decode, ServerAbilityActivatePacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(103, ServerAbilityChannelPacket.class, ServerAbilityChannelPacket::encode, ServerAbilityChannelPacket::decode, ServerAbilityChannelPacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(104, com.sekwah.narutomod.network.c2s.ServerSelectClanPacket.class, com.sekwah.narutomod.network.c2s.ServerSelectClanPacket::encode, com.sekwah.narutomod.network.c2s.ServerSelectClanPacket::decode, com.sekwah.narutomod.network.c2s.ServerSelectClanPacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(105, com.sekwah.narutomod.network.c2s.ServerRankUpPacket.class, com.sekwah.narutomod.network.c2s.ServerRankUpPacket::encode, com.sekwah.narutomod.network.c2s.ServerRankUpPacket::decode, com.sekwah.narutomod.network.c2s.ServerRankUpPacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(106, com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket.class, com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket::encode, com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket::decode, com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket.Handler::handle);
+        NARUTO_CHANNEL.registerMessage(100, ServerJutsuCastingPacket.class, ServerJutsuCastingPacket::encode, ServerJutsuCastingPacket::decode, ServerJutsuCastingPacket.Handler::handle);
+        NARUTO_CHANNEL.registerMessage(101, ServerAbilityActivatePacket.class, ServerAbilityActivatePacket::encode, ServerAbilityActivatePacket::decode, ServerAbilityActivatePacket.Handler::handle);
+        NARUTO_CHANNEL.registerMessage(102, ServerAbilityChannelPacket.class, ServerAbilityChannelPacket::encode, ServerAbilityChannelPacket::decode, ServerAbilityChannelPacket.Handler::handle);
+        NARUTO_CHANNEL.registerMessage(103, ServerSelectClanPacket.class, ServerSelectClanPacket::encode, ServerSelectClanPacket::decode, ServerSelectClanPacket.Handler::handle);
+        NARUTO_CHANNEL.registerMessage(104, ServerRankUpPacket.class, ServerRankUpPacket::encode, ServerRankUpPacket::decode, ServerRankUpPacket.Handler::handle);
+        NARUTO_CHANNEL.registerMessage(105, ServerTriggerHandJutsuPacket.class, ServerTriggerHandJutsuPacket::encode, ServerTriggerHandJutsuPacket::decode, ServerTriggerHandJutsuPacket.Handler::handle);
     }
-
 
     public static void sendToServer(Object obj) {
         NARUTO_CHANNEL.sendToServer(obj);
