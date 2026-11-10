@@ -22,7 +22,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: 17
@@ -40,9 +40,6 @@ jobs:
 
       - name: Download MC assets
         run: ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets)
-
-      - name: Run DataGen
-        run: ./gradlew runData
 
       - name: Run Tests
         run: ./gradlew test
