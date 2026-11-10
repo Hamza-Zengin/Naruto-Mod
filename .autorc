@@ -8,30 +8,21 @@
         "gradleOptions": [""]
       }
     ],
-    [
-      "exec",
-      {
-        "canary": "./gradlew build discord"
-      }
-    ],
     ["conventional-commits"],
-    ["omit-commits",
+    [
+      "omit-commits",
       {
-        "subject": ["chore(", "docs:", "ci("],
+        "subject": ["chore(", "docs:", "ci("]
       }
     ],
     "released",
     ["upload-assets", ["./build/libs/*.jar"]]
   ],
-  "owner": "sekwah41",
+  "owner": "Hamza-Zengin",
   "repo": "Naruto-Mod",
-  "name": "Sekwah",
-  "email": "contact@sekwah.com",
+  "name": "Hamza Zengin",
   "onlyPublishWithReleaseLabel": true,
   "shipit": {
-      "onlyGraduateWithReleaseLabel": true
-  },
-  "canary": {
-    "message": "📦 Published PR to [discord](https://discord.sekwah.com/) as canary version: %v"
+    "onlyGraduateWithReleaseLabel": true
   }
 }
