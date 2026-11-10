@@ -3,6 +3,7 @@ package com.sekwah.narutomod.abilities.jutsus;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
+import com.sekwah.narutomod.damagesource.NarutoDamageSource;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -46,8 +47,23 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public int getCooldown() {
-        return 180; // 9 seconds cooldown
+    public float getDefaultChakraCost() {
+        return 110.0f;
+    }
+
+    @Override
+    public float getDefaultStaminaCost() {
+        return 50.0f;
+    }
+
+    @Override
+    public int getDefaultCooldown() {
+        return 180;
+    }
+
+    @Override
+    public float getDefaultDamage() {
+        return 38.0f;
     }
 
     @Override
@@ -58,7 +74,7 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
             return false;
         }
 
-        return tryConsume(player, ninjaData, 110.0f, 50.0f, 45);
+        return tryConsume(player, ninjaData, getChakraCost(), getStaminaCost(), 45);
     }
 
     @Override
@@ -128,9 +144,10 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         }
         serverLevel.addFreshEntity(amaterasu3D);
 
+        float directDamage = this.getDamage();
         // Direct Entity Target Impact: 38.0f damage (19 full hearts!)
         if (directEntity != null) {
-            directEntity.hurt(serverLevel.damageSources().playerAttack(player), 38.0f);
+            directEntity.hurt(NarutoDamageSource.amaterasu(serverLevel, player, player), directDamage);
             directEntity.setRemainingFireTicks(300); // 15 seconds fire
             directEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 180, 3)); // Wither IV (inextinguishable black flames)
             directEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 2)); // Slowness III
@@ -144,14 +161,14 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
                     15, 0.3, 0.4, 0.3, 0.02);
         }
 
-        // Area Blast around target point: 18.0f splash damage (9 hearts)
+        // Area Blast around target point: splash damage (approx 47% of direct damage)
         final LivingEntity finalDirectTarget = directEntity;
         AABB hitBox = new AABB(targetPos.x - 4.0, targetPos.y - 2.5, targetPos.z - 4.0,
                 targetPos.x + 4.0, targetPos.y + 3.0, targetPos.z + 4.0);
         List<LivingEntity> splashTargets = serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox, e -> e != player && e != finalDirectTarget && e.isAlive());
 
         for (LivingEntity splash : splashTargets) {
-            splash.hurt(serverLevel.damageSources().playerAttack(player), 18.0f);
+            splash.hurt(NarutoDamageSource.amaterasu(serverLevel, player, player), directDamage * 0.47f);
             splash.setRemainingFireTicks(200);
             splash.addEffect(new MobEffectInstance(MobEffects.WITHER, 140, 1)); // Wither II
             splash.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));

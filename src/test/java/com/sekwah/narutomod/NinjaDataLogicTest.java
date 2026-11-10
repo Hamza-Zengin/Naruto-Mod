@@ -1,7 +1,9 @@
 package com.sekwah.narutomod;
 
+import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -125,5 +127,93 @@ public class NinjaDataLogicTest {
         assertFalse(ninjaData.isClanLocked());
         ninjaData.setClanLocked(true);
         assertTrue(ninjaData.isClanLocked());
+    }
+
+    @Test
+    @DisplayName("Verify active jutsus bitmask initialization")
+    public void testActiveJutsusBitmaskInitialization() {
+        assertEquals(0, ninjaData.getActiveJutsusFlag());
+        assertFalse(ninjaData.isSharinganActive());
+        assertFalse(ninjaData.isByakuganActive());
+        assertFalse(ninjaData.isEightGatesActive());
+        assertFalse(ninjaData.isWaterWalkActive());
+    }
+
+    @Test
+    @DisplayName("Verify active jutsus bitmask manipulation and independence")
+    public void testActiveJutsusBitmaskManipulation() {
+        // Verify bit shift constants
+        assertEquals(1, INinjaData.JUTSU_FLAG_SHARINGAN);
+        assertEquals(2, INinjaData.JUTSU_FLAG_BYAKUGAN);
+        assertEquals(4, INinjaData.JUTSU_FLAG_EIGHT_GATES);
+        assertEquals(8, INinjaData.JUTSU_FLAG_WATER_WALK);
+
+        // Activate Sharingan
+        ninjaData.setSharinganActive(true);
+        assertTrue(ninjaData.isSharinganActive());
+        assertTrue(ninjaData.isJutsuActive(INinjaData.JUTSU_FLAG_SHARINGAN));
+        assertEquals(1, ninjaData.getActiveJutsusFlag());
+
+        // Independent bits: other jutsus must remain inactive
+        assertFalse(ninjaData.isByakuganActive());
+        assertFalse(ninjaData.isEightGatesActive());
+        assertFalse(ninjaData.isWaterWalkActive());
+
+        // Activate Eight Gates concurrently
+        ninjaData.setEightGatesActive(true);
+        assertTrue(ninjaData.isSharinganActive());
+        assertTrue(ninjaData.isEightGatesActive());
+        assertEquals(1 | 4, ninjaData.getActiveJutsusFlag()); // 5
+
+        // Activate Water Walk
+        ninjaData.setWaterWalkActive(true);
+        assertTrue(ninjaData.isWaterWalkActive());
+        assertEquals(1 | 4 | 8, ninjaData.getActiveJutsusFlag()); // 13
+
+        // Deactivate Sharingan
+        ninjaData.setSharinganActive(false);
+        assertFalse(ninjaData.isSharinganActive());
+        assertTrue(ninjaData.isEightGatesActive());
+        assertTrue(ninjaData.isWaterWalkActive());
+        assertEquals(4 | 8, ninjaData.getActiveJutsusFlag()); // 12
+
+        // Activate Byakugan
+        ninjaData.setByakuganActive(true);
+        assertTrue(ninjaData.isByakuganActive());
+        assertEquals(2 | 4 | 8, ninjaData.getActiveJutsusFlag()); // 14
+    }
+
+    @Test
+    @DisplayName("Verify active jutsus bitmask NBT serialization and deserialization")
+    public void testActiveJutsusBitmaskNBT() {
+        ninjaData.setSharinganActive(true);
+        ninjaData.setWaterWalkActive(true);
+        assertEquals(INinjaData.JUTSU_FLAG_SHARINGAN | INinjaData.JUTSU_FLAG_WATER_WALK, ninjaData.getActiveJutsusFlag());
+
+        Tag serialized = ninjaData.serializeNBT();
+        assertNotNull(serialized);
+
+        NinjaData restored = new NinjaData(false);
+        restored.deserializeNBT(serialized);
+
+        assertEquals(ninjaData.getActiveJutsusFlag(), restored.getActiveJutsusFlag());
+        assertTrue(restored.isSharinganActive());
+        assertTrue(restored.isWaterWalkActive());
+        assertFalse(restored.isByakuganActive());
+        assertFalse(restored.isEightGatesActive());
+    }
+
+    @Test
+    @DisplayName("Verify active jutsus bitmask reset on resetData")
+    public void testActiveJutsusBitmaskReset() {
+        ninjaData.setActiveJutsusFlag(0b1111);
+        assertEquals(15, ninjaData.getActiveJutsusFlag());
+
+        ninjaData.resetData();
+        assertEquals(0, ninjaData.getActiveJutsusFlag());
+        assertFalse(ninjaData.isSharinganActive());
+        assertFalse(ninjaData.isByakuganActive());
+        assertFalse(ninjaData.isEightGatesActive());
+        assertFalse(ninjaData.isWaterWalkActive());
     }
 }

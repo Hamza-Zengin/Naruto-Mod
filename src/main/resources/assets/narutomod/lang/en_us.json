@@ -200,5 +200,13 @@
   "naruto.gui.ninja_menu.clan.locked": "Sealed",
   "naruto.gui.ninja_menu.clan.select": "Select Clan",
   "naruto.gui.ninja_menu.clan.unselected": "Clanless [None Selected]",
-  "naruto.gui.ninja_menu.kage_congrats": "Congratulations! You are the revered protector and highest-ranking shinobi of the village!"
+  "naruto.gui.ninja_menu.kage_congrats": "Congratulations! You are the revered protector and highest-ranking shinobi of the village!",
+  "death.attack.narutomod.amaterasu": "%1$s was incinerated by Amaterasu",
+  "death.attack.narutomod.amaterasu.player": "%1$s was incinerated by %2$s's Amaterasu",
+  "death.attack.narutomod.rasenshuriken": "%1$s was shredded by Rasenshuriken",
+  "death.attack.narutomod.rasenshuriken.player": "%1$s was shredded by %2$s's Rasenshuriken",
+  "death.attack.narutomod.fireball": "%1$s was burned by Fireball Jutsu",
+  "death.attack.narutomod.fireball.player": "%1$s was burned by %2$s's Fireball Jutsu",
+  "death.attack.narutomod.jutsu_projectile": "%1$s was struck by a Jutsu",
+  "death.attack.narutomod.jutsu_projectile.player": "%1$s was struck down by %2$s's Jutsu"
 }

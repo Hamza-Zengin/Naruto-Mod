@@ -14,4 +14,9 @@ public class CooldownTickEvent {
     public boolean isComplete() {
         return this.ticks <= 0;
     }
+
+    public boolean tickAndCheckComplete() {
+        this.ticks--;
+        return this.ticks <= 0;
+    }
 }

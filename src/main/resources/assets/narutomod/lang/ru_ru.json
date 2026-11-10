@@ -200,5 +200,13 @@
   "naruto.gui.ninja_menu.clan.locked": "Запечатано",
   "naruto.gui.ninja_menu.clan.select": "Выбрать клан",
   "naruto.gui.ninja_menu.clan.unselected": "Без клана [Не выбран]",
-  "naruto.gui.ninja_menu.kage_congrats": "Поздравляем! Вы легендарный защитник и сильнейший шиноби деревни!"
+  "naruto.gui.ninja_menu.kage_congrats": "Поздравляем! Вы легендарный защитник и сильнейший шиноби деревни!",
+  "death.attack.narutomod.amaterasu": "%1$s был испепелен Аматерасу",
+  "death.attack.narutomod.amaterasu.player": "%1$s был испепелен Аматерасу игрока %2$s",
+  "death.attack.narutomod.rasenshuriken": "%1$s был разорван Расенсюрикеном",
+  "death.attack.narutomod.rasenshuriken.player": "%1$s был разорван Расенсюрикеном игрока %2$s",
+  "death.attack.narutomod.fireball": "%1$s был сожжен Огненным Шаром",
+  "death.attack.narutomod.fireball.player": "%1$s был сожжен Огненным Шаром игрока %2$s",
+  "death.attack.narutomod.jutsu_projectile": "%1$s был поражен дзюцу",
+  "death.attack.narutomod.jutsu_projectile.player": "%1$s был сражен дзюцу игрока %2$s"
 }

@@ -1,0 +1,39 @@
+{
+  "attributes": {
+    "attack_range": 3.5,
+    "pose": "bettercombat:pose_heavy",
+    "category": "claymore",
+    "attacks": [
+      {
+        "hitbox": "HORIZONTAL_PLANE",
+        "damage_multiplier": 1.0,
+        "angle": 140.0,
+        "upswing": 0.55,
+        "animation": "bettercombat:claymore_slash_right",
+        "swing_sound": {
+          "id": "bettercombat:heavy_slash"
+        }
+      },
+      {
+        "hitbox": "HORIZONTAL_PLANE",
+        "damage_multiplier": 1.1,
+        "angle": 140.0,
+        "upswing": 0.55,
+        "animation": "bettercombat:claymore_slash_left",
+        "swing_sound": {
+          "id": "bettercombat:heavy_slash"
+        }
+      },
+      {
+        "hitbox": "FORWARD_BOX",
+        "damage_multiplier": 1.4,
+        "angle": 0.0,
+        "upswing": 0.6,
+        "animation": "bettercombat:claymore_slam",
+        "swing_sound": {
+          "id": "bettercombat:heavy_slam"
+        }
+      }
+    ]
+  }
+}

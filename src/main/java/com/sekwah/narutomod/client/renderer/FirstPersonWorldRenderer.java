@@ -95,31 +95,37 @@ public class FirstPersonWorldRenderer {
             // 1. Susanoo Ribcage surrounding player body in 1st person
             if (hasSusanoo) {
                 poseStack.pushPose();
-                poseStack.translate(px, py, pz);
+                try {
+                    poseStack.translate(px, py, pz);
 
-                float bodyYaw = Mth.rotLerp(partialTicks, player.yBodyRotO, player.yBodyRot);
-                poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
-                poseStack.scale(-1.0F, -1.0F, 1.0F);
-                poseStack.translate(0.0D, -1.501D - 0.06D, 0.0D);
-                poseStack.scale(1.22F, 1.22F, 1.22F);
+                    float bodyYaw = Mth.rotLerp(partialTicks, player.yBodyRotO, player.yBodyRot);
+                    poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
+                    poseStack.scale(-1.0F, -1.0F, 1.0F);
+                    poseStack.translate(0.0D, -1.501D - 0.06D, 0.0D);
+                    poseStack.scale(1.22F, 1.22F, 1.22F);
 
-                VertexConsumer vc = bufferSource.getBuffer(RenderType.entityTranslucent(SUSANOO_TEXTURE));
-                susanooModel.renderToBuffer(poseStack, vc, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 0.55F, 0.25F, 0.50F);
-                bufferSource.endBatch(RenderType.entityTranslucent(SUSANOO_TEXTURE));
-                poseStack.popPose();
+                    VertexConsumer vc = bufferSource.getBuffer(RenderType.entityTranslucent(SUSANOO_TEXTURE));
+                    susanooModel.renderToBuffer(poseStack, vc, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 0.55F, 0.25F, 0.50F);
+                    bufferSource.endBatch(RenderType.entityTranslucent(SUSANOO_TEXTURE));
+                } finally {
+                    poseStack.popPose();
+                }
             }
 
             // 2. Eight Gates (Hachimon Tonkō) Crimson Steam Ring at ground level around feet
             if (hasEightGates) {
                 poseStack.pushPose();
-                poseStack.translate(px, py + 0.05D, pz);
-                poseStack.scale(0.65F, 0.65F, 0.65F);
-                gatesAuraModel.setupAnim(player.tickCount + partialTicks);
+                try {
+                    poseStack.translate(px, py + 0.05D, pz);
+                    poseStack.scale(0.65F, 0.65F, 0.65F);
+                    gatesAuraModel.setupAnim(player.tickCount + partialTicks);
 
-                VertexConsumer vc = bufferSource.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND));
-                gatesAuraModel.renderToBuffer(poseStack, vc, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 0.15F, 0.15F, 0.40F);
-                bufferSource.endBatch(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND));
-                poseStack.popPose();
+                    VertexConsumer vc = bufferSource.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND));
+                    gatesAuraModel.renderToBuffer(poseStack, vc, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 0.15F, 0.15F, 0.40F);
+                    bufferSource.endBatch(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND));
+                } finally {
+                    poseStack.popPose();
+                }
             }
         });
     }

@@ -11,9 +11,13 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class FireballJutsuEntity extends AbstractHurtingProjectile {
 
@@ -92,6 +96,26 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
             return;
         }
 
+        if (!this.level().isClientSide && !this.isImpacted()) {
+            Vec3 start = this.position();
+            Vec3 delta = this.getDeltaMovement();
+            Vec3 end = start.add(delta);
+            HitResult hitResult = this.level().clip(new ClipContext(
+                    start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+            if (hitResult.getType() != HitResult.Type.MISS) {
+                end = hitResult.getLocation();
+            }
+            EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(
+                    this.level(), this, start, end, this.getBoundingBox().expandTowards(delta).inflate(1.0D), this::canHitEntity);
+            if (entityHit != null) {
+                hitResult = entityHit;
+            }
+            if (hitResult.getType() != HitResult.Type.MISS && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, hitResult)) {
+                this.onHit(hitResult);
+                return;
+            }
+        }
+
         super.tick();
         ++this.time;
         this.refreshDimensions();
@@ -122,6 +146,11 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
     }
 
     @Override
+    protected boolean canHitEntity(Entity entity) {
+        return super.canHitEntity(entity) && entity != this.getOwner();
+    }
+
+    @Override
     protected void onHit(HitResult hitResult) {
         if (this.isImpacted()) return;
         super.onHit(hitResult);
@@ -138,9 +167,25 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
         if (!this.level().isClientSide) {
             int flameRadius = 8;
             this.level().getEntities(this, this.getBoundingBox().inflate(flameRadius, flameRadius, flameRadius)).forEach(entity -> {
-                double distance = this.position().distanceToSqr(entity.position());
+                double distance = this.distanceToSqr(entity);
+                if (distance > flameRadius * flameRadius) {
+                    return;
+                }
+
+                // Line of Sight check via ClipContext RayTracing
+                HitResult los = this.level().clip(new ClipContext(
+                        this.position(), entity.getEyePosition(),
+                        ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+                if (los.getType() != HitResult.Type.MISS) {
+                    double blockDist = this.distanceToSqr(los.getLocation().x, los.getLocation().y, los.getLocation().z);
+                    if (blockDist < distance * 0.85D) {
+                        return; // Obstructed by terrain
+                    }
+                }
+
                 float fireSecs = (float) (8f - (distance / 6f)) * 20;
-                float fireDamage = (float) (15f - (distance / 4f));
+                float baseDamage = com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.get().getDamage();
+                float fireDamage = (float) (baseDamage - (distance / 4f));
                 if(fireDamage > 0) {
                     Entity entity1 = this.getOwner();
                     entity.hurt(NarutoDamageSource.fireball(this, entity1), fireDamage);
@@ -157,12 +202,13 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
 
             if(flag) {
                 int fireSpread = 2;
+                BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
                 for (int x = (int) this.getX() - fireSpread; x < (int) this.getX() + fireSpread - 1; x++) {
                     for (int y = (int) this.getY() - fireSpread + 1; y < (int) this.getY() + fireSpread; y++) {
                         for (int z = (int) this.getZ() - fireSpread + 1; z < (int) this.getZ() + fireSpread; z++) {
-                            BlockPos blockPos = new BlockPos(x, y, z);
+                            blockPos.set(x, y, z);
                             if (this.random.nextInt(2) == 0 && this.level().getBlockState(blockPos).isAir()) {
-                                this.level().setBlockAndUpdate(blockPos, BaseFireBlock.getState(this.level(), blockPos));
+                                this.level().setBlockAndUpdate(blockPos.immutable(), BaseFireBlock.getState(this.level(), blockPos));
                             }
                         }
                     }

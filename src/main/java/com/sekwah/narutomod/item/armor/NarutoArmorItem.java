@@ -12,11 +12,12 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-public class NarutoArmorItem extends ArmorItem implements IShouldHideNameplate {
+public class NarutoArmorItem extends ArmorItem implements IShouldHideNameplate, ICurioItem {
 
     private HumanoidModel armorModel = null;
     private String armorTexture = null;

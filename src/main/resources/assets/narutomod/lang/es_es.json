@@ -200,5 +200,13 @@
   "naruto.gui.ninja_menu.clan.locked": "Sellado",
   "naruto.gui.ninja_menu.clan.select": "Elegir Clan",
   "naruto.gui.ninja_menu.clan.unselected": "Sin Clan [No elegido]",
-  "naruto.gui.ninja_menu.kage_congrats": "¡Felicidades! Eres el venerado protector y el shinobi de mayor rango de la aldea."
+  "naruto.gui.ninja_menu.kage_congrats": "¡Felicidades! Eres el venerado protector y el shinobi de mayor rango de la aldea.",
+  "death.attack.narutomod.amaterasu": "%1$s fue incinerado por Amaterasu",
+  "death.attack.narutomod.amaterasu.player": "%1$s fue incinerado por el Amaterasu de %2$s",
+  "death.attack.narutomod.rasenshuriken": "%1$s fue desgarrado por el Rasenshuriken",
+  "death.attack.narutomod.rasenshuriken.player": "%1$s fue desgarrado por el Rasenshuriken de %2$s",
+  "death.attack.narutomod.fireball": "%1$s fue quemado por la Bola de Fuego",
+  "death.attack.narutomod.fireball.player": "%1$s fue quemado por la Bola de Fuego de %2$s",
+  "death.attack.narutomod.jutsu_projectile": "%1$s fue impactado por un jutsu",
+  "death.attack.narutomod.jutsu_projectile.player": "%1$s fue abatido por el jutsu de %2$s"
 }

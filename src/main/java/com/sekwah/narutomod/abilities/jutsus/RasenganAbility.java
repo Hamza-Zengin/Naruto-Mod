@@ -39,8 +39,18 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        return tryConsume(player, ninjaData, 40.0f, 0, 30);
+    public float getDefaultChakraCost() {
+        return 40.0f;
+    }
+
+    @Override
+    public int getDefaultCooldown() {
+        return 8 * 20;
+    }
+
+    @Override
+    public float getDefaultDamage() {
+        return 22.0f;
     }
 
     @Override
@@ -79,8 +89,9 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
             hitTargets.addAll(serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox, e -> e != player && e.isAlive()));
         }
 
+        float strikeDamage = com.sekwah.narutomod.abilities.NarutoAbilities.RASENGAN.get().getDamage();
         for (LivingEntity hit : hitTargets) {
-            hit.hurt(player.damageSources().playerAttack(player), 22.0f);
+            hit.hurt(player.damageSources().playerAttack(player), strikeDamage);
             Vec3 knockback = look.scale(2.5).add(0, 0.6, 0);
             if (hit instanceof Player targetPlayer) {
                 com.sekwah.sekclib.util.PlayerUtil.setVelocity(targetPlayer, knockback, true);
@@ -96,10 +107,5 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
         serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK, strikePos.x, strikePos.y, strikePos.z, 8, 0.3, 0.3, 0.3, 0.05);
 
         ninjaData.clearActiveHandJutsu();
-    }
-
-    @Override
-    public int getCooldown() {
-        return 8 * 20;
     }
 }

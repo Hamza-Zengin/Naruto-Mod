@@ -1,0 +1,39 @@
+{
+  "attributes": {
+    "attack_range": 3.0,
+    "pose": "bettercombat:pose_two_handed_katana",
+    "category": "katana",
+    "attacks": [
+      {
+        "hitbox": "HORIZONTAL_PLANE",
+        "damage_multiplier": 1.0,
+        "angle": 120.0,
+        "upswing": 0.5,
+        "animation": "bettercombat:katana_slash_right",
+        "swing_sound": {
+          "id": "bettercombat:katana_slash"
+        }
+      },
+      {
+        "hitbox": "HORIZONTAL_PLANE",
+        "damage_multiplier": 1.0,
+        "angle": 120.0,
+        "upswing": 0.5,
+        "animation": "bettercombat:katana_slash_left",
+        "swing_sound": {
+          "id": "bettercombat:katana_slash"
+        }
+      },
+      {
+        "hitbox": "FORWARD_BOX",
+        "damage_multiplier": 1.25,
+        "angle": 0.0,
+        "upswing": 0.5,
+        "animation": "bettercombat:katana_thrust",
+        "swing_sound": {
+          "id": "bettercombat:katana_slash"
+        }
+      }
+    ]
+  }
+}

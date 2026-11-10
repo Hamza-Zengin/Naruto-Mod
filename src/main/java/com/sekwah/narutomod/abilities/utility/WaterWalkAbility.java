@@ -2,6 +2,7 @@ package com.sekwah.narutomod.abilities.utility;
 
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
+import com.sekwah.narutomod.config.NarutoConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -60,14 +61,16 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
     public WaterChecks checkSteadyNormalFastPush(Player player) {
         int blockX = (int)Math.floor(player.getX());
         int blockZ = (int)Math.floor(player.getZ());
+        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+
         final int block1 = (int) Math.round(player.getY() - 0.56f);
-        boolean steadyCheck = triggerWaterWalk(player.level(), new BlockPos(blockX, block1, blockZ));
+        boolean steadyCheck = triggerWaterWalk(player.level(), mutablePos.set(blockX, block1, blockZ));
 
         int block2 = (int) Math.round(player.getY());
-        boolean pushUpFast = triggerWaterWalk(player.level(), new BlockPos(blockX, block2, blockZ));
+        boolean pushUpFast = triggerWaterWalk(player.level(), mutablePos.set(blockX, block2, blockZ));
 
         int block3 = (int) Math.round(player.getY() - 0.47f);
-        boolean pushUpNormal = triggerWaterWalk(player.level(), new BlockPos(blockX, block3, blockZ));
+        boolean pushUpNormal = triggerWaterWalk(player.level(), mutablePos.set(blockX, block3, blockZ));
 
         return new WaterChecks(steadyCheck, pushUpFast, pushUpNormal);
     }
@@ -98,7 +101,8 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
             float f = (float)Math.min(0.1D, player.getDeltaMovement().horizontalDistance());
             player.bob += (f - player.bob) * 0.4F;
         }
-        player.setDeltaMovement(vec.x(), resultingYSpeed, vec.z());
+        double speedMult = (checks.steadyCheck && NarutoConfig.waterWalkSpeed > 0) ? NarutoConfig.waterWalkSpeed : 1.0D;
+        player.setDeltaMovement(vec.x() * speedMult, resultingYSpeed, vec.z() * speedMult);
     }
 
     public boolean triggerWaterWalk(Level level, BlockPos blockPos) {

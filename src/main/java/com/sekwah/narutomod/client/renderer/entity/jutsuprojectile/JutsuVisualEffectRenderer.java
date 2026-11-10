@@ -69,84 +69,86 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
         ResourceLocation tex = getTextureLocation(entity);
         RenderType renderType = (type == JutsuVisualEffectEntity.TYPE_EARTH_WALL || type == JutsuVisualEffectEntity.TYPE_BONE_FOREST || type == JutsuVisualEffectEntity.TYPE_WOOD_PRISON)
                 ? RenderType.entityCutoutNoCull(tex)
-                : RenderType.entityTranslucent(tex);
+                : RenderType.entityTranslucentCull(tex);
         VertexConsumer consumer = buffer.getBuffer(renderType);
 
         poseStack.pushPose();
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - entity.getEffectYaw()));
+        try {
+            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - entity.getEffectYaw()));
 
-        float fadeOut = progress > 0.82F ? (1.0F - ((progress - 0.82F) / 0.18F)) : 1.0F;
-        int fullBright = 15728880; // 0x00F000F0 (Block 15, Sky 15)
-        int solidLight = Math.max(packedLight, 12583104); // Block 12, Sky 12 minimum ambient baseline
+            float fadeOut = progress > 0.82F ? (1.0F - ((progress - 0.82F) / 0.18F)) : 1.0F;
+            int fullBright = 15728880; // 0x00F000F0 (Block 15, Sky 15)
+            int solidLight = Math.max(packedLight, 12583104); // Block 12, Sky 12 minimum ambient baseline
 
-        switch (type) {
-            case JutsuVisualEffectEntity.TYPE_KIRIN_DRAGON -> {
-                float scale = 1.65F;
-                poseStack.scale(-scale, -scale, scale);
-                this.kirinModel.setupAnim(age, progress);
-                this.kirinModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.92F * fadeOut);
+            switch (type) {
+                case JutsuVisualEffectEntity.TYPE_KIRIN_DRAGON -> {
+                    float scale = 1.65F;
+                    poseStack.scale(-scale, -scale, scale);
+                    this.kirinModel.setupAnim(age, progress);
+                    this.kirinModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.92F * fadeOut);
+                }
+                case JutsuVisualEffectEntity.TYPE_WOOD_PRISON -> {
+                    float scale = 1.25F;
+                    poseStack.scale(-scale, -scale, scale);
+                    this.woodModel.setupAnim(age, progress);
+                    this.woodModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                }
+                case JutsuVisualEffectEntity.TYPE_BONE_FOREST -> {
+                    float scale = 1.2F;
+                    poseStack.scale(-scale, -scale, scale);
+                    this.boneModel.setupAnim(age);
+                    this.boneModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                }
+                case JutsuVisualEffectEntity.TYPE_RASENGAN_SPHERE -> {
+                    poseStack.translate(0.0D, 1.0D, 0.0D);
+                    float scale = 0.85F + progress * 1.35F;
+                    poseStack.scale(-scale, -scale, scale);
+                    this.rasenganModel.setupAnim(age);
+                    this.rasenganModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.88F * fadeOut);
+                }
+                case JutsuVisualEffectEntity.TYPE_CHIDORI_BURST -> {
+                    poseStack.translate(0.0D, 1.0D, 0.0D);
+                    float scale = 1.05F + Mth.sin(age * 0.8F) * 0.18F;
+                    poseStack.scale(-scale, -scale, scale);
+                    this.chidoriModel.setupAnim(age);
+                    this.chidoriModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.90F * fadeOut);
+                }
+                case JutsuVisualEffectEntity.TYPE_WATER_VORTEX -> {
+                    poseStack.translate(0.0D, 0.9D, 0.0D);
+                    float scale = 1.15F + (progress > 0.7F ? (progress - 0.7F) * 2.2F : 0.0F);
+                    poseStack.scale(-scale, -scale, scale);
+                    this.waterModel.setupAnim(age);
+                    this.waterModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.86F * fadeOut);
+                }
+                case JutsuVisualEffectEntity.TYPE_WIND_SHOCKWAVE -> {
+                    poseStack.translate(0.0D, 1.0D, 0.0D);
+                    float scale = 0.85F + progress * 1.65F;
+                    poseStack.scale(-scale, -scale, scale);
+                    this.windModel.setupAnim(age);
+                    this.windModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.82F * fadeOut);
+                }
+                case JutsuVisualEffectEntity.TYPE_AMATERASU_PILLAR -> {
+                    float scale = 1.15F;
+                    poseStack.scale(-scale, -scale, scale);
+                    this.amaterasuModel.setupAnim(age);
+                    this.amaterasuModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.94F * fadeOut);
+                }
+                case JutsuVisualEffectEntity.TYPE_SHADOW_BIND -> {
+                    float scale = 1.1F;
+                    poseStack.scale(-scale, -scale, scale);
+                    this.shadowModel.setupAnim(age, progress);
+                    this.shadowModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.92F * fadeOut);
+                }
+                case JutsuVisualEffectEntity.TYPE_EARTH_WALL -> {
+                    float scale = 1.0F;
+                    poseStack.scale(-scale, -scale, scale);
+                    this.earthModel.setupAnim(progress);
+                    this.earthModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                }
             }
-            case JutsuVisualEffectEntity.TYPE_WOOD_PRISON -> {
-                float scale = 1.25F;
-                poseStack.scale(-scale, -scale, scale);
-                this.woodModel.setupAnim(age, progress);
-                this.woodModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
-            }
-            case JutsuVisualEffectEntity.TYPE_BONE_FOREST -> {
-                float scale = 1.2F;
-                poseStack.scale(-scale, -scale, scale);
-                this.boneModel.setupAnim(age);
-                this.boneModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
-            }
-            case JutsuVisualEffectEntity.TYPE_RASENGAN_SPHERE -> {
-                poseStack.translate(0.0D, 1.0D, 0.0D);
-                float scale = 0.85F + progress * 1.35F;
-                poseStack.scale(-scale, -scale, scale);
-                this.rasenganModel.setupAnim(age);
-                this.rasenganModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.88F * fadeOut);
-            }
-            case JutsuVisualEffectEntity.TYPE_CHIDORI_BURST -> {
-                poseStack.translate(0.0D, 1.0D, 0.0D);
-                float scale = 1.05F + Mth.sin(age * 0.8F) * 0.18F;
-                poseStack.scale(-scale, -scale, scale);
-                this.chidoriModel.setupAnim(age);
-                this.chidoriModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.90F * fadeOut);
-            }
-            case JutsuVisualEffectEntity.TYPE_WATER_VORTEX -> {
-                poseStack.translate(0.0D, 0.9D, 0.0D);
-                float scale = 1.15F + (progress > 0.7F ? (progress - 0.7F) * 2.2F : 0.0F);
-                poseStack.scale(-scale, -scale, scale);
-                this.waterModel.setupAnim(age);
-                this.waterModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.86F * fadeOut);
-            }
-            case JutsuVisualEffectEntity.TYPE_WIND_SHOCKWAVE -> {
-                poseStack.translate(0.0D, 1.0D, 0.0D);
-                float scale = 0.85F + progress * 1.65F;
-                poseStack.scale(-scale, -scale, scale);
-                this.windModel.setupAnim(age);
-                this.windModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.82F * fadeOut);
-            }
-            case JutsuVisualEffectEntity.TYPE_AMATERASU_PILLAR -> {
-                float scale = 1.15F;
-                poseStack.scale(-scale, -scale, scale);
-                this.amaterasuModel.setupAnim(age);
-                this.amaterasuModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.94F * fadeOut);
-            }
-            case JutsuVisualEffectEntity.TYPE_SHADOW_BIND -> {
-                float scale = 1.1F;
-                poseStack.scale(-scale, -scale, scale);
-                this.shadowModel.setupAnim(age, progress);
-                this.shadowModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.92F * fadeOut);
-            }
-            case JutsuVisualEffectEntity.TYPE_EARTH_WALL -> {
-                float scale = 1.0F;
-                poseStack.scale(-scale, -scale, scale);
-                this.earthModel.setupAnim(progress);
-                this.earthModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
-            }
+        } finally {
+            poseStack.popPose();
         }
-
-        poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 

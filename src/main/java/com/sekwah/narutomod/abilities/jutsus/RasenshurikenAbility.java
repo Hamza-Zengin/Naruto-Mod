@@ -36,8 +36,18 @@ public class RasenshurikenAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public int getCooldown() {
+    public float getDefaultChakraCost() {
+        return 55.0f;
+    }
+
+    @Override
+    public int getDefaultCooldown() {
         return 20 * 20;
+    }
+
+    @Override
+    public float getDefaultDamage() {
+        return 5.5f;
     }
 
     @Override
@@ -45,7 +55,7 @@ public class RasenshurikenAbility extends Ability implements Ability.Cooldown {
         if (checkCooldown(player, ninjaData, this.getTranslationKey())) {
             return false;
         }
-        if (!tryConsume(player, ninjaData, 55.0f, 0, 60)) {
+        if (!tryConsume(player, ninjaData, getChakraCost(), getStaminaCost(), 60)) {
             return false;
         }
         registerCooldown(ninjaData, this.getTranslationKey());

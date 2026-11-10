@@ -200,5 +200,13 @@
   "naruto.gui.ninja_menu.clan.locked": "封印済",
   "naruto.gui.ninja_menu.clan.select": "一族を選択",
   "naruto.gui.ninja_menu.clan.unselected": "浪人 [未選択]",
-  "naruto.gui.ninja_menu.kage_congrats": "見事！そなたは里を護る頂点、伝説の忍『影』である！"
+  "naruto.gui.ninja_menu.kage_congrats": "見事！そなたは里を護る頂点、伝説の忍『影』である！",
+  "death.attack.narutomod.amaterasu": "%1$s は天照の黒炎によって焼き尽くされた",
+  "death.attack.narutomod.amaterasu.player": "%1$s は %2$s の天照によって焼き尽くされた",
+  "death.attack.narutomod.rasenshuriken": "%1$s は螺旋手裏剣によって粉砕された",
+  "death.attack.narutomod.rasenshuriken.player": "%1$s は %2$s の螺旋手裏剣によって粉砕された",
+  "death.attack.narutomod.fireball": "%1$s は豪火球の術で焼き払われた",
+  "death.attack.narutomod.fireball.player": "%1$s は %2$s の豪火球の術で焼き払われた",
+  "death.attack.narutomod.jutsu_projectile": "%1$s は忍術の直撃を受けた",
+  "death.attack.narutomod.jutsu_projectile.player": "%1$s は %2$s の忍術によって倒された"
 }

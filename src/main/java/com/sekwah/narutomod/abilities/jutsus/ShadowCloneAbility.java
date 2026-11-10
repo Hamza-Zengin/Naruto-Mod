@@ -35,8 +35,13 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        return tryConsume(player, ninjaData, 30.0f, 0, 30);
+    public float getDefaultChakraCost() {
+        return 30.0f;
+    }
+
+    @Override
+    public int getDefaultCooldown() {
+        return 12 * 20;
     }
 
     @Override
@@ -57,10 +62,5 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
         serverLevel.sendParticles(ParticleTypes.POOF, spawnX, spawnY + 0.8, spawnZ,
                 30, 0.5, 0.8, 0.5, 0.05);
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CLONE_POOF.get(), SoundSource.PLAYERS, 1.0f, 1.0f);
-    }
-
-    @Override
-    public int getCooldown() {
-        return 12 * 20;
     }
 }

@@ -15,8 +15,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -95,11 +98,29 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile {
                     List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, box,
                             e -> e.isAlive() && e != owner);
                     for (LivingEntity target : targets) {
-                        Vec3 pull = this.position().subtract(target.position()).normalize().scale(0.35);
-                        target.setDeltaMovement(pull.x, 0.12, pull.z);
+                        double dx = this.getX() - target.getX();
+                        double dz = this.getZ() - target.getZ();
+                        double distSq = dx * dx + dz * dz;
+
+                        // Line of Sight check via ClipContext
+                        HitResult los = serverLevel.clip(new ClipContext(
+                                this.position(), target.getEyePosition(),
+                                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+                        if (los.getType() != HitResult.Type.MISS) {
+                            double blockDist = this.distanceToSqr(los.getLocation().x, los.getLocation().y, los.getLocation().z);
+                            if (blockDist < distSq * 0.85D) {
+                                continue; // Obstructed by terrain
+                            }
+                        }
+
+                        if (distSq > 1.0E-4D) {
+                            double dist = Math.sqrt(distSq);
+                            double factor = 0.35D / dist;
+                            target.setDeltaMovement(dx * factor, 0.12, dz * factor);
+                        }
                         target.hurtMarked = true;
                         target.invulnerableTime = 0;
-                        target.hurt(NarutoDamageSource.jutsuProjectile(this, owner), 5.5f);
+                        target.hurt(NarutoDamageSource.rasenshuriken(this, owner), com.sekwah.narutomod.abilities.NarutoAbilities.RASENSHURIKEN.get().getDamage());
                         target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2));
                     }
                     serverLevel.playSound(null, this.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.4f, 1.6f);
@@ -112,6 +133,26 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile {
                 }
             }
             return;
+        }
+
+        if (!this.level().isClientSide && !this.isImpacted()) {
+            Vec3 start = this.position();
+            Vec3 delta = this.getDeltaMovement();
+            Vec3 end = start.add(delta);
+            HitResult hitResult = this.level().clip(new ClipContext(
+                    start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+            if (hitResult.getType() != HitResult.Type.MISS) {
+                end = hitResult.getLocation();
+            }
+            EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(
+                    this.level(), this, start, end, this.getBoundingBox().expandTowards(delta).inflate(1.0D), this::canHitEntity);
+            if (entityHit != null) {
+                hitResult = entityHit;
+            }
+            if (hitResult.getType() != HitResult.Type.MISS && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, hitResult)) {
+                this.onHit(hitResult);
+                return;
+            }
         }
 
         super.tick();
@@ -130,6 +171,11 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile {
         if (this.lifeSpan-- <= 0) {
             this.discard();
         }
+    }
+
+    @Override
+    protected boolean canHitEntity(Entity entity) {
+        return super.canHitEntity(entity) && entity != this.getOwner();
     }
 
     @Override

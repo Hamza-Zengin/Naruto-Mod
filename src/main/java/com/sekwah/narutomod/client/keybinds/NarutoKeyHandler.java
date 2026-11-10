@@ -153,12 +153,16 @@ public class NarutoKeyHandler {
             if(isCurrentlyChargingAbility) {
                 NarutoAbilities.handleCharging(currentJutsuCombo, ServerAbilityChannelPacket.ChannelStatus.STOP);
                 resetJutsuCasting();
-            } else if(ticksSinceLastKey > NarutoConfig.jutsuCastDelay){
+            } else if(ticksSinceLastKey > getSealTimeoutTicks()){
                 NarutoAbilities.handleCharging(currentJutsuCombo, ServerAbilityChannelPacket.ChannelStatus.MIN_ACTIVATE);
                 resetJutsuCasting();
             }
             isCurrentlyChargingAbility = false;
         }
+    }
+
+    private static int getSealTimeoutTicks() {
+        return Math.max(1, NarutoConfig.sealTimeoutMs / 50);
     }
 
     private static void resetJutsuCasting() {
@@ -169,7 +173,7 @@ public class NarutoKeyHandler {
     }
 
     private static void checkNonCharging() {
-        if(ticksSinceLastKey > NarutoConfig.jutsuCastDelay) {
+        if(ticksSinceLastKey > getSealTimeoutTicks()) {
             Minecraft mc = Minecraft.getInstance();
             if(mc.player != null) {
                 NarutoMod.LOGGER.debug("Casting jutsu {}", currentJutsuCombo);

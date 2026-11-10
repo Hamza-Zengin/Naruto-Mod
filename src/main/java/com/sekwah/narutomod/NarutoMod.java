@@ -33,6 +33,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.ModList;
+import com.sekwah.narutomod.compat.CuriosCompat;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,6 +58,7 @@ public class NarutoMod {
         eventBus.addListener(this::clientSetup);
         eventBus.addListener(NarutoKeyHandler::onRegisterKeyMappings);
         eventBus.addListener(this::setup);
+        eventBus.addListener(this::enqueueIMC);
         eventBus.addListener(this::registerCapabilities);
         eventBus.addListener(this::registerSyncTrackers);
         eventBus.addListener(this::registerCapabilitySync);
@@ -78,6 +82,12 @@ public class NarutoMod {
 
     private void setup(FMLCommonSetupEvent event) {
         PacketHandler.init();
+    }
+
+    private void enqueueIMC(InterModEnqueueEvent event) {
+        if (ModList.get().isLoaded("curios")) {
+            CuriosCompat.sendIMC();
+        }
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {

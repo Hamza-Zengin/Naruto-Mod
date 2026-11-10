@@ -39,8 +39,18 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        return tryConsume(player, ninjaData, 45.0f, 0, 40);
+    public float getDefaultChakraCost() {
+        return 35.0f;
+    }
+
+    @Override
+    public int getDefaultCooldown() {
+        return 6 * 20;
+    }
+
+    @Override
+    public float getDefaultDamage() {
+        return 26.0f;
     }
 
     @Override
@@ -87,8 +97,9 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
         }
         serverLevel.addFreshEntity(chidori3D);
 
+        float strikeDamage = com.sekwah.narutomod.abilities.NarutoAbilities.CHIDORI.get().getDamage();
         for (LivingEntity enemy : hitEnemies) {
-            enemy.hurt(player.damageSources().lightningBolt(), 26.0f);
+            enemy.hurt(player.damageSources().lightningBolt(), strikeDamage);
             serverLevel.sendParticles(ParticleTypes.FLASH, enemy.getX(), enemy.getY() + 1.0, enemy.getZ(), 1, 0, 0, 0, 0);
         }
 
@@ -105,10 +116,5 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
 
         player.removeEffect(MobEffects.MOVEMENT_SPEED);
         ninjaData.clearActiveHandJutsu();
-    }
-
-    @Override
-    public int getCooldown() {
-        return 10 * 20;
     }
 }

@@ -53,7 +53,69 @@ public abstract class Ability {
 
     public abstract ActivationType activationType();
 
-    public abstract boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount);
+    public float getChakraCost() {
+        ResourceLocation reg = getRegistryName();
+        if (reg != null) {
+            JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
+            if (data != null && data.chakraCost() >= 0) {
+                return data.chakraCost();
+            }
+        }
+        return getDefaultChakraCost();
+    }
+
+    public float getStaminaCost() {
+        ResourceLocation reg = getRegistryName();
+        if (reg != null) {
+            JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
+            if (data != null && data.staminaCost() >= 0) {
+                return data.staminaCost();
+            }
+        }
+        return getDefaultStaminaCost();
+    }
+
+    public float getDamage() {
+        ResourceLocation reg = getRegistryName();
+        if (reg != null) {
+            JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
+            if (data != null && data.damage() >= 0) {
+                return data.damage();
+            }
+        }
+        return getDefaultDamage();
+    }
+
+    public int getCooldown() {
+        ResourceLocation reg = getRegistryName();
+        if (reg != null) {
+            JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
+            if (data != null && data.cooldown() >= 0) {
+                return data.cooldown();
+            }
+        }
+        return getDefaultCooldown();
+    }
+
+    public float getDefaultChakraCost() {
+        return 0f;
+    }
+
+    public float getDefaultStaminaCost() {
+        return 0f;
+    }
+
+    public float getDefaultDamage() {
+        return 0f;
+    }
+
+    public int getDefaultCooldown() {
+        return 0;
+    }
+
+    public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
+        return tryConsume(player, ninjaData, getChakraCost(), getStaminaCost(), 30);
+    }
 
     public boolean handleCost(Player player, INinjaData ninjaData) {
         return handleCost(player, ninjaData, 0);
@@ -119,7 +181,12 @@ public abstract class Ability {
     }
 
     public interface Cooldown {
-        int getCooldown();
+        default int getCooldown() {
+            if (this instanceof Ability ability) {
+                return ability.getCooldown();
+            }
+            return 0;
+        }
 
         default boolean checkCooldown(Player player, INinjaData ninjaData, String translationKey) {
             if (getCooldown() > 0 && ninjaData.getCooldownEvents().containsKey(translationKey)) {

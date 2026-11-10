@@ -56,6 +56,12 @@ public class NarutoConfig {
     private static final ForgeConfigSpec.IntValue CONFIG_CHAKRA_BAR_DESIGN;
     public static int chakraBarDesign = 0;
 
+    private static final ForgeConfigSpec.DoubleValue CONFIG_WATER_WALK_SPEED;
+    public static float waterWalkSpeed = 1.0f;
+
+    private static final ForgeConfigSpec.IntValue CONFIG_SEAL_TIMEOUT_MS;
+    public static int sealTimeoutMs = 1500;
+
     static {
         ForgeConfigSpec.Builder configBuilder = new ForgeConfigSpec.Builder();
 
@@ -81,6 +87,12 @@ public class NarutoConfig {
                 .defineInRange("staminaRegenRate", 0.4d, 0.001d, 100d);
 
         configBuilder.pop();
+
+        CONFIG_WATER_WALK_SPEED = configBuilder.comment("Water walking horizontal speed multiplier")
+                .defineInRange("waterWalkSpeed", 1.0d, 0.1d, 10.0d);
+
+        CONFIG_SEAL_TIMEOUT_MS = configBuilder.comment("Seal typing timeout in milliseconds (1000ms = 1s = 20 ticks)")
+                .defineInRange("sealTimeoutMs", 1500, 100, 10000);
 
         configBuilder.pop();
 
@@ -137,6 +149,8 @@ public class NarutoConfig {
         chakraBarDesign = CONFIG_CHAKRA_BAR_DESIGN.get();
         jutsuCastDelay = CONFIG_JUTSU_CAST_DELAY
                 .get();
+        waterWalkSpeed = CONFIG_WATER_WALK_SPEED.get().floatValue();
+        sealTimeoutMs = CONFIG_SEAL_TIMEOUT_MS.get();
     }
 
     @SubscribeEvent

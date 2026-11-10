@@ -43,10 +43,23 @@ public class JutsuHandAuraLayer extends RenderLayer<AbstractClientPlayer, Player
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player,
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+            String activeHand = ninjaData.getActiveHandJutsu();
+            boolean hasChidori = "chidori".equalsIgnoreCase(activeHand);
+            boolean hasRasengan = "rasengan".equalsIgnoreCase(activeHand)
+                    || (ninjaData.getCurrentlyChanneledAbility() != null
+                    && ninjaData.getCurrentlyChanneledAbility().equals(NarutoAbilities.CHAKRA_CHARGE.getId()));
+            boolean hasEightGates = ninjaData.isEightGatesActive();
+            boolean hasByakugan = ninjaData.isByakuganActive();
+
+            // Early Exit: skip all matrix transformations and buffer allocations if no aura is active
+            if (!hasChidori && !hasRasengan && !hasEightGates && !hasByakugan) {
+                return;
+            }
+
             int fullBright = 15728880;
 
             // 1. Chidori 3D Hand Lightning Blade (active while holding Chidori)
-            if ("chidori".equalsIgnoreCase(ninjaData.getActiveHandJutsu())) {
+            if (hasChidori) {
                 poseStack.pushPose();
                 this.getParentModel().rightArm.translateAndRotate(poseStack);
                 poseStack.translate(-0.06D, 0.68D, -0.12D);
@@ -58,9 +71,7 @@ public class JutsuHandAuraLayer extends RenderLayer<AbstractClientPlayer, Player
             }
 
             // 2. 3D Swirling Chakra / Rasengan Sphere in hand (active while holding Rasengan or Chakra Charge)
-            if ("rasengan".equalsIgnoreCase(ninjaData.getActiveHandJutsu())
-                    || (ninjaData.getCurrentlyChanneledAbility() != null
-                    && ninjaData.getCurrentlyChanneledAbility().equals(NarutoAbilities.CHAKRA_CHARGE.getId()))) {
+            if (hasRasengan) {
                 poseStack.pushPose();
                 this.getParentModel().rightArm.translateAndRotate(poseStack);
                 poseStack.translate(-0.06D, 0.65D, -0.15D);
@@ -72,7 +83,6 @@ public class JutsuHandAuraLayer extends RenderLayer<AbstractClientPlayer, Player
             }
 
             // 3. Eight Gates (Hachimon Tonkō) Horizontal Crimson Steam Ring at ground level
-            boolean hasEightGates = ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.EIGHT_GATES.getId());
             if (hasEightGates) {
                 poseStack.pushPose();
                 poseStack.translate(0.0D, 1.48D, 0.0D);
@@ -84,7 +94,7 @@ public class JutsuHandAuraLayer extends RenderLayer<AbstractClientPlayer, Player
             }
 
             // 4. Byakugan 3D Gentle Fist (Jūken) Chakra Sphere on both palms
-            if (ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.BYAKUGAN.getId())) {
+            if (hasByakugan) {
                 poseStack.pushPose();
                 this.getParentModel().rightArm.translateAndRotate(poseStack);
                 poseStack.translate(-0.06D, 0.64D, -0.10D);

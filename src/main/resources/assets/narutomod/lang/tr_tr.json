@@ -200,5 +200,13 @@
   "naruto.gui.ninja_menu.clan.locked": "Mühürlü",
   "naruto.gui.ninja_menu.clan.select": "Klanı Seç",
   "naruto.gui.ninja_menu.clan.unselected": "Klansız [Seçilmedi]",
-  "naruto.gui.ninja_menu.kage_congrats": "Tebrikler! Köyün en yüce şinobisi ve efsanevi koruyucususunuz. Tüm sınav şartlarını tamamladınız, kudretiniz tüm dünyaya nam saldı!"
+  "naruto.gui.ninja_menu.kage_congrats": "Tebrikler! Köyün en yüce şinobisi ve efsanevi koruyucususunuz. Tüm sınav şartlarını tamamladınız, kudretiniz tüm dünyaya nam saldı!",
+  "death.attack.narutomod.amaterasu": "%1$s Amaterasu siyah alevleriyle küle dönüştü",
+  "death.attack.narutomod.amaterasu.player": "%1$s, %2$s adlı oyuncunun Amaterasu alevleriyle küle dönüştü",
+  "death.attack.narutomod.rasenshuriken": "%1$s Rasenshuriken ile parçalandı",
+  "death.attack.narutomod.rasenshuriken.player": "%1$s, %2$s adlı oyuncunun Rasenshuriken jutsusuyla parçalandı",
+  "death.attack.narutomod.fireball": "%1$s Ateş Topu Jutsusu ile yandı",
+  "death.attack.narutomod.fireball.player": "%1$s, %2$s adlı oyuncunun Ateş Topu Jutsusu ile yandı",
+  "death.attack.narutomod.jutsu_projectile": "%1$s bir jutsu darbesi aldı",
+  "death.attack.narutomod.jutsu_projectile.player": "%1$s, %2$s tarafından fırlatılan jutsu ile alt edildi"
 }

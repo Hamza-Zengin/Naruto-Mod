@@ -80,12 +80,15 @@ public class FirstPersonJutsuRenderer {
             // 1. Chidori 3D Lightning Blade on main hand
             if (isMainHand && "chidori".equalsIgnoreCase(ninjaData.getActiveHandJutsu())) {
                 poseStack.pushPose();
-                applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
-                poseStack.scale(0.34F, 0.34F, 0.34F);
-                chidoriModel.setupAnim(ageInTicks);
-                VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_CHIDORI));
-                chidoriModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.95F);
-                poseStack.popPose();
+                try {
+                    applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
+                    poseStack.scale(0.34F, 0.34F, 0.34F);
+                    chidoriModel.setupAnim(ageInTicks);
+                    VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_CHIDORI));
+                    chidoriModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.95F);
+                } finally {
+                    poseStack.popPose();
+                }
             }
 
             // 2. Swirling Rasengan / Chakra Charge Sphere on main hand
@@ -94,24 +97,30 @@ public class FirstPersonJutsuRenderer {
                     && ninjaData.getCurrentlyChanneledAbility().equals(NarutoAbilities.CHAKRA_CHARGE.getId()));
             if (isMainHand && hasRasengan) {
                 poseStack.pushPose();
-                applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
-                poseStack.scale(0.30F, 0.30F, 0.30F);
-                rasenganModel.setupAnim(ageInTicks);
-                VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_RASENGAN));
-                rasenganModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.90F);
-                poseStack.popPose();
+                try {
+                    applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
+                    poseStack.scale(0.30F, 0.30F, 0.30F);
+                    rasenganModel.setupAnim(ageInTicks);
+                    VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_RASENGAN));
+                    rasenganModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.90F);
+                } finally {
+                    poseStack.popPose();
+                }
             }
 
             // 3. Byakugan Gentle Fist (Jūken) Chakra Spheres on palms
-            if (ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.BYAKUGAN.getId())) {
+            if (ninjaData.isByakuganActive()) {
                 poseStack.pushPose();
-                applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
-                poseStack.scale(0.24F, 0.24F, 0.24F);
-                float spinSpeed = isMainHand ? (ageInTicks * 0.8F) : (-ageInTicks * 0.8F);
-                rasenganModel.setupAnim(spinSpeed);
-                VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_RASENGAN));
-                rasenganModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 0.85F, 0.95F, 1.0F, 0.70F);
-                poseStack.popPose();
+                try {
+                    applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
+                    poseStack.scale(0.24F, 0.24F, 0.24F);
+                    float spinSpeed = isMainHand ? (ageInTicks * 0.8F) : (-ageInTicks * 0.8F);
+                    rasenganModel.setupAnim(spinSpeed);
+                    VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_RASENGAN));
+                    rasenganModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 0.85F, 0.95F, 1.0F, 0.70F);
+                } finally {
+                    poseStack.popPose();
+                }
             }
         });
     }

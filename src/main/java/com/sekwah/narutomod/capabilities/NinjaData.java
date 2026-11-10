@@ -80,6 +80,9 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Sync(minTicks = 1, syncGlobally = true)
     private int activeHandJutsuTicks = 0;
 
+    @Sync(minTicks = 1, syncGlobally = true)
+    private int activeJutsusFlag = 0;
+
     private ArrayList<DelayedPlayerTickEvent> delayedTickEvents = new ArrayList<>();
     private HashMap<String, CooldownTickEvent> cooldownTickEvents = new HashMap<>();
 
@@ -95,6 +98,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             this.rank = "ACADEMY_STUDENT";
             this.chakraExp = 0;
             this.staminaExp = 0;
+            this.activeJutsusFlag = 0;
         }
         this.toggleAbilityData = new ToggleAbilityData();
     }
@@ -133,6 +137,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private static final String UNLOCKED_JUTSUS_TAG = "unlockedJutsus";
     private static final String ACTIVE_HAND_JUTSU_TAG = "activeHandJutsu";
     private static final String ACTIVE_HAND_JUTSU_TICKS_TAG = "activeHandJutsuTicks";
+    private static final String ACTIVE_JUTSUS_FLAG_TAG = "activeJutsusFlag";
 
     private final LazyOptional<INinjaData> holder = LazyOptional.of(() -> this);
 
@@ -540,6 +545,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         this.enemiesDefeated = 0;
         this.jutsusCastCount = 0;
         this.unlockedJutsus = "";
+        this.activeJutsusFlag = 0;
         this.chakra = this.getMaxChakra();
         this.stamina = this.getMaxStamina();
     }
@@ -625,6 +631,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             if (this.activeHandJutsuTicks > 0) {
                 this.clearActiveHandJutsu();
             }
+            this.activeJutsusFlag = 0;
             return;
         }
 
@@ -639,36 +646,27 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             }
         }
 
-        // Safe delayed tick execution: collect events to run, then execute outside iterator
-        ArrayList<DelayedPlayerTickEvent> toRun = new ArrayList<>();
-        Iterator<DelayedPlayerTickEvent> iterator = this.delayedTickEvents.iterator();
-        while (iterator.hasNext()) {
-            DelayedPlayerTickEvent event = iterator.next();
-            event.tick();
-            if (event.shouldRun()) {
-                toRun.add(event);
-                iterator.remove();
-            }
-        }
-        for (DelayedPlayerTickEvent event : toRun) {
-            event.run(player);
-        }
-
-        ArrayList<String> completeList = new ArrayList<>(cooldownTickEvents.keySet());
-        for (String name : completeList) {
-            CooldownTickEvent event = cooldownTickEvents.get(name);
-            if (event != null) {
+        // Zero-allocation delayed tick execution: iterate backwards to safely remove and run
+        if (!this.delayedTickEvents.isEmpty()) {
+            for (int i = this.delayedTickEvents.size() - 1; i >= 0; i--) {
+                DelayedPlayerTickEvent event = this.delayedTickEvents.get(i);
                 event.tick();
-                if (event.isComplete()) {
-                    cooldownTickEvents.remove(name);
+                if (event.shouldRun()) {
+                    this.delayedTickEvents.remove(i);
+                    event.run(player);
                 }
             }
+        }
+
+        // Zero-allocation cooldown tick execution: remove directly without allocating keySet copy
+        if (!this.cooldownTickEvents.isEmpty()) {
+            this.cooldownTickEvents.values().removeIf(CooldownTickEvent::tickAndCheckComplete);
         }
 
         net.minecraft.world.item.Item chestItem = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).getItem();
 
         if (this.staminaRegenInfo.canRegen()) {
-            float staminaRegen = staminaRegenInfo.regenRate;
+            float staminaRegen = NarutoConfig.staminaRegenRate > 0 ? NarutoConfig.staminaRegenRate : staminaRegenInfo.regenRate;
             if (this.clan != null && this.clan.getPath().equals("nara")) {
                 staminaRegen *= 1.3f;
             }
@@ -681,7 +679,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         }
 
         if (this.chakraRegenInfo.canRegen()) {
-            float chakraRegen = chakraRegenInfo.regenRate;
+            float chakraRegen = NarutoConfig.chakraRegenRate > 0 ? NarutoConfig.chakraRegenRate : chakraRegenInfo.regenRate;
             if (this.clan != null && this.clan.getPath().equals("uzumaki")) {
                 chakraRegen *= 2.0f;
             } else if (this.clan != null && this.clan.getPath().equals("senju")) {
@@ -723,6 +721,25 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             }
             this.ticksChanneled++;
         }
+
+        // Sync active abilities bitmask with ToggleAbilityData
+        if (this.toggleAbilityData != null) {
+            boolean hasSharingan = false;
+            boolean hasByakugan = false;
+            boolean hasEightGates = false;
+            boolean hasWaterWalk = false;
+            for (ResourceLocation id : this.toggleAbilityData.getAbilitiesHashSet()) {
+                String path = id.getPath();
+                if ("sharingan".equals(path)) hasSharingan = true;
+                else if ("byakugan".equals(path)) hasByakugan = true;
+                else if ("eight_gates".equals(path)) hasEightGates = true;
+                else if ("water_walk".equals(path)) hasWaterWalk = true;
+            }
+            setJutsuActive(JUTSU_FLAG_SHARINGAN, hasSharingan);
+            setJutsuActive(JUTSU_FLAG_BYAKUGAN, hasByakugan);
+            setJutsuActive(JUTSU_FLAG_EIGHT_GATES, hasEightGates);
+            setJutsuActive(JUTSU_FLAG_WATER_WALK, hasWaterWalk);
+        }
     }
 
     @Override
@@ -751,6 +768,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         }
         nbt.putString(ACTIVE_HAND_JUTSU_TAG, this.activeHandJutsu != null ? this.activeHandJutsu : "");
         nbt.putInt(ACTIVE_HAND_JUTSU_TICKS_TAG, this.activeHandJutsuTicks);
+        nbt.putInt(ACTIVE_JUTSUS_FLAG_TAG, this.activeJutsusFlag);
         return nbt;
     }
 
@@ -809,6 +827,9 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             if (compoundTag.contains(ACTIVE_HAND_JUTSU_TICKS_TAG)) {
                 this.activeHandJutsuTicks = compoundTag.getInt(ACTIVE_HAND_JUTSU_TICKS_TAG);
             }
+            if (compoundTag.contains(ACTIVE_JUTSUS_FLAG_TAG)) {
+                this.activeJutsusFlag = compoundTag.getInt(ACTIVE_JUTSUS_FLAG_TAG);
+            }
         }
     }
 
@@ -832,6 +853,70 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     public void clearActiveHandJutsu() {
         this.activeHandJutsu = "";
         this.activeHandJutsuTicks = 0;
+    }
+
+    @Override
+    public int getActiveJutsusFlag() {
+        return this.activeJutsusFlag;
+    }
+
+    @Override
+    public void setActiveJutsusFlag(int flag) {
+        this.activeJutsusFlag = flag;
+    }
+
+    @Override
+    public boolean isJutsuActive(int flag) {
+        return (this.activeJutsusFlag & flag) != 0;
+    }
+
+    @Override
+    public void setJutsuActive(int flag, boolean active) {
+        if (active) {
+            this.activeJutsusFlag |= flag;
+        } else {
+            this.activeJutsusFlag &= ~flag;
+        }
+    }
+
+    @Override
+    public boolean isSharinganActive() {
+        return isJutsuActive(JUTSU_FLAG_SHARINGAN);
+    }
+
+    @Override
+    public void setSharinganActive(boolean active) {
+        setJutsuActive(JUTSU_FLAG_SHARINGAN, active);
+    }
+
+    @Override
+    public boolean isByakuganActive() {
+        return isJutsuActive(JUTSU_FLAG_BYAKUGAN);
+    }
+
+    @Override
+    public void setByakuganActive(boolean active) {
+        setJutsuActive(JUTSU_FLAG_BYAKUGAN, active);
+    }
+
+    @Override
+    public boolean isEightGatesActive() {
+        return isJutsuActive(JUTSU_FLAG_EIGHT_GATES);
+    }
+
+    @Override
+    public void setEightGatesActive(boolean active) {
+        setJutsuActive(JUTSU_FLAG_EIGHT_GATES, active);
+    }
+
+    @Override
+    public boolean isWaterWalkActive() {
+        return isJutsuActive(JUTSU_FLAG_WATER_WALK);
+    }
+
+    @Override
+    public void setWaterWalkActive(boolean active) {
+        setJutsuActive(JUTSU_FLAG_WATER_WALK, active);
     }
 
     @Nonnull

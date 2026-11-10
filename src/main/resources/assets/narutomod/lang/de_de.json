@@ -200,5 +200,13 @@
   "naruto.gui.ninja_menu.clan.locked": "Versiegelt",
   "naruto.gui.ninja_menu.clan.select": "Clan wählen",
   "naruto.gui.ninja_menu.clan.unselected": "Clanlos [Nicht gewählt]",
-  "naruto.gui.ninja_menu.kage_congrats": "Herzlichen Glückwunsch! Du bist der verehrte Beschützer und ranghöchste Shinobi des Dorfes!"
+  "naruto.gui.ninja_menu.kage_congrats": "Herzlichen Glückwunsch! Du bist der verehrte Beschützer und ranghöchste Shinobi des Dorfes!",
+  "death.attack.narutomod.amaterasu": "%1$s wurde durch Amaterasu eingeäschert",
+  "death.attack.narutomod.amaterasu.player": "%1$s wurde durch %2$s's Amaterasu eingeäschert",
+  "death.attack.narutomod.rasenshuriken": "%1$s wurde durch Rasenshuriken zerfetzt",
+  "death.attack.narutomod.rasenshuriken.player": "%1$s wurde durch %2$s's Rasenshuriken zerfetzt",
+  "death.attack.narutomod.fireball": "%1$s wurde durch ein Feuerball-Jutsu verbrannt",
+  "death.attack.narutomod.fireball.player": "%1$s wurde durch %2$s's Feuerball-Jutsu verbrannt",
+  "death.attack.narutomod.jutsu_projectile": "%1$s wurde von einem Jutsu getroffen",
+  "death.attack.narutomod.jutsu_projectile.player": "%1$s wurde durch ein Jutsu von %2$s niedergestreckt"
 }

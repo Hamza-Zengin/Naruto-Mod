@@ -155,9 +155,14 @@ public class JutsuVisualEffectEntity extends Entity {
                     List<Entity> inside = serverLevel.getEntities(this, wallBox);
                     for (Entity e : inside) {
                         if (e instanceof LivingEntity living) {
-                            Vec3 pushDir = e.position().subtract(this.position());
-                            Vec3 horiz = new Vec3(pushDir.x, 0, pushDir.z).normalize().scale(0.35D);
-                            living.setDeltaMovement(living.getDeltaMovement().add(horiz.x, 0.05D, horiz.z));
+                            double dx = e.getX() - this.getX();
+                            double dz = e.getZ() - this.getZ();
+                            double distSq = dx * dx + dz * dz;
+                            if (distSq > 1.0E-4D) {
+                                double dist = Math.sqrt(distSq);
+                                double factor = 0.35D / dist;
+                                living.setDeltaMovement(living.getDeltaMovement().add(dx * factor, 0.05D, dz * factor));
+                            }
                             living.hurtMarked = true;
                         } else if (e instanceof Projectile projectile) {
                             // Deflect all incoming projectiles
@@ -221,8 +226,9 @@ public class JutsuVisualEffectEntity extends Entity {
                                 e -> e.isAlive() && (caster == null || e != caster));
                         for (LivingEntity target : trapped) {
                             // Constrict towards center
-                            Vec3 pull = this.position().subtract(target.position()).scale(0.28D);
-                            target.setDeltaMovement(pull.x, -0.2D, pull.z);
+                            double px = (this.getX() - target.getX()) * 0.28D;
+                            double pz = (this.getZ() - target.getZ()) * 0.28D;
+                            target.setDeltaMovement(px, -0.2D, pz);
                             target.hurtMarked = true;
                             target.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().magic(), 4.0F);
                             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 4));
@@ -275,8 +281,16 @@ public class JutsuVisualEffectEntity extends Entity {
                                 e -> e.isAlive() && (caster == null || e != caster));
                         for (LivingEntity s : struck) {
                             s.hurt(serverLevel.damageSources().lightningBolt(), 32.0F);
-                            Vec3 blast = s.position().subtract(this.position()).normalize().scale(2.2D);
-                            s.push(blast.x, 0.75D, blast.z);
+                            double dx = s.getX() - this.getX();
+                            double dz = s.getZ() - this.getZ();
+                            double distSq = dx * dx + dz * dz;
+                            if (distSq > 1.0E-4D) {
+                                double dist = Math.sqrt(distSq);
+                                double factor = 2.2D / dist;
+                                s.push(dx * factor, 0.75D, dz * factor);
+                            } else {
+                                s.push(0, 0.75D, 0);
+                            }
                             s.setRemainingFireTicks(100);
                             s.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 2));
                         }

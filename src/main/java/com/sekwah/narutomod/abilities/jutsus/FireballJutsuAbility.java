@@ -3,8 +3,6 @@ package com.sekwah.narutomod.abilities.jutsus;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -23,8 +21,18 @@ public class FireballJutsuAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        return tryConsume(player, ninjaData, 30.0f, 0, 30);
+    public float getDefaultChakraCost() {
+        return 30.0f;
+    }
+
+    @Override
+    public int getDefaultCooldown() {
+        return 5 * 20;
+    }
+
+    @Override
+    public float getDefaultDamage() {
+        return 20.0f;
     }
 
     @Override
@@ -35,10 +43,5 @@ public class FireballJutsuAbility extends Ability implements Ability.Cooldown {
             player.level().addFreshEntity(fireball);
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SHOOT, SoundSource.PLAYERS, 1f, 1.0f);
         }, 10);
-    }
-
-    @Override
-    public int getCooldown() {
-        return 5 * 20;
     }
 }
