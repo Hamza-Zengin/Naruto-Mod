@@ -82,6 +82,9 @@ public class NarutoMod {
 
     private void setup(FMLCommonSetupEvent event) {
         PacketHandler.init();
+        if (ModList.get().isLoaded("curios")) {
+            event.enqueueWork(CuriosCompat::registerCurios);
+        }
     }
 
     private void enqueueIMC(InterModEnqueueEvent event) {
