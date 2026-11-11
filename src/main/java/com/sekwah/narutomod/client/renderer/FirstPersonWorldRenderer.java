@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
+import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import com.sekwah.narutomod.client.model.entity.SusanooRibcageModel;
 import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.EightGatesAuraModel;
 import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.JutsuVisualEffectRenderer;
@@ -70,8 +71,9 @@ public class FirstPersonWorldRenderer {
         }
 
         player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-            boolean hasSusanoo = ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.SUSANOO_RIBCAGE.getId());
-            boolean hasEightGates = ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.EIGHT_GATES.getId());
+            ToggleAbilityData toggleData = ninjaData.getToggleAbilityData();
+            boolean hasSusanoo = toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.SUSANOO_RIBCAGE.getId());
+            boolean hasEightGates = toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.EIGHT_GATES.getId());
 
             if (!hasSusanoo && !hasEightGates) {
                 return;

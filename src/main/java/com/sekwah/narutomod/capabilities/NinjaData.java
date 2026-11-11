@@ -630,6 +630,9 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public ToggleAbilityData getToggleAbilityData() {
+        if (this.toggleAbilityData == null) {
+            this.toggleAbilityData = new ToggleAbilityData();
+        }
         return this.toggleAbilityData;
     }
 

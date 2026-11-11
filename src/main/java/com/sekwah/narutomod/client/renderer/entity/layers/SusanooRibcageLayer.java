@@ -32,7 +32,7 @@ public class SusanooRibcageLayer extends RenderLayer<AbstractClientPlayer, Playe
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
             // Early Exit: if Susanoo is not active, skip all matrix setups and buffer lookups
-            if (!ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.SUSANOO_RIBCAGE.getId())) {
+            if (ninjaData.getToggleAbilityData() == null || !ninjaData.getToggleAbilityData().hasToggleAbility(NarutoAbilities.SUSANOO_RIBCAGE.getId())) {
                 return;
             }
             poseStack.pushPose();

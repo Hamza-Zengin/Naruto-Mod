@@ -3,6 +3,7 @@ package com.sekwah.narutomod.capabilities;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
+import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -40,20 +41,23 @@ public class NinjaCapabilityHandler {
                     }
                     data.updateServerData(player);
                 }
-                for (ResourceLocation abilityName : data.getToggleAbilityData().getAbilitiesSnapshot()) {
-                    if (!data.getToggleAbilityData().hasToggleAbility(abilityName)) {
-                        continue;
-                    }
-                    Ability ability = NarutoAbilities.getAbility(abilityName);
-                    if(ability == null) continue;
-                    if(event.side.isServer()) {
-                        if(ability.handleCost(player, data)) {
-                            ability.performServer(player, data);
-                        } else {
-                            data.getToggleAbilityData().removeAbilityEnded(player, data, ability);
+                ToggleAbilityData toggleData = data.getToggleAbilityData();
+                if (toggleData != null) {
+                    for (ResourceLocation abilityName : toggleData.getAbilitiesSnapshot()) {
+                        if (!toggleData.hasToggleAbility(abilityName)) {
+                            continue;
                         }
-                    } else {
-                        if(ability instanceof Ability.Toggled toggleAbility) toggleAbility.performToggleClient(player, data);
+                        Ability ability = NarutoAbilities.getAbility(abilityName);
+                        if(ability == null) continue;
+                        if(event.side.isServer()) {
+                            if(ability.handleCost(player, data)) {
+                                ability.performServer(player, data);
+                            } else {
+                                toggleData.removeAbilityEnded(player, data, ability);
+                            }
+                        } else {
+                            if(ability instanceof Ability.Toggled toggleAbility) toggleAbility.performToggleClient(player, data);
+                        }
                     }
                 }
             });

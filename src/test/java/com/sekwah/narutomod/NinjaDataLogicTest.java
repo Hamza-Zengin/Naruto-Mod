@@ -329,4 +329,24 @@ public class NinjaDataLogicTest {
         }
         assertEquals(baseCost * 0.75f, fireball.getEffectiveChakraCost(ninjaData), 0.01f);
     }
+
+    @Test
+    @DisplayName("Verify getToggleAbilityData is null-safe and self-healing")
+    public void testToggleAbilityDataNullSafety() {
+        assertNotNull(ninjaData.getToggleAbilityData(), "Initial ToggleAbilityData should not be null");
+
+        // Force reflection to set toggleAbilityData to null (simulating corrupted network sync)
+        try {
+            java.lang.reflect.Field field = NinjaData.class.getDeclaredField("toggleAbilityData");
+            field.setAccessible(true);
+            field.set(ninjaData, null);
+        } catch (Exception e) {
+            fail("Reflection failed: " + e.getMessage());
+        }
+
+        // Must self-heal and return a non-null instance
+        assertNotNull(ninjaData.getToggleAbilityData(), "getToggleAbilityData should self-heal when field is null");
+        assertNotNull(ninjaData.getToggleAbilityData().getAbilitiesSnapshot());
+        assertEquals(0, ninjaData.getToggleAbilityData().getAbilitiesSnapshot().size());
+    }
 }

@@ -10,6 +10,10 @@ public class ToggleAbilityDataSyncTracker implements SyncTrackerSerializer<Toggl
 
     @Override
     public void encode(ToggleAbilityData objectToSend, FriendlyByteBuf outBuffer) {
+        if (objectToSend == null || objectToSend.getAbilitiesHashSet() == null) {
+            outBuffer.writeInt(0);
+            return;
+        }
         outBuffer.writeInt(objectToSend.getAbilitiesHashSet().size());
         for (ResourceLocation ability : objectToSend.getAbilitiesHashSet()) {
             outBuffer.writeUtf(ability.toString());
@@ -19,7 +23,7 @@ public class ToggleAbilityDataSyncTracker implements SyncTrackerSerializer<Toggl
     @Override
     public ToggleAbilityData decode(FriendlyByteBuf inBuffer) {
         final int size = inBuffer.readInt();
-        if (size < 0 || size > 256) {
+        if (size <= 0 || size > 256) {
             return new ToggleAbilityData(0);
         }
         ToggleAbilityData data = new ToggleAbilityData(size);
@@ -31,6 +35,9 @@ public class ToggleAbilityDataSyncTracker implements SyncTrackerSerializer<Toggl
 
     @Override
     public ToggleAbilityData clone(ToggleAbilityData data) {
+        if (data == null || data.getAbilitiesHashSet() == null) {
+            return new ToggleAbilityData();
+        }
         ToggleAbilityData cloned = new ToggleAbilityData(data.getAbilitiesHashSet().size());
         cloned.getAbilitiesHashSet().addAll(data.getAbilitiesHashSet());
         return cloned;
