@@ -31,6 +31,13 @@ public class ServerTriggerHandJutsuPacket {
         return new ServerTriggerHandJutsuPacket(id);
     }
 
+    public static float calculateEffectiveChakraCost(com.sekwah.narutomod.abilities.Ability ability, float baseCost, java.util.List<Byte> activeSeals) {
+        if (ability != null && ability.matchesExpectedSeals(activeSeals)) {
+            return baseCost * 0.75f;
+        }
+        return baseCost;
+    }
+
     public static class Handler {
         public static void handle(ServerTriggerHandJutsuPacket msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
@@ -53,11 +60,28 @@ public class ServerTriggerHandJutsuPacket {
                         }
                     }
 
+                    com.sekwah.narutomod.abilities.Ability struckAbility = "rasengan".equalsIgnoreCase(activeJutsu)
+                            ? com.sekwah.narutomod.abilities.NarutoAbilities.RASENGAN.get()
+                            : "chidori".equalsIgnoreCase(activeJutsu)
+                            ? com.sekwah.narutomod.abilities.NarutoAbilities.CHIDORI.get()
+                            : null;
+
+                    if (struckAbility != null && struckAbility.matchesExpectedSeals(ninjaData.getActiveSeals())) {
+                        float discountChakra = struckAbility.getChakraCost() * 0.25f;
+                        if (discountChakra > 0) {
+                            ninjaData.addChakra(discountChakra);
+                            player.sendSystemMessage(net.minecraft.network.chat.Component.translatable(
+                                    "jutsu.combo.perfect", net.minecraft.network.chat.Component.translatable(struckAbility.getTranslationKey()))
+                                    .withStyle(net.minecraft.ChatFormatting.GOLD));
+                        }
+                    }
+
                     if ("rasengan".equalsIgnoreCase(activeJutsu)) {
                         RasenganAbility.executeStrike(player, ninjaData, target);
                     } else if ("chidori".equalsIgnoreCase(activeJutsu)) {
                         ChidoriAbility.executeStrike(player, ninjaData, target);
                     }
+                    ninjaData.clearSeals();
                 });
             });
             ctx.get().setPacketHandled(true);

@@ -2,7 +2,10 @@ package com.sekwah.narutomod.entity;
 
 import com.sekwah.narutomod.entity.item.PaperBombEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
+import com.sekwah.narutomod.entity.jutsuprojectile.MudWallEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.RasenshurikenEntity;
+import com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity;
+import com.sekwah.narutomod.entity.jutsuprojectile.WoodPrisonEntity;
 import com.sekwah.narutomod.entity.mob.AkatsukiNinjaEntity;
 import com.sekwah.narutomod.entity.mob.RogueNinjaEntity;
 import com.sekwah.narutomod.entity.projectile.ExplosiveKunaiEntity;
@@ -48,6 +51,15 @@ public class NarutoEntities {
 
     public static final RegistryObject<EntityType<RasenshurikenEntity>> RASENSHURIKEN = register("rasenshuriken",
             EntityType.Builder.<RasenshurikenEntity>of(RasenshurikenEntity::new, MobCategory.MISC).sized(1.6F, 0.8F).clientTrackingRange(8).updateInterval(5));
+
+    public static final RegistryObject<EntityType<WaterBulletEntity>> WATER_BULLET = register("water_bullet",
+            EntityType.Builder.<WaterBulletEntity>of(WaterBulletEntity::new, MobCategory.MISC).sized(1.0F, 1.0F).clientTrackingRange(8).updateInterval(2));
+
+    public static final RegistryObject<EntityType<MudWallEntity>> MUD_WALL = register("mud_wall",
+            EntityType.Builder.<MudWallEntity>of(MudWallEntity::new, MobCategory.MISC).fireImmune().sized(3.2F, 2.8F).clientTrackingRange(10).updateInterval(2));
+
+    public static final RegistryObject<EntityType<WoodPrisonEntity>> WOOD_PRISON = register("wood_prison",
+            EntityType.Builder.<WoodPrisonEntity>of(WoodPrisonEntity::new, MobCategory.MISC).sized(3.0F, 3.0F).clientTrackingRange(10).updateInterval(2));
 
     public static final RegistryObject<EntityType<com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity>> JUTSU_VISUAL_EFFECT = register("jutsu_visual_effect",
             EntityType.Builder.<com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity>of(com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity::new, MobCategory.MISC)

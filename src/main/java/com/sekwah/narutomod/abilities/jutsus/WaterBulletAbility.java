@@ -2,6 +2,7 @@ package com.sekwah.narutomod.abilities.jutsus;
 
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
+import com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -22,6 +23,11 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
     @Override
     public ActivationType activationType() {
         return ActivationType.INSTANT;
+    }
+
+    @Override
+    public com.sekwah.narutomod.abilities.ChakraElement getChakraElement() {
+        return com.sekwah.narutomod.abilities.ChakraElement.WATER;
     }
 
     @Override
@@ -51,16 +57,18 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
         Vec3 look = player.getLookAngle();
         serverLevel.playSound(null, player.blockPosition(), SoundEvents.GENERIC_SPLASH, SoundSource.PLAYERS, 1.5f, 1.0f);
 
-        // Launch 3D Surging Water Shark / Hydro Vortex Torpedo
-        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity waterVortex =
-                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
-                        serverLevel, player.getX() + look.x * 1.2, player.getY(), player.getZ() + look.z * 1.2,
-                        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_WATER_VORTEX,
-                        20, player.getYRot());
-        waterVortex.setDeltaMovement(look.scale(0.65));
-        serverLevel.addFreshEntity(waterVortex);
-
         float bulletDamage = this.getDamage();
+
+        // Spawn physical WaterBulletEntity projectile
+        WaterBulletEntity waterBullet = new WaterBulletEntity(serverLevel, player);
+        waterBullet.setPos(player.getX() + look.x * 1.2, player.getY() + player.getEyeHeight() * 0.6, player.getZ() + look.z * 1.2);
+        waterBullet.setYRot(player.getYRot());
+        waterBullet.setXRot(player.getXRot());
+        waterBullet.setDamage(bulletDamage);
+        waterBullet.setMaxLife(25);
+        waterBullet.setDeltaMovement(look.scale(1.1));
+        serverLevel.addFreshEntity(waterBullet);
+
         for (int i = 1; i <= 8; i++) {
             Vec3 pos = player.position().add(look.scale(i)).add(0, player.getEyeHeight() * 0.7, 0);
             serverLevel.sendParticles(ParticleTypes.SPLASH, pos.x, pos.y, pos.z, 20, 0.4, 0.4, 0.4, 0.1);

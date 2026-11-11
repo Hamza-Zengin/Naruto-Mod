@@ -24,6 +24,11 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
     }
 
     @Override
+    public com.sekwah.narutomod.abilities.ChakraElement getChakraElement() {
+        return com.sekwah.narutomod.abilities.ChakraElement.WATER;
+    }
+
+    @Override
     public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
         return com.sekwah.narutomod.capabilities.NinjaRank.ACADEMY_STUDENT;
     }

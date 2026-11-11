@@ -57,9 +57,13 @@ public class ServerAbilityActivatePacket {
                             canTriggerJutsu = !cooldownAbility.checkCooldown(player, ninjaData, ability.getTranslationKey());
                         }
 
+                        boolean comboMatched = ability.matchesExpectedSeals(ninjaData.getActiveSeals());
                         if(canTriggerJutsu && ability.handleCost(player, ninjaData)) {
                             if (ability.logInChat()) {
                                 player.sendSystemMessage(Component.translatable("jutsu.cast", Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
+                                if (comboMatched) {
+                                    player.sendSystemMessage(Component.translatable("jutsu.combo.perfect", Component.translatable(ability.getTranslationKey())).withStyle(ChatFormatting.GOLD));
+                                }
                             }
                             if(ability.castingSound() != null) {
                                 player.level().playSound(null,
@@ -67,6 +71,7 @@ public class ServerAbilityActivatePacket {
                             }
                             ability.performServer(player, ninjaData);
                             ninjaData.addJutsuCast();
+                            ninjaData.clearSeals();
 
                             if (ability instanceof Ability.Cooldown cooldownAbility) {
                                cooldownAbility.registerCooldown(ninjaData, ability.getTranslationKey());

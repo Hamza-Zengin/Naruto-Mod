@@ -100,6 +100,12 @@ public class NarutoKeyHandler {
             return;
         }
         PacketHandler.sendToServer(new ServerJutsuCastingPacket(i));
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null) {
+            mc.player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+                ninjaData.addSeal((byte) i);
+            });
+        }
         ticksSinceLastKey = 0;
         if (currentJutsuCombo < MAX_JUTSU_VALUE) {
             currentJutsuCombo *= 10;
@@ -170,6 +176,10 @@ public class NarutoKeyHandler {
         currentJutsuCombo = 0;
         currentJutsuComboAbility = null;
         isCurrentlyChargingAbility = false;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null) {
+            mc.player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA).ifPresent(com.sekwah.narutomod.capabilities.INinjaData::clearSeals);
+        }
     }
 
     private static void checkNonCharging() {

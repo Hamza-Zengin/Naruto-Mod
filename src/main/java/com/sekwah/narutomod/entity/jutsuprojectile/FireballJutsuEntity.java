@@ -1,5 +1,6 @@
 package com.sekwah.narutomod.entity.jutsuprojectile;
 
+import com.sekwah.narutomod.abilities.ChakraElement;
 import com.sekwah.narutomod.damagesource.NarutoDamageSource;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import net.minecraft.core.BlockPos;
@@ -8,6 +9,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
@@ -15,11 +17,14 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class FireballJutsuEntity extends AbstractHurtingProjectile {
+import java.util.List;
+
+public class FireballJutsuEntity extends AbstractHurtingProjectile implements JutsuProjectile {
 
     private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> DATA_IMPACTED =
             net.minecraft.network.syncher.SynchedEntityData.defineId(FireballJutsuEntity.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
@@ -29,11 +34,40 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
     public int time;
     public int lifeSpan = 70;
     public float explosionPower = 2;
+    private int jutsuPower = 60;
 
     public static final float INITIAL_SCALE = 0.25f;
     public static final float GROW_SCALE = 1 - INITIAL_SCALE;
     public static final float GROW_TIME = 12.0f;
     public static final float ENTITY_SIZE = 1.5f;
+
+    @Override
+    public ChakraElement getElement() {
+        return ChakraElement.FIRE;
+    }
+
+    @Override
+    public int getJutsuPower() {
+        return this.jutsuPower;
+    }
+
+    @Override
+    public void weaken(int amount) {
+        this.jutsuPower = Math.max(0, this.jutsuPower - amount);
+        if (this.jutsuPower <= 0) {
+            this.explodeAndDiscard();
+        }
+    }
+
+    @Override
+    public void explodeAndDiscard() {
+        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+            serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2.0F, 1.0F);
+            serverLevel.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + 0.5D, this.getZ(), 45, 0.8D, 0.8D, 0.8D, 0.12D);
+            serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY() + 0.5D, this.getZ(), 15, 0.5D, 0.5D, 0.5D, 0.05D);
+        }
+        this.discard();
+    }
 
     public FireballJutsuEntity(EntityType<FireballJutsuEntity> entityConstructor, Level level) {
         super(entityConstructor, level);
@@ -119,6 +153,20 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
         super.tick();
         ++this.time;
         this.refreshDimensions();
+
+        if (!this.level().isClientSide && !this.isImpacted() && this.isAlive()) {
+            AABB clashBox = this.getBoundingBox().inflate(0.35D);
+            List<Entity> others = this.level().getEntities(this, clashBox,
+                    e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
+            for (Entity e : others) {
+                if (e instanceof JutsuProjectile other && this.isAlive() && e.isAlive()) {
+                    this.handleClash(other);
+                    if (!this.isAlive()) {
+                        return;
+                    }
+                }
+            }
+        }
 
         if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel && this.time % 2 == 0) {
             serverLevel.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + 0.5, this.getZ(), 5, 0.35, 0.35, 0.35, 0.03);
@@ -216,6 +264,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile {
             }
 
             this.playSound(SoundEvents.GENERIC_EXPLODE, 3.0f, 0.9f);
+            this.playSound(com.sekwah.narutomod.sounds.NarutoSounds.SIZZLE.get(), 2.0f, 1.1f);
         }
     }
 

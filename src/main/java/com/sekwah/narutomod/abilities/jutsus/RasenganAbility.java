@@ -61,6 +61,7 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
         ninjaData.setActiveHandJutsu("rasengan", 100);
 
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.RASENGAN.get(), SoundSource.PLAYERS, 1.2f, 1.0f);
+        serverLevel.playSound(null, player.blockPosition(), NarutoSounds.RASENGAN_LOOP.get(), SoundSource.PLAYERS, 0.9f, 1.0f);
         player.displayClientMessage(Component.translatable("jutsu.rasengan.ready").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD), true);
     }
 

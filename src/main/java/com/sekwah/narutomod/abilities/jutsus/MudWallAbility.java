@@ -2,12 +2,11 @@ package com.sekwah.narutomod.abilities.jutsus;
 
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
-import net.minecraft.ChatFormatting;
+import com.sekwah.narutomod.entity.jutsuprojectile.MudWallEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -24,6 +23,11 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
     @Override
     public ActivationType activationType() {
         return ActivationType.INSTANT;
+    }
+
+    @Override
+    public com.sekwah.narutomod.abilities.ChakraElement getChakraElement() {
+        return com.sekwah.narutomod.abilities.ChakraElement.EARTH;
     }
 
     @Override
@@ -55,13 +59,10 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
         }
 
         // Erupt 3D Sculpted Shinobi Earth Bulwark Entity (Physical Solid Barrier)
-        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity earthWall3D =
-                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
-                        serverLevel, basePos.getX() + 0.5, basePos.getY(), basePos.getZ() + 0.5,
-                        com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_EARTH_WALL,
-                        160, direction.toYRot());
-        earthWall3D.setCasterUUID(player.getUUID());
-        serverLevel.addFreshEntity(earthWall3D);
+        MudWallEntity mudWall = MudWallEntity.create(
+                serverLevel, basePos.getX() + 0.5, basePos.getY(), basePos.getZ() + 0.5,
+                160, direction.toYRot(), player.getUUID());
+        serverLevel.addFreshEntity(mudWall);
     }
 
     @Override

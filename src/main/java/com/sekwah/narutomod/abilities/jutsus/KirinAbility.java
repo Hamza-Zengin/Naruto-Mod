@@ -3,6 +3,7 @@ package com.sekwah.narutomod.abilities.jutsus;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
+import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -33,6 +34,11 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
     @Override
     public ActivationType activationType() {
         return ActivationType.INSTANT;
+    }
+
+    @Override
+    public com.sekwah.narutomod.abilities.ChakraElement getChakraElement() {
+        return com.sekwah.narutomod.abilities.ChakraElement.LIGHTNING;
     }
 
     @Override
@@ -115,6 +121,7 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
         }
 
         // Thunderous boom and electric particles (majestic, fitting, crisp audio)
+        serverLevel.playSound(null, targetBlock, NarutoSounds.KIRIN_STRIKE.get(), SoundSource.WEATHER, 3.5f, 0.85f);
         serverLevel.playSound(null, targetBlock, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 3.5f, 0.75f);
         serverLevel.playSound(null, targetBlock, SoundEvents.TRIDENT_RIPTIDE_3, SoundSource.WEATHER, 1.8f, 0.6f);
         serverLevel.playSound(null, targetBlock, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.4f, 1.1f);

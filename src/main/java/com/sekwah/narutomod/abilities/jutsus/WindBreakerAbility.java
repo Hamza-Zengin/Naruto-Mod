@@ -29,6 +29,11 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public com.sekwah.narutomod.abilities.ChakraElement getChakraElement() {
+        return com.sekwah.narutomod.abilities.ChakraElement.WIND;
+    }
+
+    @Override
     public long defaultCombo() {
         return 231;
     }

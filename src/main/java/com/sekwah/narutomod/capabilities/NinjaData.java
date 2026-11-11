@@ -21,8 +21,10 @@ import net.minecraftforge.common.util.LazyOptional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class NinjaData implements INinjaData, ICapabilityProvider {
@@ -83,6 +85,12 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Sync(minTicks = 1, syncGlobally = true)
     private int activeJutsusFlag = 0;
 
+    public static final int DEFAULT_SEAL_TIMEOUT = 60;
+    public static final int MAX_ACTIVE_SEALS = 12;
+
+    private final List<Byte> activeSeals = new ArrayList<>();
+    private int sealTimeout = 0;
+
     private ArrayList<DelayedPlayerTickEvent> delayedTickEvents = new ArrayList<>();
     private HashMap<String, CooldownTickEvent> cooldownTickEvents = new HashMap<>();
 
@@ -138,6 +146,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private static final String ACTIVE_HAND_JUTSU_TAG = "activeHandJutsu";
     private static final String ACTIVE_HAND_JUTSU_TICKS_TAG = "activeHandJutsuTicks";
     private static final String ACTIVE_JUTSUS_FLAG_TAG = "activeJutsusFlag";
+    private static final String ACTIVE_SEALS_TAG = "activeSeals";
+    private static final String SEAL_TIMEOUT_TAG = "sealTimeout";
 
     private final LazyOptional<INinjaData> holder = LazyOptional.of(() -> this);
 
@@ -546,6 +556,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         this.jutsusCastCount = 0;
         this.unlockedJutsus = "";
         this.activeJutsusFlag = 0;
+        this.clearSeals();
         this.chakra = this.getMaxChakra();
         this.stamina = this.getMaxStamina();
     }
@@ -631,13 +642,26 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             if (this.activeHandJutsuTicks > 0) {
                 this.clearActiveHandJutsu();
             }
+            this.clearSeals();
             this.activeJutsusFlag = 0;
             return;
         }
 
+        // Tick hand seal timeout
+        this.tick();
+
         // Countdown active hand jutsu (Rasengan/Chidori 5-second window)
         if (this.activeHandJutsuTicks > 0) {
             this.activeHandJutsuTicks--;
+            if (this.activeHandJutsuTicks % 20 == 0) {
+                if ("chidori".equals(this.activeHandJutsu)) {
+                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                            com.sekwah.narutomod.sounds.NarutoSounds.CHIDORI_LOOP.get(), net.minecraft.sounds.SoundSource.PLAYERS, 0.8f, 1.1f);
+                } else if ("rasengan".equals(this.activeHandJutsu)) {
+                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                            com.sekwah.narutomod.sounds.NarutoSounds.RASENGAN_LOOP.get(), net.minecraft.sounds.SoundSource.PLAYERS, 0.8f, 1.0f);
+                }
+            }
             if (this.activeHandJutsuTicks == 0) {
                 if ("chidori".equals(this.activeHandJutsu)) {
                     player.removeEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED);
@@ -769,6 +793,12 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         nbt.putString(ACTIVE_HAND_JUTSU_TAG, this.activeHandJutsu != null ? this.activeHandJutsu : "");
         nbt.putInt(ACTIVE_HAND_JUTSU_TICKS_TAG, this.activeHandJutsuTicks);
         nbt.putInt(ACTIVE_JUTSUS_FLAG_TAG, this.activeJutsusFlag);
+        byte[] seals = new byte[this.activeSeals.size()];
+        for (int i = 0; i < this.activeSeals.size(); i++) {
+            seals[i] = this.activeSeals.get(i);
+        }
+        nbt.putByteArray(ACTIVE_SEALS_TAG, seals);
+        nbt.putInt(SEAL_TIMEOUT_TAG, this.sealTimeout);
         return nbt;
     }
 
@@ -829,6 +859,16 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             }
             if (compoundTag.contains(ACTIVE_JUTSUS_FLAG_TAG)) {
                 this.activeJutsusFlag = compoundTag.getInt(ACTIVE_JUTSUS_FLAG_TAG);
+            }
+            if (compoundTag.contains(ACTIVE_SEALS_TAG)) {
+                this.activeSeals.clear();
+                byte[] seals = compoundTag.getByteArray(ACTIVE_SEALS_TAG);
+                for (byte b : seals) {
+                    this.activeSeals.add(b);
+                }
+            }
+            if (compoundTag.contains(SEAL_TIMEOUT_TAG)) {
+                this.sealTimeout = compoundTag.getInt(SEAL_TIMEOUT_TAG);
             }
         }
     }
@@ -928,5 +968,40 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Override
     public HashMap<String, CooldownTickEvent> getCooldownEvents() {
         return cooldownTickEvents;
+    }
+
+    @Override
+    public List<Byte> getActiveSeals() {
+        return Collections.unmodifiableList(this.activeSeals);
+    }
+
+    @Override
+    public void addSeal(byte seal) {
+        if (this.activeSeals.size() >= MAX_ACTIVE_SEALS) {
+            this.activeSeals.remove(0);
+        }
+        this.activeSeals.add(seal);
+        this.sealTimeout = DEFAULT_SEAL_TIMEOUT;
+    }
+
+    @Override
+    public void clearSeals() {
+        this.activeSeals.clear();
+        this.sealTimeout = 0;
+    }
+
+    @Override
+    public int getSealTimeout() {
+        return this.sealTimeout;
+    }
+
+    @Override
+    public void tick() {
+        if (this.sealTimeout > 0) {
+            this.sealTimeout--;
+            if (this.sealTimeout == 0) {
+                this.clearSeals();
+            }
+        }
     }
 }

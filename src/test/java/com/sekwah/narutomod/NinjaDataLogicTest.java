@@ -216,4 +216,117 @@ public class NinjaDataLogicTest {
         assertFalse(ninjaData.isEightGatesActive());
         assertFalse(ninjaData.isWaterWalkActive());
     }
+
+    @Test
+    @DisplayName("Verify hand seals buffer and timeout initialization")
+    public void testHandSealsBuffer() {
+        assertTrue(ninjaData.getActiveSeals().isEmpty(), "Active seals should initially be empty");
+        assertEquals(0, ninjaData.getSealTimeout());
+
+        ninjaData.addSeal((byte) 1);
+        assertEquals(1, ninjaData.getActiveSeals().size());
+        assertEquals((byte) 1, ninjaData.getActiveSeals().get(0));
+        assertEquals(NinjaData.DEFAULT_SEAL_TIMEOUT, ninjaData.getSealTimeout());
+
+        ninjaData.addSeal((byte) 2);
+        ninjaData.addSeal((byte) 1);
+        assertEquals(3, ninjaData.getActiveSeals().size());
+        assertEquals((byte) 1, ninjaData.getActiveSeals().get(0));
+        assertEquals((byte) 2, ninjaData.getActiveSeals().get(1));
+        assertEquals((byte) 1, ninjaData.getActiveSeals().get(2));
+
+        ninjaData.clearSeals();
+        assertTrue(ninjaData.getActiveSeals().isEmpty());
+        assertEquals(0, ninjaData.getSealTimeout());
+    }
+
+    @Test
+    @DisplayName("Verify hand seal timeout countdown and automatic clearance")
+    public void testHandSealTimeoutCountdown() {
+        ninjaData.addSeal((byte) 2);
+        ninjaData.addSeal((byte) 3);
+        assertEquals(2, ninjaData.getActiveSeals().size());
+        assertEquals(NinjaData.DEFAULT_SEAL_TIMEOUT, ninjaData.getSealTimeout());
+
+        // Tick 20 times (1 second)
+        for (int i = 0; i < 20; i++) {
+            ninjaData.tick();
+        }
+        assertEquals(NinjaData.DEFAULT_SEAL_TIMEOUT - 20, ninjaData.getSealTimeout());
+        assertEquals(2, ninjaData.getActiveSeals().size(), "Seals should remain before timeout");
+
+        // Tick remaining 40 times to reach 0
+        for (int i = 0; i < 40; i++) {
+            ninjaData.tick();
+        }
+        assertEquals(0, ninjaData.getSealTimeout());
+        assertTrue(ninjaData.getActiveSeals().isEmpty(), "Seals should be cleared after timeout");
+    }
+
+    @Test
+    @DisplayName("Verify hand seal max capacity constraint")
+    public void testHandSealMaxCapacity() {
+        for (byte b = 1; b <= 20; b++) {
+            ninjaData.addSeal(b);
+        }
+        assertEquals(NinjaData.MAX_ACTIVE_SEALS, ninjaData.getActiveSeals().size());
+        // Oldest seals (1..8) dropped, last 12 (9..20) kept
+        assertEquals((byte) 9, ninjaData.getActiveSeals().get(0));
+        assertEquals((byte) 20, ninjaData.getActiveSeals().get(NinjaData.MAX_ACTIVE_SEALS - 1));
+    }
+
+    @Test
+    @DisplayName("Verify hand seals NBT serialization and deserialization")
+    public void testHandSealsNBT() {
+        ninjaData.addSeal((byte) 1);
+        ninjaData.addSeal((byte) 2);
+        ninjaData.addSeal((byte) 3);
+
+        Tag serialized = ninjaData.serializeNBT();
+        NinjaData restored = new NinjaData(false);
+        restored.deserializeNBT(serialized);
+
+        assertEquals(ninjaData.getActiveSeals().size(), restored.getActiveSeals().size());
+        assertEquals(ninjaData.getActiveSeals(), restored.getActiveSeals());
+        assertEquals(ninjaData.getSealTimeout(), restored.getSealTimeout());
+    }
+
+    @Test
+    @DisplayName("Verify Ability expected seals and 25% chakra cost discount")
+    public void testHandSealComboCostDiscount() {
+        com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility fireball = new com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility();
+        fireball.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "fireball"));
+
+        // 1. Verify canon expected seals: Snake (6) - Ram (8) - Monkey (9) - Boar (12) - Horse (7) - Tiger (3)
+        assertArrayEquals(new byte[]{6, 8, 9, 12, 7, 3}, fireball.getExpectedSeals());
+
+        // 2. Test matching canon seals sequence
+        java.util.List<Byte> canonSeals = java.util.List.of((byte) 6, (byte) 8, (byte) 9, (byte) 12, (byte) 7, (byte) 3);
+        assertTrue(fireball.matchesExpectedSeals(canonSeals));
+
+        // 3. Test matching in-game defaultCombo digits (1-2-1)
+        java.util.List<Byte> comboSeals = java.util.List.of((byte) 1, (byte) 2, (byte) 1);
+        assertTrue(fireball.matchesExpectedSeals(comboSeals));
+
+        // 4. Test mismatched seals
+        java.util.List<Byte> wrongSeals = java.util.List.of((byte) 2, (byte) 3, (byte) 2);
+        assertFalse(fireball.matchesExpectedSeals(wrongSeals));
+
+        // 5. Test ServerTriggerHandJutsuPacket.calculateEffectiveChakraCost
+        float baseCost = fireball.getDefaultChakraCost(); // 30.0f
+        float discounted = com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket.calculateEffectiveChakraCost(fireball, baseCost, canonSeals);
+        assertEquals(baseCost * 0.75f, discounted, 0.01f, "Matched combo should grant exactly 25% cost reduction");
+
+        float notDiscounted = com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket.calculateEffectiveChakraCost(fireball, baseCost, wrongSeals);
+        assertEquals(baseCost, notDiscounted, 0.01f);
+
+        // 6. Test NinjaData integration with Ability.getEffectiveChakraCost
+        ninjaData.clearSeals();
+        assertEquals(baseCost, fireball.getEffectiveChakraCost(ninjaData), 0.01f);
+
+        for (byte b : comboSeals) {
+            ninjaData.addSeal(b);
+        }
+        assertEquals(baseCost * 0.75f, fireball.getEffectiveChakraCost(ninjaData), 0.01f);
+    }
 }

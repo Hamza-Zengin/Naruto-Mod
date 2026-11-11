@@ -32,6 +32,12 @@ public class NarutoSounds {
     public static final RegistryObject<SoundEvent> RASENGAN = register("rasengan");
     public static final RegistryObject<SoundEvent> CLONE_POOF = register("clone_poof");
 
+    public static final RegistryObject<SoundEvent> CHIDORI_LOOP = register("jutsu.chidori.loop");
+    public static final RegistryObject<SoundEvent> RASENGAN_LOOP = register("jutsu.rasengan.loop");
+    public static final RegistryObject<SoundEvent> FIREBALL_CAST = register("jutsu.fireball.cast");
+    public static final RegistryObject<SoundEvent> KIRIN_STRIKE = register("jutsu.kirin.strike");
+    public static final RegistryObject<SoundEvent> SHARINGAN_ACTIVATE = register("jutsu.sharingan.activate");
+
     private static RegistryObject<SoundEvent> register(String key) {
         return SOUNDS.register(key, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, key)));
     }

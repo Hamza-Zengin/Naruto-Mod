@@ -1,5 +1,6 @@
 package com.sekwah.narutomod.entity.jutsuprojectile;
 
+import com.sekwah.narutomod.abilities.ChakraElement;
 import com.sekwah.narutomod.damagesource.NarutoDamageSource;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import net.minecraft.core.particles.ParticleOptions;
@@ -29,7 +30,7 @@ import java.util.List;
  * Fūton: Rasenshuriken 3D Projectile Entity
  * High-speed spinning 4-bladed wind chakra shuriken that expands into a cellular vortex dome upon impact.
  */
-public class RasenshurikenEntity extends AbstractHurtingProjectile {
+public class RasenshurikenEntity extends AbstractHurtingProjectile implements JutsuProjectile {
 
     private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> DATA_IMPACTED =
             net.minecraft.network.syncher.SynchedEntityData.defineId(RasenshurikenEntity.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
@@ -38,6 +39,35 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile {
 
     public int time;
     public int lifeSpan = 80;
+    private int jutsuPower = 80;
+
+    @Override
+    public ChakraElement getElement() {
+        return ChakraElement.WIND;
+    }
+
+    @Override
+    public int getJutsuPower() {
+        return this.jutsuPower;
+    }
+
+    @Override
+    public void weaken(int amount) {
+        this.jutsuPower = Math.max(0, this.jutsuPower - amount);
+        if (this.jutsuPower <= 0) {
+            this.explodeAndDiscard();
+        }
+    }
+
+    @Override
+    public void explodeAndDiscard() {
+        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0);
+            serverLevel.sendParticles(ParticleTypes.CLOUD, this.getX(), this.getY() + 0.5D, this.getZ(), 30, 0.8D, 0.8D, 0.8D, 0.1D);
+            serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2.5F, 1.2F);
+        }
+        this.discard();
+    }
 
     public RasenshurikenEntity(EntityType<RasenshurikenEntity> entityConstructor, Level level) {
         super(entityConstructor, level);
@@ -157,6 +187,20 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile {
 
         super.tick();
         ++this.time;
+
+        if (!this.level().isClientSide && !this.isImpacted() && this.isAlive()) {
+            AABB clashBox = this.getBoundingBox().inflate(0.4D);
+            List<Entity> others = this.level().getEntities(this, clashBox,
+                    e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
+            for (Entity e : others) {
+                if (e instanceof JutsuProjectile other && this.isAlive() && e.isAlive()) {
+                    this.handleClash(other);
+                    if (!this.isAlive()) {
+                        return;
+                    }
+                }
+            }
+        }
 
         if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
             if (this.time % 2 == 0) {

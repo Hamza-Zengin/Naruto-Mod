@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
 
 public interface INinjaData extends INBTSerializable<Tag> {
@@ -105,5 +106,11 @@ public interface INinjaData extends INBTSerializable<Tag> {
     void setEightGatesActive(boolean active);
     boolean isWaterWalkActive();
     void setWaterWalkActive(boolean active);
+
+    List<Byte> getActiveSeals();
+    void addSeal(byte seal);
+    void clearSeals();
+    int getSealTimeout();
+    void tick();
 }
 

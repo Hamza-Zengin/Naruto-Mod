@@ -1,6 +1,7 @@
 package com.sekwah.narutomod.abilities.jutsus;
 
 import com.sekwah.narutomod.abilities.Ability;
+import com.sekwah.narutomod.abilities.ChakraElement;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import com.sekwah.narutomod.damagesource.NarutoDamageSource;
@@ -34,6 +35,11 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
     @Override
     public ActivationType activationType() {
         return ActivationType.INSTANT;
+    }
+
+    @Override
+    public ChakraElement getChakraElement() {
+        return ChakraElement.FIRE;
     }
 
     @Override

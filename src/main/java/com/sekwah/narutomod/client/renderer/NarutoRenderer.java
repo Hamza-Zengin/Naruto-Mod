@@ -3,11 +3,16 @@ package com.sekwah.narutomod.client.renderer;
 import com.sekwah.narutomod.client.model.item.model.AnbuMaskModel;
 import com.sekwah.narutomod.client.model.item.model.HeadbandModel;
 import com.sekwah.narutomod.client.model.item.model.ShinobiArmorModel;
+import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.MudWallRenderer;
+import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.WaterBulletRenderer;
+import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.WoodPrisonRenderer;
+import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.item.armor.NarutoArmorItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.RegistryObject;
@@ -16,6 +21,12 @@ public class NarutoRenderer extends BlockEntityWithoutLevelRenderer {
 
     public NarutoRenderer() {
         super(null, null);
+    }
+
+    public static void registerEntityRenderers() {
+        EntityRenderers.register(NarutoEntities.WATER_BULLET.get(), WaterBulletRenderer::new);
+        EntityRenderers.register(NarutoEntities.MUD_WALL.get(), MudWallRenderer::new);
+        EntityRenderers.register(NarutoEntities.WOOD_PRISON.get(), WoodPrisonRenderer::new);
     }
 
     public void onResourceManagerReload(ResourceManager resourceManager) {

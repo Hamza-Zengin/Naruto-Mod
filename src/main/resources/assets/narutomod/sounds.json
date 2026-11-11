@@ -88,5 +88,40 @@
       "minecraft:entity.generic.explode"
     ],
     "subtitle": "narutomod.subtitle.clone_poof"
+  },
+  "jutsu.chidori.loop": {
+    "category": "player",
+    "sounds": [
+      "narutomod:jutsu/chidori_loop"
+    ],
+    "subtitle": "narutomod.subtitle.chidori_loop"
+  },
+  "jutsu.rasengan.loop": {
+    "category": "player",
+    "sounds": [
+      "narutomod:jutsu/rasengan_loop"
+    ],
+    "subtitle": "narutomod.subtitle.rasengan_loop"
+  },
+  "jutsu.fireball.cast": {
+    "category": "player",
+    "sounds": [
+      "narutomod:jutsu/fireball_cast"
+    ],
+    "subtitle": "narutomod.subtitle.fireball_cast"
+  },
+  "jutsu.kirin.strike": {
+    "category": "weather",
+    "sounds": [
+      "narutomod:jutsu/kirin_strike"
+    ],
+    "subtitle": "narutomod.subtitle.kirin_strike"
+  },
+  "jutsu.sharingan.activate": {
+    "category": "player",
+    "sounds": [
+      "narutomod:jutsu/sharingan_activate"
+    ],
+    "subtitle": "narutomod.subtitle.sharingan_activate"
   }
 }

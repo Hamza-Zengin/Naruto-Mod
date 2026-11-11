@@ -97,7 +97,11 @@ public class NarutoRenderEvents {
 
         event.registerEntityRenderer(NarutoEntities.FIREBALL_JUTSU.get(), FireballJutsuRenderer::new);
         event.registerEntityRenderer(NarutoEntities.RASENSHURIKEN.get(), RasenshurikenRenderer::new);
+        event.registerEntityRenderer(NarutoEntities.WATER_BULLET.get(), com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.WaterBulletRenderer::new);
+        event.registerEntityRenderer(NarutoEntities.MUD_WALL.get(), com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.MudWallRenderer::new);
+        event.registerEntityRenderer(NarutoEntities.WOOD_PRISON.get(), com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.WoodPrisonRenderer::new);
         event.registerEntityRenderer(NarutoEntities.JUTSU_VISUAL_EFFECT.get(), com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.JutsuVisualEffectRenderer::new);
+        NarutoRenderer.registerEntityRenderers();
 
         event.registerEntityRenderer(NarutoEntities.SHADOW_CLONE.get(), (ctx) ->
                 new net.minecraft.client.renderer.entity.HumanoidMobRenderer<>(ctx, new net.minecraft.client.model.HumanoidModel<>(ctx.bakeLayer(net.minecraft.client.model.geom.ModelLayers.PLAYER)), 0.5f) {

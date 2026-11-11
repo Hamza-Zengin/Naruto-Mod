@@ -2,6 +2,7 @@ package com.sekwah.narutomod.abilities.jutsus;
 
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
+import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -63,6 +64,8 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
         if (player.level() instanceof ServerLevel serverLevel) {
             // On initial activation: play crisp, mystical ocular awakening sound and subtle 8-point halo
             if (ticksActive == 1) {
+                serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
+                        NarutoSounds.SHARINGAN_ACTIVATE.get(), net.minecraft.sounds.SoundSource.PLAYERS, 1.2f, 1.0f);
                 serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
                         net.minecraft.sounds.SoundEvents.ENCHANTMENT_TABLE_USE, net.minecraft.sounds.SoundSource.PLAYERS, 1.0f, 1.7f);
                 serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),

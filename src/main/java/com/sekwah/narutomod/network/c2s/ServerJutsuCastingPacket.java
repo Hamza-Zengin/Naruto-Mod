@@ -57,6 +57,10 @@ public class ServerJutsuCastingPacket {
                                 player.getX(), player.getY(), player.getZ(),
                                 playSound, SoundSource.PLAYERS, 1.0f, 1.0f);
                     }
+
+                    player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+                        ninjaData.addSeal((byte) msg.jutsuKey);
+                    });
                 }
             });
             ctx.get().setPacketHandled(true);

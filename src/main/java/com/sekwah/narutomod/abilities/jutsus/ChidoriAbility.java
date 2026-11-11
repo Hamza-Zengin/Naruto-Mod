@@ -29,6 +29,11 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public com.sekwah.narutomod.abilities.ChakraElement getChakraElement() {
+        return com.sekwah.narutomod.abilities.ChakraElement.LIGHTNING;
+    }
+
+    @Override
     public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
         return com.sekwah.narutomod.capabilities.NinjaRank.CHUNIN;
     }
@@ -63,8 +68,9 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
         // Give high-speed burst effect for the 5-second window
         player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100, 2, false, false, true));
 
-        // Sound effect
+        // Sound effect: initial Chidori activation chirp and continuous lightning surge
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CHIDORI.get(), SoundSource.PLAYERS, 1.2f, 1.0f);
+        serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CHIDORI_LOOP.get(), SoundSource.PLAYERS, 0.9f, 1.1f);
         player.displayClientMessage(Component.translatable("jutsu.chidori.ready").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD), true);
     }
 

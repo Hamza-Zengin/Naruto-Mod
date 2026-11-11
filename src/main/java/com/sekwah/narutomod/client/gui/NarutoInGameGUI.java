@@ -3,7 +3,9 @@ package com.sekwah.narutomod.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
+import com.sekwah.narutomod.capabilities.NinjaData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -12,6 +14,8 @@ import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import java.util.List;
 
 public class NarutoInGameGUI {
 
@@ -29,12 +33,17 @@ public class NarutoInGameGUI {
     @SubscribeEvent
     public void clientTickEvent(TickEvent.ClientTickEvent event) {
         this.chakraOverlay.tick();
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null) {
+            mc.player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(com.sekwah.narutomod.capabilities.INinjaData::tick);
+        }
     }
 
     @SubscribeEvent
     public void renderGameOverlay(RenderGuiOverlayEvent.Post event) {
         if (event.getOverlay() == VanillaGuiOverlay.HOTBAR.type()) {
             this.chakraOverlay.render(event.getGuiGraphics());
+            this.renderActiveHandSeals(event.getGuiGraphics());
         } else if (event.getOverlay() == VanillaGuiOverlay.VIGNETTE.type()) {
             renderFirstPersonAuraVignette(event.getGuiGraphics());
         }
@@ -93,5 +102,107 @@ public class NarutoInGameGUI {
             RenderSystem.depthMask(true);
             RenderSystem.enableDepthTest();
         });
+    }
+
+    /**
+     * Renders the active hand seal combo sequence side-by-side as styled seal badges
+     * right above the player hotbar.
+     */
+    public void renderActiveHandSeals(GuiGraphics guiGraphics) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+
+        mc.player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+            List<Byte> seals = ninjaData.getActiveSeals();
+            if (seals == null || seals.isEmpty()) {
+                return;
+            }
+
+            int screenWidth = mc.getWindow().getGuiScaledWidth();
+            int screenHeight = mc.getWindow().getGuiScaledHeight();
+            Font font = mc.font;
+
+            int badgeWidth = 22;
+            int badgeHeight = 22;
+            int spacing = 4;
+            int totalWidth = seals.size() * badgeWidth + (seals.size() - 1) * spacing;
+            int startX = (screenWidth - totalWidth) / 2;
+            int startY = screenHeight - 68; // Positioned neatly above the hotbar and chakra bars
+
+            // Subtle dark translucent background card with border
+            guiGraphics.fill(startX - 6, startY - 4, startX + totalWidth + 6, startY + badgeHeight + 5, 0xAA000000);
+            guiGraphics.renderOutline(startX - 6, startY - 4, totalWidth + 12, badgeHeight + 9, 0xFF4A6572);
+
+            for (int i = 0; i < seals.size(); i++) {
+                byte seal = seals.get(i);
+                int bx = startX + i * (badgeWidth + spacing);
+                int by = startY;
+
+                int bgColor = switch (seal) {
+                    case 1 -> 0xD01B2A47; // Seal A: Deep Ocean Blue
+                    case 2 -> 0xD0133B32; // Seal B: Emerald Chakra Green
+                    case 3 -> 0xD03E1C3B; // Seal C: Mystic Violet
+                    default -> 0xD023272A;
+                };
+                int borderColor = switch (seal) {
+                    case 1 -> 0xFF38BDF8; // Bright Blue Cyan
+                    case 2 -> 0xFF34D399; // Bright Mint Jade
+                    case 3 -> 0xFFF472B6; // Bright Lotus Pink
+                    default -> 0xFFFBBF24; // Amber Gold for zodiacs
+                };
+
+                // Badge background and glowing border
+                guiGraphics.fill(bx, by, bx + badgeWidth, by + badgeHeight, bgColor);
+                guiGraphics.renderOutline(bx, by, badgeWidth, badgeHeight, borderColor);
+
+                // Seal Kanji / Glyph
+                String sealGlyph = getSealGlyph(seal);
+                guiGraphics.drawCenteredString(font, "§f§l" + sealGlyph, bx + badgeWidth / 2, by + 3, 0xFFFFFFFF);
+
+                // Key / Canon Label
+                String keyLabel = getSealKeyLabel(seal);
+                guiGraphics.drawCenteredString(font, "§7" + keyLabel, bx + badgeWidth / 2, by + 12, 0xFFAAAAAA);
+            }
+
+            // Timeout timer bar under the badges
+            int timeout = ninjaData.getSealTimeout();
+            if (timeout > 0) {
+                float ratio = Math.min(1.0f, (float) timeout / NinjaData.DEFAULT_SEAL_TIMEOUT);
+                int barW = (int) (totalWidth * ratio);
+                guiGraphics.fill(startX, startY + badgeHeight + 2, startX + barW, startY + badgeHeight + 4, 0xFFF59E0B);
+            }
+        });
+    }
+
+    public static String getSealGlyph(byte seal) {
+        return switch (seal) {
+            case 1 -> "寅"; // Tiger / Seal A
+            case 2 -> "巳"; // Snake / Seal B
+            case 3 -> "申"; // Monkey / Seal C
+            case 4 -> "卯"; // Hare
+            case 5 -> "辰"; // Dragon
+            case 6 -> "巳"; // Snake
+            case 7 -> "午"; // Horse
+            case 8 -> "未"; // Ram
+            case 9 -> "申"; // Monkey
+            case 10 -> "酉"; // Bird
+            case 11 -> "戌"; // Dog
+            case 12 -> "亥"; // Boar
+            default -> String.valueOf(seal);
+        };
+    }
+
+    public static String getSealKeyLabel(byte seal) {
+        return switch (seal) {
+            case 1 -> "C";
+            case 2 -> "V";
+            case 3 -> "B";
+            case 6 -> "巳";
+            case 7 -> "午";
+            case 8 -> "未";
+            case 9 -> "申";
+            case 12 -> "亥";
+            default -> "#" + seal;
+        };
     }
 }

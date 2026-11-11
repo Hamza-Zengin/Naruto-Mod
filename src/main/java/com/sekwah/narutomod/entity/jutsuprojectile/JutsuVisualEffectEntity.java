@@ -1,6 +1,7 @@
 package com.sekwah.narutomod.entity.jutsuprojectile;
 
 import com.sekwah.narutomod.entity.NarutoEntities;
+import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -85,29 +86,6 @@ public class JutsuVisualEffectEntity extends Entity {
         this.entityData.define(DATA_CASTER_UUID, Optional.empty());
     }
 
-    @Override
-    public EntityDimensions getDimensions(Pose pose) {
-        if (this.getVisualType() == TYPE_EARTH_WALL) {
-            return EntityDimensions.scalable(3.2F, 2.8F);
-        }
-        return super.getDimensions(pose);
-    }
-
-    @Override
-    public boolean canBeCollidedWith() {
-        return this.getVisualType() == TYPE_EARTH_WALL;
-    }
-
-    @Override
-    public boolean isPickable() {
-        return this.getVisualType() == TYPE_EARTH_WALL;
-    }
-
-    @Override
-    public boolean canCollideWith(Entity other) {
-        return this.getVisualType() == TYPE_EARTH_WALL && other != this;
-    }
-
     public Optional<UUID> getCasterUUID() {
         return this.entityData.get(DATA_CASTER_UUID);
     }
@@ -144,61 +122,11 @@ public class JutsuVisualEffectEntity extends Entity {
             }
         }
 
-        // 2. Server-side Jutsu Combat & Physical Functionality
+        // 2. Server-side Jutsu Combat & Physical Functionality (Modularized entities handled in their own classes)
         if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
             Player caster = this.getCasterPlayer();
 
             switch (type) {
-                // --- DOTON: 3D EARTH WALL (Real Physical Barrier & Projectile Shield) ---
-                case TYPE_EARTH_WALL -> {
-                    AABB wallBox = this.getBoundingBox().inflate(0.3D, 0.0D, 0.3D);
-                    List<Entity> inside = serverLevel.getEntities(this, wallBox);
-                    for (Entity e : inside) {
-                        if (e instanceof LivingEntity living) {
-                            double dx = e.getX() - this.getX();
-                            double dz = e.getZ() - this.getZ();
-                            double distSq = dx * dx + dz * dz;
-                            if (distSq > 1.0E-4D) {
-                                double dist = Math.sqrt(distSq);
-                                double factor = 0.35D / dist;
-                                living.setDeltaMovement(living.getDeltaMovement().add(dx * factor, 0.05D, dz * factor));
-                            }
-                            living.hurtMarked = true;
-                        } else if (e instanceof Projectile projectile) {
-                            // Deflect all incoming projectiles
-                            projectile.setDeltaMovement(projectile.getDeltaMovement().scale(-0.5D));
-                            serverLevel.playSound(null, this.blockPosition(), SoundEvents.STONE_HIT, SoundSource.PLAYERS, 1.2F, 0.85F);
-                        }
-                    }
-                }
-
-                // --- SUITON: 3D WATER VORTEX TORPEDO (Active Projectile Strike) ---
-                case TYPE_WATER_VORTEX -> {
-                    AABB hitBox = this.getBoundingBox().inflate(0.8D);
-                    List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox,
-                            e -> e.isAlive() && (caster == null || e != caster));
-                    if (!enemies.isEmpty()) {
-                        for (LivingEntity enemy : enemies) {
-                            enemy.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().drown(), 14.0F);
-                            enemy.clearFire();
-                            Vec3 push = this.getDeltaMovement().normalize().scale(1.4D).add(0, 0.35D, 0);
-                            enemy.setDeltaMovement(push);
-                            enemy.hurtMarked = true;
-                        }
-                        serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_SPLASH, SoundSource.PLAYERS, 1.5F, 1.0F);
-                        serverLevel.sendParticles(ParticleTypes.SPLASH, this.getX(), this.getY() + 0.8, this.getZ(), 25, 0.5, 0.5, 0.5, 0.15);
-                        this.discard();
-                        return;
-                    }
-                    // Burst if it hits solid terrain
-                    if (serverLevel.getBlockState(this.blockPosition()).isSolidRender(serverLevel, this.blockPosition())) {
-                        serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_SPLASH, SoundSource.PLAYERS, 1.2F, 1.1F);
-                        serverLevel.sendParticles(ParticleTypes.SPLASH, this.getX(), this.getY() + 0.5, this.getZ(), 15, 0.4, 0.4, 0.4, 0.1);
-                        this.discard();
-                        return;
-                    }
-                }
-
                 // --- FŪTON: 3D WIND SHOCKWAVE FUNNEL (Piercing Gust & Deflection) ---
                 case TYPE_WIND_SHOCKWAVE -> {
                     float progress = (float) this.tickCount / (float) Math.max(1, this.getMaxLife());
@@ -214,27 +142,6 @@ public class JutsuVisualEffectEntity extends Entity {
                             living.hurtMarked = true;
                         } else if (e instanceof Projectile projectile) {
                             projectile.setDeltaMovement(this.getDeltaMovement().scale(1.8D));
-                        }
-                    }
-                }
-
-                // --- MOKUTON: 3D WOOD PRISON (Physical Entanglement & Life Siphon) ---
-                case TYPE_WOOD_PRISON -> {
-                    if (this.tickCount % 14 == 0) {
-                        AABB cageBox = this.getBoundingBox().inflate(4.5D, 2.0D, 4.5D);
-                        List<LivingEntity> trapped = serverLevel.getEntitiesOfClass(LivingEntity.class, cageBox,
-                                e -> e.isAlive() && (caster == null || e != caster));
-                        for (LivingEntity target : trapped) {
-                            // Constrict towards center
-                            double px = (this.getX() - target.getX()) * 0.28D;
-                            double pz = (this.getZ() - target.getZ()) * 0.28D;
-                            target.setDeltaMovement(px, -0.2D, pz);
-                            target.hurtMarked = true;
-                            target.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().magic(), 4.0F);
-                            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 4));
-                            if (caster != null) {
-                                caster.heal(1.0F);
-                            }
                         }
                     }
                 }
@@ -273,6 +180,7 @@ public class JutsuVisualEffectEntity extends Entity {
                 case TYPE_KIRIN_DRAGON -> {
                     if (this.tickCount == 6) {
                         // Ground slam moment
+                        serverLevel.playSound(null, this.blockPosition(), NarutoSounds.KIRIN_STRIKE.get(), SoundSource.WEATHER, 3.5F, 0.85F);
                         serverLevel.playSound(null, this.blockPosition(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 3.5F, 0.75F);
                         serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.6F, 1.0F);
 
@@ -294,6 +202,20 @@ public class JutsuVisualEffectEntity extends Entity {
                             s.setRemainingFireTicks(100);
                             s.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 2));
                         }
+                    }
+                }
+
+                case TYPE_CHIDORI_BURST -> {
+                    if (this.tickCount % 8 == 0) {
+                        serverLevel.playSound(null, this.getX(), this.getY(), this.getZ(),
+                                NarutoSounds.CHIDORI_LOOP.get(), SoundSource.PLAYERS, 0.8f, 1.2f);
+                    }
+                }
+
+                case TYPE_RASENGAN_SPHERE -> {
+                    if (this.tickCount % 8 == 0) {
+                        serverLevel.playSound(null, this.getX(), this.getY(), this.getZ(),
+                                NarutoSounds.RASENGAN_LOOP.get(), SoundSource.PLAYERS, 0.8f, 1.0f);
                     }
                 }
             }
