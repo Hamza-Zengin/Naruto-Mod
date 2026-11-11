@@ -40,10 +40,38 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
     }
 
     @Override
-    public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
+    public List<net.minecraft.resources.ResourceLocation> getPrerequisites() {
+        return List.of(new net.minecraft.resources.ResourceLocation(com.sekwah.narutomod.NarutoMod.MOD_ID, "sharingan"));
+    }
+
+    @Override
+    public int getRequiredMastery() {
+        return SharinganAbility.SharinganStage.MANGEKYOU.getMinMastery(); // 150
+    }
+
+    @Override
+    public boolean canActivate(Player player, INinjaData ninjaData) {
+        if (ninjaData == null) return false;
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
-                    Component.literal("Uchiha").withStyle(ChatFormatting.RED)), true);
+            if (player != null) {
+                player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
+                        Component.literal("Uchiha").withStyle(ChatFormatting.RED)), true);
+            }
+            return false;
+        }
+        if (!SharinganAbility.hasMangekyou(ninjaData)) {
+            if (player != null) {
+                player.displayClientMessage(Component.translatable("jutsu.susanoo.requires_mangekyou")
+                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), true);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
+        if (!canActivate(player, ninjaData)) {
             return false;
         }
 

@@ -1,5 +1,6 @@
 package com.sekwah.narutomod.abilities.jutsus;
 
+import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
@@ -7,11 +8,14 @@ import com.sekwah.narutomod.entity.jutsuprojectile.RasenshurikenEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
 
 /**
  * Fūton: Rasenshuriken (Wind Style: Rasenshuriken)
@@ -33,6 +37,16 @@ public class RasenshurikenAbility extends Ability implements Ability.Cooldown {
     @Override
     public NinjaRank getRequiredRank() {
         return NinjaRank.JONIN;
+    }
+
+    @Override
+    public List<ResourceLocation> getPrerequisites() {
+        return List.of(new ResourceLocation(NarutoMod.MOD_ID, "rasengan"));
+    }
+
+    @Override
+    public int getRequiredMastery() {
+        return 100;
     }
 
     @Override

@@ -51,6 +51,9 @@ public class ServerAbilityActivatePacket {
                     }
 
                     if (ability.activationType() == Ability.ActivationType.INSTANT) {
+                        if (!ability.canActivate(player, ninjaData)) {
+                            return;
+                        }
 
                         boolean canTriggerJutsu = true;
                         if (ability instanceof Ability.Cooldown cooldownAbility) {
@@ -89,6 +92,9 @@ public class ServerAbilityActivatePacket {
                             // Toggle ability off
                             abilityTracker.removeAbilityEnded(player, ninjaData, ability);
                         } else {
+                            if (!ability.canActivate(player, ninjaData)) {
+                                return;
+                            }
                             // Toggle ability on
                             abilityTracker.addAbilityStarted(player, ninjaData, ability);
                             ninjaData.addJutsuCast();

@@ -20,7 +20,9 @@ import com.sekwah.sekclib.SekCLib;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.RegisterCapabilitySyncEvent;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.RegisterSyncTrackerTypeEvent;
 import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
+import com.sekwah.narutomod.trackers.ResourceLocationIntMapSyncTracker;
 import com.sekwah.narutomod.trackers.ToggleAbilityDataSyncTracker;
+import com.google.gson.reflect.TypeToken;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -104,6 +106,11 @@ public class NarutoMod {
 
     public void registerSyncTrackers(RegisterSyncTrackerTypeEvent event) {
         event.registerSyncTracker(ToggleAbilityData.class, new ToggleAbilityDataSyncTracker());
+        ResourceLocationIntMapSyncTracker mapSyncTracker = new ResourceLocationIntMapSyncTracker();
+        event.registerSyncTracker(new TypeToken<java.util.Map<ResourceLocation, Integer>>(){}.getType(), mapSyncTracker);
+        event.registerSyncTracker(new TypeToken<java.util.HashMap<ResourceLocation, Integer>>(){}.getType(), mapSyncTracker);
+        event.registerSyncTracker(java.util.Map.class, mapSyncTracker);
+        event.registerSyncTracker(java.util.HashMap.class, mapSyncTracker);
     }
 
     public void registerCapabilitySync(RegisterCapabilitySyncEvent event) {

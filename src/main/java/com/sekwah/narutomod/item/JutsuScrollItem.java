@@ -119,6 +119,25 @@ public class JutsuScrollItem extends Item {
                     return;
                 }
 
+                // Strict Prerequisite & Mastery check:
+                if (!ability.meetsPrerequisites(ninjaData)) {
+                    List<ResourceLocation> prereqs = ability.getPrerequisites();
+                    StringBuilder prereqNames = new StringBuilder();
+                    for (int i = 0; i < prereqs.size(); i++) {
+                        ResourceLocation p = prereqs.get(i);
+                        Ability pa = NarutoAbilities.getAbility(p);
+                        String paName = pa != null ? Component.translatable(pa.getTranslationKey()).getString() : p.getPath();
+                        if (i > 0) prereqNames.append(", ");
+                        prereqNames.append(paName);
+                    }
+                    player.sendSystemMessage(Component.translatable("jutsu.scroll.fail_prerequisite",
+                            Component.literal(prereqNames.toString()).withStyle(ChatFormatting.YELLOW),
+                            Component.literal(String.valueOf(ability.getRequiredMastery())).withStyle(ChatFormatting.GOLD)
+                    ).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+                    level.playSound(null, player.blockPosition(), SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1.0f, 1.0f);
+                    return;
+                }
+
                 if (ninjaData.isAbilityUnlocked(targetJutsu)) {
                     player.sendSystemMessage(Component.translatable("jutsu.scroll.already_known",
                             Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.RED));
@@ -153,6 +172,21 @@ public class JutsuScrollItem extends Item {
                         Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.GOLD)).withStyle(ChatFormatting.GRAY));
                 tooltip.add(Component.translatable("jutsu.scroll.requires_rank",
                         Component.literal(ability.getRequiredRank().getTurkishName() + " (" + ability.getRequiredRank().getEnglishName() + ")").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.DARK_GRAY));
+                if (!ability.getPrerequisites().isEmpty()) {
+                    List<ResourceLocation> prereqs = ability.getPrerequisites();
+                    StringBuilder prereqNames = new StringBuilder();
+                    for (int i = 0; i < prereqs.size(); i++) {
+                        ResourceLocation p = prereqs.get(i);
+                        Ability pa = NarutoAbilities.getAbility(p);
+                        String paName = pa != null ? Component.translatable(pa.getTranslationKey()).getString() : p.getPath();
+                        if (i > 0) prereqNames.append(", ");
+                        prereqNames.append(paName);
+                    }
+                    tooltip.add(Component.translatable("jutsu.scroll.requires_prerequisite",
+                            Component.literal(prereqNames.toString()).withStyle(ChatFormatting.YELLOW),
+                            Component.literal(String.valueOf(ability.getRequiredMastery())).withStyle(ChatFormatting.GOLD)
+                    ).withStyle(ChatFormatting.GOLD));
+                }
             }
         } else {
             tooltip.add(Component.translatable("jutsu.scroll.desc").withStyle(ChatFormatting.GRAY));

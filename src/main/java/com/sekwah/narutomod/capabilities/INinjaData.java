@@ -2,6 +2,7 @@ package com.sekwah.narutomod.capabilities;
 
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -9,6 +10,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public interface INinjaData extends INBTSerializable<Tag> {
@@ -28,6 +30,9 @@ public interface INinjaData extends INBTSerializable<Tag> {
     void useStamina(float amount, int cooldown);
     void addChakra(float amount);
     void addStamina(float amount);
+    void lockChakraRegen(int ticks);
+    int getChakraRegenCooldown();
+    boolean isChakraRegenLocked();
 
     ResourceLocation getClan();
     void setClan(ResourceLocation clan);
@@ -51,6 +56,14 @@ public interface INinjaData extends INBTSerializable<Tag> {
     void addEnemyDefeated();
     void setEnemiesDefeated(int count);
 
+    int getRogueNinjasDefeated();
+    void addRogueNinjaDefeated();
+    void setRogueNinjasDefeated(int count);
+
+    int getAkatsukiNinjasDefeated();
+    void addAkatsukiNinjaDefeated();
+    void setAkatsukiNinjasDefeated(int count);
+
     int getJutsusCastCount();
     void addJutsuCast();
     void setJutsusCastCount(int count);
@@ -69,6 +82,13 @@ public interface INinjaData extends INBTSerializable<Tag> {
     java.util.Set<ResourceLocation> getUnlockedAbilities();
     String getUnlockedJutsusString();
     void setUnlockedJutsusString(String jutsus);
+
+    Map<ResourceLocation, Integer> getJutsuMasteryMap();
+    int getMastery(ResourceLocation jutsuId);
+    void addMastery(ResourceLocation jutsuId, int amount);
+
+    void saveNBTData(CompoundTag nbt);
+    void loadNBTData(CompoundTag nbt);
 
     HashMap<String, CooldownTickEvent> getCooldownEvents();
 

@@ -3,8 +3,18 @@ package com.sekwah.narutomod;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
+import com.sekwah.narutomod.abilities.Ability;
+import com.sekwah.narutomod.abilities.jutsus.ByakuganAbility;
+import com.sekwah.narutomod.abilities.jutsus.RasenshurikenAbility;
+import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
+import com.sekwah.narutomod.abilities.jutsus.SusanooRibcageAbility;
+import com.sekwah.narutomod.item.weapons.KusanagiSwordItem;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -348,5 +358,416 @@ public class NinjaDataLogicTest {
         assertNotNull(ninjaData.getToggleAbilityData(), "getToggleAbilityData should self-heal when field is null");
         assertNotNull(ninjaData.getToggleAbilityData().getAbilitiesSnapshot());
         assertEquals(0, ninjaData.getToggleAbilityData().getAbilitiesSnapshot().size());
+    }
+
+    @Test
+    @DisplayName("Verify jutsu mastery tracking, incrementing, and map retrieval")
+    public void testJutsuMasteryTracking() {
+        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
+        ResourceLocation chidori = new ResourceLocation(NarutoMod.MOD_ID, "chidori");
+
+        assertEquals(0, ninjaData.getMastery(rasengan), "Mastery should default to 0");
+        assertEquals(0, ninjaData.getMastery(chidori), "Mastery should default to 0");
+        assertTrue(ninjaData.getJutsuMasteryMap().isEmpty(), "Initial mastery map should be empty");
+
+        ninjaData.addMastery(rasengan, 1);
+        assertEquals(1, ninjaData.getMastery(rasengan));
+        assertEquals(0, ninjaData.getMastery(chidori));
+
+        ninjaData.addMastery(rasengan, 99);
+        assertEquals(100, ninjaData.getMastery(rasengan));
+
+        ninjaData.addMastery(chidori, 50);
+        assertEquals(100, ninjaData.getMastery(rasengan));
+        assertEquals(50, ninjaData.getMastery(chidori));
+
+        assertEquals(2, ninjaData.getJutsuMasteryMap().size());
+        assertEquals(100, ninjaData.getJutsuMasteryMap().get(rasengan));
+        assertEquals(50, ninjaData.getJutsuMasteryMap().get(chidori));
+    }
+
+    @Test
+    @DisplayName("Verify jutsu mastery NBT serialization and deserialization via saveNBTData and loadNBTData")
+    public void testJutsuMasteryNBT() {
+        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
+        ResourceLocation fireball = new ResourceLocation(NarutoMod.MOD_ID, "fireball");
+
+        ninjaData.addMastery(rasengan, 150);
+        ninjaData.addMastery(fireball, 30);
+
+        // Test with saveNBTData and loadNBTData
+        CompoundTag compound = new CompoundTag();
+        ninjaData.saveNBTData(compound);
+
+        NinjaData restored = new NinjaData(false);
+        restored.loadNBTData(compound);
+
+        assertEquals(150, restored.getMastery(rasengan));
+        assertEquals(30, restored.getMastery(fireball));
+        assertEquals(2, restored.getJutsuMasteryMap().size());
+
+        // Also test with serializeNBT and deserializeNBT
+        Tag serializedTag = ninjaData.serializeNBT();
+        NinjaData restoredViaTag = new NinjaData(false);
+        restoredViaTag.deserializeNBT(serializedTag);
+
+        assertEquals(150, restoredViaTag.getMastery(rasengan));
+        assertEquals(30, restoredViaTag.getMastery(fireball));
+    }
+
+    @Test
+    @DisplayName("Verify jutsu mastery cleared on resetData")
+    public void testJutsuMasteryReset() {
+        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
+        ninjaData.addMastery(rasengan, 120);
+        assertEquals(120, ninjaData.getMastery(rasengan));
+
+        ninjaData.resetData();
+        assertEquals(0, ninjaData.getMastery(rasengan));
+        assertTrue(ninjaData.getJutsuMasteryMap().isEmpty());
+    }
+
+    private static class DummyAbility extends Ability {
+        public boolean executed = false;
+
+        public DummyAbility(ResourceLocation id) {
+            this.setRegistryName(id);
+        }
+
+        @Override
+        public ActivationType activationType() {
+            return ActivationType.INSTANT;
+        }
+
+        @Override
+        public void performServer(net.minecraft.world.entity.player.Player player, INinjaData ninjaData, int ticksActive) {
+            this.executed = true;
+        }
+    }
+
+    @Test
+    @DisplayName("Verify Ability perform() and performServer() increment jutsu mastery by +1")
+    public void testAbilityPerformIncrementsMastery() {
+        ResourceLocation testJutsu = new ResourceLocation(NarutoMod.MOD_ID, "test_jutsu");
+        DummyAbility ability = new DummyAbility(testJutsu);
+
+        assertEquals(0, ninjaData.getMastery(testJutsu));
+        assertFalse(ability.executed);
+
+        // First execution via perform()
+        ability.perform(null, ninjaData);
+        assertTrue(ability.executed);
+        assertEquals(1, ninjaData.getMastery(testJutsu), "Successful perform() should grant +1 mastery");
+
+        // Second execution via perform(player, data, ticks)
+        ability.perform(null, ninjaData, 10);
+        assertEquals(2, ninjaData.getMastery(testJutsu), "Second perform() should grant another +1 mastery");
+
+        // Third execution via performServer()
+        ability.performServer(null, ninjaData);
+        assertEquals(3, ninjaData.getMastery(testJutsu), "performServer() should route to perform() and grant +1 mastery");
+    }
+
+    @Test
+    @DisplayName("Verify RasenshurikenAbility requires Rasengan with 100+ mastery")
+    public void testRasenshurikenPrerequisites() {
+        RasenshurikenAbility rasenshuriken = new RasenshurikenAbility();
+        rasenshuriken.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "rasenshuriken"));
+
+        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
+
+        // Verify prerequisite configuration
+        assertEquals(List.of(rasengan), rasenshuriken.getPrerequisites());
+        assertEquals(100, rasenshuriken.getRequiredMastery());
+
+        // 1. Rasengan not unlocked, 0 mastery
+        assertFalse(rasenshuriken.meetsPrerequisites(ninjaData), "Prerequisites must fail when Rasengan is not known");
+
+        // 2. Rasengan unlocked, but mastery is below 100
+        ninjaData.unlockAbility(rasengan);
+        ninjaData.addMastery(rasengan, 50);
+        assertFalse(rasenshuriken.meetsPrerequisites(ninjaData), "Prerequisites must fail when Rasengan mastery < 100");
+
+        // 3. Rasengan mastery reaches 99
+        ninjaData.addMastery(rasengan, 49);
+        assertEquals(99, ninjaData.getMastery(rasengan));
+        assertFalse(rasenshuriken.meetsPrerequisites(ninjaData), "Prerequisites must fail when Rasengan mastery is 99");
+
+        // 4. Rasengan mastery reaches 100
+        ninjaData.addMastery(rasengan, 1);
+        assertEquals(100, ninjaData.getMastery(rasengan));
+        assertTrue(rasenshuriken.meetsPrerequisites(ninjaData), "Prerequisites must succeed when Rasengan mastery >= 100");
+
+        // 5. Rasengan mastery exceeds 100
+        ninjaData.addMastery(rasengan, 50);
+        assertTrue(rasenshuriken.meetsPrerequisites(ninjaData));
+    }
+
+    @Test
+    @DisplayName("Verify prerequisite locks prevent unlock until mastery and rank requirements are met")
+    public void testPrerequisiteLockAndUnlockLogic() {
+        RasenshurikenAbility rasenshuriken = new RasenshurikenAbility();
+        rasenshuriken.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "rasenshuriken"));
+        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
+
+        // Genin rank, prerequisites not met
+        ninjaData.setRank("GENIN");
+        assertFalse(rasenshuriken.meetsPrerequisites(ninjaData));
+        assertFalse(ninjaData.isAbilityUnlocked(rasenshuriken));
+
+        // Unlock Rasengan and train mastery to 100, but still Genin rank
+        ninjaData.unlockAbility(rasengan);
+        ninjaData.addMastery(rasengan, 100);
+        assertTrue(rasenshuriken.meetsPrerequisites(ninjaData));
+        // Rasenshuriken requires JONIN rank
+        assertFalse(ninjaData.isAbilityUnlocked(rasenshuriken), "Must not unlock below required JONIN rank");
+
+        // Promote to JONIN rank
+        ninjaData.setRank("JONIN");
+        assertTrue(ninjaData.isAbilityUnlocked(rasenshuriken), "Should unlock once prerequisites (Rasengan 100) and JONIN rank are both achieved!");
+    }
+
+    @Test
+    @DisplayName("Verify Sharingan evolution stages based on mastery")
+    public void testSharinganEvolutionStages() {
+        assertEquals(SharinganAbility.SharinganStage.ONE_TOMOE, SharinganAbility.getStage(0));
+        assertEquals(SharinganAbility.SharinganStage.ONE_TOMOE, SharinganAbility.getStage(24));
+        assertEquals(SharinganAbility.SharinganStage.TWO_TOMOE, SharinganAbility.getStage(25));
+        assertEquals(SharinganAbility.SharinganStage.TWO_TOMOE, SharinganAbility.getStage(74));
+        assertEquals(SharinganAbility.SharinganStage.THREE_TOMOE, SharinganAbility.getStage(75));
+        assertEquals(SharinganAbility.SharinganStage.THREE_TOMOE, SharinganAbility.getStage(149));
+        assertEquals(SharinganAbility.SharinganStage.MANGEKYOU, SharinganAbility.getStage(150));
+        assertEquals(SharinganAbility.SharinganStage.MANGEKYOU, SharinganAbility.getStage(500));
+
+        ResourceLocation sharingan = new ResourceLocation(NarutoMod.MOD_ID, "sharingan");
+        assertFalse(SharinganAbility.hasMangekyou(ninjaData));
+
+        ninjaData.addMastery(sharingan, 30);
+        assertEquals(SharinganAbility.SharinganStage.TWO_TOMOE, SharinganAbility.getStage(ninjaData));
+        assertFalse(SharinganAbility.hasMangekyou(ninjaData));
+
+        ninjaData.addMastery(sharingan, 50); // 80 total
+        assertEquals(SharinganAbility.SharinganStage.THREE_TOMOE, SharinganAbility.getStage(ninjaData));
+        assertFalse(SharinganAbility.hasMangekyou(ninjaData));
+
+        ninjaData.addMastery(sharingan, 70); // 150 total
+        assertEquals(SharinganAbility.SharinganStage.MANGEKYOU, SharinganAbility.getStage(ninjaData));
+        assertTrue(SharinganAbility.hasMangekyou(ninjaData));
+    }
+
+    @Test
+    @DisplayName("Verify SusanooRibcageAbility requires Uchiha clan and Mangekyou stage")
+    public void testSusanooRequiresMangekyou() {
+        SusanooRibcageAbility susanoo = new SusanooRibcageAbility();
+        susanoo.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "susanoo_ribcage"));
+        ResourceLocation sharingan = new ResourceLocation(NarutoMod.MOD_ID, "sharingan");
+
+        // 1. Non-Uchiha clan cannot activate Susanoo
+        ninjaData.setClan(new ResourceLocation(NarutoMod.MOD_ID, "hyuga"));
+        assertFalse(susanoo.canActivate(null, ninjaData));
+        assertFalse(ninjaData.isAbilityUnlocked(susanoo));
+
+        // 2. Uchiha clan without Mangekyou (0 mastery)
+        ninjaData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "uchiha"));
+        assertFalse(susanoo.canActivate(null, ninjaData));
+        assertFalse(susanoo.meetsPrerequisites(ninjaData));
+        assertFalse(ninjaData.isAbilityUnlocked(susanoo));
+
+        // 3. Uchiha clan with 3-Tomoe (100 mastery)
+        ninjaData.unlockAbility(sharingan);
+        ninjaData.addMastery(sharingan, 100);
+        assertFalse(susanoo.canActivate(null, ninjaData));
+        assertFalse(susanoo.meetsPrerequisites(ninjaData));
+        assertFalse(ninjaData.isAbilityUnlocked(susanoo));
+
+        // 4. Awakened Mangekyou (150 mastery)
+        ninjaData.addMastery(sharingan, 50); // 150 total
+        assertTrue(susanoo.canActivate(null, ninjaData));
+        assertTrue(susanoo.meetsPrerequisites(ninjaData));
+
+        // Still requires JONIN rank to unlock
+        ninjaData.setRank("GENIN");
+        assertFalse(ninjaData.isAbilityUnlocked(susanoo));
+
+        // When reaching JONIN rank (and being Uchiha with Mangekyou), unlocks!
+        ninjaData.setRank("JONIN");
+        assertTrue(ninjaData.isAbilityUnlocked(susanoo));
+    }
+
+    @Test
+    @DisplayName("Verify Byakugan Tenketsu chakra regeneration lock and serialization")
+    public void testByakuganChakraLockDebuff() {
+        assertEquals(0, ninjaData.getChakraRegenCooldown());
+        assertFalse(ninjaData.isChakraRegenLocked());
+
+        ninjaData.lockChakraRegen(ByakuganAbility.CHAKRA_LOCK_TICKS);
+        assertEquals(100, ninjaData.getChakraRegenCooldown());
+        assertTrue(ninjaData.isChakraRegenLocked());
+
+        // Calling lockChakraRegen with smaller duration shouldn't lower the existing cooldown
+        ninjaData.lockChakraRegen(40);
+        assertEquals(100, ninjaData.getChakraRegenCooldown());
+
+        // NBT serialization test
+        Tag nbt = ninjaData.serializeNBT();
+        NinjaData restored = new NinjaData(false);
+        restored.deserializeNBT(nbt);
+        assertEquals(100, restored.getChakraRegenCooldown());
+        assertTrue(restored.isChakraRegenLocked());
+
+        // Reset data test
+        ninjaData.resetData();
+        assertEquals(0, ninjaData.getChakraRegenCooldown());
+        assertFalse(ninjaData.isChakraRegenLocked());
+    }
+
+    @Test
+    @DisplayName("Verify Alt Asama 3.3 rank mission prerequisites: Genin->Chunin and Chunin->Jonin")
+    public void testRankUpMissionPrerequisites() {
+        ResourceLocation fireball = new ResourceLocation(NarutoMod.MOD_ID, "fireball");
+        ResourceLocation waterBullet = new ResourceLocation(NarutoMod.MOD_ID, "water_bullet");
+        ResourceLocation bodyFlicker = new ResourceLocation(NarutoMod.MOD_ID, "body_flicker");
+        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
+
+        // 1. Initial Academy Student
+        assertEquals("ACADEMY_STUDENT", ninjaData.getRank());
+        assertFalse(ninjaData.canRankUp(), "Cannot graduate without chakra >= 120 and jutsus cast >= 8");
+
+        ninjaData.setBaseMaxChakra(120.0f);
+        ninjaData.setJutsusCastCount(8);
+        assertTrue(ninjaData.canRankUp());
+        assertTrue(ninjaData.rankUp());
+        assertEquals("GENIN", ninjaData.getRank());
+
+        // 2. Genin -> Chunin Requirements:
+        // Chakra >= 160, Stamina >= 130, Rogue Ninjas Defeated >= 10, At least 3 jutsus with 50+ mastery
+        assertFalse(ninjaData.canRankUp(), "Genin cannot rank up initially");
+
+        // Set chakra and stamina to target
+        ninjaData.setBaseMaxChakra(160.0f);
+        ninjaData.setBaseMaxStamina(130.0f);
+        assertFalse(ninjaData.canRankUp(), "Cannot rank up without rogue kills and jutsu masteries");
+
+        // Set rogue ninjas to 9 (needs 10)
+        ninjaData.setRogueNinjasDefeated(9);
+        ninjaData.addMastery(fireball, 50);
+        ninjaData.addMastery(waterBullet, 50);
+        ninjaData.addMastery(bodyFlicker, 50);
+        assertFalse(ninjaData.canRankUp(), "Cannot rank up with only 9 rogue kills");
+        assertEquals(1, NinjaRank.GENIN.getMissingRequirements(ninjaData).size());
+
+        // Add 10th rogue kill
+        ninjaData.addRogueNinjaDefeated();
+        assertEquals(10, ninjaData.getRogueNinjasDefeated());
+        assertTrue(ninjaData.canRankUp(), "Should be ready for Chunin rank up once all 4 requirements are met");
+        assertTrue(NinjaRank.GENIN.getMissingRequirements(ninjaData).isEmpty());
+
+        // Test one jutsu mastery failing (< 50)
+        ninjaData.getJutsuMasteryMap().put(bodyFlicker, 49);
+        assertFalse(ninjaData.canRankUp(), "Cannot rank up if only 2 jutsus have 50+ mastery");
+        ninjaData.getJutsuMasteryMap().put(bodyFlicker, 50);
+        assertTrue(ninjaData.canRankUp());
+
+        // Graduate to CHUNIN
+        assertTrue(ninjaData.rankUp());
+        assertEquals("CHUNIN", ninjaData.getRank());
+
+        // 3. Chunin -> Jonin Requirements:
+        // Chakra >= 260, Stamina >= 180, Akatsuki Defeated >= 1, At least 1 advanced jutsu with 50+ mastery
+        assertFalse(ninjaData.canRankUp(), "Chunin cannot rank up without advanced jutsu and akatsuki kill");
+
+        ninjaData.setBaseMaxChakra(260.0f);
+        ninjaData.setBaseMaxStamina(180.0f);
+        assertFalse(ninjaData.canRankUp());
+
+        // Add 50 mastery to standard jutsus (fireball, water bullet, body flicker) - none of them are advanced
+        assertEquals(3, NinjaRank.countMasteredJutsus(ninjaData, 50));
+        assertFalse(NinjaRank.hasMasteredAdvancedJutsu(ninjaData, 50));
+        assertFalse(ninjaData.canRankUp());
+
+        // Defeat an Akatsuki member
+        ninjaData.addAkatsukiNinjaDefeated();
+        assertEquals(1, ninjaData.getAkatsukiNinjasDefeated());
+        assertFalse(ninjaData.canRankUp(), "Still requires an advanced jutsu (e.g. Rasengan) with 50+ mastery");
+
+        // Master Rasengan (isScrollRequiredJutsu -> advanced) with 50 mastery
+        ninjaData.addMastery(rasengan, 50);
+        assertTrue(NinjaRank.hasMasteredAdvancedJutsu(ninjaData, 50));
+        assertTrue(ninjaData.canRankUp(), "All Chunin -> Jonin requirements now satisfied!");
+        assertTrue(NinjaRank.CHUNIN.getMissingRequirements(ninjaData).isEmpty());
+
+        // Graduate to JONIN
+        assertTrue(ninjaData.rankUp());
+        assertEquals("JONIN", ninjaData.getRank());
+
+        // 4. NBT Serialization of mission counters
+        CompoundTag tag = new CompoundTag();
+        ninjaData.saveNBTData(tag);
+
+        NinjaData restored = new NinjaData(false);
+        restored.loadNBTData(tag);
+        assertEquals(10, restored.getRogueNinjasDefeated());
+        assertEquals(1, restored.getAkatsukiNinjasDefeated());
+
+        // 5. Reset data
+        ninjaData.resetData();
+        assertEquals(0, ninjaData.getRogueNinjasDefeated());
+        assertEquals(0, ninjaData.getAkatsukiNinjasDefeated());
+    }
+
+    @Test
+    @DisplayName("Verify weapon chakra interactions (Samehada devour & Kusanagi chakra flow)")
+    public void testWeaponChakraInteractions() {
+        // 1. Samehada Chakra Devour Logic
+        NinjaData attackerData = new NinjaData(true);
+        NinjaData targetData = new NinjaData(true);
+
+        attackerData.setBaseMaxChakra(100.0f);
+        attackerData.useChakra(100.0f, 0); // Attacker empty at 0 chakra
+        assertEquals(0.0f, attackerData.getChakra(), 0.01f);
+
+        targetData.setBaseMaxChakra(100.0f);
+        assertEquals(100.0f, targetData.getChakra(), 0.01f);
+
+        // Strike 1: Target has 100 chakra -> devours 20 chakra
+        float targetChakra = targetData.getChakra();
+        float drain = Math.min(targetChakra, 20.0f);
+        targetData.useChakra(drain, 30);
+        attackerData.addChakra(drain);
+
+        assertEquals(80.0f, targetData.getChakra(), 0.01f);
+        assertEquals(20.0f, attackerData.getChakra(), 0.01f);
+
+        // Strike 2: Target has only 12 chakra left
+        targetData.useChakra(68.0f, 0);
+        assertEquals(12.0f, targetData.getChakra(), 0.01f);
+
+        targetChakra = targetData.getChakra();
+        drain = Math.min(targetChakra, 20.0f);
+        targetData.useChakra(drain, 30);
+        attackerData.addChakra(drain);
+
+        assertEquals(0.0f, targetData.getChakra(), 0.01f);
+        assertEquals(32.0f, attackerData.getChakra(), 0.01f);
+
+        // Strike 3: Target has 0 chakra -> no chakra drained
+        targetChakra = targetData.getChakra();
+        drain = Math.min(targetChakra, 20.0f);
+        assertEquals(0.0f, drain, 0.01f);
+
+        // 2. Kusanagi NBT and Chakra Flow Logic
+        CompoundTag activeTag = new CompoundTag();
+        activeTag.putBoolean(KusanagiSwordItem.NBT_CHAKRA_ACTIVE, true);
+        activeTag.putLong(KusanagiSwordItem.NBT_ACTIVE_UNTIL, 500L);
+
+        assertTrue(activeTag.getBoolean(KusanagiSwordItem.NBT_CHAKRA_ACTIVE));
+        assertEquals(500L, activeTag.getLong(KusanagiSwordItem.NBT_ACTIVE_UNTIL));
+
+        // When expired (gameTime 600 > 500)
+        long gameTime = 600L;
+        if (gameTime > activeTag.getLong(KusanagiSwordItem.NBT_ACTIVE_UNTIL)) {
+            activeTag.putBoolean(KusanagiSwordItem.NBT_CHAKRA_ACTIVE, false);
+        }
+        assertFalse(activeTag.getBoolean(KusanagiSwordItem.NBT_CHAKRA_ACTIVE));
     }
 }

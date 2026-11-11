@@ -99,4 +99,17 @@ public class PlayerEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onAttackEntity(net.minecraftforge.event.entity.player.AttackEntityEvent event) {
+        if (event.isCanceled()) return;
+        Player player = event.getEntity();
+        if (player.level().isClientSide()) return;
+
+        player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+            if (ninjaData.isByakuganActive() && event.getTarget() instanceof net.minecraft.world.entity.LivingEntity livingTarget) {
+                com.sekwah.narutomod.abilities.jutsus.ByakuganAbility.applyChakraLockStrike(player, livingTarget);
+            }
+        });
+    }
+
 }

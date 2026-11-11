@@ -42,6 +42,41 @@ public abstract class Ability {
         return NinjaRank.GENIN;
     }
 
+    public java.util.List<ResourceLocation> getPrerequisites() {
+        return java.util.Collections.emptyList();
+    }
+
+    public int getRequiredMastery() {
+        return 0;
+    }
+
+    public boolean meetsPrerequisites(INinjaData ninjaData) {
+        if (ninjaData == null) return false;
+        java.util.List<ResourceLocation> prereqs = getPrerequisites();
+        if (prereqs == null || prereqs.isEmpty()) {
+            return true;
+        }
+        int reqMastery = getRequiredMastery();
+        for (ResourceLocation prereq : prereqs) {
+            boolean unlocked = (ninjaData.getUnlockedAbilities() != null && ninjaData.getUnlockedAbilities().contains(prereq))
+                    || ninjaData.isAbilityUnlocked(prereq);
+            if (!unlocked) {
+                return false;
+            }
+            if (reqMastery > 0 && ninjaData.getMastery(prereq) < reqMastery) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Determines whether this ability can currently be activated by the player.
+     */
+    public boolean canActivate(Player player, INinjaData ninjaData) {
+        return true;
+    }
+
     public enum ActivationType {
         INSTANT,
         TOGGLE,
@@ -231,7 +266,21 @@ public abstract class Ability {
     public abstract void performServer(Player player, INinjaData ninjaData, int ticksActive);
 
     public void performServer(Player player, INinjaData ninjaData) {
-        this.performServer(player, ninjaData, 0);
+        this.perform(player, ninjaData, 0);
+    }
+
+    public void perform(Player player, INinjaData ninjaData, int ticksActive) {
+        this.performServer(player, ninjaData, ticksActive);
+        if (ninjaData != null) {
+            ResourceLocation reg = this.getRegistryName();
+            if (reg != null) {
+                ninjaData.addMastery(reg, 1);
+            }
+        }
+    }
+
+    public void perform(Player player, INinjaData ninjaData) {
+        this.perform(player, ninjaData, 0);
     }
 
     public interface Toggled {

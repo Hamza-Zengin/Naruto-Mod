@@ -4,6 +4,8 @@ import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
+import com.sekwah.narutomod.entity.mob.AkatsukiNinjaEntity;
+import com.sekwah.narutomod.entity.mob.RogueNinjaEntity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -88,7 +90,14 @@ public class NinjaCapabilityHandler {
             });
         }
         if (event.getSource().getEntity() instanceof Player killer) {
-            killer.getCapability(NINJA_DATA).ifPresent(INinjaData::addEnemyDefeated);
+            killer.getCapability(NINJA_DATA).ifPresent(ninjaData -> {
+                ninjaData.addEnemyDefeated();
+                if (event.getEntity() instanceof RogueNinjaEntity) {
+                    ninjaData.addRogueNinjaDefeated();
+                } else if (event.getEntity() instanceof AkatsukiNinjaEntity) {
+                    ninjaData.addAkatsukiNinjaDefeated();
+                }
+            });
         }
     }
 

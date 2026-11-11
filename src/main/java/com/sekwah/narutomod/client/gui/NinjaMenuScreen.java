@@ -15,8 +15,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import com.sekwah.narutomod.clans.Clan;
@@ -117,11 +119,25 @@ public class NinjaMenuScreen extends Screen {
 
                 Button rankBtn = Button.builder(btnText, b -> {
                     PacketHandler.sendToServer(new ServerRankUpPacket());
-                    ninjaData.rankUp();
+                    if (canRank) {
+                        ninjaData.rankUp();
+                    }
                     this.init();
                 }).bounds(centerX - 120, btnY, 240, 20).build();
 
                 rankBtn.active = canRank;
+
+                if (canRank) {
+                    rankBtn.setTooltip(Tooltip.create(Component.translatable("naruto.gui.ninja_menu.btn.rank_up_ready").withStyle(ChatFormatting.GREEN)));
+                } else {
+                    MutableComponent tooltipComp = Component.translatable("naruto.gui.ninja_menu.missing_requirements").withStyle(ChatFormatting.RED, ChatFormatting.BOLD);
+                    List<Component> missing = rank.getMissingRequirements(ninjaData);
+                    for (Component req : missing) {
+                        tooltipComp.append(Component.literal("\n • ").withStyle(ChatFormatting.GRAY)).append(req.copy().withStyle(ChatFormatting.YELLOW));
+                    }
+                    rankBtn.setTooltip(Tooltip.create(tooltipComp));
+                }
+
                 this.addRenderableWidget(rankBtn);
             }
         });
@@ -251,6 +267,27 @@ public class NinjaMenuScreen extends Screen {
         });
 
         super.render(graphics, mouseX, mouseY, partialTicks);
+
+        if (this.activeTab == 0) {
+            mc.player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+                NinjaRank rank = NinjaRank.fromString(ninjaData.getRank());
+                if (rank.getLevel() < NinjaRank.KAGE.getLevel() && !ninjaData.canRankUp()) {
+                    int btnY = boxY + BOX_HEIGHT - 24;
+                    int btnX = centerX - 120;
+                    int btnW = 240;
+                    int btnH = 20;
+                    if (mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH) {
+                        List<Component> missing = rank.getMissingRequirements(ninjaData);
+                        List<Component> tooltipLines = new ArrayList<>();
+                        tooltipLines.add(Component.translatable("naruto.gui.ninja_menu.missing_requirements").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+                        for (Component req : missing) {
+                            tooltipLines.add(Component.literal(" • ").withStyle(ChatFormatting.GRAY).append(req.copy().withStyle(ChatFormatting.YELLOW)));
+                        }
+                        graphics.renderComponentTooltip(this.font, tooltipLines, mouseX, mouseY);
+                    }
+                }
+            });
+        }
     }
 
     private void renderProfileTab(GuiGraphics graphics, INinjaData ninjaData, int centerX, int boxY) {
@@ -370,10 +407,14 @@ public class NinjaMenuScreen extends Screen {
         } else if (rank == NinjaRank.GENIN) {
             int needC = (int) rank.getRequiredChakraToAdvance();
             int needS = (int) rank.getRequiredStaminaToAdvance();
-            int needK = rank.getRequiredEnemiesToAdvance();
+            int needRogue = 10;
+            int needMastered = 3;
             boolean reqC = baseChakra >= needC;
             boolean reqS = baseStamina >= needS;
-            boolean reqK = ninjaData.getEnemiesDefeated() >= needK;
+            int rogueKills = ninjaData.getRogueNinjasDefeated();
+            boolean reqRogue = rogueKills >= needRogue;
+            int masteredCount = NinjaRank.countMasteredJutsus(ninjaData, 50);
+            boolean reqMastered = masteredCount >= needMastered;
             boolean ready = ninjaData.canRankUp();
 
             graphics.fill(x, examBoxY, x + contentW, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
@@ -383,23 +424,23 @@ public class NinjaMenuScreen extends Screen {
 
             String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, needC) + "/" + needC;
             String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, needS) + "/" + needS;
-            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), needK) + "/" + needK;
+            String rText = (reqRogue ? "§a✔ " : "§c✖ ") + "Kaçak Ninja: " + Math.min(rogueKills, needRogue) + "/" + needRogue;
+            String mText = (reqMastered ? "§a✔ " : "§c✖ ") + "Usta Jutsu: " + Math.min(masteredCount, needMastered) + "/" + needMastered;
             graphics.drawString(this.font, cText + "   " + sText, x + 6, examBoxY + 18, 0xFFFFFFFF);
-            graphics.drawString(this.font, kText, x + 6, examBoxY + 30, 0xFFFFFFFF);
+            graphics.drawString(this.font, rText + "   " + mText, x + 6, examBoxY + 30, 0xFFFFFFFF);
 
-            String hint = ready ? "§a✔ Chūnin terfisi hazır! Aşağıdaki butona tıklayın." : "§7Koşarak kondisyonunuzu artırın ve düşmanları yenin.";
+            String hint = ready ? "§a✔ Chūnin terfisi hazır! Aşağıdaki butona tıklayın." : "§7Kaçak ninjaları avlayın ve en az 3 jutsuda 50+ ustalığa ulaşın.";
             graphics.drawString(this.font, hint, x + 6, examBoxY + 43, 0xFFAAAAAA);
 
         } else if (rank == NinjaRank.CHUNIN) {
             int needC = (int) rank.getRequiredChakraToAdvance();
             int needS = (int) rank.getRequiredStaminaToAdvance();
-            int needK = rank.getRequiredEnemiesToAdvance();
-            int needJ = rank.getRequiredJutsusToAdvance();
+            int needAkatsuki = 1;
             boolean reqC = baseChakra >= needC;
             boolean reqS = baseStamina >= needS;
-            boolean reqK = ninjaData.getEnemiesDefeated() >= needK;
-            int unlocked = ninjaData.getUnlockedAbilities().size();
-            boolean reqJ = unlocked >= needJ;
+            int akatsukiKills = ninjaData.getAkatsukiNinjasDefeated();
+            boolean reqAkatsuki = akatsukiKills >= needAkatsuki;
+            boolean reqAdv = NinjaRank.hasMasteredAdvancedJutsu(ninjaData, 50);
             boolean ready = ninjaData.canRankUp();
 
             graphics.fill(x, examBoxY, x + contentW, examBoxY + examBoxH, ready ? 0x3322AA22 : 0x22333344);
@@ -409,12 +450,12 @@ public class NinjaMenuScreen extends Screen {
 
             String cText = (reqC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int)Math.min(baseChakra, needC) + "/" + needC;
             String sText = (reqS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int)Math.min(baseStamina, needS) + "/" + needS;
-            String kText = (reqK ? "§a✔ " : "§c✖ ") + "Düşman: " + Math.min(ninjaData.getEnemiesDefeated(), needK) + "/" + needK;
-            String jText = (reqJ ? "§a✔ " : "§c✖ ") + "Parşömen: " + Math.min(unlocked, needJ) + "/" + needJ;
+            String aText = (reqAkatsuki ? "§a✔ " : "§c✖ ") + "Akatsuki: " + Math.min(akatsukiKills, needAkatsuki) + "/" + needAkatsuki;
+            String advText = (reqAdv ? "§a✔ " : "§c✖ ") + "İleri Jutsu: " + (reqAdv ? "Hazır" : "Gerekiyor");
             graphics.drawString(this.font, cText + "   " + sText, x + 6, examBoxY + 18, 0xFFFFFFFF);
-            graphics.drawString(this.font, kText + "   " + jText, x + 6, examBoxY + 30, 0xFFFFFFFF);
+            graphics.drawString(this.font, aText + "   " + advText, x + 6, examBoxY + 30, 0xFFFFFFFF);
 
-            String hint = ready ? "§a✔ Jōnin ataması hazır! Aşağıdan rütbeye terfi edin." : "§7Gelişmiş parşömen tekniklerini (Rasengan/Chidori vb.) öğrenin.";
+            String hint = ready ? "§a✔ Jōnin ataması hazır! Aşağıdan rütbeye terfi edin." : "§7Akatsuki üyesini yenin ve ileri seviye bir teknikte (Rasengan/Chidori) ustalaşın.";
             graphics.drawString(this.font, hint, x + 6, examBoxY + 43, 0xFFAAAAAA);
 
         } else if (rank == NinjaRank.JONIN) {
@@ -564,9 +605,17 @@ public class NinjaMenuScreen extends Screen {
             graphics.fill(boxX, cardY, boxX + BOX_WIDTH, cardY + cardH, bgCol);
             graphics.renderOutline(boxX, cardY, BOX_WIDTH, cardH, borderCol);
 
-            // Ability Name
+            // Ability Name and Mastery
             String name = Component.translatable(ability.getTranslationKey()).getString();
+            int mastery = ninjaData.getMastery(id);
             graphics.drawString(this.font, "§f§l" + name, boxX + 8, cardY + 4, 0xFFFFFFFF);
+            if (id != null && "sharingan".equals(id.getPath())) {
+                com.sekwah.narutomod.abilities.jutsus.SharinganAbility.SharinganStage stage =
+                        com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(mastery);
+                graphics.drawString(this.font, "§eUstalık: §a" + mastery + " §7(" + stage.getDisplayName() + ")", boxX + 150, cardY + 4, 0xFFFFFF88);
+            } else {
+                graphics.drawString(this.font, "§eUstalık: §a" + mastery, boxX + 160, cardY + 4, 0xFFFFFF88);
+            }
 
             // Combo & Type Info
             if (unlocked) {
@@ -578,7 +627,16 @@ public class NinjaMenuScreen extends Screen {
 
             // Acquisition Type
             String reqType;
-            if (id != null && (id.getPath().equals("amaterasu") || id.getPath().equals("susanoo_ribcage"))) {
+            if (!ability.getPrerequisites().isEmpty()) {
+                StringBuilder sbPrereq = new StringBuilder();
+                for (ResourceLocation p : ability.getPrerequisites()) {
+                    Ability pa = NarutoAbilities.getAbility(p);
+                    String paName = pa != null ? Component.translatable(pa.getTranslationKey()).getString() : p.getPath();
+                    if (sbPrereq.length() > 0) sbPrereq.append(", ");
+                    sbPrereq.append(paName);
+                }
+                reqType = "§b[Önşart: " + sbPrereq + " (" + ability.getRequiredMastery() + "+ Ustalık)]";
+            } else if (id != null && (id.getPath().equals("amaterasu") || id.getPath().equals("susanoo_ribcage"))) {
                 reqType = "§c[Uchiha Parşömeni - Jōnin]";
             } else if (id != null && id.getPath().equals("eight_gates")) {
                 reqType = "§4[Yasak Parşömen - Jōnin]";

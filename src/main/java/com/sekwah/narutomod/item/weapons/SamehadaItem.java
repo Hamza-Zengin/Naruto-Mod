@@ -34,10 +34,25 @@ public class SamehadaItem extends SwordItem {
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         boolean result = super.hurtEnemy(stack, target, attacker);
         if (!attacker.level().isClientSide && attacker instanceof Player player) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-                ninjaData.addChakra(8.0f);
+            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(attackerData -> {
+                net.minecraftforge.common.util.LazyOptional<com.sekwah.narutomod.capabilities.INinjaData> targetCap =
+                        target.getCapability(NinjaCapabilityHandler.NINJA_DATA);
+                if (targetCap.isPresent()) {
+                    targetCap.ifPresent(targetData -> {
+                        float targetChakra = targetData.getChakra();
+                        if (targetChakra > 0) {
+                            float drain = Math.min(targetChakra, 20.0f);
+                            targetData.useChakra(drain, 30);
+                            attackerData.addChakra(drain);
+                        } else {
+                            player.heal(3.0f);
+                        }
+                    });
+                } else {
+                    attackerData.addChakra(8.0f);
+                    player.heal(2.0f);
+                }
             });
-            player.heal(2.0f);
             if (attacker.level() instanceof ServerLevel serverLevel) {
                 serverLevel.sendParticles(ParticleTypes.SPLASH, target.getX(), target.getY() + 1.0, target.getZ(),
                         10, 0.3, 0.4, 0.3, 0.08);

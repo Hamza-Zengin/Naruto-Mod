@@ -1,12 +1,15 @@
 package com.sekwah.narutomod.abilities.jutsus;
 
+import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,9 +21,74 @@ import java.util.List;
 
 /**
  * Sharingan (Mirror Wheel Eye)
- * Uchiha Clan Dōjutsu: Grants perception, night vision, reflex speed, and slows surrounding foes.
+ * Uchiha Clan Dōjutsu: Evolves through battle experience:
+ * - 1 Tomoe (0 - 24 Mastery): Basic perception, Night Vision, Speed I, 6m Slowness I aura.
+ * - 2 Tomoe (25 - 74 Mastery): Enhanced reflex, Speed I, 8m Slowness I + Weakness I aura.
+ * - 3 Tomoe (75 - 149 Mastery): Superior prediction, Speed II, Strength I, 10m Slowness II aura.
+ * - Mangekyō (150+ Mastery): Transcendent awakening, Speed II, Strength I, Resistance I, 12m Slowness II + Weakness I aura.
  */
 public class SharinganAbility extends Ability implements Ability.Toggled, Ability.HandleEnded {
+
+    public enum SharinganStage {
+        ONE_TOMOE("1_tomoe", 0, 24, "1 Tomoe"),
+        TWO_TOMOE("2_tomoe", 25, 74, "2 Tomoe"),
+        THREE_TOMOE("3_tomoe", 75, 149, "3 Tomoe"),
+        MANGEKYOU("mangekyou", 150, Integer.MAX_VALUE, "Mangekyō Sharingan");
+
+        private final String id;
+        private final int minMastery;
+        private final int maxMastery;
+        private final String displayName;
+
+        SharinganStage(String id, int minMastery, int maxMastery, String displayName) {
+            this.id = id;
+            this.minMastery = minMastery;
+            this.maxMastery = maxMastery;
+            this.displayName = displayName;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public int getMinMastery() {
+            return minMastery;
+        }
+
+        public int getMaxMastery() {
+            return maxMastery;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public String getTranslationKey() {
+            return "jutsu.sharingan.stage." + id;
+        }
+    }
+
+    public static SharinganStage getStage(int mastery) {
+        if (mastery >= SharinganStage.MANGEKYOU.getMinMastery()) {
+            return SharinganStage.MANGEKYOU;
+        } else if (mastery >= SharinganStage.THREE_TOMOE.getMinMastery()) {
+            return SharinganStage.THREE_TOMOE;
+        } else if (mastery >= SharinganStage.TWO_TOMOE.getMinMastery()) {
+            return SharinganStage.TWO_TOMOE;
+        } else {
+            return SharinganStage.ONE_TOMOE;
+        }
+    }
+
+    public static SharinganStage getStage(INinjaData ninjaData) {
+        if (ninjaData == null) return SharinganStage.ONE_TOMOE;
+        int mastery = ninjaData.getMastery(new ResourceLocation(NarutoMod.MOD_ID, "sharingan"));
+        return getStage(mastery);
+    }
+
+    public static boolean hasMangekyou(INinjaData ninjaData) {
+        return getStage(ninjaData) == SharinganStage.MANGEKYOU;
+    }
 
     @Override
     public ActivationType activationType() {
@@ -57,12 +125,32 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
 
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
-        // Buff caster
+        SharinganStage stage = getStage(ninjaData);
+
+        // Passive battle experience / training: grant +1 mastery every 10 seconds of sustained focus
+        if (ticksActive > 0 && ticksActive % 200 == 0) {
+            ResourceLocation reg = this.getRegistryName();
+            if (reg != null) {
+                ninjaData.addMastery(reg, 1);
+            }
+        }
+
+        // 1. Self Buffs scaling with Sharingan evolution
         player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 220, 0, false, false, false));
-        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 0, false, false, false));
+
+        int speedAmp = (stage == SharinganStage.THREE_TOMOE || stage == SharinganStage.MANGEKYOU) ? 1 : 0;
+        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, speedAmp, false, false, false));
+
+        if (stage == SharinganStage.THREE_TOMOE || stage == SharinganStage.MANGEKYOU) {
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 0, false, false, false));
+        }
+
+        if (stage == SharinganStage.MANGEKYOU) {
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 0, false, false, false));
+        }
 
         if (player.level() instanceof ServerLevel serverLevel) {
-            // On initial activation: play crisp, mystical ocular awakening sound and subtle 8-point halo
+            // On initial activation: play crisp, mystical ocular awakening sound
             if (ticksActive == 1) {
                 serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
                         NarutoSounds.SHARINGAN_ACTIVATE.get(), net.minecraft.sounds.SoundSource.PLAYERS, 1.2f, 1.0f);
@@ -73,10 +161,15 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
                 serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
                         net.minecraft.sounds.SoundEvents.BEACON_ACTIVATE, net.minecraft.sounds.SoundSource.PLAYERS, 0.5f, 1.8f);
 
+                if (stage == SharinganStage.MANGEKYOU) {
+                    serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
+                            SoundEvents.ENDERMAN_SCREAM, net.minecraft.sounds.SoundSource.PLAYERS, 0.8f, 0.6f);
+                }
+
                 double eyeY = player.getEyeY();
-                // Minimalist 4-point subtle crimson awakening shimmer at eye level
-                for (int i = 0; i < 4; i++) {
-                    double angle = (Math.PI / 2) * i;
+                int count = (stage == SharinganStage.MANGEKYOU) ? 8 : 4;
+                for (int i = 0; i < count; i++) {
+                    double angle = (2 * Math.PI / count) * i;
                     double vx = Math.cos(angle) * 0.05;
                     double vz = Math.sin(angle) * 0.05;
                     serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
@@ -84,10 +177,17 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
                             eyeY,
                             player.getZ() + Math.sin(angle) * 0.25,
                             1, vx, 0.01, vz, 0.01);
+                    if (stage == SharinganStage.MANGEKYOU) {
+                        serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
+                                player.getX() + Math.cos(angle) * 0.25,
+                                eyeY,
+                                player.getZ() + Math.sin(angle) * 0.25,
+                                1, vx, 0.01, vz, 0.01);
+                    }
                 }
             }
 
-            // Minimalist subtle crimson eye trail drifting backward from temples (once every 2 seconds)
+            // Minimalist subtle eye trail drifting backward from temples (once every 2 seconds)
             if (ticksActive % 40 == 0) {
                 Vec3 look = player.getLookAngle();
                 Vec3 up = new Vec3(0, 1, 0);
@@ -102,14 +202,36 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
                 serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
                         rightEyePos.x, rightEyePos.y, rightEyePos.z,
                         1, -look.x * 0.012, 0.005, -look.z * 0.012, 0.005);
+
+                if (stage == SharinganStage.MANGEKYOU) {
+                    serverLevel.sendParticles(ParticleTypes.SQUID_INK,
+                            leftEyePos.x, leftEyePos.y, leftEyePos.z,
+                            1, -look.x * 0.008, 0.003, -look.z * 0.008, 0.003);
+                    serverLevel.sendParticles(ParticleTypes.SQUID_INK,
+                            rightEyePos.x, rightEyePos.y, rightEyePos.z,
+                            1, -look.x * 0.008, 0.003, -look.z * 0.008, 0.003);
+                }
             }
 
-            // Reflex field: Enemies within 8 blocks are perceived as slowed
+            // 2. Reflex perception field: Enemies within evolving radius are slowed / weakened
             if (ticksActive % 20 == 0) {
-                AABB field = player.getBoundingBox().inflate(8.0);
+                double radius = switch (stage) {
+                    case ONE_TOMOE -> 6.0;
+                    case TWO_TOMOE -> 8.0;
+                    case THREE_TOMOE -> 10.0;
+                    case MANGEKYOU -> 12.0;
+                };
+
+                int slowAmp = (stage == SharinganStage.THREE_TOMOE || stage == SharinganStage.MANGEKYOU) ? 1 : 0;
+                boolean applyWeakness = (stage == SharinganStage.TWO_TOMOE || stage == SharinganStage.MANGEKYOU);
+
+                AABB field = player.getBoundingBox().inflate(radius);
                 List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, field, e -> e != player && e.isAlive());
                 for (LivingEntity enemy : enemies) {
-                    enemy.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 0, false, false));
+                    enemy.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, slowAmp, false, false));
+                    if (applyWeakness) {
+                        enemy.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 0, false, false));
+                    }
                 }
             }
         }
@@ -123,5 +245,7 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
     public void handleAbilityEnded(Player player, INinjaData ninjaData, int ticksActive) {
         player.removeEffect(MobEffects.NIGHT_VISION);
         player.removeEffect(MobEffects.MOVEMENT_SPEED);
+        player.removeEffect(MobEffects.DAMAGE_BOOST);
+        player.removeEffect(MobEffects.DAMAGE_RESISTANCE);
     }
 }

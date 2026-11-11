@@ -63,6 +63,9 @@ public class ServerAbilityChannelPacket {
 
                     if (ability.activationType() == Ability.ActivationType.CHANNELED) {
                         if (msg.status == ChannelStatus.START) {
+                            if (!ability.canActivate(player, ninjaData)) {
+                                return;
+                            }
                             ninjaData.setCurrentlyChanneledAbility(player, ability);
                         } else if (msg.status == ChannelStatus.STOP) {
                             if(ninjaData.getCurrentlyChanneledAbility() != null && ninjaData.getCurrentlyChanneledAbility().equals(ability.getRegistryName())) {

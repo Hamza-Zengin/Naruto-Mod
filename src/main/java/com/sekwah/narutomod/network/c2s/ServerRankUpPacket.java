@@ -34,7 +34,8 @@ public class ServerRankUpPacket {
                 if (player == null) return;
 
                 player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-                    if (ninjaData.canRankUp()) {
+                    NinjaRank currentRank = NinjaRank.fromString(ninjaData.getRank());
+                    if (currentRank.canRankUp(ninjaData)) {
                         if (ninjaData.rankUp()) {
                             NinjaRank newRank = NinjaRank.fromString(ninjaData.getRank());
                             player.sendSystemMessage(Component.translatable("naruto.rank.promoted",
@@ -48,7 +49,12 @@ public class ServerRankUpPacket {
                                     SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.2f, 1.0f);
                         }
                     } else {
-                        player.sendSystemMessage(Component.translatable("naruto.rank.not_ready").withStyle(ChatFormatting.RED));
+                        player.sendSystemMessage(Component.translatable("naruto.rank.not_ready").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+                        java.util.List<Component> missing = currentRank.getMissingRequirements(ninjaData);
+                        for (Component req : missing) {
+                            player.sendSystemMessage(Component.literal(" - ").withStyle(ChatFormatting.GRAY)
+                                    .append(req.copy().withStyle(ChatFormatting.YELLOW)));
+                        }
                     }
                 });
             });

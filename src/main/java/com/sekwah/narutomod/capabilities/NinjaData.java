@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class NinjaData implements INinjaData, ICapabilityProvider {
@@ -60,10 +61,19 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private int enemiesDefeated = 0;
 
     @Sync
+    private int rogueNinjasDefeated = 0;
+
+    @Sync
+    private int akatsukiNinjasDefeated = 0;
+
+    @Sync
     private int jutsusCastCount = 0;
 
     @Sync
     private String unlockedJutsus = "";
+
+    @Sync
+    private Map<ResourceLocation, Integer> jutsuMastery = new HashMap<>();
 
     private boolean creativeMode = false;
 
@@ -141,6 +151,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private static final String CHAKRA_EXP_TAG = "chakraExp";
     private static final String STAMINA_EXP_TAG = "staminaExp";
     private static final String ENEMIES_DEFEATED_TAG = "enemiesDefeated";
+    private static final String ROGUE_NINJAS_DEFEATED_TAG = "rogueNinjasDefeated";
+    private static final String AKATSUKI_NINJAS_DEFEATED_TAG = "akatsukiNinjasDefeated";
     private static final String JUTSUS_CAST_TAG = "jutsusCast";
     private static final String UNLOCKED_JUTSUS_TAG = "unlockedJutsus";
     private static final String ACTIVE_HAND_JUTSU_TAG = "activeHandJutsu";
@@ -148,6 +160,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private static final String ACTIVE_JUTSUS_FLAG_TAG = "activeJutsusFlag";
     private static final String ACTIVE_SEALS_TAG = "activeSeals";
     private static final String SEAL_TIMEOUT_TAG = "sealTimeout";
+    private static final String JUTSU_MASTERY_TAG = "jutsuMastery";
+    private static final String CHAKRA_REGEN_COOLDOWN_TAG = "chakraRegenCooldown";
 
     private final LazyOptional<INinjaData> holder = LazyOptional.of(() -> this);
 
@@ -281,7 +295,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Override
     public boolean isAbilityUnlocked(Ability ability) {
         if (ability == null) return false;
-        return isAbilityUnlocked(ability.getRegistryName());
+        return checkAbilityUnlocked(ability, ability.getRegistryName());
     }
 
     public static boolean isScrollRequiredJutsu(ResourceLocation id) {
@@ -295,8 +309,25 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Override
     public boolean isAbilityUnlocked(ResourceLocation abilityId) {
         if (abilityId == null) return false;
-        Ability ability = NarutoAbilities.getAbility(abilityId);
+        Ability ability = null;
+        try {
+            ability = NarutoAbilities.getAbility(abilityId);
+        } catch (Throwable ignored) {
+            // NarutoAbilities or Forge registry may not be initialized in standalone unit tests
+        }
+        if (ability == null) {
+            return getUnlockedAbilities().contains(abilityId);
+        }
+        return checkAbilityUnlocked(ability, abilityId);
+    }
+
+    private boolean checkAbilityUnlocked(Ability ability, ResourceLocation abilityId) {
         if (ability == null) return false;
+
+        // If ability specifies prerequisites and they are not met, it cannot be unlocked
+        if (!ability.getPrerequisites().isEmpty() && !ability.meetsPrerequisites(this)) {
+            return false;
+        }
 
         // Basic utility always unlocked
         if (ability.getRequiredRank() == NinjaRank.ACADEMY_STUDENT) {
@@ -304,34 +335,60 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         }
 
         // Innate Clan Dōjutsu (Awakens upon reaching Genin rank)
-        if (abilityId.getPath().equals("sharingan")) {
-            NinjaRank playerRank = NinjaRank.fromString(this.getRank());
-            return this.clan != null && this.clan.getPath().equals("uchiha") && playerRank.getLevel() >= NinjaRank.GENIN.getLevel();
-        }
-        if (abilityId.getPath().equals("byakugan")) {
-            NinjaRank playerRank = NinjaRank.fromString(this.getRank());
-            return this.clan != null && this.clan.getPath().equals("hyuga") && playerRank.getLevel() >= NinjaRank.GENIN.getLevel();
-        }
+        if (abilityId != null) {
+            if (abilityId.getPath().equals("sharingan")) {
+                NinjaRank playerRank = NinjaRank.fromString(this.getRank());
+                return this.clan != null && this.clan.getPath().equals("uchiha") && playerRank.getLevel() >= NinjaRank.GENIN.getLevel();
+            }
+            if (abilityId.getPath().equals("byakugan")) {
+                NinjaRank playerRank = NinjaRank.fromString(this.getRank());
+                return this.clan != null && this.clan.getPath().equals("hyuga") && playerRank.getLevel() >= NinjaRank.GENIN.getLevel();
+            }
 
-        // Scroll-only advanced & secret jutsus
-        if (isScrollRequiredJutsu(abilityId)) {
-            if (!getUnlockedAbilities().contains(abilityId)) {
+            // Scroll-only advanced & secret jutsus
+            if (isScrollRequiredJutsu(abilityId)) {
+                // Mangekyo jutsus strictly require Uchiha bloodline
+                if (abilityId.getPath().equals("amaterasu") || abilityId.getPath().equals("susanoo_ribcage")) {
+                    if (this.clan == null || !this.clan.getPath().equals("uchiha")) {
+                        return false;
+                    }
+                }
+                // Eight Gates also requires Jonin rank to withstand the forbidden strain
+                if (abilityId.getPath().equals("eight_gates")) {
+                    NinjaRank playerRank = NinjaRank.fromString(this.getRank());
+                    if (playerRank.getLevel() < NinjaRank.JONIN.getLevel()) {
+                        return false;
+                    }
+                }
+                // Unlocked explicitly via scroll or training
+                if (getUnlockedAbilities().contains(abilityId)) {
+                    return true;
+                }
+                // If jutsu has prerequisites (like Susanoo requiring Mangekyou), rank progression can awaken it
+                if (!ability.getPrerequisites().isEmpty()) {
+                    NinjaRank playerRank = NinjaRank.fromString(this.getRank());
+                    if (playerRank.getLevel() >= ability.getRequiredRank().getLevel()) {
+                        return true;
+                    }
+                }
                 return false;
             }
-            // Mangekyo jutsus also strictly require Uchiha bloodline
-            if (abilityId.getPath().equals("amaterasu") || abilityId.getPath().equals("susanoo_ribcage")) {
-                return this.clan != null && this.clan.getPath().equals("uchiha");
+        }
+
+        // Check prerequisites if jutsu defines any
+        if (!ability.getPrerequisites().isEmpty()) {
+            if (!ability.meetsPrerequisites(this)) {
+                return false;
             }
-            // Eight Gates also requires Jonin rank to withstand the forbidden strain
-            if (abilityId.getPath().equals("eight_gates")) {
-                NinjaRank playerRank = NinjaRank.fromString(this.getRank());
-                return playerRank.getLevel() >= NinjaRank.JONIN.getLevel();
+            // Once prerequisites are met, unlock if player meets required rank or has explicitly unlocked it
+            NinjaRank playerRank = NinjaRank.fromString(this.getRank());
+            if (playerRank.getLevel() >= ability.getRequiredRank().getLevel() || (abilityId != null && getUnlockedAbilities().contains(abilityId))) {
+                return true;
             }
-            return true;
         }
 
         // Unlocked explicitly via scroll or training
-        if (getUnlockedAbilities().contains(abilityId)) {
+        if (abilityId != null && getUnlockedAbilities().contains(abilityId)) {
             return true;
         }
 
@@ -393,6 +450,25 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Override
     public void setUnlockedJutsusString(String jutsus) {
         this.unlockedJutsus = jutsus != null ? jutsus : "";
+    }
+
+    @Override
+    public Map<ResourceLocation, Integer> getJutsuMasteryMap() {
+        return this.jutsuMastery;
+    }
+
+    @Override
+    public int getMastery(ResourceLocation jutsuId) {
+        if (jutsuId == null) return 0;
+        return this.jutsuMastery.getOrDefault(jutsuId, 0);
+    }
+
+    @Override
+    public void addMastery(ResourceLocation jutsuId, int amount) {
+        if (jutsuId == null || amount == 0) return;
+        int current = getMastery(jutsuId);
+        int updated = Math.max(0, current + amount);
+        this.jutsuMastery.put(jutsuId, updated);
     }
 
     @Override
@@ -487,6 +563,36 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
+    public int getRogueNinjasDefeated() {
+        return this.rogueNinjasDefeated;
+    }
+
+    @Override
+    public void addRogueNinjaDefeated() {
+        this.rogueNinjasDefeated++;
+    }
+
+    @Override
+    public void setRogueNinjasDefeated(int count) {
+        this.rogueNinjasDefeated = count;
+    }
+
+    @Override
+    public int getAkatsukiNinjasDefeated() {
+        return this.akatsukiNinjasDefeated;
+    }
+
+    @Override
+    public void addAkatsukiNinjaDefeated() {
+        this.akatsukiNinjasDefeated++;
+    }
+
+    @Override
+    public void setAkatsukiNinjasDefeated(int count) {
+        this.akatsukiNinjasDefeated = count;
+    }
+
+    @Override
     public int getJutsusCastCount() {
         NinjaRank current = NinjaRank.fromString(this.getRank());
         if (current == NinjaRank.ACADEMY_STUDENT) {
@@ -514,17 +620,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public boolean canRankUp() {
-        NinjaRank current = NinjaRank.fromString(this.getRank());
-        if (current.next() == null) return false;
-        boolean chakraOk = this.maxChakra >= current.getRequiredChakraToAdvance();
-        boolean staminaOk = this.maxStamina >= current.getRequiredStaminaToAdvance();
-        boolean enemiesOk = this.getEnemiesDefeated() >= current.getRequiredEnemiesToAdvance();
-        boolean jutsusOk = switch (current) {
-            case ACADEMY_STUDENT -> this.getJutsusCastCount() >= current.getRequiredJutsusToAdvance();
-            case CHUNIN, JONIN, ANBU -> this.getUnlockedAbilities().size() >= current.getRequiredJutsusToAdvance();
-            default -> true;
-        };
-        return chakraOk && staminaOk && enemiesOk && jutsusOk;
+        return NinjaRank.fromString(this.getRank()).canRankUp(this);
     }
 
     @Override
@@ -553,12 +649,16 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         this.chakraExp = 0;
         this.staminaExp = 0;
         this.enemiesDefeated = 0;
+        this.rogueNinjasDefeated = 0;
+        this.akatsukiNinjasDefeated = 0;
         this.jutsusCastCount = 0;
         this.unlockedJutsus = "";
+        this.jutsuMastery.clear();
         this.activeJutsusFlag = 0;
         this.clearSeals();
         this.chakra = this.getMaxChakra();
         this.stamina = this.getMaxStamina();
+        this.chakraRegenInfo.cooldown = 0;
     }
 
     @Override
@@ -587,6 +687,23 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Override
     public void addStamina(float amount) {
         this.stamina = Math.min(Math.max(this.stamina + amount, 0), this.getMaxStamina());
+    }
+
+    @Override
+    public void lockChakraRegen(int ticks) {
+        if (ticks > 0) {
+            this.chakraRegenInfo.cooldown = Math.max(this.chakraRegenInfo.cooldown, ticks);
+        }
+    }
+
+    @Override
+    public int getChakraRegenCooldown() {
+        return this.chakraRegenInfo.cooldown;
+    }
+
+    @Override
+    public boolean isChakraRegenLocked() {
+        return this.chakraRegenInfo.cooldown > 0;
     }
 
     @Override
@@ -775,8 +892,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
-    public Tag serializeNBT() {
-        final CompoundTag nbt = new CompoundTag();
+    public void saveNBTData(CompoundTag nbt) {
+        if (nbt == null) return;
         nbt.putFloat(CHAKRA_TAG, this.chakra);
         nbt.putFloat(STAMINA_TAG, this.stamina);
         nbt.putFloat(MAX_CHAKRA_TAG, this.maxChakra);
@@ -789,6 +906,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         nbt.putFloat(CHAKRA_EXP_TAG, this.chakraExp);
         nbt.putFloat(STAMINA_EXP_TAG, this.staminaExp);
         nbt.putInt(ENEMIES_DEFEATED_TAG, this.enemiesDefeated);
+        nbt.putInt(ROGUE_NINJAS_DEFEATED_TAG, this.rogueNinjasDefeated);
+        nbt.putInt(AKATSUKI_NINJAS_DEFEATED_TAG, this.akatsukiNinjasDefeated);
         nbt.putInt(JUTSUS_CAST_TAG, this.jutsusCastCount);
         if (this.unlockedJutsus != null) {
             nbt.putString(UNLOCKED_JUTSUS_TAG, this.unlockedJutsus);
@@ -802,77 +921,117 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         }
         nbt.putByteArray(ACTIVE_SEALS_TAG, seals);
         nbt.putInt(SEAL_TIMEOUT_TAG, this.sealTimeout);
+        nbt.putInt(CHAKRA_REGEN_COOLDOWN_TAG, this.chakraRegenInfo.cooldown);
+
+        CompoundTag masteryTag = new CompoundTag();
+        for (Map.Entry<ResourceLocation, Integer> entry : this.jutsuMastery.entrySet()) {
+            if (entry.getKey() != null && entry.getValue() != null) {
+                masteryTag.putInt(entry.getKey().toString(), entry.getValue());
+            }
+        }
+        nbt.put(JUTSU_MASTERY_TAG, masteryTag);
+    }
+
+    @Override
+    public Tag serializeNBT() {
+        final CompoundTag nbt = new CompoundTag();
+        saveNBTData(nbt);
         return nbt;
+    }
+
+    @Override
+    public void loadNBTData(CompoundTag compoundTag) {
+        if (compoundTag == null) return;
+        this.chakra = compoundTag.getFloat(CHAKRA_TAG);
+        this.stamina = compoundTag.getFloat(STAMINA_TAG);
+        if (compoundTag.contains(MAX_CHAKRA_TAG)) {
+            this.maxChakra = compoundTag.getFloat(MAX_CHAKRA_TAG);
+        }
+        if (compoundTag.contains(MAX_STAMINA_TAG)) {
+            this.maxStamina = compoundTag.getFloat(MAX_STAMINA_TAG);
+        }
+        if (compoundTag.contains(CLAN_TAG)) {
+            this.clan = new ResourceLocation(compoundTag.getString(CLAN_TAG));
+        }
+        if (compoundTag.contains(CLAN_LOCKED_TAG)) {
+            this.clanLocked = compoundTag.getBoolean(CLAN_LOCKED_TAG);
+        }
+        if (compoundTag.contains(RANK_TAG)) {
+            this.rank = compoundTag.getString(RANK_TAG);
+        } else {
+            this.rank = "ACADEMY_STUDENT";
+        }
+        if (compoundTag.contains(CHAKRA_EXP_TAG)) {
+            this.chakraExp = compoundTag.getFloat(CHAKRA_EXP_TAG);
+        }
+        if (compoundTag.contains(STAMINA_EXP_TAG)) {
+            this.staminaExp = compoundTag.getFloat(STAMINA_EXP_TAG);
+        }
+        if (compoundTag.contains(ENEMIES_DEFEATED_TAG)) {
+            this.enemiesDefeated = compoundTag.getInt(ENEMIES_DEFEATED_TAG);
+        }
+        if (compoundTag.contains(ROGUE_NINJAS_DEFEATED_TAG)) {
+            this.rogueNinjasDefeated = compoundTag.getInt(ROGUE_NINJAS_DEFEATED_TAG);
+        }
+        if (compoundTag.contains(AKATSUKI_NINJAS_DEFEATED_TAG)) {
+            this.akatsukiNinjasDefeated = compoundTag.getInt(AKATSUKI_NINJAS_DEFEATED_TAG);
+        }
+        if (compoundTag.contains(JUTSUS_CAST_TAG)) {
+            this.jutsusCastCount = compoundTag.getInt(JUTSUS_CAST_TAG);
+        }
+        NinjaRank current = NinjaRank.fromString(this.rank);
+        if (current == NinjaRank.ACADEMY_STUDENT) {
+            if (this.jutsusCastCount > 10) this.jutsusCastCount = 10;
+        } else if (current == NinjaRank.GENIN) {
+            if (this.enemiesDefeated > 25) this.enemiesDefeated = 25;
+        } else if (current == NinjaRank.CHUNIN) {
+            if (this.enemiesDefeated > 75) this.enemiesDefeated = 75;
+        } else if (current == NinjaRank.JONIN) {
+            if (this.enemiesDefeated > 150) this.enemiesDefeated = 150;
+        } else if (current == NinjaRank.ANBU) {
+            if (this.enemiesDefeated > 300) this.enemiesDefeated = 300;
+        }
+        if (compoundTag.contains(UNLOCKED_JUTSUS_TAG)) {
+            this.unlockedJutsus = compoundTag.getString(UNLOCKED_JUTSUS_TAG);
+        }
+        if (compoundTag.contains(ACTIVE_HAND_JUTSU_TAG)) {
+            this.activeHandJutsu = compoundTag.getString(ACTIVE_HAND_JUTSU_TAG);
+        }
+        if (compoundTag.contains(ACTIVE_HAND_JUTSU_TICKS_TAG)) {
+            this.activeHandJutsuTicks = compoundTag.getInt(ACTIVE_HAND_JUTSU_TICKS_TAG);
+        }
+        if (compoundTag.contains(ACTIVE_JUTSUS_FLAG_TAG)) {
+            this.activeJutsusFlag = compoundTag.getInt(ACTIVE_JUTSUS_FLAG_TAG);
+        }
+        if (compoundTag.contains(ACTIVE_SEALS_TAG)) {
+            this.activeSeals.clear();
+            byte[] seals = compoundTag.getByteArray(ACTIVE_SEALS_TAG);
+            for (byte b : seals) {
+                this.activeSeals.add(b);
+            }
+        }
+        if (compoundTag.contains(SEAL_TIMEOUT_TAG)) {
+            this.sealTimeout = compoundTag.getInt(SEAL_TIMEOUT_TAG);
+        }
+        if (compoundTag.contains(CHAKRA_REGEN_COOLDOWN_TAG)) {
+            this.chakraRegenInfo.cooldown = compoundTag.getInt(CHAKRA_REGEN_COOLDOWN_TAG);
+        }
+        if (compoundTag.contains(JUTSU_MASTERY_TAG, Tag.TAG_COMPOUND)) {
+            this.jutsuMastery.clear();
+            CompoundTag masteryTag = compoundTag.getCompound(JUTSU_MASTERY_TAG);
+            for (String key : masteryTag.getAllKeys()) {
+                ResourceLocation id = ResourceLocation.tryParse(key);
+                if (id != null) {
+                    this.jutsuMastery.put(id, masteryTag.getInt(key));
+                }
+            }
+        }
     }
 
     @Override
     public void deserializeNBT(Tag tag) {
         if (tag instanceof CompoundTag compoundTag) {
-            this.chakra = compoundTag.getFloat(CHAKRA_TAG);
-            this.stamina = compoundTag.getFloat(STAMINA_TAG);
-            if (compoundTag.contains(MAX_CHAKRA_TAG)) {
-                this.maxChakra = compoundTag.getFloat(MAX_CHAKRA_TAG);
-            }
-            if (compoundTag.contains(MAX_STAMINA_TAG)) {
-                this.maxStamina = compoundTag.getFloat(MAX_STAMINA_TAG);
-            }
-            if (compoundTag.contains(CLAN_TAG)) {
-                this.clan = new ResourceLocation(compoundTag.getString(CLAN_TAG));
-            }
-            if (compoundTag.contains(CLAN_LOCKED_TAG)) {
-                this.clanLocked = compoundTag.getBoolean(CLAN_LOCKED_TAG);
-            }
-            if (compoundTag.contains(RANK_TAG)) {
-                this.rank = compoundTag.getString(RANK_TAG);
-            } else {
-                this.rank = "ACADEMY_STUDENT";
-            }
-            if (compoundTag.contains(CHAKRA_EXP_TAG)) {
-                this.chakraExp = compoundTag.getFloat(CHAKRA_EXP_TAG);
-            }
-            if (compoundTag.contains(STAMINA_EXP_TAG)) {
-                this.staminaExp = compoundTag.getFloat(STAMINA_EXP_TAG);
-            }
-            if (compoundTag.contains(ENEMIES_DEFEATED_TAG)) {
-                this.enemiesDefeated = compoundTag.getInt(ENEMIES_DEFEATED_TAG);
-            }
-            if (compoundTag.contains(JUTSUS_CAST_TAG)) {
-                this.jutsusCastCount = compoundTag.getInt(JUTSUS_CAST_TAG);
-            }
-            NinjaRank current = NinjaRank.fromString(this.rank);
-            if (current == NinjaRank.ACADEMY_STUDENT) {
-                if (this.jutsusCastCount > 10) this.jutsusCastCount = 10;
-            } else if (current == NinjaRank.GENIN) {
-                if (this.enemiesDefeated > 25) this.enemiesDefeated = 25;
-            } else if (current == NinjaRank.CHUNIN) {
-                if (this.enemiesDefeated > 75) this.enemiesDefeated = 75;
-            } else if (current == NinjaRank.JONIN) {
-                if (this.enemiesDefeated > 150) this.enemiesDefeated = 150;
-            } else if (current == NinjaRank.ANBU) {
-                if (this.enemiesDefeated > 300) this.enemiesDefeated = 300;
-            }
-            if (compoundTag.contains(UNLOCKED_JUTSUS_TAG)) {
-                this.unlockedJutsus = compoundTag.getString(UNLOCKED_JUTSUS_TAG);
-            }
-            if (compoundTag.contains(ACTIVE_HAND_JUTSU_TAG)) {
-                this.activeHandJutsu = compoundTag.getString(ACTIVE_HAND_JUTSU_TAG);
-            }
-            if (compoundTag.contains(ACTIVE_HAND_JUTSU_TICKS_TAG)) {
-                this.activeHandJutsuTicks = compoundTag.getInt(ACTIVE_HAND_JUTSU_TICKS_TAG);
-            }
-            if (compoundTag.contains(ACTIVE_JUTSUS_FLAG_TAG)) {
-                this.activeJutsusFlag = compoundTag.getInt(ACTIVE_JUTSUS_FLAG_TAG);
-            }
-            if (compoundTag.contains(ACTIVE_SEALS_TAG)) {
-                this.activeSeals.clear();
-                byte[] seals = compoundTag.getByteArray(ACTIVE_SEALS_TAG);
-                for (byte b : seals) {
-                    this.activeSeals.add(b);
-                }
-            }
-            if (compoundTag.contains(SEAL_TIMEOUT_TAG)) {
-                this.sealTimeout = compoundTag.getInt(SEAL_TIMEOUT_TAG);
-            }
+            loadNBTData(compoundTag);
         }
     }
 
