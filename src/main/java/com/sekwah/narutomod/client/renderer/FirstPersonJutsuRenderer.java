@@ -77,11 +77,12 @@ public class FirstPersonJutsuRenderer {
             boolean isMainHand = hand == InteractionHand.MAIN_HAND;
             HumanoidArm arm = isMainHand ? player.getMainArm() : player.getMainArm().getOpposite();
 
-            // 1. Chidori 3D Lightning Blade on main hand
+            // 1. Chidori 3D Lightning Blade on main hand (floating in front of palm)
             if (isMainHand && "chidori".equalsIgnoreCase(ninjaData.getActiveHandJutsu())) {
                 poseStack.pushPose();
                 try {
                     applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
+                    poseStack.translate(arm == HumanoidArm.RIGHT ? -0.08D : 0.08D, 0.24D, -0.28D);
                     poseStack.scale(0.34F, 0.34F, 0.34F);
                     chidoriModel.setupAnim(ageInTicks);
                     VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_CHIDORI));
@@ -91,14 +92,13 @@ public class FirstPersonJutsuRenderer {
                 }
             }
 
-            // 2. Swirling Rasengan / Chakra Charge Sphere on main hand
-            boolean hasRasengan = "rasengan".equalsIgnoreCase(ninjaData.getActiveHandJutsu())
-                    || (ninjaData.getCurrentlyChanneledAbility() != null
-                    && ninjaData.getCurrentlyChanneledAbility().equals(NarutoAbilities.CHAKRA_CHARGE.getId()));
+            // 2. Swirling Rasengan Sphere on main hand (floating above palm; Chakra Charge hand model removed)
+            boolean hasRasengan = "rasengan".equalsIgnoreCase(ninjaData.getActiveHandJutsu());
             if (isMainHand && hasRasengan) {
                 poseStack.pushPose();
                 try {
                     applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
+                    poseStack.translate(arm == HumanoidArm.RIGHT ? -0.08D : 0.08D, 0.24D, -0.28D);
                     poseStack.scale(0.30F, 0.30F, 0.30F);
                     rasenganModel.setupAnim(ageInTicks);
                     VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_RASENGAN));

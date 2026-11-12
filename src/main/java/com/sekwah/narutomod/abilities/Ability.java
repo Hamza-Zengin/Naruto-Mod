@@ -295,14 +295,35 @@ public abstract class Ability {
         return Math.max(1.0f, baseCost * getChakraCostMultiplier(mastery));
     }
 
+    public boolean requiresSealActivationDelay() {
+        return this.defaultCombo() > 0 && this.getDefaultChakraCost() > 0;
+    }
+
+    public int getBaseActivationDelayTicks() {
+        NinjaRank rank = this.getRequiredRank();
+        if (rank == null) return 20;
+        return switch (rank) {
+            case JONIN, ANBU, KAGE -> 12;
+            case CHUNIN -> 16;
+            default -> 20;
+        };
+    }
+
+    public int getScaledActivationDelay(int mastery) {
+        if (!this.requiresSealActivationDelay()) {
+            return 0;
+        }
+        int baseDelayTicks = this.getBaseActivationDelayTicks();
+        int periods = Math.min(10, mastery / 100);
+        double multiplier = 1.0 - (periods * 0.10);
+        return Math.max(0, (int) Math.round(baseDelayTicks * multiplier));
+    }
+
     public int getActivationDelayTicks(INinjaData ninjaData) {
-        if (ninjaData == null) return 0;
+        if (ninjaData == null || !this.requiresSealActivationDelay()) return 0;
         ResourceLocation reg = getRegistryName();
         int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
-        if (mastery < 50) return 20; // 1.0s delay
-        if (mastery < 150) return 12; // 0.6s delay
-        if (mastery < 400) return 5; // 0.25s delay
-        return 0; // Instant activation
+        return getScaledActivationDelay(mastery);
     }
 
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {

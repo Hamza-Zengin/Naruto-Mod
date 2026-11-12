@@ -93,7 +93,7 @@
   "clan.narutomod.nara": "奈良一族",
   "clan.narutomod.nara.desc": "スタミナ回復速度+30%、影を操る秘伝の術を扱う。",
   "jutsu.cast": "%s を発動した！",
-  "jutsu.combo.perfect": "完璧な印コンボ！%sのチャクラ消費が25%減少！",
+  "jutsu.combo.perfect": "完璧な印コンボ！%sのチャクラ消費が25%%減少！",
   "jutsu.charge.start": "%s のチャクラ練成を開始！",
   "jutsu.channel.start": "%s の集中を開始！",
   "jutsu.channel.stop": "%s の集中を停止！",

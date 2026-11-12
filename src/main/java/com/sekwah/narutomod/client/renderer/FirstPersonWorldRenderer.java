@@ -73,9 +73,14 @@ public class FirstPersonWorldRenderer {
         player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
             ToggleAbilityData toggleData = ninjaData.getToggleAbilityData();
             boolean hasSusanoo = toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.SUSANOO_RIBCAGE.getId());
-            boolean hasEightGates = toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.EIGHT_GATES.getId());
+            boolean hasEightGatesDeath = ninjaData.isEighthGateActive()
+                    || (toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.EIGHT_GATES_DEATH.getId()));
+            boolean hasEightGates = ninjaData.isEightGatesActive() || hasEightGatesDeath
+                    || (toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.EIGHT_GATES.getId()));
+            boolean hasWaterWalk = ninjaData.isWaterWalkActive()
+                    || (toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.WATER_WALK.getId()));
 
-            if (!hasSusanoo && !hasEightGates) {
+            if (!hasSusanoo && !hasEightGates && !hasWaterWalk) {
                 return;
             }
 
@@ -114,7 +119,7 @@ public class FirstPersonWorldRenderer {
                 }
             }
 
-            // 2. Eight Gates (Hachimon Tonkō) Crimson Steam Ring at ground level around feet
+            // 2. Eight Gates (Hachimon Tonkō) Horizontal Circular Vapor Rings at ground level around feet
             if (hasEightGates) {
                 poseStack.pushPose();
                 try {
@@ -123,7 +128,27 @@ public class FirstPersonWorldRenderer {
                     gatesAuraModel.setupAnim(player.tickCount + partialTicks);
 
                     VertexConsumer vc = bufferSource.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND));
-                    gatesAuraModel.renderToBuffer(poseStack, vc, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 0.15F, 0.15F, 0.40F);
+                    if (hasEightGatesDeath) {
+                        gatesAuraModel.renderToBuffer(poseStack, vc, 15728880, OverlayTexture.NO_OVERLAY, 0.95F, 0.10F, 0.15F, 0.85F);
+                    } else {
+                        gatesAuraModel.renderToBuffer(poseStack, vc, 15728880, OverlayTexture.NO_OVERLAY, 0.35F, 0.80F, 1.0F, 0.80F);
+                    }
+                    bufferSource.endBatch(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND));
+                } finally {
+                    poseStack.popPose();
+                }
+            }
+
+            // 3. Water Walk circular blue chakra aura at player feet
+            if (hasWaterWalk) {
+                poseStack.pushPose();
+                try {
+                    poseStack.translate(px, py + 0.02D, pz);
+                    poseStack.scale(0.35F, 0.35F, 0.35F);
+                    gatesAuraModel.setupAnim((player.tickCount + partialTicks) * 1.5F);
+
+                    VertexConsumer vc = bufferSource.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND));
+                    gatesAuraModel.renderToBuffer(poseStack, vc, 15728880, OverlayTexture.NO_OVERLAY, 0.10F, 0.55F, 1.0F, 0.75F);
                     bufferSource.endBatch(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND));
                 } finally {
                     poseStack.popPose();

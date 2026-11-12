@@ -905,4 +905,72 @@ public class NinjaDataLogicTest {
         assertEquals(1200, ShadowCloneAbility.getCloneLifespan(700));
         assertEquals(1200, ShadowCloneAbility.getCloneLifespan(1500));
     }
+
+    @Test
+    @DisplayName("Verify scaled activation delay formula and mastery reduction")
+    public void testScaledActivationDelayFormula() {
+        // Genin / Base 20 ticks: -10% per 100 mastery, 0 at 1000+
+        com.sekwah.narutomod.abilities.jutsus.BoneDanceAbility geninAbility = new com.sekwah.narutomod.abilities.jutsus.BoneDanceAbility();
+        assertTrue(geninAbility.requiresSealActivationDelay());
+        assertEquals(20, geninAbility.getBaseActivationDelayTicks());
+        assertEquals(20, geninAbility.getScaledActivationDelay(0));
+        assertEquals(20, geninAbility.getScaledActivationDelay(50));
+        assertEquals(18, geninAbility.getScaledActivationDelay(100));
+        assertEquals(16, geninAbility.getScaledActivationDelay(200));
+        assertEquals(10, geninAbility.getScaledActivationDelay(500));
+        assertEquals(2, geninAbility.getScaledActivationDelay(900));
+        assertEquals(0, geninAbility.getScaledActivationDelay(1000));
+        assertEquals(0, geninAbility.getScaledActivationDelay(1500));
+
+        // Chunin / Base 16 ticks
+        ShadowCloneAbility chuninAbility = new ShadowCloneAbility();
+        assertTrue(chuninAbility.requiresSealActivationDelay());
+        assertEquals(16, chuninAbility.getBaseActivationDelayTicks());
+        assertEquals(16, chuninAbility.getScaledActivationDelay(0));
+        assertEquals(14, chuninAbility.getScaledActivationDelay(100)); // 16 * 0.9 = 14.4 -> 14
+        assertEquals(13, chuninAbility.getScaledActivationDelay(200)); // 16 * 0.8 = 12.8 -> 13
+        assertEquals(8, chuninAbility.getScaledActivationDelay(500));  // 16 * 0.5 = 8
+        assertEquals(0, chuninAbility.getScaledActivationDelay(1000));
+
+        // Jonin / Base 12 ticks
+        RasenshurikenAbility joninAbility = new RasenshurikenAbility();
+        assertTrue(joninAbility.requiresSealActivationDelay());
+        assertEquals(12, joninAbility.getBaseActivationDelayTicks());
+        assertEquals(12, joninAbility.getScaledActivationDelay(0));
+        assertEquals(11, joninAbility.getScaledActivationDelay(100)); // 12 * 0.9 = 10.8 -> 11
+        assertEquals(10, joninAbility.getScaledActivationDelay(200)); // 12 * 0.8 = 9.6 -> 10
+        assertEquals(6, joninAbility.getScaledActivationDelay(500));  // 12 * 0.5 = 6
+        assertEquals(0, joninAbility.getScaledActivationDelay(1000));
+    }
+
+    @Test
+    @DisplayName("Verify utility abilities require zero activation delay")
+    public void testUtilityAbilitiesRequireZeroDelay() {
+        com.sekwah.narutomod.abilities.utility.ChakraDashAbility dashAbility = new com.sekwah.narutomod.abilities.utility.ChakraDashAbility();
+        assertFalse(dashAbility.requiresSealActivationDelay());
+        assertEquals(0, dashAbility.getScaledActivationDelay(0));
+        assertEquals(0, dashAbility.getScaledActivationDelay(500));
+    }
+
+    @Test
+    @DisplayName("Verify Eighth Gate of Death bitmask flag and synchronization")
+    public void testEighthGateBitmask() {
+        assertEquals(16, INinjaData.JUTSU_FLAG_EIGHT_GATES_DEATH);
+        assertFalse(ninjaData.isEighthGateActive());
+
+        ninjaData.setEighthGateActive(true);
+        assertTrue(ninjaData.isEighthGateActive());
+        assertEquals(INinjaData.JUTSU_FLAG_EIGHT_GATES_DEATH, ninjaData.getActiveJutsusFlag() & INinjaData.JUTSU_FLAG_EIGHT_GATES_DEATH);
+
+        ninjaData.setEighthGateActive(false);
+        assertFalse(ninjaData.isEighthGateActive());
+    }
+
+    @Test
+    @DisplayName("Verify Shadow Clone command modes constants")
+    public void testShadowCloneCommandModes() {
+        assertEquals(0, com.sekwah.narutomod.entity.ShadowCloneEntity.MODE_FOLLOW);
+        assertEquals(1, com.sekwah.narutomod.entity.ShadowCloneEntity.MODE_PATROL);
+        assertEquals(2, com.sekwah.narutomod.entity.ShadowCloneEntity.MODE_HOLD);
+    }
 }

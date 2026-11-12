@@ -33,6 +33,11 @@ public class ChakraDashAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public boolean requiresSealActivationDelay() {
+        return false;
+    }
+
+    @Override
     public float getDefaultChakraCost() {
         return 15.0f;
     }

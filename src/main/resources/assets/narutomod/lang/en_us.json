@@ -93,7 +93,7 @@
   "clan.narutomod.nara": "Nara Clan",
   "clan.narutomod.nara.desc": "30% faster stamina recovery and shadow jutsus.",
   "jutsu.cast": "You cast %s!",
-  "jutsu.combo.perfect": "Perfect Hand Seal Combo! %s chakra cost reduced by 25%!",
+  "jutsu.combo.perfect": "Perfect Hand Seal Combo! %s chakra cost reduced by 25%%!",
   "jutsu.charge.start": "You begin charging %s!",
   "jutsu.channel.start": "You begin channelling %s!",
   "jutsu.channel.stop": "You stop channelling %s!",

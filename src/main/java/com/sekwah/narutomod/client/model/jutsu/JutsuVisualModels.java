@@ -642,16 +642,31 @@ public class JutsuVisualModels {
             MeshDefinition mesh = new MeshDefinition();
             PartDefinition root = mesh.getRoot();
 
-            // Concentric flat circular rings lying horizontally on the XZ ground plane (Y thickness = 1)
-            root.addOrReplaceChild("inner_ring",
-                    CubeListBuilder.create()
-                            .texOffs(0, 0).addBox(-12.0F, -0.5F, -12.0F, 24, 1, 24),
-                    PartPose.ZERO);
+            // Circular inner ring composed of 16 smooth radial segments
+            PartDefinition inner = root.addOrReplaceChild("inner_ring", CubeListBuilder.create(), PartPose.ZERO);
+            for (int i = 0; i < 16; i++) {
+                float angle = (float) (i * Math.PI * 2.0 / 16.0);
+                float radius = 10.0F;
+                float px = Mth.cos(angle) * radius;
+                float pz = Mth.sin(angle) * radius;
+                inner.addOrReplaceChild("inner_seg_" + i,
+                        CubeListBuilder.create()
+                                .texOffs(0, 0).addBox(-2.25F, -0.25F, -1.0F, 5, 1, 2),
+                        PartPose.offsetAndRotation(px, 0.0F, pz, 0.0F, -angle + (float) (Math.PI / 2.0), 0.0F));
+            }
 
-            root.addOrReplaceChild("outer_ring",
-                    CubeListBuilder.create()
-                            .texOffs(0, 26).addBox(-18.0F, -0.5F, -18.0F, 36, 1, 36),
-                    PartPose.ZERO);
+            // Circular outer ring composed of 16 smooth radial segments
+            PartDefinition outer = root.addOrReplaceChild("outer_ring", CubeListBuilder.create(), PartPose.ZERO);
+            for (int i = 0; i < 16; i++) {
+                float angle = (float) (i * Math.PI * 2.0 / 16.0);
+                float radius = 16.0F;
+                float px = Mth.cos(angle) * radius;
+                float pz = Mth.sin(angle) * radius;
+                outer.addOrReplaceChild("outer_seg_" + i,
+                        CubeListBuilder.create()
+                                .texOffs(0, 26).addBox(-3.5F, -0.25F, -1.0F, 7, 1, 2),
+                        PartPose.offsetAndRotation(px, 0.0F, pz, 0.0F, -angle + (float) (Math.PI / 2.0), 0.0F));
+            }
 
             return LayerDefinition.create(mesh, 128, 64);
         }

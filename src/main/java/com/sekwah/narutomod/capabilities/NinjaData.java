@@ -872,17 +872,23 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             boolean hasByakugan = false;
             boolean hasEightGates = false;
             boolean hasWaterWalk = false;
+            boolean hasEightGatesDeath = false;
             for (ResourceLocation id : this.toggleAbilityData.getAbilitiesHashSet()) {
                 String path = id.getPath();
                 if ("sharingan".equals(path)) hasSharingan = true;
                 else if ("byakugan".equals(path)) hasByakugan = true;
                 else if ("eight_gates".equals(path)) hasEightGates = true;
+                else if ("eight_gates_death".equals(path)) {
+                    hasEightGates = true;
+                    hasEightGatesDeath = true;
+                }
                 else if ("water_walk".equals(path)) hasWaterWalk = true;
             }
             setJutsuActive(JUTSU_FLAG_SHARINGAN, hasSharingan);
             setJutsuActive(JUTSU_FLAG_BYAKUGAN, hasByakugan);
             setJutsuActive(JUTSU_FLAG_EIGHT_GATES, hasEightGates);
             setJutsuActive(JUTSU_FLAG_WATER_WALK, hasWaterWalk);
+            setJutsuActive(JUTSU_FLAG_EIGHT_GATES_DEATH, hasEightGatesDeath);
         }
     }
 
@@ -1119,6 +1125,16 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Override
     public void setWaterWalkActive(boolean active) {
         setJutsuActive(JUTSU_FLAG_WATER_WALK, active);
+    }
+
+    @Override
+    public boolean isEighthGateActive() {
+        return isJutsuActive(JUTSU_FLAG_EIGHT_GATES_DEATH);
+    }
+
+    @Override
+    public void setEighthGateActive(boolean active) {
+        setJutsuActive(JUTSU_FLAG_EIGHT_GATES_DEATH, active);
     }
 
     @Nonnull

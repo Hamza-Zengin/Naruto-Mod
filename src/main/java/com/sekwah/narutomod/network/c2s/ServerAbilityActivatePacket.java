@@ -68,7 +68,7 @@ public class ServerAbilityActivatePacket {
                                     player.sendSystemMessage(Component.translatable("jutsu.combo.perfect", Component.translatable(ability.getTranslationKey())).withStyle(ChatFormatting.GOLD));
                                 }
                             }
-                            int delay = ability.getActivationDelayTicks(ninjaData);
+                            int delay = (ability.requiresSealActivationDelay() && comboMatched) ? ability.getActivationDelayTicks(ninjaData) : 0;
                             if (delay > 0) {
                                 player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                                         net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.4f, 1.2f);
