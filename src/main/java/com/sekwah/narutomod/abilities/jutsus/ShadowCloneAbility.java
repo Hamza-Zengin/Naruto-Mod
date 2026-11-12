@@ -67,7 +67,7 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
         int lifespan = getCloneLifespan(mastery);
 
         float yaw = player.getYRot();
-        double radius = count > 1 ? 2.0D : 1.5D;
+        double radius = count > 1 ? 3.2D : 2.2D;
         double angleStep = (2 * Math.PI) / count;
 
         java.util.List<net.minecraft.resources.ResourceLocation> cloneJutsus = new java.util.ArrayList<>();

@@ -97,7 +97,8 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
     @Override
     protected boolean canHitEntity(Entity target) {
         Entity owner = this.getOwner();
-        if (target == owner || (owner != null && target.getUUID().equals(owner.getUUID()))) {
+        if (target == owner || (owner != null && target.getUUID().equals(owner.getUUID()))
+                || com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(owner, target)) {
             return false;
         }
         return super.canHitEntity(target);

@@ -260,8 +260,34 @@ public class ShadowCloneEntity extends PathfinderMob {
         }
     }
 
+    @Nullable
+    public static UUID resolveRootOwnerUUID(@Nullable net.minecraft.world.entity.Entity entity) {
+        if (entity == null) return null;
+        if (entity instanceof Player player) {
+            return player.getUUID();
+        }
+        if (entity instanceof ShadowCloneEntity clone) {
+            return clone.getOwnerUUID();
+        }
+        if (entity instanceof net.minecraft.world.entity.projectile.Projectile projectile && projectile.getOwner() != null) {
+            return resolveRootOwnerUUID(projectile.getOwner());
+        }
+        return null;
+    }
+
+    public static boolean areAllies(@Nullable net.minecraft.world.entity.Entity a, @Nullable net.minecraft.world.entity.Entity b) {
+        if (a == null || b == null) return false;
+        if (a == b || a.getUUID().equals(b.getUUID())) return true;
+        UUID ownerA = resolveRootOwnerUUID(a);
+        UUID ownerB = resolveRootOwnerUUID(b);
+        return ownerA != null && ownerA.equals(ownerB);
+    }
+
     @Override
     public boolean hurt(DamageSource source, float amount) {
+        if (areAllies(this, source.getEntity()) || areAllies(this, source.getDirectEntity())) {
+            return false;
+        }
         if (!this.level().isClientSide) {
             this.poof();
         }

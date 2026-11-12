@@ -126,7 +126,8 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
                 AABB hitBox = new AABB(origin.x - radius - 1.2, origin.y - 1.0, origin.z - radius - 1.2,
                         origin.x + radius + 1.2, origin.y + 3.0, origin.z + radius + 1.2);
                 List<LivingEntity> enemies = sLevel.getEntitiesOfClass(LivingEntity.class, hitBox,
-                        e -> e.isAlive() && e != p);
+                        e -> e.isAlive() && e != p && !e.getUUID().equals(p.getUUID())
+                                && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(p, e));
 
                 for (LivingEntity enemy : enemies) {
                     double dist = Math.sqrt(enemy.distanceToSqr(origin.x, origin.y, origin.z));

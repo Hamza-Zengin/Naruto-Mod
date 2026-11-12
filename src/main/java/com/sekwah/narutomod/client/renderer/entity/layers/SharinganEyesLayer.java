@@ -48,9 +48,12 @@ public class SharinganEyesLayer extends RenderLayer<AbstractClientPlayer, Player
             } else {
                 texture = BYAKUGAN_EYES_TEXTURE;
             }
-            // Use entityCutoutNoCull with FULL_BRIGHT (15728880) to eliminate white border bleed when shaders are disabled
-            VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(texture));
-            this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+            // Use entityTranslucent with -0.0025D Z-offset and FULL_BRIGHT for shader & vanilla compatibility
+            VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(texture));
+            poseStack.pushPose();
+            poseStack.translate(0.0D, 0.0D, -0.0025D);
+            this.getParentModel().renderToBuffer(poseStack, vertexConsumer, net.minecraft.client.renderer.LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+            poseStack.popPose();
         });
     }
 }

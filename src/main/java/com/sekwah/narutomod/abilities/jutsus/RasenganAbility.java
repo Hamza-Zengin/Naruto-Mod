@@ -53,12 +53,16 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
         return 22.0f;
     }
 
+    public static int getScaledHoldDuration(int mastery) {
+        return (int) Math.round(100.0 * (1.0 + 0.20 * (Math.max(0, mastery) / 100.0)));
+    }
+
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
-        int holdTicks = 100 + (getMasteryTier(mastery) >= 4 ? 40 : (getMasteryTier(mastery) >= 2 ? 20 : 0));
+        int holdTicks = getScaledHoldDuration(mastery);
 
         // Activate hand holding window (scaled with mastery)
         ninjaData.setActiveHandJutsu("rasengan", holdTicks);

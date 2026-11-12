@@ -84,7 +84,8 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
 
             List<Entity> entities = serverLevel.getEntities(player, box);
             for (Entity entity : entities) {
-                if (entity instanceof LivingEntity living && living.isAlive()) {
+                if (entity instanceof LivingEntity living && living.isAlive()
+                        && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(player, living)) {
                     living.hurt(player.damageSources().playerAttack(player), damage);
                     living.setDeltaMovement(look.scale(2.2 * powerMult).add(0, 0.5 * powerMult, 0));
                     living.hurtMarked = true;

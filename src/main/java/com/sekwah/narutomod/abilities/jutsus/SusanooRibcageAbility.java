@@ -134,7 +134,8 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
 
             // Repulsion shockwave aura: violently push back foes and deal scaled damage
             AABB auraBox = player.getBoundingBox().inflate(3.0);
-            List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, auraBox, e -> e != player && e.isAlive());
+            List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, auraBox,
+                    e -> e != player && e.isAlive() && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(player, e));
             float damage = 6.0f * getPowerMultiplier(mastery);
             for (LivingEntity enemy : enemies) {
                 Vec3 push = enemy.position().subtract(player.position()).normalize().scale(1.2);

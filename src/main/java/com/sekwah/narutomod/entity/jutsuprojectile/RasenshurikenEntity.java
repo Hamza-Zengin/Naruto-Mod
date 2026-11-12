@@ -142,7 +142,7 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
                 if (vt % 4 == 0) {
                     AABB box = this.getBoundingBox().inflate(radius);
                     List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, box,
-                            e -> e.isAlive() && e != owner);
+                            e -> e.isAlive() && e != owner && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(owner, e));
                     for (LivingEntity target : targets) {
                         double dx = this.getX() - target.getX();
                         double dz = this.getZ() - target.getZ();
@@ -235,7 +235,8 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
 
     @Override
     protected boolean canHitEntity(Entity entity) {
-        return super.canHitEntity(entity) && entity != this.getOwner();
+        return super.canHitEntity(entity) && entity != this.getOwner()
+                && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(this.getOwner(), entity);
     }
 
     @Override

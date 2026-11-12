@@ -64,13 +64,26 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
         return true;
     }
 
+    public static int getScaledHoldDuration(int mastery) {
+        return (int) Math.round(30.0 * (1.0 + 0.10 * (Math.max(0, mastery) / 100.0)));
+    }
+
+    public static double getScaledRange(int mastery) {
+        return 14.0D * (1.0 + 0.10 * (Math.max(0, mastery) / 100.0));
+    }
+
+    public static float getScaledDamage(int mastery) {
+        return (float) (4.0 * (1.0 + 0.10 * (Math.max(0, mastery) / 100.0)));
+    }
+
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
-        float powerMult = getPowerMultiplier(mastery);
-        double maxReach = 13.0D + (getMasteryTier(mastery) >= 4 ? 4.0D : (getMasteryTier(mastery) >= 2 ? 2.0D : 0.0D));
+        int holdTicks = getScaledHoldDuration(mastery);
+        double maxReach = getScaledRange(mastery);
+        float baseDamage = getScaledDamage(mastery);
 
         Vec3 look = player.getLookAngle();
         Vec3 horizDir = new Vec3(look.x, 0, look.z).normalize();
@@ -89,7 +102,7 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
             AABB checkBox = new AABB(pos.x - 1.1, player.getY() - 1.5, pos.z - 1.1,
                     pos.x + 1.1, player.getY() + 2.5, pos.z + 1.1);
             List<LivingEntity> found = serverLevel.getEntitiesOfClass(LivingEntity.class, checkBox,
-                    e -> e.isAlive() && e != player);
+                    e -> e.isAlive() && e != player && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(player, e));
             if (!found.isEmpty()) {
                 capturedTarget = found.get(0);
                 break;
@@ -108,22 +121,24 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
         }
 
         final LivingEntity boundEntity = capturedTarget;
-        final double initialDist = Math.max(2.5D, Math.min(player.distanceTo(boundEntity), maxReach));
 
-        // Spawn 3D Shadow Bind Claws & Ribbon locked onto captured target
+        // Spawn 3D Shadow Bind Claws & Ribbon locked onto captured target for full holdTicks
         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity shadowBind3D =
                 com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
                         serverLevel, boundEntity.getX(), boundEntity.getY(), boundEntity.getZ(),
                         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_SHADOW_BIND,
-                        100, player.getYRot());
+                        holdTicks, player.getYRot());
         shadowBind3D.setTargetId(boundEntity.getId());
         serverLevel.addFreshEntity(shadowBind3D);
 
         serverLevel.playSound(null, boundEntity.blockPosition(), SoundEvents.WARDEN_TENDRIL_CLICKS, SoundSource.PLAYERS, 1.5f, 0.8f);
-        boundEntity.hurt(player.damageSources().magic(), 4.0f * powerMult);
+        boundEntity.hurt(player.damageSources().magic(), baseDamage);
+        boundEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, holdTicks, 255, false, false));
+        boundEntity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, holdTicks, 2, false, false));
 
-        // Bind target for 5 seconds (10 pulses every 10 ticks)
-        for (int step = 0; step < 10; step++) {
+        // Lock target movement & draw shadow tether for full holdTicks
+        int steps = Math.max(1, holdTicks / 5);
+        for (int step = 0; step < steps; step++) {
             final int s = step;
             ninjaData.scheduleDelayedTickEvent(p -> {
                 if (!(p.level() instanceof ServerLevel sLevel) || !boundEntity.isAlive()) return;
@@ -139,24 +154,16 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
                     sLevel.sendParticles(SHADOW_INK, lx, ly, lz, 2, 0.06, 0.02, 0.06, 0.0);
                 }
 
-                // Force target to mirror player's look vector and position offset
-                Vec3 pLook = p.getLookAngle();
-                Vec3 desiredPos = p.position().add(pLook.x * initialDist, 0, pLook.z * initialDist);
-                Vec3 pull = desiredPos.subtract(boundEntity.position()).scale(0.35);
-                boundEntity.setDeltaMovement(pull.x, 0.0, pull.z);
-                boundEntity.setYRot(p.getYRot());
-                boundEntity.setYHeadRot(p.getYHeadRot());
+                // Full movement lock
+                boundEntity.setDeltaMovement(0.0, Math.min(0.0, boundEntity.getDeltaMovement().y), 0.0);
                 boundEntity.hurtMarked = true;
 
-                boundEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 18, 6, false, false));
-                boundEntity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 18, 2, false, false));
-
                 // Final Shadow Neck Bind (Kage Kubishibari) constriction damage
-                if (s == 9) {
-                    boundEntity.hurt(p.damageSources().magic(), 6.5f * powerMult);
+                if (s == steps - 1) {
+                    boundEntity.hurt(p.damageSources().magic(), baseDamage * 1.5f);
                     sLevel.sendParticles(SHADOW_INK, boundEntity.getX(), boundEntity.getY() + 1.0, boundEntity.getZ(), 12, 0.3, 0.4, 0.3, 0.02);
                 }
-            }, step * 10);
+            }, step * 5);
         }
     }
 }

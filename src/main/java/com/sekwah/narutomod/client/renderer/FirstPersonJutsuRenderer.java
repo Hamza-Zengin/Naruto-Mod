@@ -108,20 +108,6 @@ public class FirstPersonJutsuRenderer {
                 }
             }
 
-            // 3. Byakugan Gentle Fist (Jūken) Chakra Spheres on palms
-            if (ninjaData.isByakuganActive()) {
-                poseStack.pushPose();
-                try {
-                    applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
-                    poseStack.scale(0.24F, 0.24F, 0.24F);
-                    float spinSpeed = isMainHand ? (ageInTicks * 0.8F) : (-ageInTicks * 0.8F);
-                    rasenganModel.setupAnim(spinSpeed);
-                    VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_RASENGAN));
-                    rasenganModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 0.85F, 0.95F, 1.0F, 0.70F);
-                } finally {
-                    poseStack.popPose();
-                }
-            }
         });
     }
 

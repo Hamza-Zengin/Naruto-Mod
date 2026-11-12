@@ -67,6 +67,10 @@ public class PlayerEvents {
 
     @SubscribeEvent
     public static void onLivingHurt(LivingHurtEvent event) {
+        if (com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(event.getEntity(), event.getSource().getEntity())) {
+            event.setCanceled(true);
+            return;
+        }
         // Kaguya Clan Osteoblast Bone Density Passives (+20% melee damage dealt, -15% physical damage taken)
         if (event.getSource().getEntity() instanceof Player attacker) {
             attacker.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {

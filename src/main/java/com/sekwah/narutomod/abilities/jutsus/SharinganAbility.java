@@ -30,10 +30,10 @@ import java.util.List;
 public class SharinganAbility extends Ability implements Ability.Toggled, Ability.HandleEnded {
 
     public enum SharinganStage {
-        ONE_TOMOE("1_tomoe", 0, 999, "1 Tomoe", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/sharingan_eyes_1.png")),
-        TWO_TOMOE("2_tomoe", 1000, 2499, "2 Tomoe", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/sharingan_eyes_2.png")),
-        THREE_TOMOE("3_tomoe", 2500, 4999, "3 Tomoe", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/sharingan_eyes_3.png")),
-        MANGEKYOU("mangekyou", 5000, Integer.MAX_VALUE, "Mangekyō Sharingan", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/sharingan_eyes_mangekyo.png"));
+        ONE_TOMOE("1_tomoe", 0, 999, "1 Tomoe", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_1_tomoe.png")),
+        TWO_TOMOE("2_tomoe", 1000, 2499, "2 Tomoe", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_2_tomoe.png")),
+        THREE_TOMOE("3_tomoe", 2500, 4999, "3 Tomoe", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_3_tomoe.png")),
+        MANGEKYOU("mangekyou", 5000, Integer.MAX_VALUE, "Mangekyō Sharingan", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_mangekyo.png"));
 
         private final String id;
         private final int minMastery;

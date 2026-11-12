@@ -124,25 +124,6 @@ public class JutsuHandAuraLayer extends RenderLayer<AbstractClientPlayer, Player
                 poseStack.popPose();
             }
 
-            // 5. Byakugan 3D Gentle Fist (Jūken) Chakra Sphere on both palms
-            if (hasByakugan) {
-                poseStack.pushPose();
-                this.getParentModel().rightArm.translateAndRotate(poseStack);
-                poseStack.translate(-0.06D, 0.64D, -0.10D);
-                poseStack.scale(0.24F, 0.24F, 0.24F);
-                this.rasenganHandModel.setupAnim(ageInTicks * 0.8F);
-                VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_RASENGAN));
-                this.rasenganHandModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 0.85F, 0.95F, 1.0F, 0.65F);
-                poseStack.popPose();
-
-                poseStack.pushPose();
-                this.getParentModel().leftArm.translateAndRotate(poseStack);
-                poseStack.translate(0.06D, 0.64D, -0.10D);
-                poseStack.scale(0.24F, 0.24F, 0.24F);
-                this.rasenganHandModel.setupAnim(-ageInTicks * 0.8F);
-                this.rasenganHandModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 0.85F, 0.95F, 1.0F, 0.65F);
-                poseStack.popPose();
-            }
         });
     }
 }

@@ -58,12 +58,16 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
         return 26.0f;
     }
 
+    public static int getScaledHoldDuration(int mastery) {
+        return (int) Math.round(100.0 * (1.0 + 0.20 * (Math.max(0, mastery) / 100.0)));
+    }
+
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
-        int holdTicks = 100 + (getMasteryTier(mastery) >= 4 ? 40 : (getMasteryTier(mastery) >= 2 ? 20 : 0));
+        int holdTicks = getScaledHoldDuration(mastery);
         int speedAmp = getMasteryTier(mastery) >= 4 ? 3 : 2;
 
         // Activate hand holding window (scaled with mastery)
@@ -71,6 +75,11 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
 
         // Give high-speed burst effect for the window
         player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, holdTicks, speedAmp, false, false, true));
+
+        // Electric spark burst on activation
+        serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK,
+                player.getX(), player.getY() + 1.0, player.getZ(),
+                24, 0.45, 0.45, 0.45, 0.15);
 
         // Sound effect: initial Chidori activation chirp and continuous lightning surge
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CHIDORI.get(), SoundSource.PLAYERS, 1.2f, 1.0f);

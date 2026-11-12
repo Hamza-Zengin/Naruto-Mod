@@ -196,7 +196,8 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
 
     @Override
     protected boolean canHitEntity(Entity entity) {
-        return super.canHitEntity(entity) && entity != this.getOwner();
+        return super.canHitEntity(entity) && entity != this.getOwner()
+                && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(this.getOwner(), entity);
     }
 
     @Override
