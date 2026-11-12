@@ -59,7 +59,9 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         boolean isStormy = player.level().isThundering() || player.level().isRaining();
-        float chakraCost = isStormy ? 85.0f : 130.0f; // 35% natural lightning storm discount
+        float baseChakra = isStormy ? 85.0f : 130.0f; // 35% natural lightning storm discount
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        float chakraCost = baseChakra * getChakraCostMultiplier(mastery);
         float staminaCost = isStormy ? 45.0f : 60.0f;
 
         return tryConsume(player, ninjaData, chakraCost, staminaCost, 45);
@@ -157,21 +159,25 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
                     2, 0.05, 0.1, 0.05, 0.04);
         }
 
-        // Direct damage if mob directly struck: 50.0f damage (25 hearts - near instant-kill on standard foes)
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        float powerMult = getPowerMultiplier(mastery);
+
+        // Direct damage if mob directly struck: 50.0f damage * powerMultiplier
         if (directEntity != null) {
-            directEntity.hurt(serverLevel.damageSources().lightningBolt(), 50.0f);
+            directEntity.hurt(serverLevel.damageSources().lightningBolt(), 50.0f * powerMult);
             directEntity.setRemainingFireTicks(140);
             directEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 3)); // Slowness IV
         }
 
-        // Massive electric shockwave blast: 28.0f damage (14 hearts) in 6.5 block radius
+        // Massive electric shockwave blast: 28.0f damage * powerMultiplier in scaled radius
+        double blastRadius = 6.5 + (getMasteryTier(mastery) >= 4 ? 2.0 : 0.0);
         final LivingEntity finalDirectTarget = directEntity;
-        AABB blastArea = new AABB(targetPos.x - 6.5, targetPos.y - 3.0, targetPos.z - 6.5,
-                targetPos.x + 6.5, targetPos.y + 5.0, targetPos.z + 6.5);
+        AABB blastArea = new AABB(targetPos.x - blastRadius, targetPos.y - 3.0, targetPos.z - blastRadius,
+                targetPos.x + blastRadius, targetPos.y + 5.0, targetPos.z + blastRadius);
         List<LivingEntity> victims = serverLevel.getEntitiesOfClass(LivingEntity.class, blastArea, e -> e != player && e != finalDirectTarget && e.isAlive());
 
         for (LivingEntity victim : victims) {
-            victim.hurt(serverLevel.damageSources().lightningBolt(), 28.0f);
+            victim.hurt(serverLevel.damageSources().lightningBolt(), 28.0f * powerMult);
             Vec3 knockback = victim.position().subtract(targetPos).normalize().scale(2.2);
             victim.push(knockback.x, 0.85, knockback.z);
             victim.setRemainingFireTicks(80);

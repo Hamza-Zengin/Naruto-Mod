@@ -33,24 +33,40 @@ public class ChakraDashAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public float getDefaultChakraCost() {
+        return 15.0f;
+    }
+
+    @Override
+    public int getDefaultCooldown() {
+        return 3 * 20;
+    }
+
+    @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        if (ninjaData.getChakra() < 15) {
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        float chakraCost = Math.max(6.0f, 15.0f * getChakraCostMultiplier(mastery));
+        float staminaCost = Math.max(5.0f, 10.0f * getChakraCostMultiplier(mastery));
+
+        if (ninjaData.getChakra() < chakraCost) {
             player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra", Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
             return false;
         }
-        if (ninjaData.getStamina() < 10) {
+        if (ninjaData.getStamina() < staminaCost) {
             player.displayClientMessage(Component.translatable("jutsu.fail.notenoughstamina", Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
             return false;
         }
-        ninjaData.useChakra(15, 20);
-        ninjaData.useStamina(10, 30);
+        ninjaData.useChakra(chakraCost, 20);
+        ninjaData.useStamina(staminaCost, 30);
         return true;
     }
 
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        double speed = 2.8 * (1.0 + (getPowerMultiplier(mastery) - 1.0) * 0.4);
+
         Vec3 look = player.getLookAngle();
-        double speed = 2.8;
         PlayerUtil.setVelocity(player, look.x * speed, Math.max(look.y * 0.6 + 0.35, 0.2), look.z * speed, true);
 
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -65,6 +81,6 @@ public class ChakraDashAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public int getCooldown() {
-        return 3 * 20;
+        return getDefaultCooldown();
     }
 }

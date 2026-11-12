@@ -50,6 +50,16 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public float getDefaultChakraCost() {
+        return 32.0f;
+    }
+
+    @Override
+    public float getDefaultDamage() {
+        return 7.5f;
+    }
+
+    @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("kaguya")) {
             player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
@@ -59,7 +69,7 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
         if (checkCooldown(player, ninjaData, this.getTranslationKey())) {
             return false;
         }
-        if (!tryConsume(player, ninjaData, 32.0f, 0, 45)) {
+        if (!tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 45)) {
             return false;
         }
         registerCooldown(ninjaData, this.getTranslationKey());
@@ -70,8 +80,13 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        float powerMult = getPowerMultiplier(mastery);
+        int resistTicks = (int) (160 * powerMult);
+        int resistAmp = getMasteryTier(mastery) >= 4 ? 2 : 1;
+
         // Grant temporary calcified bone armor resistance and materialize Kaguya Bone Sword if empty handed
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 160, 1));
+        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, resistTicks, resistAmp));
         if (player.getMainHandItem().isEmpty()) {
             player.setItemInHand( net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(NarutoItems.BONE_SWORD.get()));
         }
@@ -87,11 +102,12 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
                         65, player.getYRot());
         serverLevel.addFreshEntity(boneForest);
 
+        float spikeDmg = this.getDamage(ninjaData);
         for (int ring = 1; ring <= 3; ring++) {
             final int rIndex = ring;
             ninjaData.scheduleDelayedTickEvent(p -> {
                 if (!(p.level() instanceof ServerLevel sLevel)) return;
-                double radius = rIndex * 2.2D;
+                double radius = rIndex * (2.2D + (getMasteryTier(mastery) >= 3 ? 0.3D : 0.0D));
 
                 sLevel.playSound(null, p.blockPosition(), SoundEvents.SKELETON_HURT, SoundSource.PLAYERS, 1.5f, 0.55f);
                 sLevel.playSound(null, p.blockPosition(), SoundEvents.TRIDENT_HIT_GROUND, SoundSource.PLAYERS, 1.5f, 0.8f);
@@ -115,7 +131,7 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
                 for (LivingEntity enemy : enemies) {
                     double dist = Math.sqrt(enemy.distanceToSqr(origin.x, origin.y, origin.z));
                     if (Math.abs(dist - radius) <= 1.8D) {
-                        enemy.hurt(p.damageSources().playerAttack(p), 7.5f);
+                        enemy.hurt(p.damageSources().playerAttack(p), spikeDmg);
                         enemy.setDeltaMovement(enemy.getDeltaMovement().x, 0.52D, enemy.getDeltaMovement().z);
                         enemy.hurtMarked = true;
                         enemy.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 1));

@@ -57,8 +57,11 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
-        // Activate 5-second hand holding window (100 ticks)
-        ninjaData.setActiveHandJutsu("rasengan", 100);
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        int holdTicks = 100 + (getMasteryTier(mastery) >= 4 ? 40 : (getMasteryTier(mastery) >= 2 ? 20 : 0));
+
+        // Activate hand holding window (scaled with mastery)
+        ninjaData.setActiveHandJutsu("rasengan", holdTicks);
 
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.RASENGAN.get(), SoundSource.PLAYERS, 1.2f, 1.0f);
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.RASENGAN_LOOP.get(), SoundSource.PLAYERS, 0.9f, 1.0f);
@@ -90,10 +93,12 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
             hitTargets.addAll(serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox, e -> e != player && e.isAlive()));
         }
 
-        float strikeDamage = com.sekwah.narutomod.abilities.NarutoAbilities.RASENGAN.get().getDamage();
+        int mastery = ninjaData != null ? ninjaData.getMastery(com.sekwah.narutomod.abilities.NarutoAbilities.RASENGAN.getId()) : 0;
+        float powerMult = getPowerMultiplier(mastery);
+        float strikeDamage = com.sekwah.narutomod.abilities.NarutoAbilities.RASENGAN.get().getDamage(ninjaData);
         for (LivingEntity hit : hitTargets) {
             hit.hurt(player.damageSources().playerAttack(player), strikeDamage);
-            Vec3 knockback = look.scale(2.5).add(0, 0.6, 0);
+            Vec3 knockback = look.scale(2.5 * powerMult).add(0, 0.6 * powerMult, 0);
             if (hit instanceof Player targetPlayer) {
                 com.sekwah.sekclib.util.PlayerUtil.setVelocity(targetPlayer, knockback, true);
             } else {

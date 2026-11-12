@@ -62,11 +62,15 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
-        // Activate 5-second hand holding window (100 ticks)
-        ninjaData.setActiveHandJutsu("chidori", 100);
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        int holdTicks = 100 + (getMasteryTier(mastery) >= 4 ? 40 : (getMasteryTier(mastery) >= 2 ? 20 : 0));
+        int speedAmp = getMasteryTier(mastery) >= 4 ? 3 : 2;
 
-        // Give high-speed burst effect for the 5-second window
-        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100, 2, false, false, true));
+        // Activate hand holding window (scaled with mastery)
+        ninjaData.setActiveHandJutsu("chidori", holdTicks);
+
+        // Give high-speed burst effect for the window
+        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, holdTicks, speedAmp, false, false, true));
 
         // Sound effect: initial Chidori activation chirp and continuous lightning surge
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CHIDORI.get(), SoundSource.PLAYERS, 1.2f, 1.0f);
@@ -103,7 +107,7 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
         }
         serverLevel.addFreshEntity(chidori3D);
 
-        float strikeDamage = com.sekwah.narutomod.abilities.NarutoAbilities.CHIDORI.get().getDamage();
+        float strikeDamage = com.sekwah.narutomod.abilities.NarutoAbilities.CHIDORI.get().getDamage(ninjaData);
         for (LivingEntity enemy : hitEnemies) {
             enemy.hurt(player.damageSources().lightningBolt(), strikeDamage);
             serverLevel.sendParticles(ParticleTypes.FLASH, enemy.getX(), enemy.getY() + 1.0, enemy.getZ(), 1, 0, 0, 0, 0);

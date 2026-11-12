@@ -15,6 +15,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
@@ -109,7 +110,23 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
                 this.entityData.set(DATA_VORTEX_TICKS, vt);
             }
             if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+                Entity owner = this.getOwner();
                 double radius = 5.5D;
+                float baseDmg;
+                if (owner instanceof Player player) {
+                    baseDmg = player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA)
+                            .map(nd -> com.sekwah.narutomod.abilities.NarutoAbilities.RASENSHURIKEN.get().getDamage(nd))
+                            .orElse(com.sekwah.narutomod.abilities.NarutoAbilities.RASENSHURIKEN.get().getDamage());
+                    int mastery = player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA)
+                            .map(nd -> nd.getMastery(com.sekwah.narutomod.abilities.NarutoAbilities.RASENSHURIKEN.getId()))
+                            .orElse(0);
+                    int tier = com.sekwah.narutomod.abilities.Ability.getMasteryTier(mastery);
+                    if (tier >= 5) radius = 7.0D;
+                    else if (tier >= 3) radius = 6.2D;
+                } else {
+                    baseDmg = com.sekwah.narutomod.abilities.NarutoAbilities.RASENSHURIKEN.get().getDamage();
+                }
+
                 // Spiral wind dome particles
                 for (int i = 0; i < 12; i++) {
                     double angle = (vt * 0.45) + (i * Math.PI / 6.0);
@@ -123,7 +140,6 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
 
                 // Multi-hit cellular wind blades & pull towards vortex center
                 if (vt % 4 == 0) {
-                    Entity owner = this.getOwner();
                     AABB box = this.getBoundingBox().inflate(radius);
                     List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, box,
                             e -> e.isAlive() && e != owner);
@@ -150,7 +166,7 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
                         }
                         target.hurtMarked = true;
                         target.invulnerableTime = 0;
-                        target.hurt(NarutoDamageSource.rasenshuriken(this, owner), com.sekwah.narutomod.abilities.NarutoAbilities.RASENSHURIKEN.get().getDamage());
+                        target.hurt(NarutoDamageSource.rasenshuriken(this, owner), baseDmg);
                         target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2));
                     }
                     serverLevel.playSound(null, this.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.4f, 1.6f);

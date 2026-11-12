@@ -57,7 +57,9 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
         Vec3 look = player.getLookAngle();
         serverLevel.playSound(null, player.blockPosition(), SoundEvents.GENERIC_SPLASH, SoundSource.PLAYERS, 1.5f, 1.0f);
 
-        float bulletDamage = this.getDamage();
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        float powerMult = getPowerMultiplier(mastery);
+        float bulletDamage = this.getDamage(ninjaData);
 
         // Spawn physical WaterBulletEntity projectile
         WaterBulletEntity waterBullet = new WaterBulletEntity(serverLevel, player);
@@ -66,7 +68,7 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
         waterBullet.setXRot(player.getXRot());
         waterBullet.setDamage(bulletDamage);
         waterBullet.setMaxLife(25);
-        waterBullet.setDeltaMovement(look.scale(1.1));
+        waterBullet.setDeltaMovement(look.scale(1.1 * Math.min(1.4, powerMult)));
         serverLevel.addFreshEntity(waterBullet);
 
         for (int i = 1; i <= 8; i++) {
@@ -79,7 +81,7 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
             for (LivingEntity target : targets) {
                 target.hurt(player.damageSources().drown(), bulletDamage);
                 target.clearFire();
-                target.setDeltaMovement(look.scale(1.5).add(0, 0.3, 0));
+                target.setDeltaMovement(look.scale(1.5 * powerMult).add(0, 0.3 * powerMult, 0));
                 target.hurtMarked = true;
             }
         }

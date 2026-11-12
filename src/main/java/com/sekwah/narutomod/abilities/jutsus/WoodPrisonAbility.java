@@ -53,6 +53,16 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public float getDefaultChakraCost() {
+        return 28.0f;
+    }
+
+    @Override
+    public float getDefaultDamage() {
+        return 3.5f;
+    }
+
+    @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("senju")) {
             player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
@@ -62,7 +72,7 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
         if (checkCooldown(player, ninjaData, this.getTranslationKey())) {
             return false;
         }
-        if (!tryConsume(player, ninjaData, 28.0f, 0, 40)) {
+        if (!tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 40)) {
             return false;
         }
         registerCooldown(ninjaData, this.getTranslationKey());
@@ -72,6 +82,10 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
+
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        float powerMult = getPowerMultiplier(mastery);
+        int prisonLife = (int) (75 * powerMult);
 
         Vec3 start = player.getEyePosition();
         Vec3 end = start.add(player.getLookAngle().scale(14.0));
@@ -84,13 +98,14 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
         // Erupt 3D Intertwined Wood Prison Root Dome & Pillars
         WoodPrisonEntity woodPrison = WoodPrisonEntity.create(
                 serverLevel, center.x, center.y, center.z,
-                75, player.getYRot(), player.getUUID());
+                prisonLife, player.getYRot(), player.getUUID());
         serverLevel.addFreshEntity(woodPrison);
 
         BlockParticleOption woodParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.MANGROVE_WOOD.defaultBlockState());
         BlockParticleOption leafParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.AZALEA_LEAVES.defaultBlockState());
 
-        // Spawn 5waves of root constriction over 3.5 seconds
+        float waveDamage = this.getDamage(ninjaData);
+        // Spawn 5 waves of root constriction over 3.5 seconds
         for (int wave = 0; wave < 5; wave++) {
             final int w = wave;
             ninjaData.scheduleDelayedTickEvent(p -> {
@@ -120,10 +135,10 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
                     target.hurtMarked = true;
                     target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 35, 5));
                     target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 0));
-                    target.hurt(p.damageSources().playerAttack(p), 3.5f);
+                    target.hurt(p.damageSources().playerAttack(p), waveDamage);
 
                     // Senju life-force siphon
-                    p.heal(0.6f);
+                    p.heal(0.6f * powerMult);
                 }
                 sLevel.playSound(null, BlockPos.containing(center), SoundEvents.VINE_STEP, SoundSource.PLAYERS, 1.4f, 0.7f);
             }, wave * 14);

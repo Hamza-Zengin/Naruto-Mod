@@ -75,18 +75,16 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
             return false;
         }
 
-        float reductionFactor = 0f;
-        if (ninjaData != null) {
-            reductionFactor = Math.min(0.40f, (ninjaData.getMastery(this.getRegistryName()) / 1000.0f) * 0.40f);
-        }
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        float costMult = getChakraCostMultiplier(mastery);
 
         boolean isInitial = !ninjaData.getToggleAbilityData().hasToggleAbility(this.getRegistryName());
         if (isInitial) {
-            float initCost = Math.max(10.0f, 40.0f * (1.0f - reductionFactor));
+            float initCost = Math.max(10.0f, 40.0f * costMult);
             return tryConsume(player, ninjaData, initCost, 0, 30);
         } else {
             // Sustained ethereal skeleton drain: scales down with mastery
-            float sustainedCost = Math.max(0.6f, 1.0f * (1.0f - reductionFactor));
+            float sustainedCost = Math.max(0.4f, 1.0f * costMult);
             if (ninjaData.getChakra() < sustainedCost) {
                 return false;
             }
@@ -100,6 +98,12 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
         // Godlike Defense: Resistance IV (80% damage reduction) + Fire immunity
         player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 3, false, false, true));
         player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 40, 0, false, false, false));
+
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        int tier = getMasteryTier(mastery);
+        if (tier >= 3 && !player.hasEffect(MobEffects.ABSORPTION)) {
+            player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 100, tier - 3, false, false, false));
+        }
 
         // Anti-AFK periodic mastery training
         if (ninjaData != null && player.tickCount % 200 == 0) {
@@ -128,13 +132,14 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
                     player.getZ() + (player.getRandom().nextDouble() - 0.5) * 1.5,
                     1, 0, 0.02, 0, 0.01);
 
-            // Repulsion shockwave aura: violently push back foes and deal 6.0f magic damage
+            // Repulsion shockwave aura: violently push back foes and deal scaled damage
             AABB auraBox = player.getBoundingBox().inflate(3.0);
             List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, auraBox, e -> e != player && e.isAlive());
+            float damage = 6.0f * getPowerMultiplier(mastery);
             for (LivingEntity enemy : enemies) {
                 Vec3 push = enemy.position().subtract(player.position()).normalize().scale(1.2);
                 enemy.push(push.x, 0.45, push.z);
-                enemy.hurt(serverLevel.damageSources().playerAttack(player), 6.0f);
+                enemy.hurt(serverLevel.damageSources().playerAttack(player), damage);
             }
         }
     }

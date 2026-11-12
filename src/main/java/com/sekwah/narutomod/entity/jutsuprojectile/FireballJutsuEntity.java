@@ -12,6 +12,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
@@ -214,9 +215,20 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
 
         if (!this.level().isClientSide) {
             int flameRadius = 8;
+            Entity owner = this.getOwner();
+            if (owner instanceof Player player) {
+                int mastery = player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA)
+                        .map(nd -> nd.getMastery(com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.getId()))
+                        .orElse(0);
+                int tier = com.sekwah.narutomod.abilities.Ability.getMasteryTier(mastery);
+                if (tier >= 5) flameRadius = 10;
+                else if (tier >= 3) flameRadius = 9;
+            }
+
+            final int effectiveRadius = flameRadius;
             this.level().getEntities(this, this.getBoundingBox().inflate(flameRadius, flameRadius, flameRadius)).forEach(entity -> {
                 double distance = this.distanceToSqr(entity);
-                if (distance > flameRadius * flameRadius) {
+                if (distance > effectiveRadius * effectiveRadius) {
                     return;
                 }
 
@@ -232,7 +244,14 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                 }
 
                 float fireSecs = (float) (8f - (distance / 6f)) * 20;
-                float baseDamage = com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.get().getDamage();
+                float baseDamage;
+                if (owner instanceof Player player) {
+                    baseDamage = player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA)
+                            .map(nd -> com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.get().getDamage(nd))
+                            .orElse(com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.get().getDamage());
+                } else {
+                    baseDamage = com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.get().getDamage();
+                }
                 float fireDamage = (float) (baseDamage - (distance / 4f));
                 if(fireDamage > 0) {
                     Entity entity1 = this.getOwner();

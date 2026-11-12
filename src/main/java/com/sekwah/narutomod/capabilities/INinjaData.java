@@ -86,6 +86,10 @@ public interface INinjaData extends INBTSerializable<Tag> {
     Map<ResourceLocation, Integer> getJutsuMasteryMap();
     int getMastery(ResourceLocation jutsuId);
     void addMastery(ResourceLocation jutsuId, int amount);
+    default int getAbilityMastery(com.sekwah.narutomod.abilities.Ability ability) {
+        if (ability == null || ability.getRegistryName() == null) return 0;
+        return getMastery(ability.getRegistryName());
+    }
 
     void saveNBTData(CompoundTag nbt);
     void loadNBTData(CompoundTag nbt);

@@ -195,6 +195,18 @@ public abstract class Ability {
         return getDefaultDamage();
     }
 
+    public float getDamage(INinjaData ninjaData) {
+        float base = getDamage();
+        if (ninjaData == null) return base;
+        ResourceLocation reg = getRegistryName();
+        int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
+        return base * getPowerMultiplier(mastery);
+    }
+
+    public float getDamage(int mastery) {
+        return getDamage() * getPowerMultiplier(mastery);
+    }
+
     public int getCooldown() {
         ResourceLocation reg = getRegistryName();
         if (reg != null) {
@@ -204,6 +216,18 @@ public abstract class Ability {
             }
         }
         return getDefaultCooldown();
+    }
+
+    public int getCooldown(INinjaData ninjaData) {
+        int base = getCooldown();
+        if (ninjaData == null) return base;
+        ResourceLocation reg = getRegistryName();
+        int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
+        return getCooldown(mastery);
+    }
+
+    public int getCooldown(int mastery) {
+        return Math.max(1, (int) (getCooldown() * getCooldownMultiplier(mastery)));
     }
 
     public float getDefaultChakraCost() {
@@ -222,13 +246,53 @@ public abstract class Ability {
         return 0;
     }
 
+    public static int getMasteryTier(int mastery) {
+        if (mastery < 50) return 1;
+        if (mastery < 150) return 2;
+        if (mastery < 350) return 3;
+        if (mastery < 700) return 4;
+        return 5;
+    }
+
+    public static float getChakraCostMultiplier(int mastery) {
+        int tier = getMasteryTier(mastery);
+        return switch (tier) {
+            case 2 -> 0.90f;
+            case 3 -> 0.80f;
+            case 4 -> 0.70f;
+            case 5 -> 0.60f;
+            default -> 1.00f;
+        };
+    }
+
+    public static float getPowerMultiplier(int mastery) {
+        int tier = getMasteryTier(mastery);
+        return switch (tier) {
+            case 2 -> 1.12f;
+            case 3 -> 1.25f;
+            case 4 -> 1.40f;
+            case 5 -> 1.60f;
+            default -> 1.00f;
+        };
+    }
+
+    public static float getCooldownMultiplier(int mastery) {
+        int tier = getMasteryTier(mastery);
+        return switch (tier) {
+            case 2 -> 0.90f;
+            case 3 -> 0.80f;
+            case 4 -> 0.70f;
+            case 5 -> 0.60f;
+            default -> 1.00f;
+        };
+    }
+
     public float getScaledChakraCost(INinjaData ninjaData) {
         float baseCost = getEffectiveChakraCost(ninjaData);
         if (ninjaData == null) return baseCost;
         ResourceLocation reg = getRegistryName();
         int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
-        float reductionFactor = Math.min(0.40f, (mastery / 1000.0f) * 0.40f);
-        return Math.max(1.0f, baseCost * (1.0f - reductionFactor));
+        return Math.max(1.0f, baseCost * getChakraCostMultiplier(mastery));
     }
 
     public int getActivationDelayTicks(INinjaData ninjaData) {
@@ -293,7 +357,9 @@ public abstract class Ability {
         if (ninjaData != null && this.activationType() != ActivationType.TOGGLE) {
             ResourceLocation reg = this.getRegistryName();
             if (reg != null) {
-                ninjaData.addMastery(reg, 1);
+                int currentMastery = ninjaData.getMastery(reg);
+                int gain = (currentMastery < 150) ? 3 : (currentMastery < 350 ? 2 : 1);
+                ninjaData.addMastery(reg, gain);
             }
         }
     }
@@ -330,8 +396,15 @@ public abstract class Ability {
             return 0;
         }
 
+        default int getCooldown(INinjaData ninjaData) {
+            if (this instanceof Ability ability) {
+                return ability.getCooldown(ninjaData);
+            }
+            return getCooldown();
+        }
+
         default boolean checkCooldown(Player player, INinjaData ninjaData, String translationKey) {
-            if (getCooldown() > 0 && ninjaData.getCooldownEvents().containsKey(translationKey)) {
+            if (getCooldown(ninjaData) > 0 && ninjaData.getCooldownEvents().containsKey(translationKey)) {
                 player.displayClientMessage(Component.translatable("jutsu.fail.cooldown",
                         Component.translatable(translationKey).withStyle(ChatFormatting.YELLOW),
                         Component.literal(String.valueOf((int) Math.ceil(ninjaData.getCooldownEvents().get(translationKey).ticks / 20f))).withStyle(ChatFormatting.YELLOW)
@@ -342,8 +415,9 @@ public abstract class Ability {
         }
 
         default void registerCooldown(INinjaData ninjaData, String translationKey) {
-            if (getCooldown() > 0) {
-                ninjaData.getCooldownEvents().put(translationKey, new CooldownTickEvent(getCooldown()));
+            int cd = getCooldown(ninjaData);
+            if (cd > 0) {
+                ninjaData.getCooldownEvents().put(translationKey, new CooldownTickEvent(cd));
             }
         }
     }

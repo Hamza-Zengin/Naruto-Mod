@@ -103,19 +103,7 @@ public class NarutoRenderEvents {
         event.registerEntityRenderer(NarutoEntities.JUTSU_VISUAL_EFFECT.get(), com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.JutsuVisualEffectRenderer::new);
         NarutoRenderer.registerEntityRenderers();
 
-        event.registerEntityRenderer(NarutoEntities.SHADOW_CLONE.get(), (ctx) ->
-                new net.minecraft.client.renderer.entity.HumanoidMobRenderer<>(ctx, new net.minecraft.client.model.HumanoidModel<>(ctx.bakeLayer(net.minecraft.client.model.geom.ModelLayers.PLAYER)), 0.5f) {
-                    @Override
-                    public ResourceLocation getTextureLocation(com.sekwah.narutomod.entity.ShadowCloneEntity entity) {
-                        java.util.UUID ownerUUID = entity.getOwnerUUID();
-                        if (ownerUUID != null) {
-                            String ownerName = entity.getCustomName() != null ? entity.getCustomName().getString() : "ShadowClone";
-                            return net.minecraft.client.Minecraft.getInstance().getSkinManager()
-                                    .getInsecureSkinLocation(new com.mojang.authlib.GameProfile(ownerUUID, ownerName));
-                        }
-                        return net.minecraft.client.resources.DefaultPlayerSkin.getDefaultSkin();
-                    }
-                });
+        event.registerEntityRenderer(NarutoEntities.SHADOW_CLONE.get(), com.sekwah.narutomod.client.renderer.entity.ShadowCloneRenderer::new);
 
         event.registerEntityRenderer(NarutoEntities.ROGUE_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "rogue_ninja"));
         event.registerEntityRenderer(NarutoEntities.AKATSUKI_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "akatsuki_ninja"));

@@ -39,10 +39,18 @@ public class ChakraChargeAbility extends Ability implements Ability.Channeled {
     @Override
     public void handleChannelling(Player player, INinjaData ninjaData, int ticksChanneled) {
        boolean wasBelowMax = ninjaData.getChakra() < ninjaData.getMaxChakra();
+       int mastery = ninjaData.getAbilityMastery(this);
+       float rateMult = switch (getMasteryTier(mastery)) {
+           case 2 -> 1.10f;
+           case 3 -> 1.20f;
+           case 4 -> 1.35f;
+           case 5 -> 1.50f;
+           default -> 1.00f;
+       };
        if(player.isSprinting() || !player.onGround()) {
-           ninjaData.addChakra(0.2f);
+           ninjaData.addChakra(0.2f * rateMult);
        } else {
-           ninjaData.addChakra(1f);
+           ninjaData.addChakra(1f * rateMult);
            // Meditation: If crouching quietly, focus chakra pathways and train chakra control
            if (player.isCrouching()) {
                ninjaData.addChakraExp(0.10f);

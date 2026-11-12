@@ -53,13 +53,16 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
             return false;
         }
 
-        if (ninjaData.getChakra() < 0.25f) {
+        int mastery = ninjaData.getAbilityMastery(this);
+        float drain = 0.25f * getChakraCostMultiplier(mastery);
+
+        if (ninjaData.getChakra() < drain) {
             player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
                     Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
             return false;
         }
 
-        ninjaData.useChakra(0.25f, 20);
+        ninjaData.useChakra(drain, 20);
         return true;
     }
 
@@ -73,9 +76,11 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
             }
         }
 
-        // Ping all entities in 30 blocks radius with GLOWING effect every second
+        // Ping all entities in mastery-scaled radius (30 - 48 blocks) with GLOWING effect every second
         if (ticksActive % 20 == 0 && player.level() instanceof ServerLevel serverLevel) {
-            AABB field = player.getBoundingBox().inflate(30.0);
+            int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+            double range = 30.0 * getPowerMultiplier(mastery);
+            AABB field = player.getBoundingBox().inflate(range);
             List<LivingEntity> entities = serverLevel.getEntitiesOfClass(LivingEntity.class, field, e -> e != player && e.isAlive());
             for (LivingEntity entity : entities) {
                 entity.addEffect(new MobEffectInstance(MobEffects.GLOWING, 30, 0, false, false, false));

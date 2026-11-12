@@ -54,7 +54,9 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
             return false;
         }
         boolean isNara = ninjaData.getClan() != null && ninjaData.getClan().getPath().equalsIgnoreCase("nara");
-        float cost = isNara ? 22.0f : 32.0f;
+        float baseCost = isNara ? 22.0f : 32.0f;
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        float cost = baseCost * getChakraCostMultiplier(mastery);
         if (!tryConsume(player, ninjaData, cost, 0, 40)) {
             return false;
         }
@@ -66,6 +68,10 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        float powerMult = getPowerMultiplier(mastery);
+        double maxReach = 13.0D + (getMasteryTier(mastery) >= 4 ? 4.0D : (getMasteryTier(mastery) >= 2 ? 2.0D : 0.0D));
+
         Vec3 look = player.getLookAngle();
         Vec3 horizDir = new Vec3(look.x, 0, look.z).normalize();
         if (horizDir.lengthSqr() < 0.001) {
@@ -74,9 +80,9 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
 
         serverLevel.playSound(null, player.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, 1.5f, 0.7f);
 
-        // Extend shadow line up to 13 blocks
+        // Extend shadow line up to scaled reach
         LivingEntity capturedTarget = null;
-        for (double d = 1.0; d <= 13.0; d += 0.6) {
+        for (double d = 1.0; d <= maxReach; d += 0.6) {
             Vec3 pos = player.position().add(horizDir.scale(d));
             serverLevel.sendParticles(SHADOW_INK, pos.x, player.getY() + 0.1, pos.z, 3, 0.12, 0.02, 0.12, 0.0);
 
@@ -102,7 +108,7 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
         }
 
         final LivingEntity boundEntity = capturedTarget;
-        final double initialDist = Math.max(2.5D, Math.min(player.distanceTo(boundEntity), 12.0D));
+        final double initialDist = Math.max(2.5D, Math.min(player.distanceTo(boundEntity), maxReach));
 
         // Spawn 3D Shadow Bind Claws & Ribbon locked onto captured target
         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity shadowBind3D =
@@ -114,7 +120,7 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
         serverLevel.addFreshEntity(shadowBind3D);
 
         serverLevel.playSound(null, boundEntity.blockPosition(), SoundEvents.WARDEN_TENDRIL_CLICKS, SoundSource.PLAYERS, 1.5f, 0.8f);
-        boundEntity.hurt(player.damageSources().magic(), 4.0f);
+        boundEntity.hurt(player.damageSources().magic(), 4.0f * powerMult);
 
         // Bind target for 5 seconds (10 pulses every 10 ticks)
         for (int step = 0; step < 10; step++) {
@@ -147,7 +153,7 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
 
                 // Final Shadow Neck Bind (Kage Kubishibari) constriction damage
                 if (s == 9) {
-                    boundEntity.hurt(p.damageSources().magic(), 6.5f);
+                    boundEntity.hurt(p.damageSources().magic(), 6.5f * powerMult);
                     sLevel.sendParticles(SHADOW_INK, boundEntity.getX(), boundEntity.getY() + 1.0, boundEntity.getZ(), 12, 0.3, 0.4, 0.3, 0.02);
                 }
             }, step * 10);

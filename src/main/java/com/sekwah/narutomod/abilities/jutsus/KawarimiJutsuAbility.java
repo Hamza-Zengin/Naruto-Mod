@@ -35,8 +35,18 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public float getDefaultChakraCost() {
+        return 20.0f;
+    }
+
+    @Override
+    public int getDefaultCooldown() {
+        return 6 * 20;
+    }
+
+    @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        return tryConsume(player, ninjaData, 20.0f, 0, 20);
+        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 20);
     }
 
     @Override
@@ -55,10 +65,13 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
             serverLevel.setBlockAndUpdate(currentPos, Blocks.OAK_LOG.defaultBlockState());
         }
 
-        // Teleport 6 blocks backwards
+        // Teleport backwards, scaling distance with mastery (6.0 to 10.0 blocks)
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        double distance = 6.0 + (getMasteryTier(mastery) - 1) * 1.0;
+
         Vec3 look = player.getLookAngle();
-        double targetX = player.getX() - (look.x * 6);
-        double targetZ = player.getZ() - (look.z * 6);
+        double targetX = player.getX() - (look.x * distance);
+        double targetZ = player.getZ() - (look.z * distance);
         double targetY = player.getY();
 
         player.teleportTo(targetX, targetY, targetZ);
@@ -70,6 +83,6 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public int getCooldown() {
-        return 6 * 20;
+        return getDefaultCooldown();
     }
 }

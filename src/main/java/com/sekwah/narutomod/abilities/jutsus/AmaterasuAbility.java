@@ -178,12 +178,17 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         }
         serverLevel.addFreshEntity(amaterasu3D);
 
-        float directDamage = this.getDamage();
-        // Direct Entity Target Impact: 38.0f damage (19 full hearts!)
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        float powerMult = getPowerMultiplier(mastery);
+        float directDamage = this.getDamage(ninjaData);
+        int fireTicks = (int) (300 * powerMult);
+        int witherTicks = (int) (180 * powerMult);
+
+        // Direct Entity Target Impact: damage scaled with mastery
         if (directEntity != null) {
             directEntity.hurt(NarutoDamageSource.amaterasu(serverLevel, player, player), directDamage);
-            directEntity.setRemainingFireTicks(300); // 15 seconds fire
-            directEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 180, 3)); // Wither IV (inextinguishable black flames)
+            directEntity.setRemainingFireTicks(fireTicks); // Inextinguishable black flames
+            directEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, witherTicks, 3)); // Wither IV
             directEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 2)); // Slowness III
             directEntity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 160, 0));
 
@@ -203,8 +208,8 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
 
         for (LivingEntity splash : splashTargets) {
             splash.hurt(NarutoDamageSource.amaterasu(serverLevel, player, player), directDamage * 0.47f);
-            splash.setRemainingFireTicks(200);
-            splash.addEffect(new MobEffectInstance(MobEffects.WITHER, 140, 1)); // Wither II
+            splash.setRemainingFireTicks((int) (200 * powerMult));
+            splash.addEffect(new MobEffectInstance(MobEffects.WITHER, (int) (140 * powerMult), 1)); // Wither II
             splash.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));
 
             serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,

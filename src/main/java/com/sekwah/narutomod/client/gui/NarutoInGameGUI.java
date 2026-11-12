@@ -8,6 +8,7 @@ import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
@@ -130,6 +131,23 @@ public class NarutoInGameGUI {
             int totalWidth = seals.size() * badgeWidth + (seals.size() - 1) * spacing;
             int startX = (screenWidth - totalWidth) / 2;
             int startY = screenHeight - 68; // Positioned neatly above the hotbar and chakra bars
+
+            // Check for matched jutsu preview
+            long combo = 0;
+            for (byte b : seals) {
+                combo = combo * 10 + b;
+            }
+            com.sekwah.narutomod.abilities.Ability matched = com.sekwah.narutomod.abilities.NarutoAbilities.getAbilityFromCombo(combo);
+            if (matched != null) {
+                String jutsuName = Component.translatable(matched.getTranslationKey()).getString();
+                String previewText = "§a§l» " + jutsuName + " «";
+                int textW = font.width(previewText);
+                int midX = screenWidth / 2;
+                int previewY = startY - 19;
+                guiGraphics.fill(midX - textW / 2 - 5, previewY - 2, midX + textW / 2 + 5, previewY + 11, 0x80000000);
+                guiGraphics.renderOutline(midX - textW / 2 - 5, previewY - 2, textW + 10, 13, 0x4034D399);
+                guiGraphics.drawCenteredString(font, previewText, midX, previewY, 0xFF55FF55);
+            }
 
             // Subtle dark translucent background card with border
             guiGraphics.fill(startX - 6, startY - 4, startX + totalWidth + 6, startY + badgeHeight + 5, 0xAA000000);

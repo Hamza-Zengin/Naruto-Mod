@@ -36,13 +36,23 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public float getDefaultChakraCost() {
+        return 30.0f;
+    }
+
+    @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        return tryConsume(player, ninjaData, 30.0f, 0, 30);
+        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 30);
     }
 
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
+
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        float powerMult = getPowerMultiplier(mastery);
+        int maxLife = (int) (160 * powerMult);
+        float maxHealth = MudWallEntity.DEFAULT_MAX_HEALTH * powerMult;
 
         Direction direction = player.getDirection();
         BlockPos basePos = player.blockPosition().relative(direction, 2);
@@ -61,7 +71,8 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
         // Erupt 3D Sculpted Shinobi Earth Bulwark Entity (Physical Solid Barrier)
         MudWallEntity mudWall = MudWallEntity.create(
                 serverLevel, basePos.getX() + 0.5, basePos.getY(), basePos.getZ() + 0.5,
-                160, direction.toYRot(), player.getUUID());
+                maxLife, direction.toYRot(), player.getUUID());
+        mudWall.setHealth(maxHealth);
         serverLevel.addFreshEntity(mudWall);
     }
 

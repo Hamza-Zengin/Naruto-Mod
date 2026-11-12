@@ -44,23 +44,49 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
         return 12 * 20;
     }
 
+    public static int getCloneCount(int mastery) {
+        if (mastery < 100) return 1;
+        if (mastery < 300) return 2;
+        if (mastery < 700) return 4;
+        return 8;
+    }
+
+    public static int getCloneLifespan(int mastery) {
+        if (mastery < 100) return 20 * 20; // 20s (400 ticks)
+        if (mastery < 300) return 30 * 20; // 30s (600 ticks)
+        if (mastery < 700) return 45 * 20; // 45s (900 ticks)
+        return 60 * 20; // 60s (1200 ticks)
+    }
+
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
-        Vec3 look = player.getLookAngle();
-        double spawnX = player.getX() + (look.x * 1.5);
-        double spawnY = player.getY();
-        double spawnZ = player.getZ() + (look.z * 1.5);
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        int count = getCloneCount(mastery);
+        int lifespan = getCloneLifespan(mastery);
 
-        ShadowCloneEntity clone = new ShadowCloneEntity(NarutoEntities.SHADOW_CLONE.get(), serverLevel);
-        clone.moveTo(spawnX, spawnY, spawnZ, player.getYRot(), player.getXRot());
-        clone.setOwner(player);
+        float yaw = player.getYRot();
+        double radius = count > 1 ? 2.0D : 1.5D;
+        double angleStep = (2 * Math.PI) / count;
 
-        serverLevel.addFreshEntity(clone);
+        for (int i = 0; i < count; i++) {
+            double angle = Math.toRadians(yaw) + (i * angleStep) + (Math.PI / 2);
+            double spawnX = player.getX() - Math.sin(angle) * radius;
+            double spawnY = player.getY();
+            double spawnZ = player.getZ() + Math.cos(angle) * radius;
 
-        serverLevel.sendParticles(ParticleTypes.POOF, spawnX, spawnY + 0.8, spawnZ,
-                30, 0.5, 0.8, 0.5, 0.05);
+            ShadowCloneEntity clone = new ShadowCloneEntity(NarutoEntities.SHADOW_CLONE.get(), serverLevel);
+            clone.moveTo(spawnX, spawnY, spawnZ, yaw, player.getXRot());
+            clone.setOwner(player);
+            clone.setMaxLifespan(lifespan);
+
+            serverLevel.addFreshEntity(clone);
+
+            serverLevel.sendParticles(ParticleTypes.POOF, spawnX, spawnY + 0.8, spawnZ,
+                    25, 0.4, 0.6, 0.4, 0.05);
+        }
+
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CLONE_POOF.get(), SoundSource.PLAYERS, 1.0f, 1.0f);
     }
 }

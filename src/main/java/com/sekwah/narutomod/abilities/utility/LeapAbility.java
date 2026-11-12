@@ -37,20 +37,25 @@ public class LeapAbility extends Ability {
             player.displayClientMessage(Component.translatable("jutsu.fail.notonground", Component.translatable("jutsu.leap").withStyle(ChatFormatting.YELLOW)), true);
             return false;
         }
-        if(ninjaData.getStamina() < 10) {
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        float staminaCost = Math.max(5.0f, 10.0f * getChakraCostMultiplier(mastery));
+        if(ninjaData.getStamina() < staminaCost) {
             player.displayClientMessage(Component.translatable("jutsu.fail.notenoughstamina", Component.translatable("jutsu.leap").withStyle(ChatFormatting.YELLOW)), true);
             return false;
         }
-        ninjaData.useStamina(10, 40);
+        ninjaData.useStamina(staminaCost, 40);
         return true;
     }
 
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        float boostMult = 1.0f + (getPowerMultiplier(mastery) - 1.0f) * 0.58f; // up to +35% at Lv 5
+
         Vec3 lookVector = player.getLookAngle();
-        float horScale = 2.41f;
-        PlayerUtil.setVelocity(player, lookVector.x * horScale, (lookVector.y + 0.8F)
-                , lookVector.z * horScale, true);
+        float horScale = 2.41f * boostMult;
+        float vertScale = (float) ((lookVector.y + 0.8F) * (1.0f + (boostMult - 1.0f) * 0.5f));
+        PlayerUtil.setVelocity(player, lookVector.x * horScale, vertScale, lookVector.z * horScale, true);
         player.level().playSound(null,
                 player.getX(), player.getY(), player.getZ(), NarutoSounds.LEAP.get(), SoundSource.PLAYERS, 0.5f, 1.0f);
     }

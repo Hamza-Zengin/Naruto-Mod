@@ -287,6 +287,52 @@ public class NinjaMenuScreen extends Screen {
                     }
                 }
             });
+        } else if (this.activeTab == 2) {
+            mc.player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+                int startIndex = jutsuPage * JUTSUS_PER_PAGE;
+                int endIndex = Math.min(startIndex + JUTSUS_PER_PAGE, allAbilities.size());
+                int boxX = centerX - BOX_WIDTH / 2;
+                int cardStartY = boxY + 16;
+                int cardH = 36;
+                int cardGap = 4;
+
+                for (int i = startIndex; i < endIndex; i++) {
+                    int cardY = cardStartY + (i - startIndex) * (cardH + cardGap);
+                    if (mouseX >= boxX && mouseX <= boxX + BOX_WIDTH && mouseY >= cardY && mouseY <= cardY + cardH) {
+                        Ability ability = allAbilities.get(i);
+                        ResourceLocation id = ability.getRegistryName();
+                        int mastery = ninjaData.getMastery(id);
+                        int tier = Ability.getMasteryTier(mastery);
+
+                        List<Component> tooltip = new ArrayList<>();
+                        tooltip.add(Component.translatable(ability.getTranslationKey()).copy().withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
+                        tooltip.add(Component.literal("§eUstalık Seviyesi: §aLv." + tier + " §7(" + mastery + " puan)"));
+
+                        int discountPercent = (int) Math.round((1.0f - Ability.getChakraCostMultiplier(mastery)) * 100);
+                        int powerBonusPercent = (int) Math.round((Ability.getPowerMultiplier(mastery) - 1.0f) * 100);
+                        int cdReductionPercent = (int) Math.round((1.0f - Ability.getCooldownMultiplier(mastery)) * 100);
+
+                        if (discountPercent > 0) {
+                            tooltip.add(Component.literal("§bÇakra Tasarrufu: §a-%" + discountPercent));
+                        } else {
+                            tooltip.add(Component.literal("§bÇakra Tasarrufu: §7%0"));
+                        }
+
+                        if (powerBonusPercent > 0) {
+                            tooltip.add(Component.literal("§6Güç Bonusu: §a+%" + powerBonusPercent));
+                        } else {
+                            tooltip.add(Component.literal("§6Güç Bonusu: §7%0"));
+                        }
+
+                        if (cdReductionPercent > 0) {
+                            tooltip.add(Component.literal("§dBekleme Süresi: §a-%" + cdReductionPercent));
+                        }
+
+                        graphics.renderComponentTooltip(this.font, tooltip, mouseX, mouseY);
+                        break;
+                    }
+                }
+            });
         }
     }
 
@@ -633,7 +679,7 @@ public class NinjaMenuScreen extends Screen {
                         com.sekwah.narutomod.abilities.jutsus.EightGatesAbility.getStage(mastery);
                 masteryText = "§eUstalık: §a" + mastery + " §7(" + gstage.getDisplayName() + ")";
             } else {
-                masteryText = "§eUstalık: §a" + mastery;
+                masteryText = "§eUstalık: §a" + mastery + " §7(Lv." + Ability.getMasteryTier(mastery) + ")";
             }
             int masteryWidth = this.font.width(masteryText);
             graphics.drawString(this.font, masteryText, boxX + BOX_WIDTH - masteryWidth - 8, cardY + 15, 0xFFFFFF88);

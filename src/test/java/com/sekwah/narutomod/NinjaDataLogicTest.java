@@ -9,6 +9,7 @@ import com.sekwah.narutomod.abilities.jutsus.ByakuganAbility;
 import com.sekwah.narutomod.abilities.jutsus.EightGatesAbility;
 import com.sekwah.narutomod.abilities.jutsus.EighthGateOfDeathAbility;
 import com.sekwah.narutomod.abilities.jutsus.RasenshurikenAbility;
+import com.sekwah.narutomod.abilities.jutsus.ShadowCloneAbility;
 import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
 import com.sekwah.narutomod.abilities.jutsus.SusanooRibcageAbility;
 import com.sekwah.narutomod.item.weapons.KusanagiSwordItem;
@@ -449,7 +450,7 @@ public class NinjaDataLogicTest {
     }
 
     @Test
-    @DisplayName("Verify Ability perform() and performServer() increment jutsu mastery by +1")
+    @DisplayName("Verify Ability perform() and performServer() increment jutsu mastery dynamically (+3/+2/+1)")
     public void testAbilityPerformIncrementsMastery() {
         ResourceLocation testJutsu = new ResourceLocation(NarutoMod.MOD_ID, "test_jutsu");
         DummyAbility ability = new DummyAbility(testJutsu);
@@ -457,18 +458,28 @@ public class NinjaDataLogicTest {
         assertEquals(0, ninjaData.getMastery(testJutsu));
         assertFalse(ability.executed);
 
-        // First execution via perform()
+        // First execution via perform() (mastery < 150 grants +3)
         ability.perform(null, ninjaData);
         assertTrue(ability.executed);
-        assertEquals(1, ninjaData.getMastery(testJutsu), "Successful perform() should grant +1 mastery");
+        assertEquals(3, ninjaData.getMastery(testJutsu), "Successful perform() below 150 should grant +3 mastery");
 
         // Second execution via perform(player, data, ticks)
         ability.perform(null, ninjaData, 10);
-        assertEquals(2, ninjaData.getMastery(testJutsu), "Second perform() should grant another +1 mastery");
+        assertEquals(6, ninjaData.getMastery(testJutsu), "Second perform() below 150 should grant another +3 mastery");
 
         // Third execution via performServer()
         ability.performServer(null, ninjaData);
-        assertEquals(3, ninjaData.getMastery(testJutsu), "performServer() should route to perform() and grant +1 mastery");
+        assertEquals(9, ninjaData.getMastery(testJutsu), "performServer() should route to perform() and grant +3 mastery");
+
+        // Mastery tier transition (150 <= mastery < 350 grants +2)
+        ninjaData.addMastery(testJutsu, 150); // total 159
+        ability.perform(null, ninjaData);
+        assertEquals(161, ninjaData.getMastery(testJutsu), "Perform() between 150 and 350 should grant +2 mastery");
+
+        // Mastery tier transition (mastery >= 350 grants +1)
+        ninjaData.addMastery(testJutsu, 200); // total 361
+        ability.perform(null, ninjaData);
+        assertEquals(362, ninjaData.getMastery(testJutsu), "Perform() above 350 should grant +1 mastery");
     }
 
     @Test
@@ -832,5 +843,66 @@ public class NinjaDataLogicTest {
         ninjaData.addMastery(eightGates, 1000); // 5000 total
         assertTrue(deathGate.meetsPrerequisites(ninjaData));
         assertTrue(deathGate.canActivate(null, ninjaData));
+    }
+
+    @Test
+    @DisplayName("Verify Ability global mastery tiers and cost/power/cooldown multipliers")
+    public void testAbilityMasteryTiersAndMultipliers() {
+        // Tiers: Lv.1 (<50), Lv.2 (<150), Lv.3 (<350), Lv.4 (<700), Lv.5 (>=700)
+        assertEquals(1, Ability.getMasteryTier(0));
+        assertEquals(1, Ability.getMasteryTier(49));
+        assertEquals(2, Ability.getMasteryTier(50));
+        assertEquals(2, Ability.getMasteryTier(149));
+        assertEquals(3, Ability.getMasteryTier(150));
+        assertEquals(3, Ability.getMasteryTier(349));
+        assertEquals(4, Ability.getMasteryTier(350));
+        assertEquals(4, Ability.getMasteryTier(699));
+        assertEquals(5, Ability.getMasteryTier(700));
+        assertEquals(5, Ability.getMasteryTier(2000));
+
+        // Chakra Cost Multipliers: Lv.1: 1.0, Lv.2: 0.90, Lv.3: 0.80, Lv.4: 0.70, Lv.5: 0.60
+        assertEquals(1.00f, Ability.getChakraCostMultiplier(0), 0.001f);
+        assertEquals(0.90f, Ability.getChakraCostMultiplier(50), 0.001f);
+        assertEquals(0.80f, Ability.getChakraCostMultiplier(150), 0.001f);
+        assertEquals(0.70f, Ability.getChakraCostMultiplier(350), 0.001f);
+        assertEquals(0.60f, Ability.getChakraCostMultiplier(700), 0.001f);
+
+        // Power Multipliers: Lv.1: 1.0, Lv.2: 1.12, Lv.3: 1.25, Lv.4: 1.40, Lv.5: 1.60
+        assertEquals(1.00f, Ability.getPowerMultiplier(0), 0.001f);
+        assertEquals(1.12f, Ability.getPowerMultiplier(50), 0.001f);
+        assertEquals(1.25f, Ability.getPowerMultiplier(150), 0.001f);
+        assertEquals(1.40f, Ability.getPowerMultiplier(350), 0.001f);
+        assertEquals(1.60f, Ability.getPowerMultiplier(700), 0.001f);
+
+        // Cooldown Multipliers: Lv.1: 1.0, Lv.2: 0.90, Lv.3: 0.80, Lv.4: 0.70, Lv.5: 0.60
+        assertEquals(1.00f, Ability.getCooldownMultiplier(0), 0.001f);
+        assertEquals(0.90f, Ability.getCooldownMultiplier(50), 0.001f);
+        assertEquals(0.80f, Ability.getCooldownMultiplier(150), 0.001f);
+        assertEquals(0.70f, Ability.getCooldownMultiplier(350), 0.001f);
+        assertEquals(0.60f, Ability.getCooldownMultiplier(700), 0.001f);
+    }
+
+    @Test
+    @DisplayName("Verify Shadow Clone count and lifespan scaling with mastery")
+    public void testShadowCloneMasteryScaling() {
+        // Counts: <100 -> 1, <300 -> 2, <700 -> 4, >=700 -> 8
+        assertEquals(1, ShadowCloneAbility.getCloneCount(0));
+        assertEquals(1, ShadowCloneAbility.getCloneCount(99));
+        assertEquals(2, ShadowCloneAbility.getCloneCount(100));
+        assertEquals(2, ShadowCloneAbility.getCloneCount(299));
+        assertEquals(4, ShadowCloneAbility.getCloneCount(300));
+        assertEquals(4, ShadowCloneAbility.getCloneCount(699));
+        assertEquals(8, ShadowCloneAbility.getCloneCount(700));
+        assertEquals(8, ShadowCloneAbility.getCloneCount(1000));
+
+        // Lifespan: <100 -> 400 (20s), <300 -> 600 (30s), <700 -> 900 (45s), >=700 -> 1200 (60s)
+        assertEquals(400, ShadowCloneAbility.getCloneLifespan(0));
+        assertEquals(400, ShadowCloneAbility.getCloneLifespan(99));
+        assertEquals(600, ShadowCloneAbility.getCloneLifespan(100));
+        assertEquals(600, ShadowCloneAbility.getCloneLifespan(299));
+        assertEquals(900, ShadowCloneAbility.getCloneLifespan(300));
+        assertEquals(900, ShadowCloneAbility.getCloneLifespan(699));
+        assertEquals(1200, ShadowCloneAbility.getCloneLifespan(700));
+        assertEquals(1200, ShadowCloneAbility.getCloneLifespan(1500));
     }
 }

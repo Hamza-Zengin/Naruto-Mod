@@ -74,7 +74,7 @@ public class RasenshurikenAbility extends Ability implements Ability.Cooldown {
         if (checkCooldown(player, ninjaData, this.getTranslationKey())) {
             return false;
         }
-        if (!tryConsume(player, ninjaData, getChakraCost(), getStaminaCost(), 60)) {
+        if (!tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), 60)) {
             return false;
         }
         registerCooldown(ninjaData, this.getTranslationKey());

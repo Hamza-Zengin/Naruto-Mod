@@ -116,63 +116,6 @@ public class ChakraAndStaminaGUI {
                 intStaminaColor,
                 intStaminaColorDarker);
 
-        this.renderHandSealsHUD(guiGraphics);
-    }
-
-    private void renderHandSealsHUD(GuiGraphics guiGraphics) {
-        long combo = com.sekwah.narutomod.client.keybinds.NarutoKeyHandler.getCurrentJutsuCombo();
-        if (combo <= 0) return;
-
-        String comboStr = String.valueOf(combo);
-        int midX = this.screenWidth / 2;
-        int y = this.screenHeight - 64;
-
-        int totalWidth = comboStr.length() * 30 + (comboStr.length() - 1) * 8;
-        int startX = midX - (totalWidth / 2);
-
-        // Draw seals badges
-        for (int i = 0; i < comboStr.length(); i++) {
-            char c = comboStr.charAt(i);
-            int badgeX = startX + i * 38;
-
-            guiGraphics.fill(badgeX, y, badgeX + 30, y + 22, 0xDD111118);
-            guiGraphics.renderOutline(badgeX, y, 30, 22, 0xFFFFAA00);
-
-            String sealName;
-            String key;
-            if (c == '1') {
-                sealName = "Tori";
-                key = "C";
-            } else if (c == '2') {
-                sealName = "Ram";
-                key = "V";
-            } else if (c == '3') {
-                sealName = "Snake";
-                key = "B";
-            } else {
-                sealName = String.valueOf(c);
-                key = "?";
-            }
-
-            centeredText(guiGraphics, "§e§l" + key, badgeX + 15, y + 3, 0xFFFFFFFF);
-            centeredText(guiGraphics, "§7" + sealName, badgeX + 15, y + 12, 0xFFAAAAAA);
-
-            if (i < comboStr.length() - 1) {
-                guiGraphics.drawString(this.getFont(), "§6>", badgeX + 32, y + 7, 0xFFFFAA00, false);
-            }
-        }
-
-        // Preview jutsu if matched
-        com.sekwah.narutomod.abilities.Ability matched = com.sekwah.narutomod.abilities.NarutoAbilities.getAbilityFromCombo(combo);
-        if (matched != null) {
-            String jutsuName = net.minecraft.network.chat.Component.translatable(matched.getTranslationKey()).getString();
-            centeredText(guiGraphics, "§a§l» " + jutsuName + " «", midX, y - 11, 0xFF55FF55);
-        }
-    }
-
-    private void centeredText(GuiGraphics guiGraphics, String text, int x, int y, int color) {
-        int width = this.getFont().width(text) / 2;
-        guiGraphics.drawString(this.getFont(), text, x - width, y, color, false);
     }
 
     private void centeredTextOutlined(GuiGraphics guiGraphics, String text, int x, int y, int color, int backgroundColor) {

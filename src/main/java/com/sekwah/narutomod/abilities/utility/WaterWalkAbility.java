@@ -50,8 +50,8 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
             fullCost += 0.12F;
         }
         if (fullCost > 0 && ninjaData != null) {
-            float reductionFactor = Math.min(0.40f, (ninjaData.getMastery(this.getRegistryName()) / 1000.0f) * 0.40f);
-            fullCost = Math.max(0.02f, fullCost * (1.0f - reductionFactor));
+            int mastery = ninjaData.getAbilityMastery(this);
+            fullCost = Math.max(0.01f, fullCost * getChakraCostMultiplier(mastery));
         }
         if(ninjaData.getChakra() < fullCost) {
             player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra", Component.translatable("jutsu.waterwalk").withStyle(ChatFormatting.YELLOW)), true);
@@ -84,7 +84,7 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
         return new WaterChecks(steadyCheck, pushUpFast, pushUpNormal);
     }
 
-    private void updatePlayerMovement(Player player) {
+    private void updatePlayerMovement(Player player, INinjaData ninjaData) {
         WaterChecks checks = this.checkSteadyNormalFastPush(player);
 
         Vec3 vec = player.getDeltaMovement();
@@ -110,7 +110,9 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
             float f = (float)Math.min(0.1D, player.getDeltaMovement().horizontalDistance());
             player.bob += (f - player.bob) * 0.4F;
         }
-        double speedMult = (checks.steadyCheck && NarutoConfig.waterWalkSpeed > 0) ? NarutoConfig.waterWalkSpeed : 1.0D;
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        double masteryBonus = 1.0 + (getPowerMultiplier(mastery) - 1.0) * 0.25;
+        double speedMult = ((checks.steadyCheck && NarutoConfig.waterWalkSpeed > 0) ? NarutoConfig.waterWalkSpeed : 1.0D) * masteryBonus;
         player.setDeltaMovement(vec.x() * speedMult, resultingYSpeed, vec.z() * speedMult);
     }
 
@@ -121,7 +123,7 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
 
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
-        updatePlayerMovement(player);
+        updatePlayerMovement(player, ninjaData);
         if (ninjaData != null && player.tickCount % 180 == 0) {
             WaterChecks checks = this.checkSteadyNormalFastPush(player);
             if ((checks.steadyCheck || checks.pushUpFast || checks.pushUpNormal)
@@ -136,6 +138,6 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
 
     @Override
     public void performToggleClient(Player player, INinjaData ninjaData) {
-        updatePlayerMovement(player);
+        updatePlayerMovement(player, ninjaData);
     }
 }
