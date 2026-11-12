@@ -49,6 +49,10 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
         } else if (checks.steadyCheck) {
             fullCost += 0.12F;
         }
+        if (fullCost > 0 && ninjaData != null) {
+            float reductionFactor = Math.min(0.40f, (ninjaData.getMastery(this.getRegistryName()) / 1000.0f) * 0.40f);
+            fullCost = Math.max(0.02f, fullCost * (1.0f - reductionFactor));
+        }
         if(ninjaData.getChakra() < fullCost) {
             player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra", Component.translatable("jutsu.waterwalk").withStyle(ChatFormatting.YELLOW)), true);
             return false;
@@ -118,6 +122,16 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         updatePlayerMovement(player);
+        if (ninjaData != null && player.tickCount % 180 == 0) {
+            WaterChecks checks = this.checkSteadyNormalFastPush(player);
+            if ((checks.steadyCheck || checks.pushUpFast || checks.pushUpNormal)
+                    && player.getDeltaMovement().horizontalDistanceSqr() > 0.001) {
+                net.minecraft.resources.ResourceLocation reg = this.getRegistryName();
+                if (reg != null) {
+                    ninjaData.addMastery(reg, 1);
+                }
+            }
+        }
     }
 
     @Override

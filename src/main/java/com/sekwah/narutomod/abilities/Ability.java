@@ -222,8 +222,27 @@ public abstract class Ability {
         return 0;
     }
 
+    public float getScaledChakraCost(INinjaData ninjaData) {
+        float baseCost = getEffectiveChakraCost(ninjaData);
+        if (ninjaData == null) return baseCost;
+        ResourceLocation reg = getRegistryName();
+        int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
+        float reductionFactor = Math.min(0.40f, (mastery / 1000.0f) * 0.40f);
+        return Math.max(1.0f, baseCost * (1.0f - reductionFactor));
+    }
+
+    public int getActivationDelayTicks(INinjaData ninjaData) {
+        if (ninjaData == null) return 0;
+        ResourceLocation reg = getRegistryName();
+        int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
+        if (mastery < 50) return 20; // 1.0s delay
+        if (mastery < 150) return 12; // 0.6s delay
+        if (mastery < 400) return 5; // 0.25s delay
+        return 0; // Instant activation
+    }
+
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        return tryConsume(player, ninjaData, getEffectiveChakraCost(ninjaData), getStaminaCost(), 30);
+        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), 30);
     }
 
     public boolean handleCost(Player player, INinjaData ninjaData) {
@@ -271,7 +290,7 @@ public abstract class Ability {
 
     public void perform(Player player, INinjaData ninjaData, int ticksActive) {
         this.performServer(player, ninjaData, ticksActive);
-        if (ninjaData != null) {
+        if (ninjaData != null && this.activationType() != ActivationType.TOGGLE) {
             ResourceLocation reg = this.getRegistryName();
             if (reg != null) {
                 ninjaData.addMastery(reg, 1);

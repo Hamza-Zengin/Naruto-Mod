@@ -75,15 +75,22 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
             return false;
         }
 
+        float reductionFactor = 0f;
+        if (ninjaData != null) {
+            reductionFactor = Math.min(0.40f, (ninjaData.getMastery(this.getRegistryName()) / 1000.0f) * 0.40f);
+        }
+
         boolean isInitial = !ninjaData.getToggleAbilityData().hasToggleAbility(this.getRegistryName());
         if (isInitial) {
-            return tryConsume(player, ninjaData, 40.0f, 0, 30);
+            float initCost = Math.max(10.0f, 40.0f * (1.0f - reductionFactor));
+            return tryConsume(player, ninjaData, initCost, 0, 30);
         } else {
-            // Sustained ethereal skeleton drain: 1.0f per tick (20 chakra/second)
-            if (ninjaData.getChakra() < 1.0f) {
+            // Sustained ethereal skeleton drain: scales down with mastery
+            float sustainedCost = Math.max(0.6f, 1.0f * (1.0f - reductionFactor));
+            if (ninjaData.getChakra() < sustainedCost) {
                 return false;
             }
-            ninjaData.useChakra(1.0f, 30);
+            ninjaData.useChakra(sustainedCost, 30);
             return true;
         }
     }
@@ -93,6 +100,18 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
         // Godlike Defense: Resistance IV (80% damage reduction) + Fire immunity
         player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 3, false, false, true));
         player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 40, 0, false, false, false));
+
+        // Anti-AFK periodic mastery training
+        if (ninjaData != null && player.tickCount % 200 == 0) {
+            boolean isMoving = player.getDeltaMovement().horizontalDistanceSqr() > 0.001;
+            boolean inCombat = player.getLastHurtByMob() != null && (player.tickCount - player.getLastHurtByMobTimestamp() < 100);
+            if (isMoving || inCombat) {
+                net.minecraft.resources.ResourceLocation reg = this.getRegistryName();
+                if (reg != null) {
+                    ninjaData.addMastery(reg, 1);
+                }
+            }
+        }
 
         // Activation sound on first tick
         if (ticksActive == 1 && player.level() instanceof ServerLevel serverLevel) {

@@ -40,8 +40,16 @@ public class SharinganEyesLayer extends RenderLayer<AbstractClientPlayer, Player
             if (!sharingan && !byakugan) {
                 return;
             }
-            ResourceLocation texture = sharingan ? SHARINGAN_EYES_TEXTURE : BYAKUGAN_EYES_TEXTURE;
-            VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.eyes(texture));
+            ResourceLocation texture;
+            if (sharingan) {
+                com.sekwah.narutomod.abilities.jutsus.SharinganAbility.SharinganStage stage =
+                        com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(ninjaData);
+                texture = stage.getTexture();
+            } else {
+                texture = BYAKUGAN_EYES_TEXTURE;
+            }
+            // Use entityCutoutNoCull with FULL_BRIGHT (15728880) to eliminate white border bleed when shaders are disabled
+            VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(texture));
             this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         });
     }

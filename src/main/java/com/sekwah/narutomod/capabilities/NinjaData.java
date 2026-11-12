@@ -303,7 +303,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         String path = id.getPath();
         return path.equals("rasengan") || path.equals("chidori") || path.equals("shadow_clone")
                 || path.equals("kirin") || path.equals("amaterasu") || path.equals("susanoo_ribcage")
-                || path.equals("eight_gates");
+                || path.equals("eight_gates") || path.equals("eight_gates_death");
     }
 
     @Override

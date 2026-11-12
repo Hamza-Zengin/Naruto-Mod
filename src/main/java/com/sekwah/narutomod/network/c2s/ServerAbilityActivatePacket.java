@@ -68,11 +68,24 @@ public class ServerAbilityActivatePacket {
                                     player.sendSystemMessage(Component.translatable("jutsu.combo.perfect", Component.translatable(ability.getTranslationKey())).withStyle(ChatFormatting.GOLD));
                                 }
                             }
-                            if(ability.castingSound() != null) {
-                                player.level().playSound(null,
-                                        player.getX(), player.getY(), player.getZ(), ability.castingSound(), SoundSource.PLAYERS, 0.5f, 1.0f);
+                            int delay = ability.getActivationDelayTicks(ninjaData);
+                            if (delay > 0) {
+                                player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                                        net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.4f, 1.2f);
+                                ninjaData.scheduleDelayedTickEvent(p -> {
+                                    if(ability.castingSound() != null) {
+                                        p.level().playSound(null,
+                                                p.getX(), p.getY(), p.getZ(), ability.castingSound(), SoundSource.PLAYERS, 0.5f, 1.0f);
+                                    }
+                                    ability.performServer(p, ninjaData);
+                                }, delay);
+                            } else {
+                                if(ability.castingSound() != null) {
+                                    player.level().playSound(null,
+                                            player.getX(), player.getY(), player.getZ(), ability.castingSound(), SoundSource.PLAYERS, 0.5f, 1.0f);
+                                }
+                                ability.performServer(player, ninjaData);
                             }
-                            ability.performServer(player, ninjaData);
                             ninjaData.addJutsuCast();
                             ninjaData.clearSeals();
 
@@ -84,8 +97,8 @@ public class ServerAbilityActivatePacket {
                         ToggleAbilityData abilityTracker = ninjaData.getToggleAbilityData();
                         HashSet<ResourceLocation> abilities = abilityTracker.getAbilitiesHashSet();
                         if(abilities.contains(ability.getRegistryName())) {
-                            if (NarutoAbilities.EIGHT_GATES.getId().equals(ability.getRegistryName())) {
-                                player.sendSystemMessage(Component.translatable("jutsu.eight_gates.cannot_close")
+                            if (NarutoAbilities.EIGHT_GATES_DEATH.getId().equals(ability.getRegistryName())) {
+                                player.sendSystemMessage(Component.translatable("jutsu.eight_gates_death.cannot_close")
                                         .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
                                 return;
                             }

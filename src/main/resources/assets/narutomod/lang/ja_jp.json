@@ -233,5 +233,22 @@
   "jutsu.sharingan.stage.1_tomoe": "一巴",
   "jutsu.sharingan.stage.2_tomoe": "二巴",
   "jutsu.sharingan.stage.3_tomoe": "三巴",
-  "jutsu.sharingan.stage.mangekyou": "万華鏡写輪眼"
+  "jutsu.sharingan.stage.mangekyou": "万華鏡写輪眼",
+  "narutomod.ability.amaterasu.requires_mangekyo": "天照を発動するには万華鏡写輪眼を開眼し起動する必要があります！",
+  "narutomod:eight_gates_death": "八門遁甲：死門",
+  "jutsu.eight_gates_death.requires_gate7": "死門を開くには最初の七門で5000以上の熟練度が必要です！",
+  "jutsu.eight_gates_death.cannot_close": "死門は一度開くと閉じられません！命が尽きるまで燃え続けます！",
+  "jutsu.eight_gates_death.activated": "第八死門、開！血が真紅の蒸気となって燃え上がる！",
+  "jutsu.eight_gates_death.hp_drain": "スタミナ枯渇！死門の力が生命力を焼き尽くしていく！",
+  "jutsu.eight_gates_death.inevitable_death": "真紅の蒸気が消えた…死門が最後の代償を求める。",
+  "jutsu.eight_gates.stage.kaimon": "第一開門（かいもん）",
+  "jutsu.eight_gates.stage.kyumon": "第二休門（きゅうもん）",
+  "jutsu.eight_gates.stage.seimon": "第三生門（せいもん）",
+  "jutsu.eight_gates.stage.shomon": "第四傷門（しょうもん）",
+  "jutsu.eight_gates.stage.tomon": "第五杜門（ともん）",
+  "jutsu.eight_gates.stage.keimon": "第六景門（けいもん）",
+  "jutsu.eight_gates.stage.kyumon_wonder": "第七驚門（きょうもん）",
+  "jutsu.eight_gates.opened": "【%s、開！】",
+  "jutsu.eight_gates.closed": "八門遁甲解除。筋肉疲労が押し寄せる。",
+  "jutsu.eight_gates.stamina_exhausted": "スタミナ限界！八門遁甲が自動解除されました。"
 }

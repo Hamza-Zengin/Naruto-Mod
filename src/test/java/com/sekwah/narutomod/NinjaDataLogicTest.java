@@ -4,7 +4,10 @@ import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import com.sekwah.narutomod.abilities.Ability;
+import com.sekwah.narutomod.abilities.jutsus.AmaterasuAbility;
 import com.sekwah.narutomod.abilities.jutsus.ByakuganAbility;
+import com.sekwah.narutomod.abilities.jutsus.EightGatesAbility;
+import com.sekwah.narutomod.abilities.jutsus.EighthGateOfDeathAbility;
 import com.sekwah.narutomod.abilities.jutsus.RasenshurikenAbility;
 import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
 import com.sekwah.narutomod.abilities.jutsus.SusanooRibcageAbility;
@@ -531,26 +534,26 @@ public class NinjaDataLogicTest {
     @DisplayName("Verify Sharingan evolution stages based on mastery")
     public void testSharinganEvolutionStages() {
         assertEquals(SharinganAbility.SharinganStage.ONE_TOMOE, SharinganAbility.getStage(0));
-        assertEquals(SharinganAbility.SharinganStage.ONE_TOMOE, SharinganAbility.getStage(24));
-        assertEquals(SharinganAbility.SharinganStage.TWO_TOMOE, SharinganAbility.getStage(25));
-        assertEquals(SharinganAbility.SharinganStage.TWO_TOMOE, SharinganAbility.getStage(74));
-        assertEquals(SharinganAbility.SharinganStage.THREE_TOMOE, SharinganAbility.getStage(75));
-        assertEquals(SharinganAbility.SharinganStage.THREE_TOMOE, SharinganAbility.getStage(149));
-        assertEquals(SharinganAbility.SharinganStage.MANGEKYOU, SharinganAbility.getStage(150));
-        assertEquals(SharinganAbility.SharinganStage.MANGEKYOU, SharinganAbility.getStage(500));
+        assertEquals(SharinganAbility.SharinganStage.ONE_TOMOE, SharinganAbility.getStage(999));
+        assertEquals(SharinganAbility.SharinganStage.TWO_TOMOE, SharinganAbility.getStage(1000));
+        assertEquals(SharinganAbility.SharinganStage.TWO_TOMOE, SharinganAbility.getStage(2499));
+        assertEquals(SharinganAbility.SharinganStage.THREE_TOMOE, SharinganAbility.getStage(2500));
+        assertEquals(SharinganAbility.SharinganStage.THREE_TOMOE, SharinganAbility.getStage(4999));
+        assertEquals(SharinganAbility.SharinganStage.MANGEKYOU, SharinganAbility.getStage(5000));
+        assertEquals(SharinganAbility.SharinganStage.MANGEKYOU, SharinganAbility.getStage(8000));
 
         ResourceLocation sharingan = new ResourceLocation(NarutoMod.MOD_ID, "sharingan");
         assertFalse(SharinganAbility.hasMangekyou(ninjaData));
 
-        ninjaData.addMastery(sharingan, 30);
+        ninjaData.addMastery(sharingan, 1000);
         assertEquals(SharinganAbility.SharinganStage.TWO_TOMOE, SharinganAbility.getStage(ninjaData));
         assertFalse(SharinganAbility.hasMangekyou(ninjaData));
 
-        ninjaData.addMastery(sharingan, 50); // 80 total
+        ninjaData.addMastery(sharingan, 1500); // 2500 total
         assertEquals(SharinganAbility.SharinganStage.THREE_TOMOE, SharinganAbility.getStage(ninjaData));
         assertFalse(SharinganAbility.hasMangekyou(ninjaData));
 
-        ninjaData.addMastery(sharingan, 70); // 150 total
+        ninjaData.addMastery(sharingan, 2500); // 5000 total
         assertEquals(SharinganAbility.SharinganStage.MANGEKYOU, SharinganAbility.getStage(ninjaData));
         assertTrue(SharinganAbility.hasMangekyou(ninjaData));
     }
@@ -573,15 +576,15 @@ public class NinjaDataLogicTest {
         assertFalse(susanoo.meetsPrerequisites(ninjaData));
         assertFalse(ninjaData.isAbilityUnlocked(susanoo));
 
-        // 3. Uchiha clan with 3-Tomoe (100 mastery)
+        // 3. Uchiha clan with 3-Tomoe (2500 mastery)
         ninjaData.unlockAbility(sharingan);
-        ninjaData.addMastery(sharingan, 100);
+        ninjaData.addMastery(sharingan, 2500);
         assertFalse(susanoo.canActivate(null, ninjaData));
         assertFalse(susanoo.meetsPrerequisites(ninjaData));
         assertFalse(ninjaData.isAbilityUnlocked(susanoo));
 
-        // 4. Awakened Mangekyou (150 mastery)
-        ninjaData.addMastery(sharingan, 50); // 150 total
+        // 4. Awakened Mangekyou (5000 mastery)
+        ninjaData.addMastery(sharingan, 2500); // 5000 total
         assertTrue(susanoo.canActivate(null, ninjaData));
         assertTrue(susanoo.meetsPrerequisites(ninjaData));
 
@@ -769,5 +772,65 @@ public class NinjaDataLogicTest {
             activeTag.putBoolean(KusanagiSwordItem.NBT_CHAKRA_ACTIVE, false);
         }
         assertFalse(activeTag.getBoolean(KusanagiSwordItem.NBT_CHAKRA_ACTIVE));
+    }
+
+    @Test
+    @DisplayName("Verify Amaterasu requires Uchiha clan, active Sharingan, and Mangekyo stage")
+    public void testAmaterasuRequiresMangekyou() {
+        AmaterasuAbility amaterasu = new AmaterasuAbility();
+        amaterasu.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "amaterasu"));
+        ResourceLocation sharingan = new ResourceLocation(NarutoMod.MOD_ID, "sharingan");
+
+        // 1. Non-Uchiha clan cannot activate
+        ninjaData.setClan(new ResourceLocation(NarutoMod.MOD_ID, "hyuga"));
+        assertFalse(amaterasu.canActivate(null, ninjaData));
+
+        // 2. Uchiha clan without active Sharingan
+        ninjaData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "uchiha"));
+        ninjaData.unlockAbility(sharingan);
+        ninjaData.addMastery(sharingan, 5000);
+        assertFalse(amaterasu.canActivate(null, ninjaData)); // Sharingan not active
+
+        // 3. Sharingan active but mastery < 5000 (3-Tomoe)
+        ninjaData.setJutsuActive(NinjaData.JUTSU_FLAG_SHARINGAN, true);
+        NinjaData lowMasteryData = new NinjaData(true);
+        lowMasteryData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "uchiha"));
+        lowMasteryData.unlockAbility(sharingan);
+        lowMasteryData.addMastery(sharingan, 2500); // 3-Tomoe
+        lowMasteryData.setJutsuActive(NinjaData.JUTSU_FLAG_SHARINGAN, true);
+        assertFalse(amaterasu.canActivate(null, lowMasteryData));
+
+        // 4. Sharingan active and Mangekyo (5000+ mastery)
+        assertTrue(amaterasu.canActivate(null, ninjaData));
+    }
+
+    @Test
+    @DisplayName("Verify Eight Gates stages progression and Eighth Gate of Death requirement")
+    public void testEightGatesStagesAndDeathGate() {
+        // Gate progression
+        assertEquals(EightGatesAbility.GateStage.GATE_1, EightGatesAbility.getStage(0));
+        assertEquals(EightGatesAbility.GateStage.GATE_1, EightGatesAbility.getStage(399));
+        assertEquals(EightGatesAbility.GateStage.GATE_2, EightGatesAbility.getStage(400));
+        assertEquals(EightGatesAbility.GateStage.GATE_2, EightGatesAbility.getStage(999));
+        assertEquals(EightGatesAbility.GateStage.GATE_3, EightGatesAbility.getStage(1000));
+        assertEquals(EightGatesAbility.GateStage.GATE_4, EightGatesAbility.getStage(2000));
+        assertEquals(EightGatesAbility.GateStage.GATE_5, EightGatesAbility.getStage(3000));
+        assertEquals(EightGatesAbility.GateStage.GATE_6, EightGatesAbility.getStage(4000));
+        assertEquals(EightGatesAbility.GateStage.GATE_7, EightGatesAbility.getStage(5000));
+
+        EighthGateOfDeathAbility deathGate = new EighthGateOfDeathAbility();
+        deathGate.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "eight_gates_death"));
+        ResourceLocation eightGates = new ResourceLocation(NarutoMod.MOD_ID, "eight_gates");
+
+        // Without mastery 5000 in eight_gates
+        ninjaData.unlockAbility(eightGates);
+        ninjaData.addMastery(eightGates, 4000);
+        assertFalse(deathGate.meetsPrerequisites(ninjaData));
+        assertFalse(deathGate.canActivate(null, ninjaData));
+
+        // With 5000 mastery in eight_gates (Gate 7 reached)
+        ninjaData.addMastery(eightGates, 1000); // 5000 total
+        assertTrue(deathGate.meetsPrerequisites(ninjaData));
+        assertTrue(deathGate.canActivate(null, ninjaData));
     }
 }

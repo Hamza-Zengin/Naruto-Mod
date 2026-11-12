@@ -73,14 +73,42 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
+    public List<net.minecraft.resources.ResourceLocation> getPrerequisites() {
+        return List.of(new net.minecraft.resources.ResourceLocation(com.sekwah.narutomod.NarutoMod.MOD_ID, "sharingan"));
+    }
+
+    @Override
+    public int getRequiredMastery() {
+        return SharinganAbility.SharinganStage.MANGEKYOU.getMinMastery();
+    }
+
+    @Override
+    public boolean canActivate(Player player, INinjaData ninjaData) {
+        if (ninjaData == null) return false;
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
-                    Component.literal("Uchiha").withStyle(ChatFormatting.RED)), true);
+            if (player != null) {
+                player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
+                        Component.literal("Uchiha").withStyle(ChatFormatting.RED)), true);
+            }
+            return false;
+        }
+        if (!ninjaData.isSharinganActive() || !SharinganAbility.hasMangekyou(ninjaData)) {
+            if (player != null) {
+                player.displayClientMessage(Component.translatable("narutomod.ability.amaterasu.requires_mangekyo")
+                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), true);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
+        if (!canActivate(player, ninjaData)) {
             return false;
         }
 
-        return tryConsume(player, ninjaData, getChakraCost(), getStaminaCost(), 45);
+        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), 45);
     }
 
     @Override

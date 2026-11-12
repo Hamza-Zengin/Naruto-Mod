@@ -38,6 +38,7 @@ public class ChakraChargeAbility extends Ability implements Ability.Channeled {
 
     @Override
     public void handleChannelling(Player player, INinjaData ninjaData, int ticksChanneled) {
+       boolean wasBelowMax = ninjaData.getChakra() < ninjaData.getMaxChakra();
        if(player.isSprinting() || !player.onGround()) {
            ninjaData.addChakra(0.2f);
        } else {
@@ -50,6 +51,14 @@ public class ChakraChargeAbility extends Ability implements Ability.Channeled {
                            player.getX(), player.getY() + 0.5, player.getZ(),
                            3, 0.3, 0.3, 0.3, 0.05);
                }
+           }
+       }
+
+       // Periodic mastery gain when actively restoring chakra
+       if (wasBelowMax && ticksChanneled > 0 && ticksChanneled % 60 == 0) {
+           net.minecraft.resources.ResourceLocation reg = this.getRegistryName();
+           if (reg != null) {
+               ninjaData.addMastery(reg, 1);
            }
        }
     }

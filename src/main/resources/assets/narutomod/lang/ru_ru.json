@@ -233,5 +233,22 @@
   "jutsu.sharingan.stage.1_tomoe": "1 Томоэ",
   "jutsu.sharingan.stage.2_tomoe": "2 Томоэ",
   "jutsu.sharingan.stage.3_tomoe": "3 Томоэ",
-  "jutsu.sharingan.stage.mangekyou": "Мангекё Шаринган"
+  "jutsu.sharingan.stage.mangekyou": "Мангекё Шаринган",
+  "narutomod.ability.amaterasu.requires_mangekyo": "Вы должны пробудить и активировать Мангекё Шаринган, чтобы использовать Аматерасу!",
+  "narutomod:eight_gates_death": "Хачимон: Врата Смерти",
+  "jutsu.eight_gates_death.requires_gate7": "Вам нужно 5000+ мастерства в первых семи вратах, чтобы открыть Врата Смерти!",
+  "jutsu.eight_gates_death.cannot_close": "Врата Смерти нельзя закрыть после открытия! Они сжигают до самого конца!",
+  "jutsu.eight_gates_death.activated": "Восьмые Врата Смерти открыты! Ваша кровь превращается в алый пар!",
+  "jutsu.eight_gates_death.hp_drain": "Выносливость иссякла! Врата Смерти сжигают вашу жизненную силу!",
+  "jutsu.eight_gates_death.inevitable_death": "Алый пар рассеялся... Врата Смерти забирают последнюю дань.",
+  "jutsu.eight_gates.stage.kaimon": "1-е Врата: Врата Открытия (Каймон)",
+  "jutsu.eight_gates.stage.kyumon": "2-е Врата: Врата Исцеления (Кюмон)",
+  "jutsu.eight_gates.stage.seimon": "3-е Врата: Врата Жизни (Сеймон)",
+  "jutsu.eight_gates.stage.shomon": "4-е Врата: Врата Боли (Сёмон)",
+  "jutsu.eight_gates.stage.tomon": "5-е Врата: Врата Предела (Томон)",
+  "jutsu.eight_gates.stage.keimon": "6-е Врата: Врата Радости (Кеймон)",
+  "jutsu.eight_gates.stage.kyumon_wonder": "7-е Врата: Врата Чуда (Кёмон)",
+  "jutsu.eight_gates.opened": "[%s Открыты!]",
+  "jutsu.eight_gates.closed": "Восемь Врат закрыты. Наступает мышечная усталость.",
+  "jutsu.eight_gates.stamina_exhausted": "Выносливость иссякла! Восемь Врат автоматически закрылись."
 }

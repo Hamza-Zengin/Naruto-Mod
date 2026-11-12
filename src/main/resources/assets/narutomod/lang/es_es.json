@@ -233,5 +233,22 @@
   "jutsu.sharingan.stage.1_tomoe": "1 Tomoe",
   "jutsu.sharingan.stage.2_tomoe": "2 Tomoe",
   "jutsu.sharingan.stage.3_tomoe": "3 Tomoe",
-  "jutsu.sharingan.stage.mangekyou": "Mangekyō Sharingan"
+  "jutsu.sharingan.stage.mangekyou": "Mangekyō Sharingan",
+  "narutomod.ability.amaterasu.requires_mangekyo": "¡Debes despertar y activar el Mangekyō Sharingan para lanzar Amaterasu!",
+  "narutomod:eight_gates_death": "Hachimon: Puerta de la Muerte",
+  "jutsu.eight_gates_death.requires_gate7": "¡Debes alcanzar más de 5000 de maestría en las primeras Siete Puertas para abrir la Puerta de la Muerte!",
+  "jutsu.eight_gates_death.cannot_close": "¡La Puerta de la Muerte no se puede cerrar una vez abierta! ¡Arderá hasta el final!",
+  "jutsu.eight_gates_death.activated": "¡La Octava Puerta de la Muerte está abierta! ¡Tu sangre se enciende en vapor carmesí!",
+  "jutsu.eight_gates_death.hp_drain": "¡Resistencia agotada! ¡La Puerta de la Muerte está consumiendo tu energía vital!",
+  "jutsu.eight_gates_death.inevitable_death": "El vapor carmesí se ha desvanecido... La Puerta de la Muerte cobra su precio final.",
+  "jutsu.eight_gates.stage.kaimon": "1.ª Puerta: Puerta de la Apertura (Kaimon)",
+  "jutsu.eight_gates.stage.kyumon": "2.ª Puerta: Puerta del Descanso (Kyūmon)",
+  "jutsu.eight_gates.stage.seimon": "3.ª Puerta: Puerta de la Vida (Seimon)",
+  "jutsu.eight_gates.stage.shomon": "4.ª Puerta: Puerta del Dolor (Shōmon)",
+  "jutsu.eight_gates.stage.tomon": "5.ª Puerta: Puerta del Cierre (Tomon)",
+  "jutsu.eight_gates.stage.keimon": "6.ª Puerta: Puerta de la Visión (Keimon)",
+  "jutsu.eight_gates.stage.kyumon_wonder": "7.ª Puerta: Puerta del Asombro (Kyōmon)",
+  "jutsu.eight_gates.opened": "[¡%s Abierta!]",
+  "jutsu.eight_gates.closed": "Ocho Puertas cerradas. La fatiga muscular comienza.",
+  "jutsu.eight_gates.stamina_exhausted": "¡Resistencia agotada! Las Ocho Puertas se cerraron automáticamente."
 }

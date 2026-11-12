@@ -233,5 +233,22 @@
   "jutsu.sharingan.stage.1_tomoe": "1 Tomoe",
   "jutsu.sharingan.stage.2_tomoe": "2 Tomoe",
   "jutsu.sharingan.stage.3_tomoe": "3 Tomoe",
-  "jutsu.sharingan.stage.mangekyou": "Mangekyō Sharingan"
+  "jutsu.sharingan.stage.mangekyou": "Mangekyō Sharingan",
+  "narutomod.ability.amaterasu.requires_mangekyo": "Você deve despertar e ativar o Mangekyō Sharingan para conjurar o Amaterasu!",
+  "narutomod:eight_gates_death": "Hachimon: Portão da Morte",
+  "jutsu.eight_gates_death.requires_gate7": "Você deve atingir mais de 5000 de maestria nos primeiros Sete Portões para abrir o Portão da Morte!",
+  "jutsu.eight_gates_death.cannot_close": "O Portão da Morte não pode ser fechado após aberto! Ele queimará até o fim!",
+  "jutsu.eight_gates_death.activated": "O Oitavo Portão da Morte está aberto! Seu sangue se acende em vapor carmesim!",
+  "jutsu.eight_gates_death.hp_drain": "Estamina esgotada! O Portão da Morte está queimando sua energia vital!",
+  "jutsu.eight_gates_death.inevitable_death": "O vapor carmesim desapareceu... O Portão da Morte cobra seu preço final.",
+  "jutsu.eight_gates.stage.kaimon": "1º Portão: Portão da Abertura (Kaimon)",
+  "jutsu.eight_gates.stage.kyumon": "2º Portão: Portão da Cura (Kyūmon)",
+  "jutsu.eight_gates.stage.seimon": "3º Portão: Portão da Vida (Seimon)",
+  "jutsu.eight_gates.stage.shomon": "4º Portão: Portão da Dor (Shōmon)",
+  "jutsu.eight_gates.stage.tomon": "5º Portão: Portão do Limite (Tomon)",
+  "jutsu.eight_gates.stage.keimon": "6º Portão: Portão da Visão (Keimon)",
+  "jutsu.eight_gates.stage.kyumon_wonder": "7º Portão: Portão do Espanto (Kyōmon)",
+  "jutsu.eight_gates.opened": "[%s Aberto!]",
+  "jutsu.eight_gates.closed": "Oito Portões fechados. A fadiga muscular começa.",
+  "jutsu.eight_gates.stamina_exhausted": "Estamina esgotada! Os Oito Portões fecharam automaticamente."
 }

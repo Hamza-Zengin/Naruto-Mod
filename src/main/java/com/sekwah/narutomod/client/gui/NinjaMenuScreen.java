@@ -605,19 +605,16 @@ public class NinjaMenuScreen extends Screen {
             graphics.fill(boxX, cardY, boxX + BOX_WIDTH, cardY + cardH, bgCol);
             graphics.renderOutline(boxX, cardY, BOX_WIDTH, cardH, borderCol);
 
-            // Ability Name and Mastery
+            // Ability Name and Status (Row 1)
             String name = Component.translatable(ability.getTranslationKey()).getString();
-            int mastery = ninjaData.getMastery(id);
-            graphics.drawString(this.font, "§f§l" + name, boxX + 8, cardY + 4, 0xFFFFFFFF);
-            if (id != null && "sharingan".equals(id.getPath())) {
-                com.sekwah.narutomod.abilities.jutsus.SharinganAbility.SharinganStage stage =
-                        com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(mastery);
-                graphics.drawString(this.font, "§eUstalık: §a" + mastery + " §7(" + stage.getDisplayName() + ")", boxX + 150, cardY + 4, 0xFFFFFF88);
-            } else {
-                graphics.drawString(this.font, "§eUstalık: §a" + mastery, boxX + 160, cardY + 4, 0xFFFFFF88);
-            }
+            String status = unlocked ? "§a✔ ÖĞRENİLDİ" : "§c✖ KİLİTLİ";
+            int statusWidth = this.font.width(status);
+            int maxNameWidth = BOX_WIDTH - statusWidth - 24;
+            String displayName = this.font.width(name) > maxNameWidth ? this.font.plainSubstrByWidth(name, maxNameWidth - 8) + "..." : name;
+            graphics.drawString(this.font, "§f§l" + displayName, boxX + 8, cardY + 4, 0xFFFFFFFF);
+            graphics.drawString(this.font, status, boxX + BOX_WIDTH - statusWidth - 8, cardY + 4, 0xFFFFFFFF);
 
-            // Combo & Type Info
+            // Combo & Mastery (Row 2)
             if (unlocked) {
                 String comboText = formatCombo(ability.defaultCombo());
                 graphics.drawString(this.font, "§eMühür: §b" + comboText, boxX + 8, cardY + 15, 0xFFDDDDDD);
@@ -625,7 +622,23 @@ public class NinjaMenuScreen extends Screen {
                 graphics.drawString(this.font, "§eMühür: §7??? (Gizli)", boxX + 8, cardY + 15, 0xFFAAAAAA);
             }
 
-            // Acquisition Type
+            int mastery = ninjaData.getMastery(id);
+            String masteryText;
+            if (id != null && "sharingan".equals(id.getPath())) {
+                com.sekwah.narutomod.abilities.jutsus.SharinganAbility.SharinganStage stage =
+                        com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(mastery);
+                masteryText = "§eUstalık: §a" + mastery + " §7(" + stage.getDisplayName() + ")";
+            } else if (id != null && "eight_gates".equals(id.getPath())) {
+                com.sekwah.narutomod.abilities.jutsus.EightGatesAbility.GateStage gstage =
+                        com.sekwah.narutomod.abilities.jutsus.EightGatesAbility.getStage(mastery);
+                masteryText = "§eUstalık: §a" + mastery + " §7(" + gstage.getDisplayName() + ")";
+            } else {
+                masteryText = "§eUstalık: §a" + mastery;
+            }
+            int masteryWidth = this.font.width(masteryText);
+            graphics.drawString(this.font, masteryText, boxX + BOX_WIDTH - masteryWidth - 8, cardY + 15, 0xFFFFFF88);
+
+            // Acquisition Type (Row 3)
             String reqType;
             if (!ability.getPrerequisites().isEmpty()) {
                 StringBuilder sbPrereq = new StringBuilder();
@@ -638,6 +651,8 @@ public class NinjaMenuScreen extends Screen {
                 reqType = "§b[Önşart: " + sbPrereq + " (" + ability.getRequiredMastery() + "+ Ustalık)]";
             } else if (id != null && (id.getPath().equals("amaterasu") || id.getPath().equals("susanoo_ribcage"))) {
                 reqType = "§c[Uchiha Parşömeni - Jōnin]";
+            } else if (id != null && id.getPath().equals("eight_gates_death")) {
+                reqType = "§4[Nihai Yasak Parşömen - Jōnin]";
             } else if (id != null && id.getPath().equals("eight_gates")) {
                 reqType = "§4[Yasak Parşömen - Jōnin]";
             } else if (id != null && id.getPath().equals("rasenshuriken")) {
@@ -660,10 +675,6 @@ public class NinjaMenuScreen extends Screen {
                 reqType = "§a[Rütbe: " + ability.getRequiredRank().getTurkishName() + "]";
             }
             graphics.drawString(this.font, reqType, boxX + 8, cardY + 25, 0xFFAAAAAA);
-
-            // Status label (aligned right)
-            String status = unlocked ? "§a✔ ÖĞRENİLDİ" : "§c✖ KİLİTLİ";
-            graphics.drawString(this.font, status, boxX + BOX_WIDTH - this.font.width(status) - 10, cardY + 13, 0xFFFFFFFF);
         }
     }
 
