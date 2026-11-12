@@ -458,28 +458,28 @@ public class NinjaDataLogicTest {
         assertEquals(0, ninjaData.getMastery(testJutsu));
         assertFalse(ability.executed);
 
-        // First execution via perform() (mastery < 150 grants +3)
+        // First execution via perform() (mastery < 100 grants +5)
         ability.perform(null, ninjaData);
         assertTrue(ability.executed);
-        assertEquals(3, ninjaData.getMastery(testJutsu), "Successful perform() below 150 should grant +3 mastery");
+        assertEquals(5, ninjaData.getMastery(testJutsu), "Successful perform() below 100 should grant +5 mastery");
 
         // Second execution via perform(player, data, ticks)
         ability.perform(null, ninjaData, 10);
-        assertEquals(6, ninjaData.getMastery(testJutsu), "Second perform() below 150 should grant another +3 mastery");
+        assertEquals(10, ninjaData.getMastery(testJutsu), "Second perform() below 100 should grant another +5 mastery");
 
         // Third execution via performServer()
         ability.performServer(null, ninjaData);
-        assertEquals(9, ninjaData.getMastery(testJutsu), "performServer() should route to perform() and grant +3 mastery");
+        assertEquals(15, ninjaData.getMastery(testJutsu), "performServer() should route to perform() and grant +5 mastery");
 
         // Mastery tier transition (150 <= mastery < 350 grants +2)
         ninjaData.addMastery(testJutsu, 150); // total 159
         ability.perform(null, ninjaData);
-        assertEquals(161, ninjaData.getMastery(testJutsu), "Perform() between 150 and 350 should grant +2 mastery");
+        assertEquals(168, ninjaData.getMastery(testJutsu), "Perform() between 100 and 250 should grant +3 mastery");
 
-        // Mastery tier transition (mastery >= 350 grants +1)
-        ninjaData.addMastery(testJutsu, 200); // total 361
+        // Mastery tier transition (250 <= mastery < 500 grants +2)
+        ninjaData.addMastery(testJutsu, 200); // total 368
         ability.perform(null, ninjaData);
-        assertEquals(362, ninjaData.getMastery(testJutsu), "Perform() above 350 should grant +1 mastery");
+        assertEquals(370, ninjaData.getMastery(testJutsu), "Perform() between 250 and 500 should grant +2 mastery");
     }
 
     @Test
@@ -820,14 +820,14 @@ public class NinjaDataLogicTest {
     public void testEightGatesStagesAndDeathGate() {
         // Gate progression
         assertEquals(EightGatesAbility.GateStage.GATE_1, EightGatesAbility.getStage(0));
-        assertEquals(EightGatesAbility.GateStage.GATE_1, EightGatesAbility.getStage(399));
-        assertEquals(EightGatesAbility.GateStage.GATE_2, EightGatesAbility.getStage(400));
-        assertEquals(EightGatesAbility.GateStage.GATE_2, EightGatesAbility.getStage(999));
-        assertEquals(EightGatesAbility.GateStage.GATE_3, EightGatesAbility.getStage(1000));
-        assertEquals(EightGatesAbility.GateStage.GATE_4, EightGatesAbility.getStage(2000));
-        assertEquals(EightGatesAbility.GateStage.GATE_5, EightGatesAbility.getStage(3000));
-        assertEquals(EightGatesAbility.GateStage.GATE_6, EightGatesAbility.getStage(4000));
-        assertEquals(EightGatesAbility.GateStage.GATE_7, EightGatesAbility.getStage(5000));
+        assertEquals(EightGatesAbility.GateStage.GATE_1, EightGatesAbility.getStage(39));
+        assertEquals(EightGatesAbility.GateStage.GATE_2, EightGatesAbility.getStage(40));
+        assertEquals(EightGatesAbility.GateStage.GATE_2, EightGatesAbility.getStage(119));
+        assertEquals(EightGatesAbility.GateStage.GATE_3, EightGatesAbility.getStage(120));
+        assertEquals(EightGatesAbility.GateStage.GATE_4, EightGatesAbility.getStage(250));
+        assertEquals(EightGatesAbility.GateStage.GATE_5, EightGatesAbility.getStage(450));
+        assertEquals(EightGatesAbility.GateStage.GATE_6, EightGatesAbility.getStage(700));
+        assertEquals(EightGatesAbility.GateStage.GATE_7, EightGatesAbility.getStage(1000));
 
         EighthGateOfDeathAbility deathGate = new EighthGateOfDeathAbility();
         deathGate.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "eight_gates_death"));
@@ -907,40 +907,95 @@ public class NinjaDataLogicTest {
     }
 
     @Test
-    @DisplayName("Verify scaled activation delay formula and mastery reduction")
+    @DisplayName("Verify scaled activation delay formula (50% halved base) and mastery reduction")
     public void testScaledActivationDelayFormula() {
-        // Genin / Base 20 ticks: -10% per 100 mastery, 0 at 1000+
+        // Genin / Base 10 ticks (0.50s): -10% per 100 mastery, 0 at 1000+
         com.sekwah.narutomod.abilities.jutsus.BoneDanceAbility geninAbility = new com.sekwah.narutomod.abilities.jutsus.BoneDanceAbility();
         assertTrue(geninAbility.requiresSealActivationDelay());
-        assertEquals(20, geninAbility.getBaseActivationDelayTicks());
-        assertEquals(20, geninAbility.getScaledActivationDelay(0));
-        assertEquals(20, geninAbility.getScaledActivationDelay(50));
-        assertEquals(18, geninAbility.getScaledActivationDelay(100));
-        assertEquals(16, geninAbility.getScaledActivationDelay(200));
-        assertEquals(10, geninAbility.getScaledActivationDelay(500));
-        assertEquals(2, geninAbility.getScaledActivationDelay(900));
+        assertEquals(10, geninAbility.getBaseActivationDelayTicks());
+        assertEquals(10, geninAbility.getScaledActivationDelay(0));
+        assertEquals(10, geninAbility.getScaledActivationDelay(50));
+        assertEquals(9, geninAbility.getScaledActivationDelay(100));
+        assertEquals(8, geninAbility.getScaledActivationDelay(200));
+        assertEquals(5, geninAbility.getScaledActivationDelay(500));
+        assertEquals(1, geninAbility.getScaledActivationDelay(900));
         assertEquals(0, geninAbility.getScaledActivationDelay(1000));
         assertEquals(0, geninAbility.getScaledActivationDelay(1500));
 
-        // Chunin / Base 16 ticks
+        // Chunin / Base 8 ticks (0.40s)
         ShadowCloneAbility chuninAbility = new ShadowCloneAbility();
         assertTrue(chuninAbility.requiresSealActivationDelay());
-        assertEquals(16, chuninAbility.getBaseActivationDelayTicks());
-        assertEquals(16, chuninAbility.getScaledActivationDelay(0));
-        assertEquals(14, chuninAbility.getScaledActivationDelay(100)); // 16 * 0.9 = 14.4 -> 14
-        assertEquals(13, chuninAbility.getScaledActivationDelay(200)); // 16 * 0.8 = 12.8 -> 13
-        assertEquals(8, chuninAbility.getScaledActivationDelay(500));  // 16 * 0.5 = 8
+        assertEquals(8, chuninAbility.getBaseActivationDelayTicks());
+        assertEquals(8, chuninAbility.getScaledActivationDelay(0));
+        assertEquals(7, chuninAbility.getScaledActivationDelay(100)); // 8 * 0.9 = 7.2 -> 7
+        assertEquals(6, chuninAbility.getScaledActivationDelay(200)); // 8 * 0.8 = 6.4 -> 6
+        assertEquals(4, chuninAbility.getScaledActivationDelay(500)); // 8 * 0.5 = 4
         assertEquals(0, chuninAbility.getScaledActivationDelay(1000));
 
-        // Jonin / Base 12 ticks
+        // Jonin / Base 6 ticks (0.30s)
         RasenshurikenAbility joninAbility = new RasenshurikenAbility();
         assertTrue(joninAbility.requiresSealActivationDelay());
-        assertEquals(12, joninAbility.getBaseActivationDelayTicks());
-        assertEquals(12, joninAbility.getScaledActivationDelay(0));
-        assertEquals(11, joninAbility.getScaledActivationDelay(100)); // 12 * 0.9 = 10.8 -> 11
-        assertEquals(10, joninAbility.getScaledActivationDelay(200)); // 12 * 0.8 = 9.6 -> 10
-        assertEquals(6, joninAbility.getScaledActivationDelay(500));  // 12 * 0.5 = 6
+        assertEquals(6, joninAbility.getBaseActivationDelayTicks());
+        assertEquals(6, joninAbility.getScaledActivationDelay(0));
+        assertEquals(5, joninAbility.getScaledActivationDelay(100)); // 6 * 0.9 = 5.4 -> 5
+        assertEquals(5, joninAbility.getScaledActivationDelay(200)); // 6 * 0.8 = 4.8 -> 5
+        assertEquals(3, joninAbility.getScaledActivationDelay(500)); // 6 * 0.5 = 3
         assertEquals(0, joninAbility.getScaledActivationDelay(1000));
+    }
+
+    @Test
+    @DisplayName("Verify 50% halved cooldown and 10% per 100 mastery reduction")
+    public void testScaledCooldownFormula() {
+        ShadowCloneAbility ability = new ShadowCloneAbility();
+        // Base 200 ticks -> halved to 100 ticks
+        assertEquals(100, ability.getScaledCooldown(200, 0));
+        assertEquals(90, ability.getScaledCooldown(200, 100));
+        assertEquals(80, ability.getScaledCooldown(200, 200));
+        assertEquals(50, ability.getScaledCooldown(200, 500));
+        assertEquals(20, ability.getScaledCooldown(200, 800)); // Max 80% mastery discount -> 20% of 100 = 20
+        assertEquals(20, ability.getScaledCooldown(200, 1500));
+        // Minimum 5 ticks clamp
+        assertEquals(5, ability.getScaledCooldown(10, 500));
+    }
+
+    @Test
+    @DisplayName("Verify tiered mastery increment curve and setMastery")
+    public void testTieredMasteryIncrementCurve() {
+        ResourceLocation jutsu = new ResourceLocation("narutomod", "fireball");
+        assertEquals(0, ninjaData.getMastery(jutsu));
+
+        // < 100: +5 for instant, +2 for toggle
+        ninjaData.incrementJutsuMastery(jutsu, false);
+        assertEquals(5, ninjaData.getMastery(jutsu));
+        ninjaData.incrementJutsuMastery(jutsu, true);
+        assertEquals(7, ninjaData.getMastery(jutsu));
+
+        // 100..249: +3 for instant
+        ninjaData.setMastery(jutsu, 100);
+        ninjaData.incrementJutsuMastery(jutsu, false);
+        assertEquals(103, ninjaData.getMastery(jutsu));
+
+        // 250..499: +2 for instant
+        ninjaData.setMastery(jutsu, 250);
+        ninjaData.incrementJutsuMastery(jutsu, false);
+        assertEquals(252, ninjaData.getMastery(jutsu));
+
+        // 500+: +1
+        ninjaData.setMastery(jutsu, 500);
+        ninjaData.incrementJutsuMastery(jutsu, false);
+        assertEquals(501, ninjaData.getMastery(jutsu));
+    }
+
+    @Test
+    @DisplayName("Verify Eight Gates (Hachimon) faster stage thresholds")
+    public void testEightGatesStageThresholds() {
+        assertEquals(EightGatesAbility.GateStage.GATE_1, EightGatesAbility.getStage(0));
+        assertEquals(EightGatesAbility.GateStage.GATE_2, EightGatesAbility.getStage(40));
+        assertEquals(EightGatesAbility.GateStage.GATE_3, EightGatesAbility.getStage(120));
+        assertEquals(EightGatesAbility.GateStage.GATE_4, EightGatesAbility.getStage(250));
+        assertEquals(EightGatesAbility.GateStage.GATE_5, EightGatesAbility.getStage(450));
+        assertEquals(EightGatesAbility.GateStage.GATE_6, EightGatesAbility.getStage(700));
+        assertEquals(EightGatesAbility.GateStage.GATE_7, EightGatesAbility.getStage(1000));
     }
 
     @Test

@@ -63,7 +63,8 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
 
         // Spawn physical WaterBulletEntity projectile
         WaterBulletEntity waterBullet = new WaterBulletEntity(serverLevel, player);
-        waterBullet.setPos(player.getX() + look.x * 1.2, player.getY() + player.getEyeHeight() * 0.6, player.getZ() + look.z * 1.2);
+        Vec3 spawnPos = player.getEyePosition().add(look.scale(1.3));
+        waterBullet.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
         waterBullet.setYRot(player.getYRot());
         waterBullet.setXRot(player.getXRot());
         waterBullet.setDamage(bulletDamage);

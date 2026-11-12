@@ -36,11 +36,20 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity> {
         poseStack.pushPose();
         try {
             poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - Mth.lerp(partialTicks, entity.yRotO, entity.getYRot())));
-            poseStack.translate(0.0D, 0.9D, 0.0D);
-            float scale = 1.15F + (progress > 0.7F ? (progress - 0.7F) * 2.2F : 0.0F);
+            poseStack.mulPose(Axis.XP.rotationDegrees(Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
+            poseStack.translate(0.0D, 0.25D, 0.0D);
+
+            // 1. 3D Fluid Water Core Sphere (r = 0.45F)
+            com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.RasenganSphereModel.renderSmoothSphere(
+                    poseStack, consumer, 0.45F, 12, 16, 15728880, OverlayTexture.NO_OVERLAY,
+                    0.08F, 0.50F, 0.95F, 0.90F * fadeOut
+            );
+
+            // 2. Surrounding Swirling Water Vortex Rings
+            float scale = 0.85F + (progress > 0.7F ? (progress - 0.7F) * 1.5F : 0.0F);
             poseStack.scale(-scale, -scale, scale);
             this.waterModel.setupAnim(age);
-            this.waterModel.renderToBuffer(poseStack, consumer, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.86F * fadeOut);
+            this.waterModel.renderToBuffer(poseStack, consumer, 15728880, OverlayTexture.NO_OVERLAY, 0.20F, 0.65F, 1.0F, 0.80F * fadeOut);
         } finally {
             poseStack.popPose();
         }

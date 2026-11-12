@@ -227,7 +227,7 @@ public abstract class Ability {
     }
 
     public int getCooldown(int mastery) {
-        return Math.max(1, (int) (getCooldown() * getCooldownMultiplier(mastery)));
+        return getScaledCooldown(getCooldown(), mastery);
     }
 
     public float getDefaultChakraCost() {
@@ -301,11 +301,11 @@ public abstract class Ability {
 
     public int getBaseActivationDelayTicks() {
         NinjaRank rank = this.getRequiredRank();
-        if (rank == null) return 20;
+        if (rank == null) return 10;
         return switch (rank) {
-            case JONIN, ANBU, KAGE -> 12;
-            case CHUNIN -> 16;
-            default -> 20;
+            case JONIN, ANBU, KAGE -> 6;
+            case CHUNIN -> 8;
+            default -> 10;
         };
     }
 
@@ -315,8 +315,15 @@ public abstract class Ability {
         }
         int baseDelayTicks = this.getBaseActivationDelayTicks();
         int periods = Math.min(10, mastery / 100);
-        double multiplier = 1.0 - (periods * 0.10);
-        return Math.max(0, (int) Math.round(baseDelayTicks * multiplier));
+        double multiplier = Math.max(0.0, 1.0 - (periods * 0.10));
+        return (int) Math.round(baseDelayTicks * multiplier);
+    }
+
+    public int getScaledCooldown(int baseCooldown, int mastery) {
+        double reducedBase = baseCooldown * 0.50;
+        int periods = Math.min(8, mastery / 100);
+        double masteryMultiplier = 1.0 - (periods * 0.10);
+        return Math.max(5, (int) Math.round(reducedBase * masteryMultiplier));
     }
 
     public int getActivationDelayTicks(INinjaData ninjaData) {
@@ -378,9 +385,7 @@ public abstract class Ability {
         if (ninjaData != null && this.activationType() != ActivationType.TOGGLE) {
             ResourceLocation reg = this.getRegistryName();
             if (reg != null) {
-                int currentMastery = ninjaData.getMastery(reg);
-                int gain = (currentMastery < 150) ? 3 : (currentMastery < 350 ? 2 : 1);
-                ninjaData.addMastery(reg, gain);
+                ninjaData.incrementJutsuMastery(reg, false);
             }
         }
     }

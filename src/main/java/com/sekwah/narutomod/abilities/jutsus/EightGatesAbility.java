@@ -28,13 +28,13 @@ import net.minecraft.world.entity.player.Player;
 public class EightGatesAbility extends Ability implements Ability.Toggled, Ability.HandleEnded {
 
     public enum GateStage {
-        GATE_1("kaimon", 0, 399, "1. Kapı: Açılış Kapısı (Kaimon)", 0.05f),
-        GATE_2("kyumon", 400, 999, "2. Kapı: Dinlenme Kapısı (Kyūmon)", 0.03f),
-        GATE_3("seimon", 1000, 1999, "3. Kapı: Yaşam Kapısı (Seimon)", 0.08f),
-        GATE_4("shomon", 2000, 2999, "4. Kapı: Acı Kapısı (Shōmon)", 0.12f),
-        GATE_5("tomon", 3000, 3999, "5. Kapı: Kapanış Kapısı (Tomon)", 0.16f),
-        GATE_6("keimon", 4000, 4999, "6. Kapı: Neşe Kapısı (Keimon)", 0.20f),
-        GATE_7("kyumon_wonder", 5000, Integer.MAX_VALUE, "7. Kapı: Şok Kapısı (Kyōmon)", 0.25f);
+        GATE_1("kaimon", 0, 39, "1. Kapı: Açılış Kapısı (Kaimon)", 0.05f),
+        GATE_2("kyumon", 40, 119, "2. Kapı: Dinlenme Kapısı (Kyūmon)", 0.03f),
+        GATE_3("seimon", 120, 249, "3. Kapı: Yaşam Kapısı (Seimon)", 0.08f),
+        GATE_4("shomon", 250, 449, "4. Kapı: Acı Kapısı (Shōmon)", 0.12f),
+        GATE_5("tomon", 450, 699, "5. Kapı: Kapanış Kapısı (Tomon)", 0.16f),
+        GATE_6("keimon", 700, 999, "6. Kapı: Neşe Kapısı (Keimon)", 0.20f),
+        GATE_7("kyumon_wonder", 1000, Integer.MAX_VALUE, "7. Kapı: Şok Kapısı (Kyōmon)", 0.25f);
 
         private final String id;
         private final int minMastery;
@@ -128,15 +128,24 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
 
         GateStage stage = getStage(ninjaData);
 
-        // Anti-AFK periodic mastery gain: every 10 seconds of active movement or combat
-        if (player.tickCount % 200 == 0) {
-            boolean isMoving = player.getDeltaMovement().horizontalDistanceSqr() > 0.001;
-            boolean inCombat = player.getLastHurtByMob() != null && (player.tickCount - player.getLastHurtByMobTimestamp() < 100);
-            if (isMoving || inCombat) {
-                ResourceLocation reg = this.getRegistryName();
-                if (reg != null) {
-                    ninjaData.addMastery(reg, 1);
-                }
+        // Fast periodic mastery gain while active
+        ResourceLocation reg = this.getRegistryName();
+        if (reg != null) {
+            int mastery = ninjaData.getMastery(reg);
+            int interval;
+            int gain;
+            if (mastery < 250) {
+                interval = 40; // Every 2 seconds
+                gain = 3;
+            } else if (mastery < 600) {
+                interval = 50; // Every 2.5 seconds
+                gain = 2;
+            } else {
+                interval = 60; // Every 3 seconds
+                gain = 1;
+            }
+            if (player.tickCount % interval == 0) {
+                ninjaData.addMastery(reg, gain);
             }
         }
 
@@ -230,6 +239,30 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
                         .withStyle(ChatFormatting.YELLOW), true);
                 player.level().playSound(null, player.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.8f, 1.0f);
             }
+        }
+    }
+
+    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = NarutoMod.MOD_ID)
+    public static class EightGatesCombatEvents {
+        private static final String LAST_COMBAT_MASTERY_TICK = "narutomod_eight_gates_last_hit_tick";
+        private static final int COMBAT_MASTERY_COOLDOWN_TICKS = 20;
+        private static final int COMBAT_MASTERY_GAIN = 2;
+
+        @net.minecraftforge.eventbus.api.SubscribeEvent
+        public static void onLivingHurt(net.minecraftforge.event.entity.living.LivingHurtEvent event) {
+            if (event.getEntity().level().isClientSide()) return;
+            if (!(event.getSource().getEntity() instanceof Player attacker)) return;
+            if (event.getSource().isIndirect()) return; // Melee only
+
+            attacker.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+                if (ninjaData.isEightGatesActive()) {
+                    int lastTick = attacker.getPersistentData().getInt(LAST_COMBAT_MASTERY_TICK);
+                    if (attacker.tickCount - lastTick >= COMBAT_MASTERY_COOLDOWN_TICKS) {
+                        attacker.getPersistentData().putInt(LAST_COMBAT_MASTERY_TICK, attacker.tickCount);
+                        ninjaData.addMastery(new ResourceLocation(NarutoMod.MOD_ID, "eight_gates"), COMBAT_MASTERY_GAIN);
+                    }
+                }
+            });
         }
     }
 }

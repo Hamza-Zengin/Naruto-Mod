@@ -55,6 +55,14 @@ public class NarutoCommands {
         return SharedSuggestionProvider.suggest(jutsuNames, builder);
     };
 
+    private static final SuggestionProvider<CommandSourceStack> SUGGEST_JUTSU_IDS = (ctx, builder) -> {
+        List<ResourceLocation> ids = new ArrayList<>();
+        for (RegistryObject<Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
+            ids.add(entry.getId());
+        }
+        return SharedSuggestionProvider.suggestResource(ids, builder);
+    };
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("naruto")
                 .requires(source -> source.hasPermission(2))
@@ -159,6 +167,34 @@ public class NarutoCommands {
                                         .executes(ctx -> lockJutsu(ctx.getSource(), Collections.singleton(ctx.getSource().getPlayerOrException()), StringArgumentType.getString(ctx, "jutsuId")))
                                         .then(Commands.argument("targets", EntityArgument.players())
                                                 .executes(ctx -> lockJutsu(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), StringArgumentType.getString(ctx, "jutsuId")))))))
+
+                // === MASTERY ===
+                .then(Commands.literal("mastery")
+                        .then(Commands.literal("set")
+                                .then(Commands.argument("targets", EntityArgument.players())
+                                        .then(Commands.argument("jutsu", net.minecraft.commands.arguments.ResourceLocationArgument.id())
+                                                .suggests(SUGGEST_JUTSU_IDS)
+                                                .then(Commands.argument("amount", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 10000))
+                                                        .executes(ctx -> setJutsuMastery(ctx.getSource(),
+                                                                EntityArgument.getPlayers(ctx, "targets"),
+                                                                net.minecraft.commands.arguments.ResourceLocationArgument.getId(ctx, "jutsu"),
+                                                                com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "amount")))))))
+                        .then(Commands.literal("add")
+                                .then(Commands.argument("targets", EntityArgument.players())
+                                        .then(Commands.argument("jutsu", net.minecraft.commands.arguments.ResourceLocationArgument.id())
+                                                .suggests(SUGGEST_JUTSU_IDS)
+                                                .then(Commands.argument("amount", com.mojang.brigadier.arguments.IntegerArgumentType.integer(-10000, 10000))
+                                                        .executes(ctx -> addJutsuMastery(ctx.getSource(),
+                                                                EntityArgument.getPlayers(ctx, "targets"),
+                                                                net.minecraft.commands.arguments.ResourceLocationArgument.getId(ctx, "jutsu"),
+                                                                com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "amount")))))))
+                        .then(Commands.literal("get")
+                                .then(Commands.argument("targets", EntityArgument.players())
+                                        .then(Commands.argument("jutsu", net.minecraft.commands.arguments.ResourceLocationArgument.id())
+                                                .suggests(SUGGEST_JUTSU_IDS)
+                                                .executes(ctx -> getJutsuMastery(ctx.getSource(),
+                                                        EntityArgument.getPlayers(ctx, "targets"),
+                                                        net.minecraft.commands.arguments.ResourceLocationArgument.getId(ctx, "jutsu")))))))
 
                 // === STATS & RESET ===
                 .then(Commands.literal("stats")
@@ -461,6 +497,50 @@ public class NarutoCommands {
             player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
                 data.resetData();
                 source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun ninja verileri Akademi Öğrencisi başlangıç seviyesine sıfırlandı.").withStyle(ChatFormatting.GOLD), true);
+            });
+        }
+        return players.size();
+    }
+
+    // === MASTERY HANDLERS ===
+    private static int setJutsuMastery(CommandSourceStack source, Collection<ServerPlayer> players, ResourceLocation jutsuId, int amount) {
+        if (NarutoAbilities.ABILITY.getEntries().stream().noneMatch(e -> e.getId().equals(jutsuId))) {
+            source.sendFailure(Component.literal("Geçersiz jutsu ID'si: " + jutsuId).withStyle(ChatFormatting.RED));
+            return 0;
+        }
+        for (ServerPlayer player : players) {
+            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
+                data.setMastery(jutsuId, amount);
+                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " - " + jutsuId + " ustalığı " + amount + " olarak ayarlandı.").withStyle(ChatFormatting.GREEN), true);
+            });
+        }
+        return players.size();
+    }
+
+    private static int addJutsuMastery(CommandSourceStack source, Collection<ServerPlayer> players, ResourceLocation jutsuId, int amount) {
+        if (NarutoAbilities.ABILITY.getEntries().stream().noneMatch(e -> e.getId().equals(jutsuId))) {
+            source.sendFailure(Component.literal("Geçersiz jutsu ID'si: " + jutsuId).withStyle(ChatFormatting.RED));
+            return 0;
+        }
+        for (ServerPlayer player : players) {
+            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
+                data.addMastery(jutsuId, amount);
+                int updated = data.getMastery(jutsuId);
+                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " - " + jutsuId + " ustalığı güncellendi: " + updated).withStyle(ChatFormatting.GREEN), true);
+            });
+        }
+        return players.size();
+    }
+
+    private static int getJutsuMastery(CommandSourceStack source, Collection<ServerPlayer> players, ResourceLocation jutsuId) {
+        if (NarutoAbilities.ABILITY.getEntries().stream().noneMatch(e -> e.getId().equals(jutsuId))) {
+            source.sendFailure(Component.literal("Geçersiz jutsu ID'si: " + jutsuId).withStyle(ChatFormatting.RED));
+            return 0;
+        }
+        for (ServerPlayer player : players) {
+            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
+                int current = data.getMastery(jutsuId);
+                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " - " + jutsuId + " ustalığı: " + current).withStyle(ChatFormatting.AQUA), false);
             });
         }
         return players.size();

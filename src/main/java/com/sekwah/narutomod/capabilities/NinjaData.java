@@ -464,11 +464,34 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
+    public void setMastery(ResourceLocation jutsuId, int amount) {
+        if (jutsuId == null) return;
+        this.jutsuMastery.put(jutsuId, Math.max(0, amount));
+    }
+
+    @Override
     public void addMastery(ResourceLocation jutsuId, int amount) {
         if (jutsuId == null || amount == 0) return;
         int current = getMastery(jutsuId);
         int updated = Math.max(0, current + amount);
         this.jutsuMastery.put(jutsuId, updated);
+    }
+
+    @Override
+    public void incrementJutsuMastery(ResourceLocation jutsuId, boolean isToggle) {
+        if (jutsuId == null) return;
+        int current = getMastery(jutsuId);
+        int gain;
+        if (current < 100) {
+            gain = isToggle ? 2 : 5;
+        } else if (current < 250) {
+            gain = isToggle ? 2 : 3;
+        } else if (current < 500) {
+            gain = isToggle ? 1 : 2;
+        } else {
+            gain = 1;
+        }
+        addMastery(jutsuId, gain);
     }
 
     @Override

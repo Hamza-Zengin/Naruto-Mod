@@ -95,6 +95,15 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
     }
 
     @Override
+    protected boolean canHitEntity(Entity target) {
+        Entity owner = this.getOwner();
+        if (target == owner || (owner != null && target.getUUID().equals(owner.getUUID()))) {
+            return false;
+        }
+        return super.canHitEntity(target);
+    }
+
+    @Override
     protected Item getDefaultItem() {
         return Items.WATER_BUCKET;
     }

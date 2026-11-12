@@ -51,9 +51,27 @@ public class ShadowCloneEntity extends PathfinderMob {
     @Nullable
     private UUID ownerUUID;
     private int lifeTicks = 600; // 30 seconds default
+    private final java.util.List<net.minecraft.resources.ResourceLocation> unlockedCloneJutsus = new java.util.ArrayList<>();
+    private int cloneJutsuCooldown = 0;
+    private boolean fastJutsuCooldown = false;
 
     public ShadowCloneEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
+    }
+
+    public void setUnlockedCloneJutsus(java.util.List<net.minecraft.resources.ResourceLocation> jutsus) {
+        this.unlockedCloneJutsus.clear();
+        if (jutsus != null) {
+            this.unlockedCloneJutsus.addAll(jutsus);
+        }
+    }
+
+    public java.util.List<net.minecraft.resources.ResourceLocation> getUnlockedCloneJutsus() {
+        return this.unlockedCloneJutsus;
+    }
+
+    public void setFastJutsuCooldown(boolean fast) {
+        this.fastJutsuCooldown = fast;
     }
 
     @Override
@@ -78,6 +96,7 @@ public class ShadowCloneEntity extends PathfinderMob {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.25D, true));
+        this.goalSelector.addGoal(2, new CloneJutsuAttackGoal(this));
         this.goalSelector.addGoal(2, new CloneFollowOwnerGoal(this, 1.25D));
         this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 1.0D) {
             @Override
@@ -231,6 +250,9 @@ public class ShadowCloneEntity extends PathfinderMob {
     public void tick() {
         super.tick();
         if (!this.level().isClientSide) {
+            if (this.cloneJutsuCooldown > 0) {
+                this.cloneJutsuCooldown--;
+            }
             this.lifeTicks--;
             if (this.lifeTicks <= 0) {
                 this.poof();
@@ -281,6 +303,10 @@ public class ShadowCloneEntity extends PathfinderMob {
             this.setFlags(java.util.EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
         }
 
+        private static final double START_FOLLOW_DIST_SQ = 36.0D; // 6.0 blocks
+        private static final double STOP_FOLLOW_DIST_SQ = 9.0D;   // 3.0 blocks
+        private static final double TELEPORT_DIST_SQ = 900.0D;   // 30.0 blocks
+
         @Override
         public boolean canUse() {
             if (this.clone.getCommandMode() != MODE_FOLLOW) {
@@ -290,7 +316,7 @@ public class ShadowCloneEntity extends PathfinderMob {
             if (owner == null || owner.isSpectator() || !owner.isAlive()) {
                 return false;
             }
-            return this.clone.distanceToSqr(owner) > 16.0D; // Greater than 4 blocks
+            return this.clone.distanceToSqr(owner) > START_FOLLOW_DIST_SQ;
         }
 
         @Override
@@ -302,7 +328,7 @@ public class ShadowCloneEntity extends PathfinderMob {
             if (owner == null || owner.isSpectator() || !owner.isAlive()) {
                 return false;
             }
-            return this.clone.distanceToSqr(owner) > 9.0D; // Stop within 3 blocks
+            return this.clone.distanceToSqr(owner) > STOP_FOLLOW_DIST_SQ;
         }
 
         @Override
@@ -323,8 +349,8 @@ public class ShadowCloneEntity extends PathfinderMob {
             this.clone.getLookControl().setLookAt(owner, 10.0F, (float) this.clone.getMaxHeadXRot());
 
             double distSq = this.clone.distanceToSqr(owner);
-            // Teleport if too far (> 20 blocks = 400 distSq)
-            if (distSq > 400.0D && owner.onGround()) {
+            // Teleport if too far (> 30 blocks)
+            if (distSq > TELEPORT_DIST_SQ && owner.onGround()) {
                 teleportNearOwner(owner);
                 return;
             }
@@ -421,6 +447,83 @@ public class ShadowCloneEntity extends PathfinderMob {
                 this.timestamp = owner.getLastHurtMobTimestamp();
             }
             super.start();
+        }
+    }
+
+    public static class CloneJutsuAttackGoal extends Goal {
+        private static final float CLONE_JUTSU_DAMAGE_MULTIPLIER = 0.65F;
+        private static final int NORMAL_COOLDOWN_TICKS = 120; // 6 seconds
+        private static final int FAST_COOLDOWN_TICKS = 80;    // 4 seconds (600+ mastery)
+
+        private final ShadowCloneEntity clone;
+
+        public CloneJutsuAttackGoal(ShadowCloneEntity clone) {
+            this.clone = clone;
+        }
+
+        @Override
+        public boolean canUse() {
+            if (this.clone.unlockedCloneJutsus.isEmpty()) return false;
+            if (this.clone.cloneJutsuCooldown > 0) return false;
+            LivingEntity target = this.clone.getTarget();
+            return target != null && target.isAlive() && this.clone.hasLineOfSight(target);
+        }
+
+        @Override
+        public void start() {
+            LivingEntity target = this.clone.getTarget();
+            if (target == null || !(this.clone.level() instanceof ServerLevel serverLevel)) return;
+
+            double dist = this.clone.distanceTo(target);
+            java.util.List<net.minecraft.resources.ResourceLocation> candidates = new java.util.ArrayList<>();
+            for (net.minecraft.resources.ResourceLocation id : this.clone.unlockedCloneJutsus) {
+                String path = id.getPath();
+                if ("fireball".equals(path) && dist >= 6.0D && dist <= 20.0D) candidates.add(id);
+                else if ("water_bullet".equals(path) && dist >= 5.0D && dist <= 20.0D) candidates.add(id);
+                else if ("wind_breaker".equals(path) && dist >= 3.5D && dist <= 12.0D) candidates.add(id);
+                else if (("rasengan".equals(path) || "chidori".equals(path)) && dist <= 4.5D) candidates.add(id);
+            }
+
+            if (candidates.isEmpty()) return;
+
+            net.minecraft.resources.ResourceLocation chosen = candidates.get(this.clone.getRandom().nextInt(candidates.size()));
+            this.clone.getLookControl().setLookAt(target, 30.0F, 30.0F);
+            this.clone.swing(InteractionHand.MAIN_HAND);
+            serverLevel.playSound(null, this.clone.blockPosition(), NarutoSounds.JUTSU_CAST.get(), SoundSource.PLAYERS, 0.9F, 1.1F);
+
+            net.minecraft.world.phys.Vec3 dir = target.getEyePosition().subtract(this.clone.getEyePosition()).normalize();
+            String path = chosen.getPath();
+
+            if ("fireball".equals(path)) {
+                com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity fireball =
+                        new com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity(this.clone, dir.x, dir.y, dir.z);
+                net.minecraft.world.phys.Vec3 spawnPos = this.clone.getEyePosition().add(dir.scale(1.3));
+                fireball.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+                serverLevel.addFreshEntity(fireball);
+            } else if ("water_bullet".equals(path)) {
+                com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity bullet =
+                        new com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity(serverLevel, this.clone);
+                net.minecraft.world.phys.Vec3 spawnPos = this.clone.getEyePosition().add(dir.scale(1.3));
+                bullet.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+                bullet.setDamage(10.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
+                bullet.setMaxLife(25);
+                bullet.setDeltaMovement(dir.scale(1.1));
+                serverLevel.addFreshEntity(bullet);
+            } else if ("wind_breaker".equals(path)) {
+                serverLevel.sendParticles(ParticleTypes.CLOUD, target.getX(), target.getY() + 1.0, target.getZ(), 18, 0.5, 0.5, 0.5, 0.15);
+                target.hurt(this.clone.damageSources().mobAttack(this.clone), 8.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
+                target.setDeltaMovement(dir.scale(1.6).add(0, 0.35, 0));
+            } else if ("rasengan".equals(path)) {
+                serverLevel.sendParticles(ParticleTypes.END_ROD, target.getX(), target.getY() + 1.0, target.getZ(), 20, 0.3, 0.3, 0.3, 0.15);
+                target.hurt(this.clone.damageSources().mobAttack(this.clone), 14.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
+                serverLevel.playSound(null, target.blockPosition(), NarutoSounds.RASENGAN.get(), SoundSource.PLAYERS, 0.9F, 1.0F);
+            } else if ("chidori".equals(path)) {
+                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getY() + 1.0, target.getZ(), 24, 0.4, 0.4, 0.4, 0.2);
+                target.hurt(this.clone.damageSources().mobAttack(this.clone), 14.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
+                serverLevel.playSound(null, target.blockPosition(), NarutoSounds.CHIDORI.get(), SoundSource.PLAYERS, 0.9F, 1.0F);
+            }
+
+            this.clone.cloneJutsuCooldown = this.clone.fastJutsuCooldown ? FAST_COOLDOWN_TICKS : NORMAL_COOLDOWN_TICKS;
         }
     }
 }

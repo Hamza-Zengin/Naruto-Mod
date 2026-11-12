@@ -64,10 +64,11 @@ public class NarutoInGameGUI {
         mc.player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
             ToggleAbilityData toggleData = ninjaData.getToggleAbilityData();
             boolean hasSusanoo = toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.SUSANOO_RIBCAGE.getId());
-            boolean hasEightGates = toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.EIGHT_GATES.getId());
+            boolean hasEightGatesDeath = ninjaData.isEighthGateActive()
+                    || (toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.EIGHT_GATES_DEATH.getId()));
             boolean hasByakugan = toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.BYAKUGAN.getId());
 
-            if (!hasSusanoo && !hasEightGates && !hasByakugan) {
+            if (!hasSusanoo && !hasEightGatesDeath && !hasByakugan) {
                 return;
             }
 
@@ -87,8 +88,8 @@ public class NarutoInGameGUI {
                 guiGraphics.blit(VIGNETTE_LOCATION, 0, 0, -90, 0.0F, 0.0F, screenWidth, screenHeight, screenWidth, screenHeight);
             }
 
-            // 2. Eight Gates Crimson Steam Heartbeat Vignette
-            if (hasEightGates) {
+            // 2. Eighth Gate of Death Crimson Steam Heartbeat Vignette
+            if (hasEightGatesDeath) {
                 float pulse = 0.20F + 0.07F * Mth.sin(ticks * 0.22F);
                 RenderSystem.setShaderColor(1.0F, 0.12F, 0.18F, pulse);
                 guiGraphics.blit(VIGNETTE_LOCATION, 0, 0, -90, 0.0F, 0.0F, screenWidth, screenHeight, screenWidth, screenHeight);

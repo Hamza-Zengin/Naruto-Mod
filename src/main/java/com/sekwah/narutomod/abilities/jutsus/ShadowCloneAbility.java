@@ -70,6 +70,17 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
         double radius = count > 1 ? 2.0D : 1.5D;
         double angleStep = (2 * Math.PI) / count;
 
+        java.util.List<net.minecraft.resources.ResourceLocation> cloneJutsus = new java.util.ArrayList<>();
+        if (ninjaData != null && mastery >= 300) {
+            String[] basicPool = {"fireball", "water_bullet", "wind_breaker", "rasengan", "chidori"};
+            for (String jutsuName : basicPool) {
+                net.minecraft.resources.ResourceLocation id = new net.minecraft.resources.ResourceLocation(com.sekwah.narutomod.NarutoMod.MOD_ID, jutsuName);
+                if (ninjaData.getMastery(id) >= 250) {
+                    cloneJutsus.add(id);
+                }
+            }
+        }
+
         for (int i = 0; i < count; i++) {
             double angle = Math.toRadians(yaw) + (i * angleStep) + (Math.PI / 2);
             double spawnX = player.getX() - Math.sin(angle) * radius;
@@ -80,6 +91,8 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
             clone.moveTo(spawnX, spawnY, spawnZ, yaw, player.getXRot());
             clone.setOwner(player);
             clone.setMaxLifespan(lifespan);
+            clone.setUnlockedCloneJutsus(cloneJutsus);
+            clone.setFastJutsuCooldown(mastery >= 600);
 
             serverLevel.addFreshEntity(clone);
 
