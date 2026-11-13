@@ -48,12 +48,36 @@ public class SharinganEyesLayer extends RenderLayer<AbstractClientPlayer, Player
             } else {
                 texture = BYAKUGAN_EYES_TEXTURE;
             }
-            // Use entityTranslucent with -0.0025D Z-offset and FULL_BRIGHT for shader & vanilla compatibility
-            VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityTranslucent(texture));
+            VertexConsumer consumer = buffer.getBuffer(RenderType.entityTranslucent(texture));
             poseStack.pushPose();
-            poseStack.translate(0.0D, 0.0D, -0.0025D);
-            this.getParentModel().renderToBuffer(poseStack, vertexConsumer, net.minecraft.client.renderer.LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+            this.getParentModel().head.translateAndRotate(poseStack);
+
+            org.joml.Matrix4f matrix = poseStack.last().pose();
+            org.joml.Matrix3f normal = poseStack.last().normal();
+
+            float z = -4.003F / 16.0F;
+            float yTop = -4.0F / 16.0F;
+            float yBottom = -3.0F / 16.0F;
+            int fullBright = net.minecraft.client.renderer.LightTexture.FULL_BRIGHT;
+
+            // Right Eye Iris: X = [-2/16 .. -1/16]
+            drawEyeQuad(consumer, matrix, normal, -2.0F / 16.0F, -1.0F / 16.0F, yTop, yBottom, z, fullBright);
+            // Left Eye Iris: X = [+1/16 .. +2/16]
+            drawEyeQuad(consumer, matrix, normal, 1.0F / 16.0F, 2.0F / 16.0F, yTop, yBottom, z, fullBright);
+
             poseStack.popPose();
         });
+    }
+
+    private static void drawEyeQuad(VertexConsumer consumer, org.joml.Matrix4f matrix, org.joml.Matrix3f normal,
+                                    float x1, float x2, float y1, float y2, float z, int light) {
+        consumer.vertex(matrix, x1, y1, z).color(255, 255, 255, 255).uv(0.0F, 0.0F)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normal, 0.0F, 0.0F, -1.0F).endVertex();
+        consumer.vertex(matrix, x1, y2, z).color(255, 255, 255, 255).uv(0.0F, 1.0F)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normal, 0.0F, 0.0F, -1.0F).endVertex();
+        consumer.vertex(matrix, x2, y2, z).color(255, 255, 255, 255).uv(1.0F, 1.0F)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normal, 0.0F, 0.0F, -1.0F).endVertex();
+        consumer.vertex(matrix, x2, y1, z).color(255, 255, 255, 255).uv(1.0F, 0.0F)
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normal, 0.0F, 0.0F, -1.0F).endVertex();
     }
 }

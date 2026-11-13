@@ -86,7 +86,7 @@ public class FirstPersonJutsuRenderer {
                     poseStack.scale(0.34F, 0.34F, 0.34F);
                     chidoriModel.setupAnim(ageInTicks);
                     VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_CHIDORI));
-                    chidoriModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.95F);
+                    chidoriModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
                 } finally {
                     poseStack.popPose();
                 }

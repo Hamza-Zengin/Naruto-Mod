@@ -69,7 +69,7 @@ public class JutsuHandAuraLayer extends RenderLayer<AbstractClientPlayer, Player
                 poseStack.scale(0.32F, 0.32F, 0.32F);
                 this.chidoriHandModel.setupAnim(ageInTicks);
                 VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(JutsuVisualEffectRenderer.TEX_CHIDORI));
-                this.chidoriHandModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.90F);
+                this.chidoriHandModel.renderToBuffer(poseStack, vc, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
                 poseStack.popPose();
             }
 

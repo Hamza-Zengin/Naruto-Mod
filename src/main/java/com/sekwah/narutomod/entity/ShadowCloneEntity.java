@@ -74,6 +74,13 @@ public class ShadowCloneEntity extends PathfinderMob {
         this.fastJutsuCooldown = fast;
     }
 
+    private static final EntityDataAccessor<String> DATA_ACTIVE_ABILITIES =
+            SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Integer> DATA_SHARINGAN_STAGE =
+            SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> DATA_HACHIMON_GATE =
+            SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.INT);
+
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
@@ -82,11 +89,14 @@ public class ShadowCloneEntity extends PathfinderMob {
         this.entityData.define(DATA_MAX_LIFESPAN, 600);
         this.entityData.define(DATA_IS_SLIM, false);
         this.entityData.define(DATA_COMMAND_MODE, MODE_FOLLOW);
+        this.entityData.define(DATA_ACTIVE_ABILITIES, "");
+        this.entityData.define(DATA_SHARINGAN_STAGE, 0);
+        this.entityData.define(DATA_HACHIMON_GATE, 0);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 1.0D) // Dies in 1 hit like shadow clone
+                .add(Attributes.MAX_HEALTH, 6.0D) // 3 hearts base health
                 .add(Attributes.MOVEMENT_SPEED, 0.32D)
                 .add(Attributes.ATTACK_DAMAGE, 5.0D)
                 .add(Attributes.FOLLOW_RANGE, 24.0D);
@@ -288,10 +298,58 @@ public class ShadowCloneEntity extends PathfinderMob {
         if (areAllies(this, source.getEntity()) || areAllies(this, source.getDirectEntity())) {
             return false;
         }
-        if (!this.level().isClientSide) {
+        boolean result = super.hurt(source, amount);
+        if (result && !this.level().isClientSide && this.getHealth() <= 0.0F) {
             this.poof();
         }
-        return super.hurt(source, amount);
+        return result;
+    }
+
+    public void copyActiveAbilitiesFrom(Player owner, com.sekwah.narutomod.capabilities.INinjaData ninjaData) {
+        if (ninjaData == null) return;
+        java.util.Set<net.minecraft.resources.ResourceLocation> toggles = ninjaData.getToggleAbilityData().getAbilitiesHashSet();
+        String joined = toggles.stream()
+                .map(net.minecraft.resources.ResourceLocation::toString)
+                .collect(java.util.stream.Collectors.joining(","));
+        this.entityData.set(DATA_ACTIVE_ABILITIES, joined);
+
+        if (ninjaData.isSharinganActive()) {
+            this.entityData.set(DATA_SHARINGAN_STAGE,
+                    com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(ninjaData).ordinal() + 1);
+            this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED, 1200, 0, false, false));
+        }
+        if (hasActiveAbility("susanoo_ribcage")) {
+            this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE, 1200, 1, false, false));
+        }
+        if (hasActiveAbility("eight_gates")) {
+            int gate = com.sekwah.narutomod.abilities.jutsus.EightGatesAbility.getStage(ninjaData).ordinal() + 1;
+            this.entityData.set(DATA_HACHIMON_GATE, gate);
+            this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.DAMAGE_BOOST, 1200, Math.min(2, gate / 3), false, false));
+            this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED, 1200, Math.min(2, gate / 3), false, false));
+        }
+    }
+
+    public boolean hasActiveAbility(String abilityPath) {
+        String data = this.entityData.get(DATA_ACTIVE_ABILITIES);
+        if (data == null || data.isEmpty()) return false;
+        for (String token : data.split(",")) {
+            if (token.equals(abilityPath) || token.endsWith(":" + abilityPath)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int getSharinganStage() {
+        return this.entityData.get(DATA_SHARINGAN_STAGE);
+    }
+
+    public int getHachimonGate() {
+        return this.entityData.get(DATA_HACHIMON_GATE);
     }
 
     @Override

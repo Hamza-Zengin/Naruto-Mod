@@ -93,6 +93,12 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
             clone.setMaxLifespan(lifespan);
             clone.setUnlockedCloneJutsus(cloneJutsus);
             clone.setFastJutsuCooldown(mastery >= 600);
+            double cloneMaxHealth = 6.0D + Math.min(4, getMasteryTier(mastery));
+            if (clone.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH) != null) {
+                clone.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(cloneMaxHealth);
+            }
+            clone.setHealth((float) cloneMaxHealth);
+            clone.copyActiveAbilitiesFrom(player, ninjaData);
 
             serverLevel.addFreshEntity(clone);
 

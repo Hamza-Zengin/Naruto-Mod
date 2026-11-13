@@ -113,6 +113,9 @@ public interface INinjaData extends INBTSerializable<Tag> {
     void setActiveHandJutsu(String jutsu, int ticks);
     void clearActiveHandJutsu();
 
+    boolean isShimonPenaltyActive();
+    void setShimonPenaltyActive(boolean active);
+
     // Bitmask constants for synchronized active abilities
     int JUTSU_FLAG_SHARINGAN           = 1 << 0;
     int JUTSU_FLAG_BYAKUGAN            = 1 << 1;

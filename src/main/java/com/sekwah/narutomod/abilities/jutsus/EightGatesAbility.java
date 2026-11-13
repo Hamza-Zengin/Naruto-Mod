@@ -127,6 +127,9 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
         }
 
         GateStage stage = getStage(ninjaData);
+        if (stage.name().equals("SHIMON")) {
+            ninjaData.setShimonPenaltyActive(true);
+        }
 
         // Fast periodic mastery gain while active
         ResourceLocation reg = this.getRegistryName();

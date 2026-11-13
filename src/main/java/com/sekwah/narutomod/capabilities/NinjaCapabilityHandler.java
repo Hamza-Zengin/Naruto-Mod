@@ -69,15 +69,53 @@ public class NinjaCapabilityHandler {
 
     @SubscribeEvent
     public static void playerClone(PlayerEvent.Clone event) {
-        event.getOriginal().getCapability(NINJA_DATA).ifPresent(original -> {
-            event.getEntity().getCapability(NINJA_DATA).ifPresent(future -> {
-                future.deserializeNBT(original.serializeNBT());
-                if (event.isWasDeath()) {
-                    future.setChakra(future.getMaxChakra());
-                    future.setStamina(future.getMaxStamina());
-                }
+        if (event.isWasDeath()) {
+            event.getOriginal().reviveCaps();
+        }
+        try {
+            event.getOriginal().getCapability(NINJA_DATA).ifPresent(original -> {
+                event.getEntity().getCapability(NINJA_DATA).ifPresent(future -> {
+                    future.deserializeNBT(original.serializeNBT());
+                    if (event.isWasDeath()) {
+                        boolean usedShimon = original.isShimonPenaltyActive()
+                                || original.getToggleAbilityData().getAbilitiesHashSet().contains(
+                                        com.sekwah.narutomod.abilities.NarutoAbilities.EIGHT_GATES.getId());
+                        double retentionRate = usedShimon ? 0.75D : 0.95D;
+
+                        java.util.Map<net.minecraft.resources.ResourceLocation, Integer> masteries = future.getJutsuMasteryMap();
+                        for (java.util.Map.Entry<net.minecraft.resources.ResourceLocation, Integer> entry : new java.util.HashMap<>(masteries).entrySet()) {
+                            int current = entry.getValue();
+                            if (current > 0) {
+                                int reduced = Math.max(0, (int) Math.floor(current * retentionRate));
+                                future.setMastery(entry.getKey(), reduced);
+                            }
+                        }
+
+                        float newMaxChakra = Math.max(100.0F, (float) Math.floor(original.getMaxChakra() * retentionRate));
+                        float newMaxStamina = Math.max(100.0F, (float) Math.floor(original.getMaxStamina() * retentionRate));
+                        future.setMaxChakra(newMaxChakra);
+                        future.setMaxStamina(newMaxStamina);
+                        future.setChakra(newMaxChakra);
+                        future.setStamina(newMaxStamina);
+                        future.setShimonPenaltyActive(false);
+                        future.getToggleAbilityData().getAbilitiesHashSet().clear();
+                    }
+                });
             });
-        });
+        } finally {
+            if (event.isWasDeath()) {
+                event.getOriginal().invalidateCaps();
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            serverPlayer.getCapability(NINJA_DATA).ifPresent(ninjaData -> {
+                ninjaData.updateServerData(serverPlayer);
+            });
+        }
     }
 
     @SubscribeEvent

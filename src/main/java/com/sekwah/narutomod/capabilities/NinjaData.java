@@ -922,6 +922,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public void saveNBTData(CompoundTag nbt) {
+        nbt.putBoolean("shimonPenaltyActive", this.shimonPenaltyActive);
         if (nbt == null) return;
         nbt.putFloat(CHAKRA_TAG, this.chakra);
         nbt.putFloat(STAMINA_TAG, this.stamina);
@@ -1062,6 +1063,18 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         if (tag instanceof CompoundTag compoundTag) {
             loadNBTData(compoundTag);
         }
+    }
+
+    private boolean shimonPenaltyActive = false;
+
+    @Override
+    public boolean isShimonPenaltyActive() {
+        return this.shimonPenaltyActive;
+    }
+
+    @Override
+    public void setShimonPenaltyActive(boolean active) {
+        this.shimonPenaltyActive = active;
     }
 
     @Override
