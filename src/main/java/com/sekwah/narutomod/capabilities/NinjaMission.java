@@ -32,9 +32,9 @@ public enum NinjaMission {
         if (data == null) return 0;
         return switch (this) {
             case D_RANK_PATROL -> data.getEnemiesDefeated();
-            case C_RANK_ROGUE_HUNT -> data.getRogueNinjaKills();
+            case C_RANK_ROGUE_HUNT -> data.getRogueNinjasDefeated();
             case B_RANK_JUTSU_DRILL -> data.getJutsusCastCount();
-            case A_RANK_AKATSUKI_RECON, S_RANK_AKATSUKI_BOUNTY -> data.getAkatsukiKills();
+            case A_RANK_AKATSUKI_RECON, S_RANK_AKATSUKI_BOUNTY -> data.getAkatsukiNinjasDefeated();
         };
     }
 
