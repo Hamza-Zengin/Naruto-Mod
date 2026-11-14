@@ -1,0 +1,60 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "min": 3,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "narutomod:scroll_amaterasu"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "narutomod:scroll_susanoo"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "narutomod:scroll_chidori"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 6,
+          "name": "narutomod:scroll_kirin"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "narutomod:kusanagi_sword"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 12,
+          "name": "narutomod:chakra_metal",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": { "min": 2, "max": 5 }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "narutomod:kunai",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": { "min": 4, "max": 10 }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

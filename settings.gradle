@@ -7,3 +7,11 @@ pluginManagement {
         }
     }
 }
+
+if (file('../SekCLib').exists()) {
+    includeBuild('../SekCLib') {
+        dependencySubstitution {
+            substitute module('com.sekwah:SekCLib') using project(':')
+        }
+    }
+}

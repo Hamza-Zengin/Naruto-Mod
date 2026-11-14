@@ -129,6 +129,15 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
         serverLevel.playSound(null, targetBlock, SoundEvents.TRIDENT_RIPTIDE_3, SoundSource.WEATHER, 1.8f, 0.6f);
         serverLevel.playSound(null, targetBlock, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.4f, 1.1f);
 
+        com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
+                new com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket(
+                        new net.minecraft.resources.ResourceLocation("narutomod", "kirin_impact"),
+                        targetPos, new Vec3(0, 1, 0), 1.6f, 0x66CCFF),
+                player);
+        com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
+                new com.sekwah.narutomod.network.s2c.ClientCameraShakePacket(1.35f, 18),
+                player);
+
         // Huge vertical electric dragon beam
         for (double y = targetPos.y; y < targetPos.y + 25; y += 0.5) {
             serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,

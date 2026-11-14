@@ -65,6 +65,15 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
         Vec3 look = player.getLookAngle();
         serverLevel.playSound(null, player.blockPosition(), SoundEvents.PHANTOM_FLAP, SoundSource.PLAYERS, 2.0f, 0.7f);
 
+        com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
+                new com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket(
+                        new net.minecraft.resources.ResourceLocation("narutomod", "wind_breaker"),
+                        player.getEyePosition(), look, Math.min(1.5f, powerMult), 0xD8F8E8),
+                player);
+        com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
+                new com.sekwah.narutomod.network.s2c.ClientCameraShakePacket(0.55f, 10),
+                player);
+
         // Launch 3D Expanding Sonic Wind Funnel & Blade Rings
         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity windFunnel =
                 com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
