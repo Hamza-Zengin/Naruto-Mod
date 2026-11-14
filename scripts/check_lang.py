@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -15,6 +16,14 @@ def main():
 
     en_keys = set(en_data.keys())
     has_errors = False
+
+    jutsu_suffix_re = re.compile(r"(?i)\b(no\s+jutsu|jutsu|jutsusu)\s*$")
+    jutsu_name_keys = sorted(k for k in en_data.keys() if k.startswith("narutomod:"))
+
+    for k in jutsu_name_keys:
+        if jutsu_suffix_re.search(en_data[k]):
+            has_errors = True
+            print(f"❌ en_us.json: Forbidden suffix in jutsu name {k}: {en_data[k]!r}", file=sys.stderr)
 
     for lang_file in sorted(lang_dir.glob("*.json")):
         if lang_file.name == "en_us.json":
@@ -40,6 +49,10 @@ def main():
             if extra:
                 print(f"   Extra sample: {list(extra)[:5]}")
         else:
+            for k in jutsu_name_keys:
+                if data.get(k) != en_data.get(k):
+                    has_errors = True
+                    print(f"❌ {lang_file.name}: Jutsu name {k} ({data.get(k)!r}) != en_us.json ({en_data.get(k)!r})", file=sys.stderr)
             print(f"✅ {lang_file.name}: Perfect parity ({len(keys)} keys)")
 
     if has_errors:

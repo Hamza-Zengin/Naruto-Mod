@@ -4,6 +4,7 @@ import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.network.c2s.ServerAbilityActivatePacket;
 import com.sekwah.narutomod.network.c2s.ServerAbilityChannelPacket;
 import com.sekwah.narutomod.network.c2s.ServerJutsuCastingPacket;
+import com.sekwah.narutomod.network.c2s.ServerMissionActionPacket;
 import com.sekwah.narutomod.network.c2s.ServerRankUpPacket;
 import com.sekwah.narutomod.network.c2s.ServerSelectClanPacket;
 import com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket;
@@ -38,6 +39,7 @@ public class PacketHandler {
         NARUTO_CHANNEL.registerMessage(103, ServerSelectClanPacket.class, ServerSelectClanPacket::encode, ServerSelectClanPacket::decode, ServerSelectClanPacket.Handler::handle);
         NARUTO_CHANNEL.registerMessage(104, ServerRankUpPacket.class, ServerRankUpPacket::encode, ServerRankUpPacket::decode, ServerRankUpPacket.Handler::handle);
         NARUTO_CHANNEL.registerMessage(105, ServerTriggerHandJutsuPacket.class, ServerTriggerHandJutsuPacket::encode, ServerTriggerHandJutsuPacket::decode, ServerTriggerHandJutsuPacket.Handler::handle);
+        NARUTO_CHANNEL.registerMessage(106, ServerMissionActionPacket.class, ServerMissionActionPacket::encode, ServerMissionActionPacket::decode, ServerMissionActionPacket.Handler::handle);
 
         // Server to client packets
         NARUTO_CHANNEL.registerMessage(200, ClientJutsuEffectPacket.class, ClientJutsuEffectPacket::encode, ClientJutsuEffectPacket::decode, ClientJutsuEffectPacket.Handler::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));

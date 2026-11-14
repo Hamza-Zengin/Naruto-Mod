@@ -31,7 +31,7 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 123;
+        return 3123;
     }
 
     @Override

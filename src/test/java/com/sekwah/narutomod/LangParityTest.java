@@ -33,6 +33,8 @@ public class LangParityTest {
         return map;
     }
 
+    private static final Pattern NO_JUTSU_SUFFIX_PATTERN = Pattern.compile("(?i).*\\b(no\\s+jutsu|jutsu|jutsusu)\\s*$");
+
     @Test
     public void testLangFilesExistAndMatchEnUs() throws Exception {
         Path enPath = LANG_DIR.resolve("en_us.json");
@@ -40,6 +42,18 @@ public class LangParityTest {
 
         Map<String, String> enKeys = parseSimpleJson(enPath);
         Assertions.assertFalse(enKeys.isEmpty(), "en_us.json should not be empty!");
+
+        List<String> jutsuNameKeys = enKeys.keySet().stream()
+                .filter(k -> k.startsWith("narutomod:"))
+                .sorted()
+                .toList();
+        Assertions.assertEquals(26, jutsuNameKeys.size(), "Expected 26 canonical jutsu name keys");
+
+        for (String jutsuKey : jutsuNameKeys) {
+            String val = enKeys.get(jutsuKey);
+            Assertions.assertFalse(NO_JUTSU_SUFFIX_PATTERN.matcher(val).matches(),
+                    "Jutsu name " + jutsuKey + " must not end with 'jutsu' or 'no jutsu': " + val);
+        }
 
         try (var stream = Files.list(LANG_DIR)) {
             List<Path> langFiles = stream
@@ -55,6 +69,11 @@ public class LangParityTest {
 
                 Assertions.assertTrue(missing.isEmpty(),
                     "Language file " + langPath.getFileName() + " is missing " + missing.size() + " keys: " + missing);
+
+                for (String jutsuKey : jutsuNameKeys) {
+                    Assertions.assertEquals(enKeys.get(jutsuKey), targetKeys.get(jutsuKey),
+                            "Jutsu name " + jutsuKey + " in " + langPath.getFileName() + " must match canonical en_us.json name");
+                }
             }
         }
     }

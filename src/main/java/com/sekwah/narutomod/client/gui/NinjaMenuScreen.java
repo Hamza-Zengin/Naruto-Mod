@@ -53,33 +53,48 @@ public class NinjaMenuScreen extends Screen {
         int centerX = this.width / 2;
         int topY = 24;
 
-        // Modern Tab Navigation Buttons
-        int tabBtnW = 100;
+        // Modern Tab Navigation Buttons (4 tabs centered inside 340px)
+        int tabBtnW = 80;
+        int tabGap = 5;
+        int totalTabsW = tabBtnW * 4 + tabGap * 3;
+        int tabStartX = centerX - totalTabsW / 2;
+
         Component profileTitle = Component.translatable("naruto.gui.ninja_menu.tab.profile");
         Component clansTitle = Component.translatable("naruto.gui.ninja_menu.tab.clans");
         Component jutsusTitle = Component.translatable("naruto.gui.ninja_menu.tab.jutsus");
+        Component missionsTitle = Component.translatable("naruto.gui.ninja_menu.tab.missions");
 
         Component tab0 = this.activeTab == 0 ? Component.literal("§6§l[ ").append(profileTitle).append(" ]") : profileTitle;
         Component tab1 = this.activeTab == 1 ? Component.literal("§6§l[ ").append(clansTitle).append(" ]") : clansTitle;
         Component tab2 = this.activeTab == 2 ? Component.literal("§6§l[ ").append(jutsusTitle).append(" ]") : jutsusTitle;
+        Component tab3 = this.activeTab == 3 ? Component.literal("§6§l[ ").append(missionsTitle).append(" ]") : missionsTitle;
 
         this.addRenderableWidget(Button.builder(tab0, b -> switchTab(0))
-                .bounds(centerX - 155, topY, tabBtnW, 20).build());
+                .bounds(tabStartX, topY, tabBtnW, 20).build());
 
         this.addRenderableWidget(Button.builder(tab1, b -> switchTab(1))
-                .bounds(centerX - 50, topY, tabBtnW, 20).build());
+                .bounds(tabStartX + (tabBtnW + tabGap), topY, tabBtnW, 20).build());
 
         this.addRenderableWidget(Button.builder(tab2, b -> switchTab(2))
-                .bounds(centerX + 55, topY, tabBtnW, 20).build());
+                .bounds(tabStartX + (tabBtnW + tabGap) * 2, topY, tabBtnW, 20).build());
 
-        // Cache abilities
+        this.addRenderableWidget(Button.builder(tab3, b -> switchTab(3))
+                .bounds(tabStartX + (tabBtnW + tabGap) * 3, topY, tabBtnW, 20).build());
+
+        // Cache and sort only unlocked abilities from simplest to most complex
         this.allAbilities.clear();
-        NarutoAbilities.ABILITY.getEntries().forEach(entry -> {
-            Ability ability = entry.get();
-            if (ability.defaultCombo() > 0) {
-                this.allAbilities.add(ability);
-            }
-        });
+        Minecraft mcInit = Minecraft.getInstance();
+        if (mcInit.player != null) {
+            mcInit.player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+                NarutoAbilities.ABILITY.getEntries().forEach(entry -> {
+                    Ability ability = entry.get();
+                    if (ability.defaultCombo() > 0 && ninjaData.isAbilityUnlocked(ability)) {
+                        this.allAbilities.add(ability);
+                    }
+                });
+            });
+        }
+        this.allAbilities.sort(Ability.COMPLEXITY_COMPARATOR);
 
         int boxY = topY + 28;
 
@@ -89,6 +104,8 @@ public class NinjaMenuScreen extends Screen {
             initClanTab(centerX, boxY);
         } else if (this.activeTab == 2) {
             initJutsuTab(centerX, boxY);
+        } else if (this.activeTab == 3) {
+            initMissionsTab(centerX, boxY);
         }
     }
 
@@ -238,6 +255,60 @@ public class NinjaMenuScreen extends Screen {
         }
     }
 
+    private void initMissionsTab(int centerX, int boxY) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+        mc.player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+            com.sekwah.narutomod.capabilities.NinjaMission active =
+                    com.sekwah.narutomod.capabilities.NinjaMission.fromId(ninjaData.getActiveMissionId());
+            int boxX = centerX - BOX_WIDTH / 2;
+
+            if (active != null) {
+                boolean completed = active.isCompleted(ninjaData);
+                int btnY = boxY + 125;
+                if (completed) {
+                    this.addRenderableWidget(Button.builder(
+                            Component.translatable("naruto.gui.ninja_menu.mission.claim"),
+                            b -> {
+                                PacketHandler.sendToServer(new com.sekwah.narutomod.network.c2s.ServerMissionActionPacket(
+                                        com.sekwah.narutomod.network.c2s.ServerMissionActionPacket.Action.CLAIM_REWARD,
+                                        active.getId()));
+                                this.onClose();
+                            }).bounds(centerX - 80, btnY, 160, 22).build());
+                } else {
+                    this.addRenderableWidget(Button.builder(
+                            Component.translatable("naruto.gui.ninja_menu.mission.abandon"),
+                            b -> {
+                                PacketHandler.sendToServer(new com.sekwah.narutomod.network.c2s.ServerMissionActionPacket(
+                                        com.sekwah.narutomod.network.c2s.ServerMissionActionPacket.Action.ABANDON_MISSION,
+                                        active.getId()));
+                                this.onClose();
+                            }).bounds(centerX - 80, btnY, 160, 22).build());
+                }
+            } else {
+                NinjaRank playerRank = NinjaRank.fromString(ninjaData.getRank());
+                com.sekwah.narutomod.capabilities.NinjaMission[] missions =
+                        com.sekwah.narutomod.capabilities.NinjaMission.values();
+                int startY = boxY + 36;
+                int rowH = 30;
+                for (int i = 0; i < missions.length; i++) {
+                    com.sekwah.narutomod.capabilities.NinjaMission m = missions[i];
+                    int rowY = startY + i * rowH;
+                    Button acceptBtn = Button.builder(
+                            Component.translatable("naruto.gui.ninja_menu.mission.accept"),
+                            b -> {
+                                PacketHandler.sendToServer(new com.sekwah.narutomod.network.c2s.ServerMissionActionPacket(
+                                        com.sekwah.narutomod.network.c2s.ServerMissionActionPacket.Action.ACCEPT_MISSION,
+                                        m.getId()));
+                                this.onClose();
+                            }).bounds(boxX + BOX_WIDTH - 88, rowY + 3, 80, 20).build();
+                    acceptBtn.active = m.canAccept(playerRank);
+                    this.addRenderableWidget(acceptBtn);
+                }
+            }
+        });
+    }
+
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(graphics);
@@ -260,6 +331,8 @@ public class NinjaMenuScreen extends Screen {
                 renderClanTab(graphics, ninjaData, centerX, boxY);
             } else if (this.activeTab == 2) {
                 renderJutsuTab(graphics, ninjaData, centerX, boxY);
+            } else if (this.activeTab == 3) {
+                renderMissionsTab(graphics, ninjaData, centerX, boxY);
             }
         });
 
@@ -632,6 +705,11 @@ public class NinjaMenuScreen extends Screen {
     private void renderJutsuTab(GuiGraphics graphics, INinjaData ninjaData, int centerX, int boxY) {
         int boxX = centerX - BOX_WIDTH / 2;
 
+        if (allAbilities.isEmpty()) {
+            graphics.drawCenteredString(this.font, "§7Henüz öğrenilmiş bir jutsu yok.", centerX, boxY + 60, 0xFFAAAAAA);
+            return;
+        }
+
         int startIndex = jutsuPage * JUTSUS_PER_PAGE;
         int endIndex = Math.min(startIndex + JUTSUS_PER_PAGE, allAbilities.size());
         int maxPages = Math.max(1, (int) Math.ceil((double) allAbilities.size() / JUTSUS_PER_PAGE));
@@ -644,20 +722,19 @@ public class NinjaMenuScreen extends Screen {
 
         for (int i = startIndex; i < endIndex; i++) {
             Ability ability = allAbilities.get(i);
-            boolean unlocked = ninjaData.isAbilityUnlocked(ability);
             ResourceLocation id = ability.getRegistryName();
 
             int cardY = cardStartY + (i - startIndex) * (cardH + cardGap);
 
-            int bgCol = unlocked ? 0xCC112211 : 0xCC221111;
-            int borderCol = unlocked ? 0xFF228822 : 0xFF882222;
+            int bgCol = 0xCC112211;
+            int borderCol = 0xFF228822;
 
             graphics.fill(boxX, cardY, boxX + BOX_WIDTH, cardY + cardH, bgCol);
             graphics.renderOutline(boxX, cardY, BOX_WIDTH, cardH, borderCol);
 
             // Ability Name and Status (Row 1)
             String name = Component.translatable(ability.getTranslationKey()).getString();
-            String status = unlocked ? "§a✔ ÖĞRENİLDİ" : "§c✖ KİLİTLİ";
+            String status = "§a✔ ÖĞRENİLDİ";
             int statusWidth = this.font.width(status);
             int maxNameWidth = BOX_WIDTH - statusWidth - 24;
             String displayName = this.font.width(name) > maxNameWidth ? this.font.plainSubstrByWidth(name, maxNameWidth - 8) + "..." : name;
@@ -665,12 +742,8 @@ public class NinjaMenuScreen extends Screen {
             graphics.drawString(this.font, status, boxX + BOX_WIDTH - statusWidth - 8, cardY + 4, 0xFFFFFFFF);
 
             // Combo & Mastery (Row 2)
-            if (unlocked) {
-                String comboText = formatCombo(ability.defaultCombo());
-                graphics.drawString(this.font, "§eMühür: §b" + comboText, boxX + 8, cardY + 15, 0xFFDDDDDD);
-            } else {
-                graphics.drawString(this.font, "§eMühür: §7??? (Gizli)", boxX + 8, cardY + 15, 0xFFAAAAAA);
-            }
+            String comboText = formatCombo(ability.defaultCombo());
+            graphics.drawString(this.font, "§eMühür: §b" + comboText, boxX + 8, cardY + 15, 0xFFDDDDDD);
 
             int mastery = ninjaData.getMastery(id);
             String masteryText;
@@ -757,6 +830,61 @@ public class NinjaMenuScreen extends Screen {
         graphics.fill(x, y, x + width, y + height, bgCol);
         graphics.fill(x, y, x + (int) (width * ratio), y + height, fillCol);
         graphics.renderOutline(x, y, width, height, 0xFF555566);
+    }
+
+    private void renderMissionsTab(GuiGraphics graphics, INinjaData ninjaData, int centerX, int boxY) {
+        int boxX = centerX - BOX_WIDTH / 2;
+        graphics.fill(boxX, boxY, boxX + BOX_WIDTH, boxY + BOX_HEIGHT, 0xCC11111A);
+        graphics.renderOutline(boxX, boxY, BOX_WIDTH, BOX_HEIGHT, 0xFF555566);
+
+        NinjaRank rank = NinjaRank.fromString(ninjaData.getRank());
+        String headerInfo = "§6Rütbe: §f" + rank.getEnglishName()
+                + "   §eTamamlanan Görev: §a" + ninjaData.getCompletedMissionsCount();
+        graphics.drawString(this.font, headerInfo, boxX + 12, boxY + 12, 0xFFFFFFFF);
+
+        com.sekwah.narutomod.capabilities.NinjaMission active =
+                com.sekwah.narutomod.capabilities.NinjaMission.fromId(ninjaData.getActiveMissionId());
+
+        if (active != null) {
+            int cardY = boxY + 38;
+            boolean completed = active.isCompleted(ninjaData);
+            int borderCol = completed ? 0xFF33AA33 : 0xFFCC9922;
+            graphics.fill(boxX + 10, cardY, boxX + BOX_WIDTH - 10, cardY + 76, 0xCC181824);
+            graphics.renderOutline(boxX + 10, cardY, BOX_WIDTH - 20, 76, borderCol);
+
+            String title = "§6§l[" + active.getRankLabel() + "] §f"
+                    + Component.translatable(active.getTranslationKey()).getString();
+            graphics.drawString(this.font, title, boxX + 20, cardY + 10, 0xFFFFFFFF);
+
+            int progress = active.getProgress(ninjaData);
+            int target = active.getTargetCount();
+            float ratio = target > 0 ? (float) progress / target : 1.0f;
+            String progText = (completed ? "§a✔ Tamamlandı: " : "§eİlerleme: ") + progress + " / " + target
+                    + "   §bÖdül: +" + active.getRewardXp() + " XP";
+            graphics.drawString(this.font, progText, boxX + 20, cardY + 28, 0xFFDDDDDD);
+
+            renderBar(graphics, boxX + 20, cardY + 46, BOX_WIDTH - 40, 10, ratio,
+                    completed ? 0xFF33CC33 : 0xFF3399FF, 0xFF222233);
+        } else {
+            com.sekwah.narutomod.capabilities.NinjaMission[] missions =
+                    com.sekwah.narutomod.capabilities.NinjaMission.values();
+            int startY = boxY + 36;
+            int rowH = 30;
+            for (int i = 0; i < missions.length; i++) {
+                com.sekwah.narutomod.capabilities.NinjaMission m = missions[i];
+                int rowY = startY + i * rowH;
+                boolean eligible = m.canAccept(rank);
+                graphics.fill(boxX + 8, rowY, boxX + BOX_WIDTH - 96, rowY + 26, 0xCC181822);
+                graphics.renderOutline(boxX + 8, rowY, BOX_WIDTH - 104, 26, eligible ? 0xFF447744 : 0xFF553333);
+
+                String mName = (eligible ? "§6[" + m.getRankLabel() + "] §f" : "§8[" + m.getRankLabel() + "] ")
+                        + Component.translatable(m.getTranslationKey()).getString();
+                graphics.drawString(this.font, mName, boxX + 14, rowY + 4, 0xFFFFFFFF);
+                String mMeta = "§7Hedef: " + m.getTargetCount() + " | Ödül: +" + m.getRewardXp() + " XP"
+                        + (eligible ? "" : " §c(" + m.getRequiredRank().getEnglishName() + ")");
+                graphics.drawString(this.font, mMeta, boxX + 14, rowY + 15, 0xFFAAAAAA);
+            }
+        }
     }
 
     @Override

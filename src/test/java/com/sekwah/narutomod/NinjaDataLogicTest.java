@@ -48,8 +48,10 @@ public class NinjaDataLogicTest {
         assertEquals(NinjaRank.ACADEMY_STUDENT, NinjaRank.fromString(ninjaData.getRank()));
         assertFalse(ninjaData.isClanLocked());
         assertEquals("shinobi", ninjaData.getClan().getPath());
-        assertTrue(ninjaData.getChakra() > 0, "Initial chakra should be greater than 0");
-        assertTrue(ninjaData.getStamina() > 0, "Initial stamina should be greater than 0");
+        assertEquals(1000.0f, ninjaData.getMaxChakra(), 0.01f, "Initial maxChakra should be 1000");
+        assertEquals(800.0f, ninjaData.getMaxStamina(), 0.01f, "Initial maxStamina should be 800");
+        assertEquals(1000.0f, ninjaData.getChakra(), 0.01f, "Initial chakra should be 1000");
+        assertEquals(800.0f, ninjaData.getStamina(), 0.01f, "Initial stamina should be 800");
         assertEquals("", ninjaData.getUnlockedJutsusString());
     }
 
@@ -1027,5 +1029,153 @@ public class NinjaDataLogicTest {
         assertEquals(0, com.sekwah.narutomod.entity.ShadowCloneEntity.MODE_FOLLOW);
         assertEquals(1, com.sekwah.narutomod.entity.ShadowCloneEntity.MODE_PATROL);
         assertEquals(2, com.sekwah.narutomod.entity.ShadowCloneEntity.MODE_HOLD);
+    }
+
+    @Test
+    @DisplayName("Verify normal death applies exact 5% penalty without increasing chakra/stamina")
+    public void testNormalDeathPenalty5Percent() {
+        ResourceLocation fireball = new ResourceLocation(NarutoMod.MOD_ID, "fireball");
+        ninjaData.setBaseMaxChakra(1000.0f);
+        ninjaData.setBaseMaxStamina(800.0f);
+        ninjaData.setMastery(fireball, 100);
+        ninjaData.setChakraExp(40.0f);
+        ninjaData.setStaminaExp(20.0f);
+        ninjaData.setShimonPenaltyActive(false);
+
+        NinjaData respawned = new NinjaData(true);
+        respawned.deserializeNBT(ninjaData.serializeNBT());
+        NinjaData.applyDeathPenalty(ninjaData, respawned, false);
+
+        assertEquals(950.0f, respawned.getBaseMaxChakra(), 0.01f);
+        assertEquals(760.0f, respawned.getBaseMaxStamina(), 0.01f);
+        assertEquals(95, respawned.getMastery(fireball));
+        assertEquals(38.0f, respawned.getChakraExp(), 0.01f);
+        assertEquals(19.0f, respawned.getStaminaExp(), 0.01f);
+        assertFalse(respawned.isShimonPenaltyActive());
+    }
+
+    @Test
+    @DisplayName("Verify Hachimon: Shimon death applies exact 25% penalty")
+    public void testEighthGateDeathPenalty25Percent() {
+        ResourceLocation chidori = new ResourceLocation(NarutoMod.MOD_ID, "chidori");
+        ninjaData.setBaseMaxChakra(1000.0f);
+        ninjaData.setBaseMaxStamina(800.0f);
+        ninjaData.setMastery(chidori, 200);
+        ninjaData.setChakraExp(40.0f);
+        ninjaData.setStaminaExp(20.0f);
+        ninjaData.setShimonPenaltyActive(true);
+
+        NinjaData respawned = new NinjaData(true);
+        respawned.deserializeNBT(ninjaData.serializeNBT());
+        NinjaData.applyDeathPenalty(ninjaData, respawned, false);
+
+        assertEquals(750.0f, respawned.getBaseMaxChakra(), 0.01f);
+        assertEquals(600.0f, respawned.getBaseMaxStamina(), 0.01f);
+        assertEquals(150, respawned.getMastery(chidori));
+        assertEquals(30.0f, respawned.getChakraExp(), 0.01f);
+        assertEquals(15.0f, respawned.getStaminaExp(), 0.01f);
+        assertFalse(respawned.isShimonPenaltyActive());
+    }
+
+    @Test
+    @DisplayName("Verify ShadowPossession is locked to Nara clan and clan jutsus are blocked from scrolls")
+    public void testNaraShadowPossessionAndClanScrollRestriction() {
+        com.sekwah.narutomod.abilities.jutsus.ShadowPossessionAbility shadowPossession =
+                new com.sekwah.narutomod.abilities.jutsus.ShadowPossessionAbility();
+        shadowPossession.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "shadow_possession"));
+
+        // Non-Nara cannot activate
+        ninjaData.setClan(new ResourceLocation(NarutoMod.MOD_ID, "shinobi"));
+        assertFalse(shadowPossession.canActivate(null, ninjaData));
+
+        ninjaData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "uchiha"));
+        assertFalse(shadowPossession.canActivate(null, ninjaData));
+
+        // Nara clan can activate
+        ninjaData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "nara"));
+        assertTrue(shadowPossession.canActivate(null, ninjaData));
+
+        // Clan jutsus are rejected by NinjaData.isClanRestrictedJutsu (used by JutsuScrollItem)
+        assertTrue(NinjaData.isClanRestrictedJutsu(
+                new ResourceLocation(NarutoMod.MOD_ID, "shadow_possession")));
+        assertTrue(NinjaData.isClanRestrictedJutsu(
+                new ResourceLocation(NarutoMod.MOD_ID, "amaterasu")));
+        assertTrue(NinjaData.isClanRestrictedJutsu(
+                new ResourceLocation(NarutoMod.MOD_ID, "susanoo_ribcage")));
+        assertFalse(NinjaData.isClanRestrictedJutsu(
+                new ResourceLocation(NarutoMod.MOD_ID, "rasengan")));
+    }
+
+    @Test
+    @DisplayName("Verify Ability.COMPLEXITY_COMPARATOR sorts from simplest (2-key) to most complex (5-key)")
+    public void testAbilityComplexityComparator() {
+        Ability dash = new com.sekwah.narutomod.abilities.utility.ChakraDashAbility();
+        dash.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "chakra_dash")); // 2 keys
+
+        Ability fireball = new com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility();
+        fireball.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "fireball")); // 3 keys
+
+        Ability chidori = new com.sekwah.narutomod.abilities.jutsus.ChidoriAbility();
+        chidori.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "chidori")); // 4 keys
+
+        Ability amaterasu = new AmaterasuAbility();
+        amaterasu.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "amaterasu")); // 5 keys
+
+        java.util.List<Ability> list = new java.util.ArrayList<>(List.of(amaterasu, fireball, chidori, dash));
+        list.sort(Ability.COMPLEXITY_COMPARATOR);
+
+        assertEquals(List.of(dash, fireball, chidori, amaterasu), list);
+    }
+
+    @Test
+    @DisplayName("Verify NinjaMission lifecycle: accept, progress, complete, claim reward, abandon, and NBT")
+    public void testMissionLifecycleAndNBT() {
+        assertEquals("", ninjaData.getActiveMissionId());
+        assertEquals("NONE", ninjaData.getMissionStatus());
+        assertEquals(0, ninjaData.getCompletedMissionsCount());
+
+        // Accept D-Rank Patrol (target 10, reward 25)
+        assertTrue(ninjaData.acceptMission(com.sekwah.narutomod.capabilities.NinjaMission.D_RANK_PATROL));
+        assertEquals("d_rank_patrol", ninjaData.getActiveMissionId());
+        assertEquals("IN_PROGRESS", ninjaData.getMissionStatus());
+        assertEquals(0, ninjaData.getMissionProgress());
+
+        // Advance progress
+        assertFalse(ninjaData.incrementMissionProgress(9));
+        assertEquals(9, ninjaData.getMissionProgress());
+        assertFalse(com.sekwah.narutomod.capabilities.NinjaMission.D_RANK_PATROL.isCompleted(ninjaData));
+
+        // Complete on 10th
+        assertTrue(ninjaData.incrementMissionProgress(1));
+        assertEquals(10, ninjaData.getMissionProgress());
+        assertEquals("COMPLETED", ninjaData.getMissionStatus());
+        assertTrue(com.sekwah.narutomod.capabilities.NinjaMission.D_RANK_PATROL.isCompleted(ninjaData));
+
+        // NBT roundtrip
+        CompoundTag tag = new CompoundTag();
+        ninjaData.saveNBTData(tag);
+        NinjaData restored = new NinjaData(false);
+        restored.loadNBTData(tag);
+        assertEquals("d_rank_patrol", restored.getActiveMissionId());
+        assertEquals(10, restored.getMissionProgress());
+        assertEquals("COMPLETED", restored.getMissionStatus());
+
+        // Claim reward (set below cap so EXP gain is observable)
+        restored.setBaseMaxChakra(200.0f);
+        restored.setBaseMaxStamina(200.0f);
+        assertTrue(restored.claimMissionReward());
+        assertEquals("", restored.getActiveMissionId());
+        assertEquals("NONE", restored.getMissionStatus());
+        assertEquals(1, restored.getCompletedMissionsCount());
+        assertTrue(restored.getChakraExp() > 0.0f);
+        assertTrue(restored.getStaminaExp() > 0.0f);
+
+        // Abandon mission
+        assertTrue(restored.acceptMission(com.sekwah.narutomod.capabilities.NinjaMission.D_RANK_PATROL));
+        restored.incrementMissionProgress(3);
+        restored.abandonMission();
+        assertEquals("", restored.getActiveMissionId());
+        assertEquals(0, restored.getMissionProgress());
+        assertEquals("NONE", restored.getMissionStatus());
     }
 }

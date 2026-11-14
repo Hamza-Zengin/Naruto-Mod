@@ -47,11 +47,6 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 4,
-          "name": "narutomod:scroll_amaterasu"
-        },
-        {
-          "type": "minecraft:item",
           "weight": 3,
           "name": "narutomod:samehada"
         },

@@ -23,6 +23,11 @@ public class LeapAbility extends Ability {
     }
 
     @Override
+    public long defaultCombo() {
+        return 33;
+    }
+
+    @Override
     public boolean logInChat() {
         return false;
     }

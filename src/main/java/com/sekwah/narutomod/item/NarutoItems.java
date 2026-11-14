@@ -73,20 +73,11 @@ public class NarutoItems {
     public static final RegistryObject<Item> SCROLL_KIRIN = ITEMS.register("scroll_kirin", ()
             -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.KIRIN.getId()));
 
-    public static final RegistryObject<Item> SCROLL_AMATERASU = ITEMS.register("scroll_amaterasu", ()
-            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.AMATERASU.getId(), "uchiha"));
-
-    public static final RegistryObject<Item> SCROLL_SUSANOO = ITEMS.register("scroll_susanoo", ()
-            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.SUSANOO_RIBCAGE.getId(), "uchiha"));
-
     public static final RegistryObject<Item> SCROLL_EIGHT_GATES = ITEMS.register("scroll_eight_gates", ()
             -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.EIGHT_GATES.getId()));
 
     public static final RegistryObject<Item> SCROLL_RASENSHURIKEN = ITEMS.register("scroll_rasenshuriken", ()
             -> new JutsuScrollItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), NarutoAbilities.RASENSHURIKEN.getId()));
-
-    public static final RegistryObject<Item> SCROLL_SHADOW_POSSESSION = ITEMS.register("scroll_shadow_possession", ()
-            -> new JutsuScrollItem(new Item.Properties().stacksTo(1).rarity(Rarity.RARE), NarutoAbilities.SHADOW_POSSESSION.getId()));
 
     // Spawn Eggs
     public static final RegistryObject<Item> ROGUE_NINJA_SPAWN_EGG = ITEMS.register("rogue_ninja_spawn_egg", ()
@@ -196,10 +187,7 @@ public class NarutoItems {
                         output.accept(SCROLL_RASENGAN.get());
                         output.accept(SCROLL_CHIDORI.get());
                         output.accept(SCROLL_SHADOW_CLONE.get());
-                        output.accept(SCROLL_SHADOW_POSSESSION.get());
                         output.accept(SCROLL_KIRIN.get());
-                        output.accept(SCROLL_AMATERASU.get());
-                        output.accept(SCROLL_SUSANOO.get());
                         output.accept(SCROLL_EIGHT_GATES.get());
                         output.accept(SCROLL_RASENSHURIKEN.get());
                         output.accept(ROGUE_NINJA_SPAWN_EGG.get());

@@ -39,8 +39,8 @@ public class IchirakuRamenItem extends Item {
             player.heal(8.0F);
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 600, 0));
             player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-                ninjaData.addChakra(60.0f);
-                ninjaData.addStamina(60.0f);
+                ninjaData.addChakra(120.0f);
+                ninjaData.addStamina(120.0f);
             });
             level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.8f, 1.0f);
 

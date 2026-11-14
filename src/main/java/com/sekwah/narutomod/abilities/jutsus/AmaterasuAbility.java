@@ -49,7 +49,7 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 1123; // C - C - V - B
+        return 12321; // C - C - V - B
     }
 
     @Override

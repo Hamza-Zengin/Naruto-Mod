@@ -34,8 +34,8 @@ public class MilitaryRationsPillItem extends Item {
 
         if (!level.isClientSide()) {
             player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-                ninjaData.addChakra(50.0f);
-                ninjaData.addStamina(50.0f);
+                ninjaData.addChakra(100.0f);
+                ninjaData.addStamina(100.0f);
 
                 player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 20 * 30, 0)); // Speed I for 30 seconds
 

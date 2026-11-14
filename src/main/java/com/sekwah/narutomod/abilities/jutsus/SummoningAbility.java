@@ -29,7 +29,7 @@ public class SummoningAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 213;
+        return 132;
     }
 
     @Override

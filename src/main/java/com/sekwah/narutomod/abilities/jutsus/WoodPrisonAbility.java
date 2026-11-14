@@ -44,7 +44,7 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 313; // B - C - B
+        return 2321; // B - C - B
     }
 
     @Override

@@ -63,6 +63,14 @@ public class NarutoCommands {
         return SharedSuggestionProvider.suggestResource(ids, builder);
     };
 
+    private static final SuggestionProvider<CommandSourceStack> SUGGEST_MISSIONS = (ctx, builder) -> {
+        List<String> missionIds = new ArrayList<>();
+        for (com.sekwah.narutomod.capabilities.NinjaMission m : com.sekwah.narutomod.capabilities.NinjaMission.values()) {
+            missionIds.add(m.getId());
+        }
+        return SharedSuggestionProvider.suggest(missionIds, builder);
+    };
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("naruto")
                 .requires(source -> source.hasPermission(2))
@@ -84,7 +92,7 @@ public class NarutoCommands {
                                         .then(Commands.argument("targets", EntityArgument.players())
                                                 .executes(ctx -> addChakra(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), FloatArgumentType.getFloat(ctx, "amount"))))))
                         .then(Commands.literal("max")
-                                .then(Commands.argument("amount", FloatArgumentType.floatArg(100, 500))
+                                .then(Commands.argument("amount", FloatArgumentType.floatArg(100, 1000))
                                         .executes(ctx -> setMaxChakra(ctx.getSource(), Collections.singleton(ctx.getSource().getPlayerOrException()), FloatArgumentType.getFloat(ctx, "amount")))
                                         .then(Commands.argument("targets", EntityArgument.players())
                                                 .executes(ctx -> setMaxChakra(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), FloatArgumentType.getFloat(ctx, "amount")))))))
@@ -106,7 +114,7 @@ public class NarutoCommands {
                                         .then(Commands.argument("targets", EntityArgument.players())
                                                 .executes(ctx -> addStamina(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), FloatArgumentType.getFloat(ctx, "amount"))))))
                         .then(Commands.literal("max")
-                                .then(Commands.argument("amount", FloatArgumentType.floatArg(100, 400))
+                                .then(Commands.argument("amount", FloatArgumentType.floatArg(100, 800))
                                         .executes(ctx -> setMaxStamina(ctx.getSource(), Collections.singleton(ctx.getSource().getPlayerOrException()), FloatArgumentType.getFloat(ctx, "amount")))
                                         .then(Commands.argument("targets", EntityArgument.players())
                                                 .executes(ctx -> setMaxStamina(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"), FloatArgumentType.getFloat(ctx, "amount")))))))
@@ -204,7 +212,20 @@ public class NarutoCommands {
                 .then(Commands.literal("reset")
                         .executes(ctx -> resetData(ctx.getSource(), Collections.singleton(ctx.getSource().getPlayerOrException())))
                         .then(Commands.argument("targets", EntityArgument.players())
-                                .executes(ctx -> resetData(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets"))))));
+                                .executes(ctx -> resetData(ctx.getSource(), EntityArgument.getPlayers(ctx, "targets")))))
+                .then(Commands.literal("mission")
+                        .then(Commands.literal("assign")
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .then(Commands.argument("missionId", StringArgumentType.word()).suggests(SUGGEST_MISSIONS)
+                                                .executes(ctx -> assignMission(ctx.getSource(),
+                                                        EntityArgument.getPlayer(ctx, "target"),
+                                                        StringArgumentType.getString(ctx, "missionId"))))))
+                        .then(Commands.literal("complete")
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .executes(ctx -> completeMission(ctx.getSource(), EntityArgument.getPlayer(ctx, "target")))))
+                        .then(Commands.literal("reset")
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .executes(ctx -> resetMission(ctx.getSource(), EntityArgument.getPlayer(ctx, "target")))))));
     }
 
     // === CHAKRA HANDLERS ===
@@ -547,5 +568,45 @@ public class NarutoCommands {
             });
         }
         return players.size();
+    }
+
+    private static int assignMission(CommandSourceStack source, ServerPlayer player, String missionId) {
+        com.sekwah.narutomod.capabilities.NinjaMission mission = com.sekwah.narutomod.capabilities.NinjaMission.fromId(missionId);
+        if (mission == null) {
+            source.sendFailure(Component.literal("Geçersiz görev ID'si: " + missionId).withStyle(ChatFormatting.RED));
+            return 0;
+        }
+        player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
+            data.acceptMission(mission);
+            data.updateServerData(player);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için görev atandı: " + mission.getId())
+                    .withStyle(ChatFormatting.GREEN), true);
+        });
+        return 1;
+    }
+
+    private static int completeMission(CommandSourceStack source, ServerPlayer player) {
+        player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
+            com.sekwah.narutomod.capabilities.NinjaMission active = com.sekwah.narutomod.capabilities.NinjaMission.fromId(data.getActiveMissionId());
+            if (active == null) {
+                source.sendFailure(Component.literal(player.getScoreboardName() + " için aktif görev yok.").withStyle(ChatFormatting.RED));
+                return;
+            }
+            data.setMissionProgress(active.getTargetCount());
+            data.updateServerData(player);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " görevi tamamlandı olarak işaretlendi: " + active.getId())
+                    .withStyle(ChatFormatting.GOLD), true);
+        });
+        return 1;
+    }
+
+    private static int resetMission(CommandSourceStack source, ServerPlayer player) {
+        player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
+            data.abandonMission();
+            data.updateServerData(player);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " aktif görevi sıfırlandı.")
+                    .withStyle(ChatFormatting.YELLOW), true);
+        });
+        return 1;
     }
 }

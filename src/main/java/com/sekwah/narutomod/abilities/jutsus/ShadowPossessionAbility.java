@@ -40,7 +40,7 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
 
     @Override
     public long defaultCombo() {
-        return 331; // B - B - C
+        return 2132; // B - B - C
     }
 
     @Override
@@ -49,9 +49,23 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
     }
 
     @Override
+    public boolean canActivate(Player player, INinjaData ninjaData) {
+        if (ninjaData == null || ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("nara")) {
+            if (player != null) {
+                player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
+                        Component.literal("Nara").withStyle(ChatFormatting.DARK_GRAY)), true);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        boolean isNara = ninjaData.getClan() != null && ninjaData.getClan().getPath().equalsIgnoreCase("nara");
-        float baseCost = isNara ? 22.0f : 32.0f;
+        if (!canActivate(player, ninjaData)) {
+            return false;
+        }
+        float baseCost = 22.0f;
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
         float cost = baseCost * getChakraCostMultiplier(mastery);
         return tryConsume(player, ninjaData, cost, 0, 40);

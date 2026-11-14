@@ -9,16 +9,6 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "weight": 10,
-          "name": "narutomod:scroll_amaterasu"
-        },
-        {
-          "type": "minecraft:item",
-          "weight": 8,
-          "name": "narutomod:scroll_susanoo"
-        },
-        {
-          "type": "minecraft:item",
           "weight": 8,
           "name": "narutomod:scroll_chidori"
         },

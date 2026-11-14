@@ -54,6 +54,18 @@ public class ShadowCloneEntity extends PathfinderMob {
     private final java.util.List<net.minecraft.resources.ResourceLocation> unlockedCloneJutsus = new java.util.ArrayList<>();
     private int cloneJutsuCooldown = 0;
     private boolean fastJutsuCooldown = false;
+    private boolean decoyMode = false;
+
+    public void setDecoyMode(boolean decoyMode) {
+        this.decoyMode = decoyMode;
+        if (decoyMode) {
+            this.setNoAi(true);
+        }
+    }
+
+    public boolean isDecoyMode() {
+        return this.decoyMode;
+    }
 
     public ShadowCloneEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
@@ -368,7 +380,7 @@ public class ShadowCloneEntity extends PathfinderMob {
     }
 
     public void poof() {
-        if (this.level() instanceof ServerLevel serverLevel) {
+        if (!this.decoyMode && this.level() instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ParticleTypes.POOF, this.getX(), this.getY() + 0.8, this.getZ(),
                     25, 0.4, 0.5, 0.4, 0.05);
             serverLevel.playSound(null, this.blockPosition(), NarutoSounds.CLONE_POOF.get(), SoundSource.PLAYERS, 1.0f, 1.0f);

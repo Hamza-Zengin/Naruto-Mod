@@ -77,28 +77,7 @@ public class NinjaCapabilityHandler {
                 event.getEntity().getCapability(NINJA_DATA).ifPresent(future -> {
                     future.deserializeNBT(original.serializeNBT());
                     if (event.isWasDeath()) {
-                        boolean usedShimon = original.isShimonPenaltyActive()
-                                || original.getToggleAbilityData().getAbilitiesHashSet().contains(
-                                        com.sekwah.narutomod.abilities.NarutoAbilities.EIGHT_GATES_DEATH.getId());
-                        double retentionRate = usedShimon ? 0.75D : 0.95D;
-
-                        java.util.Map<net.minecraft.resources.ResourceLocation, Integer> masteries = future.getJutsuMasteryMap();
-                        for (java.util.Map.Entry<net.minecraft.resources.ResourceLocation, Integer> entry : new java.util.HashMap<>(masteries).entrySet()) {
-                            int current = entry.getValue();
-                            if (current > 0) {
-                                int reduced = Math.max(0, (int) Math.floor(current * retentionRate));
-                                future.setMastery(entry.getKey(), reduced);
-                            }
-                        }
-
-                        float newMaxChakra = Math.max(100.0F, (float) Math.floor(original.getBaseMaxChakra() * retentionRate));
-                        float newMaxStamina = Math.max(100.0F, (float) Math.floor(original.getBaseMaxStamina() * retentionRate));
-                        future.setMaxChakra(newMaxChakra);
-                        future.setMaxStamina(newMaxStamina);
-                        future.setChakra(newMaxChakra);
-                        future.setStamina(newMaxStamina);
-                        future.setShimonPenaltyActive(false);
-                        future.getToggleAbilityData().getAbilitiesHashSet().clear();
+                        applyDeathPenalty(original, future);
                     }
                 });
             });
@@ -107,6 +86,12 @@ public class NinjaCapabilityHandler {
                 event.getOriginal().invalidateCaps();
             }
         }
+    }
+
+    public static void applyDeathPenalty(INinjaData original, INinjaData future) {
+        boolean hasEighthGateToggle = original.getToggleAbilityData().getAbilitiesHashSet().contains(
+                com.sekwah.narutomod.abilities.NarutoAbilities.EIGHT_GATES_DEATH.getId());
+        NinjaData.applyDeathPenalty(original, future, hasEighthGateToggle);
     }
 
     @SubscribeEvent
@@ -122,6 +107,11 @@ public class NinjaCapabilityHandler {
     public static void onLivingDeath(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
         if (event.getEntity() instanceof Player player) {
             player.getCapability(NINJA_DATA).ifPresent(ninjaData -> {
+                if (ninjaData.isEighthGateActive()
+                        || ninjaData.getToggleAbilityData().hasToggleAbility(
+                                com.sekwah.narutomod.abilities.NarutoAbilities.EIGHT_GATES_DEATH.getId())) {
+                    ninjaData.setShimonPenaltyActive(true);
+                }
                 if (ninjaData.getCurrentlyChanneledAbility() != null) {
                     ninjaData.setCurrentlyChanneledAbility(player, null);
                 }
@@ -134,6 +124,26 @@ public class NinjaCapabilityHandler {
                     ninjaData.addRogueNinjaDefeated();
                 } else if (event.getEntity() instanceof AkatsukiNinjaEntity) {
                     ninjaData.addAkatsukiNinjaDefeated();
+                }
+
+                NinjaMission active = NinjaMission.fromId(ninjaData.getActiveMissionId());
+                if (active != null && NinjaMission.MissionStatus.fromString(ninjaData.getMissionStatus()) == NinjaMission.MissionStatus.IN_PROGRESS) {
+                    boolean matches = switch (active.getTargetType()) {
+                        case KILL_ENEMY -> !(event.getEntity() instanceof Player)
+                                && !(event.getEntity() instanceof com.sekwah.narutomod.entity.ShadowCloneEntity);
+                        case KILL_ROGUE -> event.getEntity() instanceof RogueNinjaEntity;
+                        case KILL_AKATSUKI -> event.getEntity() instanceof AkatsukiNinjaEntity;
+                        case CAST_JUTSU -> false;
+                    };
+                    if (matches) {
+                        boolean justCompleted = ninjaData.incrementMissionProgress(1);
+                        if (justCompleted) {
+                            killer.sendSystemMessage(net.minecraft.network.chat.Component.translatable(
+                                    "naruto.mission.completed",
+                                    net.minecraft.network.chat.Component.translatable(active.getTranslationKey()))
+                                    .withStyle(net.minecraft.ChatFormatting.GOLD, net.minecraft.ChatFormatting.BOLD));
+                        }
+                    }
                 }
             });
         }

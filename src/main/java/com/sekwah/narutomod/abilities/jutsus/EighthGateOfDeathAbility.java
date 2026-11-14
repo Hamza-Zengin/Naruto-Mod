@@ -43,7 +43,7 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
 
     @Override
     public long defaultCombo() {
-        return 23311; // V - B - B - C - C
+        return 31213; // V - B - B - C - C
     }
 
     @Override
@@ -133,6 +133,7 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
 
             // Stamina exhausted: fatal thermal incineration begins
             if (ninjaData.getStamina() <= 0.01f && !player.isCreative()) {
+                ninjaData.setShimonPenaltyActive(true);
                 if (ticksActive % 20 == 0) {
                     player.displayClientMessage(Component.translatable("jutsu.eight_gates_death.hp_drain")
                             .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
@@ -159,6 +160,7 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
 
             // Once the Gate of Death is closed or extinguishes: inevitable fatal decay
             if (!player.isCreative() && !player.isSpectator()) {
+                ninjaData.setShimonPenaltyActive(true);
                 player.addEffect(new MobEffectInstance(MobEffects.WITHER, 1200, 2, false, true, true)); // Fatal decay
                 player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 600, 3));
                 player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 600, 3));

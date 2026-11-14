@@ -29,7 +29,7 @@ public class ChakraDashAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 22;
+        return 13;
     }
 
     @Override

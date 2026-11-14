@@ -48,7 +48,7 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 2113; // V - C - C - B
+        return 13231; // V - C - C - B
     }
 
     @Override

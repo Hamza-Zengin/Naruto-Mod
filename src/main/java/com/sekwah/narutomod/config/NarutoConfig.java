@@ -24,10 +24,10 @@ public class NarutoConfig {
     public static final ForgeConfigSpec MOD_CONFIG;
 
     private static final ForgeConfigSpec.DoubleValue CONFIG_MAX_CHAKRA;
-    public static float maxChakra = 100.0f;
+    public static float maxChakra = 1000.0f;
 
     private static final ForgeConfigSpec.DoubleValue CONFIG_MAX_STAMINA;
-    public static float maxStamina = 100.0f;
+    public static float maxStamina = 800.0f;
 
     private static final ForgeConfigSpec.DoubleValue CONFIG_CHAKRA_REGEN_RATE;
     public static float chakraRegenRate = 0.05f;
@@ -62,6 +62,24 @@ public class NarutoConfig {
     private static final ForgeConfigSpec.IntValue CONFIG_SEAL_TIMEOUT_MS;
     public static int sealTimeoutMs = 1500;
 
+    private static final ForgeConfigSpec.DoubleValue CONFIG_KAWARIMI_MIN_DISTANCE;
+    public static double kawarimiMinDistance = 5.0d;
+
+    private static final ForgeConfigSpec.DoubleValue CONFIG_KAWARIMI_MAX_DISTANCE;
+    public static double kawarimiMaxDistance = 14.0d;
+
+    private static final ForgeConfigSpec.IntValue CONFIG_KAWARIMI_MIN_COOLDOWN;
+    public static int kawarimiMinCooldownTicks = 60;
+
+    private static final ForgeConfigSpec.IntValue CONFIG_KAWARIMI_MAX_COOLDOWN;
+    public static int kawarimiMaxCooldownTicks = 200;
+
+    private static final ForgeConfigSpec.IntValue CONFIG_KAWARIMI_MIN_CAST;
+    public static int kawarimiMinCastTicks = 2;
+
+    private static final ForgeConfigSpec.IntValue CONFIG_KAWARIMI_MAX_CAST;
+    public static int kawarimiMaxCastTicks = 15;
+
     static {
         ForgeConfigSpec.Builder configBuilder = new ForgeConfigSpec.Builder();
 
@@ -75,10 +93,10 @@ public class NarutoConfig {
         configBuilder.comment("Stuff such as regen rates and maximum (will likely change with updates, e.g. stats system)").push(ENERGY_BARS);
 
         CONFIG_MAX_CHAKRA = configBuilder.comment("Max Chakra")
-                .defineInRange("maxChakra",  100F ,  0d, Integer.MAX_VALUE);
+                .defineInRange("maxChakra",  1000F ,  0d, Integer.MAX_VALUE);
 
         CONFIG_MAX_STAMINA = configBuilder.comment("Max Stamina")
-                .defineInRange("maxStamina",  100F ,  0d, Integer.MAX_VALUE);
+                .defineInRange("maxStamina",  800F ,  0d, Integer.MAX_VALUE);
 
         CONFIG_CHAKRA_REGEN_RATE = configBuilder.comment("Chakra regeneration per tick")
                 .defineInRange("chakraRegenRate", 0.05d, 0.001d, 100d);
@@ -93,6 +111,24 @@ public class NarutoConfig {
 
         CONFIG_SEAL_TIMEOUT_MS = configBuilder.comment("Seal typing timeout in milliseconds (1000ms = 1s = 20 ticks)")
                 .defineInRange("sealTimeoutMs", 1500, 100, 10000);
+
+        CONFIG_KAWARIMI_MIN_DISTANCE = configBuilder.comment("Kawarimi minimum teleport distance at max mastery")
+                .defineInRange("kawarimiMinDistance", 5.0d, 1.0d, 64.0d);
+
+        CONFIG_KAWARIMI_MAX_DISTANCE = configBuilder.comment("Kawarimi maximum teleport distance at 0 mastery")
+                .defineInRange("kawarimiMaxDistance", 14.0d, 1.0d, 64.0d);
+
+        CONFIG_KAWARIMI_MIN_COOLDOWN = configBuilder.comment("Kawarimi minimum cooldown in ticks at max mastery")
+                .defineInRange("kawarimiMinCooldownTicks", 60, 0, 2400);
+
+        CONFIG_KAWARIMI_MAX_COOLDOWN = configBuilder.comment("Kawarimi maximum cooldown in ticks at 0 mastery")
+                .defineInRange("kawarimiMaxCooldownTicks", 200, 0, 2400);
+
+        CONFIG_KAWARIMI_MIN_CAST = configBuilder.comment("Kawarimi minimum cast delay in ticks at max mastery")
+                .defineInRange("kawarimiMinCastTicks", 2, 0, 200);
+
+        CONFIG_KAWARIMI_MAX_CAST = configBuilder.comment("Kawarimi maximum cast delay in ticks at 0 mastery")
+                .defineInRange("kawarimiMaxCastTicks", 15, 0, 200);
 
         configBuilder.pop();
 
@@ -151,6 +187,12 @@ public class NarutoConfig {
                 .get();
         waterWalkSpeed = CONFIG_WATER_WALK_SPEED.get().floatValue();
         sealTimeoutMs = CONFIG_SEAL_TIMEOUT_MS.get();
+        kawarimiMinDistance = CONFIG_KAWARIMI_MIN_DISTANCE.get();
+        kawarimiMaxDistance = CONFIG_KAWARIMI_MAX_DISTANCE.get();
+        kawarimiMinCooldownTicks = CONFIG_KAWARIMI_MIN_COOLDOWN.get();
+        kawarimiMaxCooldownTicks = CONFIG_KAWARIMI_MAX_COOLDOWN.get();
+        kawarimiMinCastTicks = CONFIG_KAWARIMI_MIN_CAST.get();
+        kawarimiMaxCastTicks = CONFIG_KAWARIMI_MAX_CAST.get();
     }
 
     @SubscribeEvent

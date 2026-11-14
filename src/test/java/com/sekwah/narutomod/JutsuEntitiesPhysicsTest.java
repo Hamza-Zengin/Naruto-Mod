@@ -77,4 +77,46 @@ public class JutsuEntitiesPhysicsTest {
         assertTrue(rendererContent.contains("EntityRenderers.register(NarutoEntities.MUD_WALL.get()"));
         assertTrue(rendererContent.contains("EntityRenderers.register(NarutoEntities.WOOD_PRISON.get()"));
     }
+
+    @Test
+    @DisplayName("Verify Kawarimi spiral search avoids walls, mastery scales, and no logs/particles exist")
+    public void testKawarimiSafeOpenSpaceAndStealth() throws IOException {
+        // 1. Mastery scaling: distance, cooldown, and cast duration decrease as mastery goes 0 -> 100
+        double dist0 = com.sekwah.narutomod.abilities.jutsus.KawarimiJutsuAbility.getScaledTeleportDistance(0);
+        double dist100 = com.sekwah.narutomod.abilities.jutsus.KawarimiJutsuAbility.getScaledTeleportDistance(100);
+        assertTrue(dist0 > dist100, "Kawarimi distance must decrease from max (0 mastery) to min (100 mastery)");
+
+        int cd0 = com.sekwah.narutomod.abilities.jutsus.KawarimiJutsuAbility.getScaledCooldownTicks(0);
+        int cd100 = com.sekwah.narutomod.abilities.jutsus.KawarimiJutsuAbility.getScaledCooldownTicks(100);
+        assertTrue(cd0 > cd100, "Kawarimi cooldown must decrease as mastery increases");
+
+        com.sekwah.narutomod.abilities.jutsus.KawarimiJutsuAbility kawarimi =
+                new com.sekwah.narutomod.abilities.jutsus.KawarimiJutsuAbility();
+        assertTrue(kawarimi.getScaledActivationDelay(0) > kawarimi.getScaledActivationDelay(100),
+                "Kawarimi cast duration must decrease as mastery increases");
+
+        // 2. Spiral search must never return a walled/blocked coordinate and must find nearest open block
+        net.minecraft.core.BlockPos anchor = new net.minecraft.core.BlockPos(10, 64, 10);
+        net.minecraft.core.BlockPos openSpot = new net.minecraft.core.BlockPos(12, 64, 10);
+        net.minecraft.core.BlockPos found = com.sekwah.narutomod.abilities.jutsus.KawarimiJutsuAbility.findSafeOpenBlockPos(
+                pos -> pos.equals(openSpot),
+                anchor,
+                6
+        );
+        assertEquals(openSpot, found, "Spiral search must skip blocked anchor and return nearest safe open spot");
+
+        // When entire area is solid wall, must return null (cancel teleport instead of suffocating player)
+        net.minecraft.core.BlockPos none = com.sekwah.narutomod.abilities.jutsus.KawarimiJutsuAbility.findSafeOpenBlockPos(
+                pos -> false,
+                anchor,
+                6
+        );
+        assertNull(none, "Must return null when no safe open space exists");
+
+        // 3. Source check: zero OAK_LOG, zero particles, zero sounds
+        String src = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/abilities/jutsus/KawarimiJutsuAbility.java"));
+        assertFalse(src.contains("OAK_LOG"), "Kawarimi must not place OAK_LOG");
+        assertFalse(src.contains("sendParticles"), "Kawarimi must not spawn particles");
+        assertFalse(src.contains("playSound"), "Kawarimi must not play sounds");
+    }
 }

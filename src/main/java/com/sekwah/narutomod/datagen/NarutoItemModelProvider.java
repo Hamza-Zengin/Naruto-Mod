@@ -19,11 +19,8 @@ public class NarutoItemModelProvider extends ItemModelProvider {
         simpleItemWithTexture("scroll_chidori", "item/scrolls/scroll_chidori");
         simpleItemWithTexture("scroll_shadow_clone", "item/scrolls/scroll_shadow_clone");
         simpleItemWithTexture("scroll_kirin", "item/scrolls/scroll_kirin");
-        simpleItemWithTexture("scroll_amaterasu", "item/scrolls/scroll_amaterasu");
-        simpleItemWithTexture("scroll_susanoo", "item/scrolls/scroll_susanoo");
         simpleItemWithTexture("scroll_eight_gates", "item/scrolls/scroll_eight_gates");
         simpleItemWithTexture("scroll_rasenshuriken", "item/scrolls/scroll_rasenshuriken");
-        simpleItemWithTexture("scroll_shadow_possession", "item/scrolls/scroll_shadow_possession");
         simpleItemWithTexture("jutsu_scroll", "item/scrolls/scroll_rasengan");
 
         // --- Basic Items & Weapons (2D items) ---

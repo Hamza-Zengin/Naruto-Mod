@@ -42,7 +42,7 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
 
     @Override
     public long defaultCombo() {
-        return 333;
+        return 2312;
     }
 
     @Override

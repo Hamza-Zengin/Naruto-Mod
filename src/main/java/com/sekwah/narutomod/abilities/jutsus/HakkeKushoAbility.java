@@ -30,7 +30,7 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 221;
+        return 3212;
     }
 
     @Override

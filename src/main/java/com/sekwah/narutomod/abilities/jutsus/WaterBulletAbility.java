@@ -32,7 +32,7 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 312;
+        return 212;
     }
 
     @Override

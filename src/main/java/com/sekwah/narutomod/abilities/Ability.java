@@ -107,6 +107,25 @@ public abstract class Ability {
         return seals;
     }
 
+    public static int getComboKeyLength(Ability a) {
+        if (a == null || a.defaultCombo() <= 0) return 0;
+        return Long.toString(a.defaultCombo()).length();
+    }
+
+    /**
+     * Sorts abilities from simplest to most complex:
+     * 1) Combo key length (ascending)
+     * 2) Total default resource cost: chakra + stamina (ascending)
+     * 3) Required rank level (ascending)
+     * 4) Registry name (deterministic alphabetical order)
+     */
+    public static final java.util.Comparator<Ability> COMPLEXITY_COMPARATOR =
+            java.util.Comparator
+                    .comparingInt(Ability::getComboKeyLength)
+                    .thenComparingDouble(a -> a.getDefaultChakraCost() + a.getDefaultStaminaCost())
+                    .thenComparingInt(a -> a.getRequiredRank() != null ? a.getRequiredRank().getLevel() : 0)
+                    .thenComparing(a -> a.getRegistryName() != null ? a.getRegistryName().toString() : "");
+
     /**
      * Checks if the entered seal list matches the ability's expected seal sequence or defaultCombo digits.
      */

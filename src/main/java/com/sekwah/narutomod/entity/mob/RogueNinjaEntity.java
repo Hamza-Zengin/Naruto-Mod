@@ -146,8 +146,5 @@ public class RogueNinjaEntity extends Monster {
         if (this.random.nextFloat() < 0.25f) {
             this.spawnAtLocation(new ItemStack(NarutoItems.MILITARY_RATIONS_PILL.get(), 1));
         }
-        if (this.random.nextFloat() < 0.08f) {
-            this.spawnAtLocation(new ItemStack(NarutoItems.SCROLL_SHADOW_POSSESSION.get(), 1));
-        }
     }
 }

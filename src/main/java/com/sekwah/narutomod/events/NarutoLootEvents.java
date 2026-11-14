@@ -47,10 +47,7 @@ public class NarutoLootEvents {
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_RASENGAN.get()).setWeight(5))
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_CHIDORI.get()).setWeight(5))
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_SHADOW_CLONE.get()).setWeight(5))
-                    .add(LootItem.lootTableItem(NarutoItems.SCROLL_SHADOW_POSSESSION.get()).setWeight(4))
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_KIRIN.get()).setWeight(3))
-                    .add(LootItem.lootTableItem(NarutoItems.SCROLL_AMATERASU.get()).setWeight(2))
-                    .add(LootItem.lootTableItem(NarutoItems.SCROLL_SUSANOO.get()).setWeight(2))
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_EIGHT_GATES.get()).setWeight(2))
                     .add(LootItem.lootTableItem(NarutoItems.SCROLL_RASENSHURIKEN.get()).setWeight(2));
 

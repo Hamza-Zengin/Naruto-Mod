@@ -35,7 +35,7 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 112;
+        return 2123;
     }
 
     @Override

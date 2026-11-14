@@ -36,7 +36,7 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
 
     @Override
     public long defaultCombo() {
-        return 1223; // C - V - V - B (cvvb)
+        return 12132; // C - V - V - B (cvvb)
     }
 
     @Override

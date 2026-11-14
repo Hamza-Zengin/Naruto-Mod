@@ -31,7 +31,7 @@ public class TsukuyomiAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 111;
+        return 32132;
     }
 
     @Override

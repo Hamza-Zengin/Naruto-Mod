@@ -75,6 +75,18 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     @Sync
     private Map<ResourceLocation, Integer> jutsuMastery = new HashMap<>();
 
+    @Sync
+    private String activeMissionId = "";
+
+    @Sync
+    private int missionProgress = 0;
+
+    @Sync
+    private int completedMissionsCount = 0;
+
+    @Sync
+    private String missionStatus = "NONE";
+
     private boolean creativeMode = false;
 
     @Sync(minTicks = 1)
@@ -106,8 +118,8 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     public NinjaData(boolean isServer) {
         if (isServer) {
-            this.maxChakra = NarutoConfig.maxChakra > 0 ? NarutoConfig.maxChakra : 100.0f;
-            this.maxStamina = NarutoConfig.maxStamina > 0 ? NarutoConfig.maxStamina : 100.0f;
+            this.maxChakra = NarutoConfig.maxChakra > 0 ? NarutoConfig.maxChakra : 1000.0f;
+            this.maxStamina = NarutoConfig.maxStamina > 0 ? NarutoConfig.maxStamina : 800.0f;
             this.chakra = this.getMaxChakra();
             this.stamina = this.getMaxStamina();
             this.clan = new ResourceLocation(NarutoMod.MOD_ID, "shinobi");
@@ -225,14 +237,14 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public void setBaseMaxChakra(float amount) {
-        this.maxChakra = Math.min(Math.max(100f, amount), 500f);
+        this.maxChakra = Math.min(Math.max(100f, amount), 1000f);
         float max = this.getMaxChakra();
         if (this.chakra > max) this.chakra = max;
     }
 
     @Override
     public void setBaseMaxStamina(float amount) {
-        this.maxStamina = Math.min(Math.max(100f, amount), 400f);
+        this.maxStamina = Math.min(Math.max(100f, amount), 800f);
         float max = this.getMaxStamina();
         if (this.stamina > max) this.stamina = max;
     }
@@ -306,6 +318,20 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
                 || path.equals("eight_gates") || path.equals("eight_gates_death");
     }
 
+    public static boolean isClanRestrictedJutsu(ResourceLocation id) {
+        if (id == null) return false;
+        String path = id.getPath();
+        return path.equals("amaterasu")
+                || path.equals("susanoo_ribcage")
+                || path.equals("sharingan")
+                || path.equals("tsukuyomi")
+                || path.equals("byakugan")
+                || path.equals("hakke_kusho")
+                || path.equals("bone_dance")
+                || path.equals("wood_prison")
+                || path.equals("shadow_possession");
+    }
+
     @Override
     public boolean isAbilityUnlocked(ResourceLocation abilityId) {
         if (abilityId == null) return false;
@@ -343,6 +369,17 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             if (abilityId.getPath().equals("byakugan")) {
                 NinjaRank playerRank = NinjaRank.fromString(this.getRank());
                 return this.clan != null && this.clan.getPath().equals("hyuga") && playerRank.getLevel() >= NinjaRank.GENIN.getLevel();
+            }
+            if (abilityId.getPath().equals("shadow_possession")) {
+                if (this.clan == null || !this.clan.getPath().equals("nara")) return false;
+            } else if (abilityId.getPath().equals("tsukuyomi")) {
+                if (this.clan == null || !this.clan.getPath().equals("uchiha")) return false;
+            } else if (abilityId.getPath().equals("hakke_kusho")) {
+                if (this.clan == null || !this.clan.getPath().equals("hyuga")) return false;
+            } else if (abilityId.getPath().equals("bone_dance")) {
+                if (this.clan == null || !this.clan.getPath().equals("kaguya")) return false;
+            } else if (abilityId.getPath().equals("wood_prison")) {
+                if (this.clan == null || !this.clan.getPath().equals("senju")) return false;
             }
 
             // Scroll-only advanced & secret jutsus
@@ -506,7 +543,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public void addChakraExp(float amount) {
-        if (this.maxChakra >= 500f) {
+        if (this.maxChakra >= 1000f) {
             this.chakraExp = 0;
             return;
         }
@@ -517,9 +554,9 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         } else {
             neededExp = 55.0f + (this.maxChakra - 150.0f) * 1.10f;
         }
-        if (this.chakraExp >= neededExp && this.maxChakra < 500f) {
+        if (this.chakraExp >= neededExp && this.maxChakra < 1000f) {
             this.chakraExp -= neededExp;
-            this.maxChakra = Math.min(this.maxChakra + 5.0f, 500.0f);
+            this.maxChakra = Math.min(this.maxChakra + 5.0f, 1000.0f);
             if (this.chakra > this.getMaxChakra()) this.chakra = this.getMaxChakra();
         }
     }
@@ -536,15 +573,15 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
 
     @Override
     public void addStaminaExp(float amount) {
-        if (this.maxStamina >= 400f) {
+        if (this.maxStamina >= 800f) {
             this.staminaExp = 0;
             return;
         }
         this.staminaExp += amount;
         float neededExp = 50.0f + (this.maxStamina - 100.0f) * 1.10f;
-        if (this.staminaExp >= neededExp && this.maxStamina < 400f) {
+        if (this.staminaExp >= neededExp && this.maxStamina < 800f) {
             this.staminaExp -= neededExp;
-            this.maxStamina = Math.min(this.maxStamina + 5.0f, 400.0f);
+            this.maxStamina = Math.min(this.maxStamina + 5.0f, 800.0f);
             if (this.stamina > this.getMaxStamina()) this.stamina = this.getMaxStamina();
         }
     }
@@ -634,6 +671,11 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         } else {
             this.jutsusCastCount++;
         }
+        NinjaMission active = NinjaMission.fromId(this.activeMissionId);
+        if (active != null && active.getTargetType() == NinjaMission.TargetType.CAST_JUTSU
+                && NinjaMission.MissionStatus.fromString(this.missionStatus) == NinjaMission.MissionStatus.IN_PROGRESS) {
+            incrementMissionProgress(1);
+        }
     }
 
     @Override
@@ -675,6 +717,10 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         this.rogueNinjasDefeated = 0;
         this.akatsukiNinjasDefeated = 0;
         this.jutsusCastCount = 0;
+        this.activeMissionId = "";
+        this.missionProgress = 0;
+        this.completedMissionsCount = 0;
+        this.missionStatus = "NONE";
         this.unlockedJutsus = "";
         this.jutsuMastery.clear();
         this.activeJutsusFlag = 0;
@@ -952,6 +998,10 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         nbt.putByteArray(ACTIVE_SEALS_TAG, seals);
         nbt.putInt(SEAL_TIMEOUT_TAG, this.sealTimeout);
         nbt.putInt(CHAKRA_REGEN_COOLDOWN_TAG, this.chakraRegenInfo.cooldown);
+        nbt.putString("activeMissionId", this.activeMissionId != null ? this.activeMissionId : "");
+        nbt.putInt("missionProgress", this.missionProgress);
+        nbt.putInt("completedMissionsCount", this.completedMissionsCount);
+        nbt.putString("missionStatus", this.missionStatus != null ? this.missionStatus : "NONE");
 
         CompoundTag masteryTag = new CompoundTag();
         for (Map.Entry<ResourceLocation, Integer> entry : this.jutsuMastery.entrySet()) {
@@ -1042,6 +1092,18 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         }
         if (compoundTag.contains(SEAL_TIMEOUT_TAG)) {
             this.sealTimeout = compoundTag.getInt(SEAL_TIMEOUT_TAG);
+        }
+        if (compoundTag.contains("activeMissionId")) {
+            this.activeMissionId = compoundTag.getString("activeMissionId");
+        }
+        if (compoundTag.contains("missionProgress")) {
+            this.missionProgress = Math.max(0, compoundTag.getInt("missionProgress"));
+        }
+        if (compoundTag.contains("completedMissionsCount")) {
+            this.completedMissionsCount = Math.max(0, compoundTag.getInt("completedMissionsCount"));
+        }
+        if (compoundTag.contains("missionStatus")) {
+            this.missionStatus = compoundTag.getString("missionStatus");
         }
         if (compoundTag.contains(CHAKRA_REGEN_COOLDOWN_TAG)) {
             this.chakraRegenInfo.cooldown = compoundTag.getInt(CHAKRA_REGEN_COOLDOWN_TAG);
@@ -1217,5 +1279,134 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
                 this.clearSeals();
             }
         }
+    }
+
+    /**
+     * Applies death penalty (-5% normally, -25% when killed by Eighth Gate / Hachimon: Shimon)
+     * without re-adding clan/rank bonuses on top of existing stats.
+     */
+    public static void applyDeathPenalty(INinjaData original, INinjaData future, boolean hasEighthGateToggle) {
+        if (original == null || future == null) {
+            return;
+        }
+        boolean isEighthGateDeath = original.isShimonPenaltyActive()
+                || original.isEighthGateActive()
+                || hasEighthGateToggle;
+        float multiplier = isEighthGateDeath ? 0.75f : 0.95f;
+
+        float newBaseMaxChakra = Math.max(100.0f, original.getBaseMaxChakra() * multiplier);
+        float newBaseMaxStamina = Math.max(100.0f, original.getBaseMaxStamina() * multiplier);
+
+        future.setBaseMaxChakra(newBaseMaxChakra);
+        future.setBaseMaxStamina(newBaseMaxStamina);
+        future.setChakra(future.getMaxChakra());
+        future.setStamina(future.getMaxStamina());
+
+        future.setChakraExp(original.getChakraExp() * multiplier);
+        future.setStaminaExp(original.getStaminaExp() * multiplier);
+
+        for (Map.Entry<ResourceLocation, Integer> entry : original.getJutsuMasteryMap().entrySet()) {
+            int penalized = (int) Math.floor(entry.getValue() * multiplier);
+            future.setMastery(entry.getKey(), Math.max(0, penalized));
+        }
+
+        future.setShimonPenaltyActive(false);
+        future.setEighthGateActive(false);
+        future.setEightGatesActive(false);
+        future.clearActiveHandJutsu();
+        if (future.getToggleAbilityData() != null) {
+            future.getToggleAbilityData().getAbilitiesHashSet().clear();
+        }
+    }
+
+    @Override
+    public String getActiveMissionId() {
+        return this.activeMissionId != null ? this.activeMissionId : "";
+    }
+
+    @Override
+    public void setActiveMissionId(String missionId) {
+        this.activeMissionId = missionId != null ? missionId : "";
+    }
+
+    @Override
+    public int getMissionProgress() {
+        return this.missionProgress;
+    }
+
+    @Override
+    public void setMissionProgress(int progress) {
+        this.missionProgress = Math.max(0, progress);
+        NinjaMission active = NinjaMission.fromId(this.activeMissionId);
+        if (active != null && this.missionProgress >= active.getTargetCount()) {
+            this.missionProgress = active.getTargetCount();
+            this.missionStatus = NinjaMission.MissionStatus.COMPLETED.name();
+        }
+    }
+
+    @Override
+    public int getCompletedMissionsCount() {
+        return this.completedMissionsCount;
+    }
+
+    @Override
+    public void setCompletedMissionsCount(int count) {
+        this.completedMissionsCount = Math.max(0, count);
+    }
+
+    @Override
+    public String getMissionStatus() {
+        return this.missionStatus != null ? this.missionStatus : NinjaMission.MissionStatus.NONE.name();
+    }
+
+    @Override
+    public void setMissionStatus(String status) {
+        this.missionStatus = status != null ? status : NinjaMission.MissionStatus.NONE.name();
+    }
+
+    @Override
+    public boolean acceptMission(NinjaMission mission) {
+        if (mission == null) return false;
+        this.activeMissionId = mission.getId();
+        this.missionProgress = 0;
+        this.missionStatus = NinjaMission.MissionStatus.IN_PROGRESS.name();
+        return true;
+    }
+
+    @Override
+    public boolean incrementMissionProgress(int amount) {
+        NinjaMission active = NinjaMission.fromId(this.activeMissionId);
+        if (active == null || NinjaMission.MissionStatus.fromString(this.missionStatus) != NinjaMission.MissionStatus.IN_PROGRESS) {
+            return false;
+        }
+        this.missionProgress = Math.min(active.getTargetCount(), this.missionProgress + Math.max(0, amount));
+        if (this.missionProgress >= active.getTargetCount()) {
+            this.missionStatus = NinjaMission.MissionStatus.COMPLETED.name();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void abandonMission() {
+        this.activeMissionId = "";
+        this.missionProgress = 0;
+        this.missionStatus = NinjaMission.MissionStatus.NONE.name();
+    }
+
+    @Override
+    public boolean claimMissionReward() {
+        NinjaMission active = NinjaMission.fromId(this.activeMissionId);
+        if (active == null) return false;
+        if (NinjaMission.MissionStatus.fromString(this.missionStatus) != NinjaMission.MissionStatus.COMPLETED
+                && this.missionProgress < active.getTargetCount()) {
+            return false;
+        }
+        float reward = active.getRewardXp();
+        this.addChakraExp(reward * 0.5f);
+        this.addStaminaExp(reward * 0.5f);
+        this.completedMissionsCount++;
+        abandonMission();
+        return true;
     }
 }

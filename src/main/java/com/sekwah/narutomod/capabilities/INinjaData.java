@@ -144,5 +144,18 @@ public interface INinjaData extends INBTSerializable<Tag> {
     void clearSeals();
     int getSealTimeout();
     void tick();
+
+    String getActiveMissionId();
+    void setActiveMissionId(String missionId);
+    int getMissionProgress();
+    void setMissionProgress(int progress);
+    int getCompletedMissionsCount();
+    void setCompletedMissionsCount(int count);
+    String getMissionStatus();
+    void setMissionStatus(String status);
+    boolean acceptMission(NinjaMission mission);
+    boolean incrementMissionProgress(int amount);
+    void abandonMission();
+    boolean claimMissionReward();
 }
 

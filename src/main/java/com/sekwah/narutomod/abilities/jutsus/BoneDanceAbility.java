@@ -41,7 +41,7 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 132; // C - B - V
+        return 1213; // C - B - V
     }
 
     @Override

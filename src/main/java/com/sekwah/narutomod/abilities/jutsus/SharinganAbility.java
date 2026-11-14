@@ -108,7 +108,7 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
 
     @Override
     public long defaultCombo() {
-        return 111;
+        return 1231;
     }
 
     @Override

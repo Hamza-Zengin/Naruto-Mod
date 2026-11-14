@@ -50,6 +50,10 @@ public class JutsuScrollItem extends Item {
         this(properties, null, null);
     }
 
+    public static boolean isClanRestrictedJutsu(@Nullable ResourceLocation id) {
+        return com.sekwah.narutomod.capabilities.NinjaData.isClanRestrictedJutsu(id);
+    }
+
     public ResourceLocation getTargetJutsu(ItemStack stack) {
         if (this.fixedJutsuId != null) {
             return this.fixedJutsuId;
@@ -90,6 +94,13 @@ public class JutsuScrollItem extends Item {
                 Ability ability = NarutoAbilities.getAbility(targetJutsu);
                 if (ability == null) {
                     player.sendSystemMessage(Component.translatable("jutsu.scroll.invalid").withStyle(ChatFormatting.RED));
+                    return;
+                }
+
+                // Clan-restricted jutsus can only be awakened via clan progression, never via scrolls
+                if (isClanRestrictedJutsu(targetJutsu)) {
+                    player.sendSystemMessage(Component.translatable("jutsu.scroll.invalid").withStyle(ChatFormatting.RED));
+                    level.playSound(null, player.blockPosition(), SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1.0f, 1.0f);
                     return;
                 }
 

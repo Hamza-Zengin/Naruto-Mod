@@ -40,7 +40,7 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 213;
+        return 1312;
     }
 
     @Override

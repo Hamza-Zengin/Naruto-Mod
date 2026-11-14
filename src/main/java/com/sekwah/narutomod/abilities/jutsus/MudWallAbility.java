@@ -32,7 +32,7 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 321; // B - V - C
+        return 232; // B - V - C
     }
 
     @Override

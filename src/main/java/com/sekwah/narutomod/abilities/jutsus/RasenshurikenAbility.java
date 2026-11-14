@@ -51,7 +51,7 @@ public class RasenshurikenAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 1122; // C - C - V - V
+        return 21312; // C - C - V - V
     }
 
     @Override

@@ -180,10 +180,8 @@ public class AkatsukiNinjaEntity extends Monster {
         float roll = this.random.nextFloat();
         if (roll < 0.35f) {
             this.spawnAtLocation(new ItemStack(NarutoItems.SCROLL_RASENSHURIKEN.get(), 1));
-        } else if (roll < 0.60f) {
+        } else if (roll < 0.65f) {
             this.spawnAtLocation(new ItemStack(NarutoItems.SCROLL_KIRIN.get(), 1));
-        } else if (roll < 0.80f) {
-            this.spawnAtLocation(new ItemStack(NarutoItems.SCROLL_AMATERASU.get(), 1));
         }
     }
 }

@@ -86,7 +86,7 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
 
     @Override
     public long defaultCombo() {
-        return 2331; // V - B - B - C
+        return 3132; // V - B - B - C
     }
 
     @Override
