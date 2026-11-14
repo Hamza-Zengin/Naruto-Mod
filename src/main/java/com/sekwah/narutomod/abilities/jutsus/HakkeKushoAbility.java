@@ -78,6 +78,15 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
         Vec3 look = player.getLookAngle();
         serverLevel.playSound(null, player.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 0.9f, 1.6f);
 
+        com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
+                new com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket(
+                        new net.minecraft.resources.ResourceLocation("narutomod", "hakke_kusho"),
+                        eyePos, look, byakuganOn ? 1.3f : 1.0f, 0xA8E6FF),
+                player);
+        com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
+                new com.sekwah.narutomod.network.s2c.ClientCameraShakePacket(0.45f, 8),
+                player);
+
         for (int i = 1; i <= 14; i++) {
             Vec3 pos = eyePos.add(look.scale(i));
             serverLevel.sendParticles(ParticleTypes.SONIC_BOOM, pos.x, pos.y, pos.z, 1, 0.0, 0.0, 0.0, 0.0);

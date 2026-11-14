@@ -54,6 +54,10 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    maven {
+        name = "Illusive Soulworks"
+        url = "https://maven.theillusivec4.top/"
+    }
 }
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
@@ -146,13 +150,18 @@ dependencies {
     implementation 'org.spongepowered:mixin:0.8.5'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    // SekCLib core dependency (deobfuscated forge 1.20.1 library)
-    implementation fg.deobf(files("libs/SekCLib-1.20.1-${project.sekclib_version}-deobf.jar"))
+    // SekCLib core dependency (Composite Build when ../SekCLib exists, otherwise deobf artifact)
+    if (file('../SekCLib').exists()) {
+        implementation("com.sekwah:SekCLib:1.20.1-${project.sekclib_version}") {
+            exclude group: 'net.minecraftforge', module: 'forge'
+        }
+    } else {
+        implementation fg.deobf("com.sekwah:SekCLib:1.20.1-${project.sekclib_version}")
+    }
 
     // Curios API (soft dependency)
-    compileOnly files("libs/curios-forge-1.20.1-api.jar")
-    runtimeOnly files("libs/curios-forge-1.20.1-api.jar")
-    testImplementation files("libs/curios-forge-1.20.1-api.jar")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
 
     // Unit testing
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
@@ -174,6 +183,7 @@ mixin {
 jar {
     finalizedBy 'reobfJar'
     archiveClassifier = ''
+    exclude 'com/sekwah/narutomod/datagen/**'
     manifest {
         attributes([
                 "Specification-Title": project.modid,

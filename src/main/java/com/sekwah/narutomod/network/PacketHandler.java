@@ -7,6 +7,8 @@ import com.sekwah.narutomod.network.c2s.ServerJutsuCastingPacket;
 import com.sekwah.narutomod.network.c2s.ServerRankUpPacket;
 import com.sekwah.narutomod.network.c2s.ServerSelectClanPacket;
 import com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket;
+import com.sekwah.narutomod.network.s2c.ClientCameraShakePacket;
+import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -14,6 +16,8 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
+
+import java.util.Optional;
 
 public class PacketHandler {
 
@@ -34,6 +38,10 @@ public class PacketHandler {
         NARUTO_CHANNEL.registerMessage(103, ServerSelectClanPacket.class, ServerSelectClanPacket::encode, ServerSelectClanPacket::decode, ServerSelectClanPacket.Handler::handle);
         NARUTO_CHANNEL.registerMessage(104, ServerRankUpPacket.class, ServerRankUpPacket::encode, ServerRankUpPacket::decode, ServerRankUpPacket.Handler::handle);
         NARUTO_CHANNEL.registerMessage(105, ServerTriggerHandJutsuPacket.class, ServerTriggerHandJutsuPacket::encode, ServerTriggerHandJutsuPacket::decode, ServerTriggerHandJutsuPacket.Handler::handle);
+
+        // Server to client packets
+        NARUTO_CHANNEL.registerMessage(200, ClientJutsuEffectPacket.class, ClientJutsuEffectPacket::encode, ClientJutsuEffectPacket::decode, ClientJutsuEffectPacket.Handler::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        NARUTO_CHANNEL.registerMessage(201, ClientCameraShakePacket.class, ClientCameraShakePacket::encode, ClientCameraShakePacket::decode, ClientCameraShakePacket.Handler::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 
     public static void sendToServer(Object obj) {
@@ -43,6 +51,10 @@ public class PacketHandler {
     // These are for handling from server side to players.
     public static void sendToPlayer(Object obj, ServerPlayer player) {
         NARUTO_CHANNEL.sendTo(obj, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    public static void sendToTrackingAndSelf(Object msg, Entity target) {
+        NARUTO_CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> target), msg);
     }
 
     public static void sentToTrackingAndSelf(Object obj, ServerPlayer player) {

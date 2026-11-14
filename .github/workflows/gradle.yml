@@ -10,9 +10,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Naruto-Mod
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Naruto-Mod
+        uses: actions/checkout@v4
+        with:
+          path: Naruto-Mod
+
+      - name: Checkout SekCLib (Composite Build)
+        uses: actions/checkout@v4
+        with:
+          repository: Hamza-Zengin/SekCLib
+          path: SekCLib
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
@@ -53,16 +65,16 @@ jobs:
         with:
           name: NarutoMod-1.20.1-v12.2
           path: |
-            build/libs/NarutoMod-*.jar
-            !build/libs/*-deobf.jar
-            !build/libs/*-sources.jar
+            Naruto-Mod/build/libs/NarutoMod-*.jar
+            !Naruto-Mod/build/libs/*-deobf.jar
+            !Naruto-Mod/build/libs/*-sources.jar
 
       - name: Upload Dev & Source Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: NarutoMod-1.20.1-v12.2-dev
           path: |
-            build/libs/*-deobf.jar
-            build/libs/*-sources.jar
+            Naruto-Mod/build/libs/*-deobf.jar
+            Naruto-Mod/build/libs/*-sources.jar
 
 

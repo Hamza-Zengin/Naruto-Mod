@@ -1,5 +1,15 @@
 {
   "name": "narutomod:akatsuki_hideout",
   "fallback": "minecraft:empty",
-  "elements": []
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "narutomod:akatsuki_hideout",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
 }
