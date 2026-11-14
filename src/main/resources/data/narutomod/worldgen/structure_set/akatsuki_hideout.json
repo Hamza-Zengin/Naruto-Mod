@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "narutomod:akatsuki_hideout",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 847291034,
+    "spacing": 48,
+    "separation": 16
+  }
+}
