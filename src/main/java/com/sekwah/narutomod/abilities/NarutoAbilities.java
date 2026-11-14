@@ -58,6 +58,8 @@ public class NarutoAbilities {
     public static final RegistryObject<BoneDanceAbility> BONE_DANCE = ABILITY.register("bone_dance", BoneDanceAbility::new);
     public static final RegistryObject<ShadowPossessionAbility> SHADOW_POSSESSION = ABILITY.register("shadow_possession", ShadowPossessionAbility::new);
     public static final RegistryObject<RasenshurikenAbility> RASENSHURIKEN = ABILITY.register("rasenshuriken", RasenshurikenAbility::new);
+    public static final RegistryObject<TsukuyomiAbility> TSUKUYOMI = ABILITY.register("tsukuyomi", TsukuyomiAbility::new);
+    public static final RegistryObject<HakkeKushoAbility> HAKKE_KUSHO = ABILITY.register("hakke_kusho", HakkeKushoAbility::new);
 
     public static void register(IEventBus eventBus) {
         ABILITY.register(eventBus);
