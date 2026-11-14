@@ -250,5 +250,13 @@
   "jutsu.eight_gates.stage.kyumon_wonder": "7.ª Puerta: Puerta del Asombro (Kyōmon)",
   "jutsu.eight_gates.opened": "[¡%s Abierta!]",
   "jutsu.eight_gates.closed": "Ocho Puertas cerradas. La fatiga muscular comienza.",
-  "jutsu.eight_gates.stamina_exhausted": "¡Resistencia agotada! Las Ocho Puertas se cerraron automáticamente."
+  "jutsu.eight_gates.stamina_exhausted": "¡Resistencia agotada! Las Ocho Puertas se cerraron automáticamente.",
+  "naruto.clone.order": "§6Orden de Clon de Sombra: §a[%s]",
+  "naruto.clone.mode.patrol": "Patrulla Agresiva",
+  "naruto.clone.mode.hold": "Mantener Posición",
+  "naruto.clone.mode.follow": "Seguir y Proteger",
+  "naruto.gui.ninja_menu.mastery.level": "§eNivel de Maestría: §aNv.%s §7(%s pts)",
+  "naruto.gui.ninja_menu.mastery.chakra_discount": "§bAhorro de Chakra: %s",
+  "naruto.gui.ninja_menu.mastery.power_bonus": "§6Bono de Poder: %s",
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dReducción de Enfriamiento: %s"
 }

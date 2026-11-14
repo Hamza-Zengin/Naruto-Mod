@@ -173,6 +173,7 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
                         serverLevel, targetPos.x, targetPos.y, targetPos.z,
                         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_AMATERASU_PILLAR,
                         90, player.getYRot());
+        amaterasu3D.setCasterUUID(player.getUUID());
         if (directEntity != null) {
             amaterasu3D.setTargetId(directEntity.getId());
         }

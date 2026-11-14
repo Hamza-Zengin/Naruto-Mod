@@ -200,15 +200,15 @@ public class ShadowCloneEntity extends PathfinderMob {
                     clone.setCommandMode(nextMode);
                 }
 
-                String modeName;
-                switch (nextMode) {
-                    case MODE_PATROL -> modeName = "Saldırgan Devriye";
-                    case MODE_HOLD -> modeName = "Konumu Koru";
-                    default -> modeName = "Takip ve Koruma";
-                }
+                String modeKey = switch (nextMode) {
+                    case MODE_PATROL -> "naruto.clone.mode.patrol";
+                    case MODE_HOLD -> "naruto.clone.mode.hold";
+                    default -> "naruto.clone.mode.follow";
+                };
 
                 player.displayClientMessage(
-                        net.minecraft.network.chat.Component.literal("§6Gölge Klonu Emri: §a[" + modeName + "]"),
+                        net.minecraft.network.chat.Component.translatable("naruto.clone.order",
+                                net.minecraft.network.chat.Component.translatable(modeKey)),
                         true
                 );
                 this.level().playSound(null, player.blockPosition(), net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.8f, 1.2f);

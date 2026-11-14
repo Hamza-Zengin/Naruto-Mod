@@ -250,5 +250,13 @@
   "jutsu.eight_gates.stage.kyumon_wonder": "7th Gate: Gate of Wonder (Kyōmon)",
   "jutsu.eight_gates.opened": "[%s Opened!]",
   "jutsu.eight_gates.closed": "Eight Gates closed. Muscle fatigue sets in.",
-  "jutsu.eight_gates.stamina_exhausted": "Stamina exhausted! Eight Gates automatically closed."
+  "jutsu.eight_gates.stamina_exhausted": "Stamina exhausted! Eight Gates automatically closed.",
+  "naruto.clone.order": "§6Shadow Clone Order: §a[%s]",
+  "naruto.clone.mode.patrol": "Aggressive Patrol",
+  "naruto.clone.mode.hold": "Hold Position",
+  "naruto.clone.mode.follow": "Follow & Guard",
+  "naruto.gui.ninja_menu.mastery.level": "§eMastery Level: §aLv.%s §7(%s pts)",
+  "naruto.gui.ninja_menu.mastery.chakra_discount": "§bChakra Efficiency: %s",
+  "naruto.gui.ninja_menu.mastery.power_bonus": "§6Power Bonus: %s",
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dCooldown Reduction: %s"
 }

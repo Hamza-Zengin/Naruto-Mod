@@ -72,19 +72,8 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
         waterBullet.setDeltaMovement(look.scale(1.1 * Math.min(1.4, powerMult)));
         serverLevel.addFreshEntity(waterBullet);
 
-        for (int i = 1; i <= 8; i++) {
-            Vec3 pos = player.position().add(look.scale(i)).add(0, player.getEyeHeight() * 0.7, 0);
-            serverLevel.sendParticles(ParticleTypes.SPLASH, pos.x, pos.y, pos.z, 20, 0.4, 0.4, 0.4, 0.1);
-            serverLevel.sendParticles(ParticleTypes.DRIPPING_WATER, pos.x, pos.y, pos.z, 10, 0.3, 0.3, 0.3, 0.05);
-
-            AABB box = new AABB(pos.x - 1.2, pos.y - 1.2, pos.z - 1.2, pos.x + 1.2, pos.y + 1.2, pos.z + 1.2);
-            List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, box, e -> e != player && e.isAlive());
-            for (LivingEntity target : targets) {
-                target.hurt(player.damageSources().drown(), bulletDamage);
-                target.clearFire();
-                target.setDeltaMovement(look.scale(1.5 * powerMult).add(0, 0.3 * powerMult, 0));
-                target.hurtMarked = true;
-            }
-        }
+        // Spawn initial splash particles at launch point
+        serverLevel.sendParticles(ParticleTypes.SPLASH, spawnPos.x, spawnPos.y, spawnPos.z, 20, 0.4, 0.4, 0.4, 0.1);
+        serverLevel.sendParticles(ParticleTypes.DRIPPING_WATER, spawnPos.x, spawnPos.y, spawnPos.z, 10, 0.3, 0.3, 0.3, 0.05);
     }
 }

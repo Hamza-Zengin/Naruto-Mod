@@ -50,18 +50,11 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
 
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        if (checkCooldown(player, ninjaData, this.getTranslationKey())) {
-            return false;
-        }
         boolean isNara = ninjaData.getClan() != null && ninjaData.getClan().getPath().equalsIgnoreCase("nara");
         float baseCost = isNara ? 22.0f : 32.0f;
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
         float cost = baseCost * getChakraCostMultiplier(mastery);
-        if (!tryConsume(player, ninjaData, cost, 0, 40)) {
-            return false;
-        }
-        registerCooldown(ninjaData, this.getTranslationKey());
-        return true;
+        return tryConsume(player, ninjaData, cost, 0, 40);
     }
 
     public static int getScaledHoldDuration(int mastery) {

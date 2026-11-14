@@ -250,5 +250,13 @@
   "jutsu.eight_gates.stage.kyumon_wonder": "7º Portão: Portão do Espanto (Kyōmon)",
   "jutsu.eight_gates.opened": "[%s Aberto!]",
   "jutsu.eight_gates.closed": "Oito Portões fechados. A fadiga muscular começa.",
-  "jutsu.eight_gates.stamina_exhausted": "Estamina esgotada! Os Oito Portões fecharam automaticamente."
+  "jutsu.eight_gates.stamina_exhausted": "Estamina esgotada! Os Oito Portões fecharam automaticamente.",
+  "naruto.clone.order": "§6Ordem do Clone das Sombras: §a[%s]",
+  "naruto.clone.mode.patrol": "Patrulha Agressiva",
+  "naruto.clone.mode.hold": "Manter Posição",
+  "naruto.clone.mode.follow": "Seguir e Proteger",
+  "naruto.gui.ninja_menu.mastery.level": "§eNível de Maestria: §aNv.%s §7(%s pts)",
+  "naruto.gui.ninja_menu.mastery.chakra_discount": "§bEconomia de Chakra: %s",
+  "naruto.gui.ninja_menu.mastery.power_bonus": "§6Bônus de Poder: %s",
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dRedução de Recarga: %s"
 }

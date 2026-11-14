@@ -112,6 +112,7 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
                         serverLevel, targetPos.x, targetPos.y, targetPos.z,
                         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_KIRIN_DRAGON,
                         38, player.getYRot());
+        kirinDragon.setCasterUUID(player.getUUID());
         serverLevel.addFreshEntity(kirinDragon);
 
         // Lightning strike

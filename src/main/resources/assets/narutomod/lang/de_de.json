@@ -250,5 +250,13 @@
   "jutsu.eight_gates.stage.kyumon_wonder": "7. Tor: Tor des Wunders (Kyōmon)",
   "jutsu.eight_gates.opened": "[%s Geöffnet!]",
   "jutsu.eight_gates.closed": "Acht Tore geschlossen. Muskelschwäche setzt ein.",
-  "jutsu.eight_gates.stamina_exhausted": "Ausdauer erschöpft! Acht Tore wurden automatisch geschlossen."
+  "jutsu.eight_gates.stamina_exhausted": "Ausdauer erschöpft! Acht Tore wurden automatisch geschlossen.",
+  "naruto.clone.order": "§6Schattendoppelgänger-Befehl: §a[%s]",
+  "naruto.clone.mode.patrol": "Aggressive Patrouille",
+  "naruto.clone.mode.hold": "Position halten",
+  "naruto.clone.mode.follow": "Folgen & Beschützen",
+  "naruto.gui.ninja_menu.mastery.level": "§eMeisterschaftsstufe: §aLv.%s §7(%s Pkt.)",
+  "naruto.gui.ninja_menu.mastery.chakra_discount": "§bChakra-Ersparnis: %s",
+  "naruto.gui.ninja_menu.mastery.power_bonus": "§6Kraftbonus: %s",
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dAbklingzeit-Reduktion: %s"
 }

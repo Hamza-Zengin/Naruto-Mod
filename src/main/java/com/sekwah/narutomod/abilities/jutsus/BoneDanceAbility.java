@@ -66,14 +66,7 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
                     Component.literal("Kaguya").withStyle(ChatFormatting.WHITE)), true);
             return false;
         }
-        if (checkCooldown(player, ninjaData, this.getTranslationKey())) {
-            return false;
-        }
-        if (!tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 45)) {
-            return false;
-        }
-        registerCooldown(ninjaData, this.getTranslationKey());
-        return true;
+        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 45);
     }
 
     @Override
@@ -100,9 +93,9 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
                         serverLevel, origin.x, origin.y, origin.z,
                         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_BONE_FOREST,
                         65, player.getYRot());
+        boneForest.setCasterUUID(player.getUUID());
         serverLevel.addFreshEntity(boneForest);
 
-        float spikeDmg = this.getDamage(ninjaData);
         for (int ring = 1; ring <= 3; ring++) {
             final int rIndex = ring;
             ninjaData.scheduleDelayedTickEvent(p -> {
@@ -121,22 +114,6 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
                         sLevel.sendParticles(boneParticle, sx, origin.y + h, sz, 3, 0.08, 0.15, 0.08, 0.02);
                     }
                     sLevel.sendParticles(ParticleTypes.CRIT, sx, origin.y + 1.8, sz, 2, 0.05, 0.1, 0.05, 0.02);
-                }
-
-                AABB hitBox = new AABB(origin.x - radius - 1.2, origin.y - 1.0, origin.z - radius - 1.2,
-                        origin.x + radius + 1.2, origin.y + 3.0, origin.z + radius + 1.2);
-                List<LivingEntity> enemies = sLevel.getEntitiesOfClass(LivingEntity.class, hitBox,
-                        e -> e.isAlive() && e != p && !e.getUUID().equals(p.getUUID())
-                                && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(p, e));
-
-                for (LivingEntity enemy : enemies) {
-                    double dist = Math.sqrt(enemy.distanceToSqr(origin.x, origin.y, origin.z));
-                    if (Math.abs(dist - radius) <= 1.8D) {
-                        enemy.hurt(p.damageSources().playerAttack(p), spikeDmg);
-                        enemy.setDeltaMovement(enemy.getDeltaMovement().x, 0.52D, enemy.getDeltaMovement().z);
-                        enemy.hurtMarked = true;
-                        enemy.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 1));
-                    }
                 }
             }, (ring - 1) * 8);
         }

@@ -69,14 +69,7 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
                     Component.literal("Senju").withStyle(ChatFormatting.GREEN)), true);
             return false;
         }
-        if (checkCooldown(player, ninjaData, this.getTranslationKey())) {
-            return false;
-        }
-        if (!tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 40)) {
-            return false;
-        }
-        registerCooldown(ninjaData, this.getTranslationKey());
-        return true;
+        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 40);
     }
 
     @Override
@@ -95,53 +88,10 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
         serverLevel.playSound(null, BlockPos.containing(center), SoundEvents.ROOTED_DIRT_BREAK, SoundSource.PLAYERS, 1.8f, 0.6f);
         serverLevel.playSound(null, BlockPos.containing(center), SoundEvents.CHERRY_WOOD_PLACE, SoundSource.PLAYERS, 1.8f, 0.7f);
 
-        // Erupt 3D Intertwined Wood Prison Root Dome & Pillars
+        // Erupt 3D Intertwined Wood Prison Root Dome & Pillars (WoodPrisonEntity handles periodic constriction damage & healing)
         WoodPrisonEntity woodPrison = WoodPrisonEntity.create(
                 serverLevel, center.x, center.y, center.z,
                 prisonLife, player.getYRot(), player.getUUID());
         serverLevel.addFreshEntity(woodPrison);
-
-        BlockParticleOption woodParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.MANGROVE_WOOD.defaultBlockState());
-        BlockParticleOption leafParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.AZALEA_LEAVES.defaultBlockState());
-
-        float waveDamage = this.getDamage(ninjaData);
-        // Spawn 5 waves of root constriction over 3.5 seconds
-        for (int wave = 0; wave < 5; wave++) {
-            final int w = wave;
-            ninjaData.scheduleDelayedTickEvent(p -> {
-                if (!(p.level() instanceof ServerLevel sLevel)) return;
-
-                // Spiraling root pillars & emerald spore aura
-                for (int i = 0; i < 16; i++) {
-                    double angle = (i * Math.PI / 8.0) + (w * 0.4);
-                    double r = 1.5 + (i % 3) * 1.3;
-                    double px = center.x + Math.cos(angle) * r;
-                    double pz = center.z + Math.sin(angle) * r;
-                    for (double h = 0; h <= 2.4; h += 0.6) {
-                        sLevel.sendParticles(woodParticle, px, center.y + h, pz, 2, 0.15, 0.2, 0.15, 0.05);
-                    }
-                    sLevel.sendParticles(leafParticle, px, center.y + 1.5, pz, 1, 0.2, 0.2, 0.2, 0.02);
-                }
-
-                AABB trapBox = new AABB(center.x - 5.0, center.y - 2.0, center.z - 5.0,
-                        center.x + 5.0, center.y + 3.5, center.z + 5.0);
-                List<LivingEntity> targets = sLevel.getEntitiesOfClass(LivingEntity.class, trapBox,
-                        e -> e.isAlive() && e != p);
-
-                for (LivingEntity target : targets) {
-                    // Entangle and pull toward root nexus
-                    Vec3 pull = center.subtract(target.position()).scale(0.25);
-                    target.setDeltaMovement(pull.x, -0.25, pull.z);
-                    target.hurtMarked = true;
-                    target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 35, 5));
-                    target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 0));
-                    target.hurt(p.damageSources().playerAttack(p), waveDamage);
-
-                    // Senju life-force siphon
-                    p.heal(0.6f * powerMult);
-                }
-                sLevel.playSound(null, BlockPos.containing(center), SoundEvents.VINE_STEP, SoundSource.PLAYERS, 1.4f, 0.7f);
-            }, wave * 14);
-        }
     }
 }

@@ -250,5 +250,13 @@
   "jutsu.eight_gates.stage.kyumon_wonder": "7ème Porte : Porte de la Merveille (Kyōmon)",
   "jutsu.eight_gates.opened": "[%s Ouverte !]",
   "jutsu.eight_gates.closed": "Huit Portes fermées. La fatigue musculaire s'installe.",
-  "jutsu.eight_gates.stamina_exhausted": "Endurance épuisée ! Les Huit Portes se sont refermées automatiquement."
+  "jutsu.eight_gates.stamina_exhausted": "Endurance épuisée ! Les Huit Portes se sont refermées automatiquement.",
+  "naruto.clone.order": "§6Ordre du Clone de l'Ombre : §a[%s]",
+  "naruto.clone.mode.patrol": "Patrouille Agressive",
+  "naruto.clone.mode.hold": "Tenir la Position",
+  "naruto.clone.mode.follow": "Suivre et Protéger",
+  "naruto.gui.ninja_menu.mastery.level": "§eNiveau de Maîtrise : §aNiv.%s §7(%s pts)",
+  "naruto.gui.ninja_menu.mastery.chakra_discount": "§bÉconomie de Chakra : %s",
+  "naruto.gui.ninja_menu.mastery.power_bonus": "§6Bonus de Puissance : %s",
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dRéduction de Recharge : %s"
 }

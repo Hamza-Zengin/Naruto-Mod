@@ -39,7 +39,7 @@ Ninja Menüsü (`J` tuşu) üzerinden klanınızı seçin ve shinobi mirasınız
   - Tahta Hapishanesi (*Mokuton: Jukai Kōtan*)
   - Kemik Dansı (*Sawarabi no Mai*)
 - **Kekkei Genkai ve Yasak Sanatlar**:
-  - Sharingan & Byakugan (HD 2048x2048 göz küresi dokuları)
+  - Sharingan & Byakugan (32x32 özel iris katmanı ve Mangekyō Sharingan dokuları)
   - Amaterasu (sönmeyen siyah alevler)
   - Susanoo Kaburga Kalkanı (Susanoo Ribcage)
   - Kirin (Gök gürültüsü ejderhası)

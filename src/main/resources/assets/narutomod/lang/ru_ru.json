@@ -250,5 +250,13 @@
   "jutsu.eight_gates.stage.kyumon_wonder": "7-е Врата: Врата Чуда (Кёмон)",
   "jutsu.eight_gates.opened": "[%s Открыты!]",
   "jutsu.eight_gates.closed": "Восемь Врат закрыты. Наступает мышечная усталость.",
-  "jutsu.eight_gates.stamina_exhausted": "Выносливость иссякла! Восемь Врат автоматически закрылись."
+  "jutsu.eight_gates.stamina_exhausted": "Выносливость иссякла! Восемь Врат автоматически закрылись.",
+  "naruto.clone.order": "§6Приказ Теневому Клону: §a[%s]",
+  "naruto.clone.mode.patrol": "Агрессивный патруль",
+  "naruto.clone.mode.hold": "Удерживать позицию",
+  "naruto.clone.mode.follow": "Следовать и защищать",
+  "naruto.gui.ninja_menu.mastery.level": "§eУровень мастерства: §aУр.%s §7(%s очк.)",
+  "naruto.gui.ninja_menu.mastery.chakra_discount": "§bЭкономия чакры: %s",
+  "naruto.gui.ninja_menu.mastery.power_bonus": "§6Бонус силы: %s",
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dСокращение перезарядки: %s"
 }

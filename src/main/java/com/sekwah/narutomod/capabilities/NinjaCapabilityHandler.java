@@ -79,7 +79,7 @@ public class NinjaCapabilityHandler {
                     if (event.isWasDeath()) {
                         boolean usedShimon = original.isShimonPenaltyActive()
                                 || original.getToggleAbilityData().getAbilitiesHashSet().contains(
-                                        com.sekwah.narutomod.abilities.NarutoAbilities.EIGHT_GATES.getId());
+                                        com.sekwah.narutomod.abilities.NarutoAbilities.EIGHT_GATES_DEATH.getId());
                         double retentionRate = usedShimon ? 0.75D : 0.95D;
 
                         java.util.Map<net.minecraft.resources.ResourceLocation, Integer> masteries = future.getJutsuMasteryMap();
@@ -91,8 +91,8 @@ public class NinjaCapabilityHandler {
                             }
                         }
 
-                        float newMaxChakra = Math.max(100.0F, (float) Math.floor(original.getMaxChakra() * retentionRate));
-                        float newMaxStamina = Math.max(100.0F, (float) Math.floor(original.getMaxStamina() * retentionRate));
+                        float newMaxChakra = Math.max(100.0F, (float) Math.floor(original.getBaseMaxChakra() * retentionRate));
+                        float newMaxStamina = Math.max(100.0F, (float) Math.floor(original.getBaseMaxStamina() * retentionRate));
                         future.setMaxChakra(newMaxChakra);
                         future.setMaxStamina(newMaxStamina);
                         future.setChakra(newMaxChakra);

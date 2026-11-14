@@ -250,5 +250,13 @@
   "jutsu.eight_gates.stage.kyumon_wonder": "7. Kapı: Şok Kapısı (Kyōmon)",
   "jutsu.eight_gates.opened": "[%s Açıldı!]",
   "jutsu.eight_gates.closed": "Sekiz Kapı kapatıldı. Kas yorgunluğu başladı.",
-  "jutsu.eight_gates.stamina_exhausted": "Kondisyon tükendi! Sekiz Kapı otomatik olarak kapatıldı."
+  "jutsu.eight_gates.stamina_exhausted": "Kondisyon tükendi! Sekiz Kapı otomatik olarak kapatıldı.",
+  "naruto.clone.order": "§6Gölge Klonu Emri: §a[%s]",
+  "naruto.clone.mode.patrol": "Saldırgan Devriye",
+  "naruto.clone.mode.hold": "Konumu Koru",
+  "naruto.clone.mode.follow": "Takip ve Koruma",
+  "naruto.gui.ninja_menu.mastery.level": "§eUstalık Seviyesi: §aLv.%s §7(%s puan)",
+  "naruto.gui.ninja_menu.mastery.chakra_discount": "§bÇakra Tasarrufu: %s",
+  "naruto.gui.ninja_menu.mastery.power_bonus": "§6Güç Bonusu: %s",
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dBekleme Süresi: %s"
 }

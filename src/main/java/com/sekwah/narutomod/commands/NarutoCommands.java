@@ -395,7 +395,7 @@ public class NarutoCommands {
                         source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için " + jutsuId + " aktif edildi.").withStyle(ChatFormatting.GREEN), true);
                     }
                 } else {
-                    ability.performServer(player, data, 0);
+                    ability.perform(player, data, 0);
                     data.addJutsuCast();
                     source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " tarafından " + jutsuId + " uygulandı.").withStyle(ChatFormatting.GREEN), true);
                 }
@@ -474,7 +474,10 @@ public class NarutoCommands {
                 String clan = data.getClan() != null ? data.getClan().getPath() : "shinobi";
                 String clanLock = data.isClanLocked() ? "§c[Kilitli]" : "§a[Seçilmedi]";
 
-                float cExpNeeded = 60.0f + (data.getBaseMaxChakra() - 100.0f) * 1.20f;
+                float baseChakra = data.getBaseMaxChakra();
+                float cExpNeeded = baseChakra < 150.0f
+                        ? 30.0f + (baseChakra - 100.0f) * 0.50f
+                        : 55.0f + (baseChakra - 150.0f) * 1.10f;
                 float sExpNeeded = 50.0f + (data.getBaseMaxStamina() - 100.0f) * 1.10f;
 
                 source.sendSuccess(() -> Component.literal("=== SHINOBI STATS: " + player.getScoreboardName() + " ===").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);

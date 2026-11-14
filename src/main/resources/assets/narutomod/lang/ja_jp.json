@@ -250,5 +250,13 @@
   "jutsu.eight_gates.stage.kyumon_wonder": "第七驚門（きょうもん）",
   "jutsu.eight_gates.opened": "【%s、開！】",
   "jutsu.eight_gates.closed": "八門遁甲解除。筋肉疲労が押し寄せる。",
-  "jutsu.eight_gates.stamina_exhausted": "スタミナ限界！八門遁甲が自動解除されました。"
+  "jutsu.eight_gates.stamina_exhausted": "スタミナ限界！八門遁甲が自動解除されました。",
+  "naruto.clone.order": "§6影分身の指令: §a[%s]",
+  "naruto.clone.mode.patrol": "積極哨戒",
+  "naruto.clone.mode.hold": "位置死守",
+  "naruto.clone.mode.follow": "追従・護衛",
+  "naruto.gui.ninja_menu.mastery.level": "§e熟練度レベル: §aLv.%s §7(%s pt)",
+  "naruto.gui.ninja_menu.mastery.chakra_discount": "§bチャクラ効率: %s",
+  "naruto.gui.ninja_menu.mastery.power_bonus": "§6威力ボーナス: %s",
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dクールダウン短縮: %s"
 }

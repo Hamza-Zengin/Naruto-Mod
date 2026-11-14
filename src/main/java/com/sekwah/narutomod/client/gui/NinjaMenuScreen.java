@@ -118,11 +118,10 @@ public class NinjaMenuScreen extends Screen {
                 int btnY = boxY + BOX_HEIGHT - 24;
 
                 Button rankBtn = Button.builder(btnText, b -> {
-                    PacketHandler.sendToServer(new ServerRankUpPacket());
                     if (canRank) {
-                        ninjaData.rankUp();
+                        b.active = false;
+                        PacketHandler.sendToServer(new ServerRankUpPacket());
                     }
-                    this.init();
                 }).bounds(centerX - 120, btnY, 240, 20).build();
 
                 rankBtn.active = canRank;
@@ -193,10 +192,8 @@ public class NinjaMenuScreen extends Screen {
                                 label,
                                 b -> {
                                     if (!ninjaData.isClanLocked()) {
+                                        b.active = false;
                                         PacketHandler.sendToServer(new ServerSelectClanPacket(clanLoc));
-                                        ninjaData.setClan(clanLoc);
-                                        ninjaData.setClanLocked(true);
-                                        this.init();
                                     }
                                 })
                         .bounds(boxX + BOX_WIDTH - 82, btnY, 75, 20)
@@ -306,26 +303,26 @@ public class NinjaMenuScreen extends Screen {
 
                         List<Component> tooltip = new ArrayList<>();
                         tooltip.add(Component.translatable(ability.getTranslationKey()).copy().withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
-                        tooltip.add(Component.literal("§eUstalık Seviyesi: §aLv." + tier + " §7(" + mastery + " puan)"));
+                        tooltip.add(Component.translatable("naruto.gui.ninja_menu.mastery.level", tier, mastery));
 
                         int discountPercent = (int) Math.round((1.0f - Ability.getChakraCostMultiplier(mastery)) * 100);
                         int powerBonusPercent = (int) Math.round((Ability.getPowerMultiplier(mastery) - 1.0f) * 100);
                         int cdReductionPercent = (int) Math.round((1.0f - Ability.getCooldownMultiplier(mastery)) * 100);
 
                         if (discountPercent > 0) {
-                            tooltip.add(Component.literal("§bÇakra Tasarrufu: §a-%" + discountPercent));
+                            tooltip.add(Component.translatable("naruto.gui.ninja_menu.mastery.chakra_discount", "§a-%" + discountPercent));
                         } else {
-                            tooltip.add(Component.literal("§bÇakra Tasarrufu: §7%0"));
+                            tooltip.add(Component.translatable("naruto.gui.ninja_menu.mastery.chakra_discount", "§7%0"));
                         }
 
                         if (powerBonusPercent > 0) {
-                            tooltip.add(Component.literal("§6Güç Bonusu: §a+%" + powerBonusPercent));
+                            tooltip.add(Component.translatable("naruto.gui.ninja_menu.mastery.power_bonus", "§a+%" + powerBonusPercent));
                         } else {
-                            tooltip.add(Component.literal("§6Güç Bonusu: §7%0"));
+                            tooltip.add(Component.translatable("naruto.gui.ninja_menu.mastery.power_bonus", "§7%0"));
                         }
 
                         if (cdReductionPercent > 0) {
-                            tooltip.add(Component.literal("§dBekleme Süresi: §a-%" + cdReductionPercent));
+                            tooltip.add(Component.translatable("naruto.gui.ninja_menu.mastery.cooldown_reduction", "§a-%" + cdReductionPercent));
                         }
 
                         graphics.renderComponentTooltip(this.font, tooltip, mouseX, mouseY);
