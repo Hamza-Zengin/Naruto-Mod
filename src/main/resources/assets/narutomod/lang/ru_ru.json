@@ -258,5 +258,13 @@
   "naruto.gui.ninja_menu.mastery.level": "§eУровень мастерства: §aУр.%s §7(%s очк.)",
   "naruto.gui.ninja_menu.mastery.chakra_discount": "§bЭкономия чакры: %s",
   "naruto.gui.ninja_menu.mastery.power_bonus": "§6Бонус силы: %s",
-  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dСокращение перезарядки: %s"
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dСокращение перезарядки: %s",
+  "naruto.gui.ninja_menu.profile.clan_label": "§eКлан: §f%s",
+  "naruto.gui.ninja_menu.profile.sealed": "§2[Запечатано]",
+  "naruto.gui.ninja_menu.profile.changeable": "§e[Изменяемо]",
+  "naruto.gui.ninja_menu.profile.rank_label": "§bРанг ниндзя: §f%s",
+  "naruto.gui.ninja_menu.profile.rank_bonus": "§7(+%s чакры, +%s выносливости)",
+  "naruto.gui.ninja_menu.profile.chakra": "§9Чакра",
+  "naruto.gui.ninja_menu.profile.stamina": "§aВыносливость",
+  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(База: %s)"
 }

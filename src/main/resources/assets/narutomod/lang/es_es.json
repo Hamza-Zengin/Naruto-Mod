@@ -258,5 +258,13 @@
   "naruto.gui.ninja_menu.mastery.level": "§eNivel de Maestría: §aNv.%s §7(%s pts)",
   "naruto.gui.ninja_menu.mastery.chakra_discount": "§bAhorro de Chakra: %s",
   "naruto.gui.ninja_menu.mastery.power_bonus": "§6Bono de Poder: %s",
-  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dReducción de Enfriamiento: %s"
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dReducción de Enfriamiento: %s",
+  "naruto.gui.ninja_menu.profile.clan_label": "§eClan: §f%s",
+  "naruto.gui.ninja_menu.profile.sealed": "§2[Sellado]",
+  "naruto.gui.ninja_menu.profile.changeable": "§e[Cambiable]",
+  "naruto.gui.ninja_menu.profile.rank_label": "§bRango Ninja: §f%s",
+  "naruto.gui.ninja_menu.profile.rank_bonus": "§7(+%s Chakra, +%s Resistencia)",
+  "naruto.gui.ninja_menu.profile.chakra": "§9Chakra",
+  "naruto.gui.ninja_menu.profile.stamina": "§aResistencia",
+  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(Base: %s)"
 }

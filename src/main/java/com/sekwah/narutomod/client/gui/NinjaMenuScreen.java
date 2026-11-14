@@ -351,12 +351,15 @@ public class NinjaMenuScreen extends Screen {
         ResourceLocation clanLoc = ninjaData.getClan();
         String clanStatusStr;
         if (clanLoc == null || clanLoc.getPath().equalsIgnoreCase("shinobi")) {
-            clanStatusStr = "§eKlan: §7" + Component.translatable("naruto.gui.ninja_menu.clan.unselected").getString();
+            clanStatusStr = Component.translatable("naruto.gui.ninja_menu.profile.clan_label",
+                    Component.translatable("naruto.gui.ninja_menu.clan.unselected").getString()).getString();
         } else {
             Clan clan = NarutoClans.getClan(clanLoc);
-            String clanDisplay = clan != null ? clan.getName().getString() : (clanLoc.getPath().substring(0, 1).toUpperCase(java.util.Locale.ROOT) + clanLoc.getPath().substring(1) + " Klanı");
-            String lockBadge = ninjaData.isClanLocked() ? "§2[Mühürlü]" : "§e[Değiştirilebilir]";
-            clanStatusStr = "§eKlan: §f" + clanDisplay + " " + lockBadge;
+            String clanDisplay = clan != null ? clan.getName().getString() : (clanLoc.getPath().substring(0, 1).toUpperCase(java.util.Locale.ROOT) + clanLoc.getPath().substring(1));
+            String lockBadge = Component.translatable(ninjaData.isClanLocked()
+                    ? "naruto.gui.ninja_menu.profile.sealed"
+                    : "naruto.gui.ninja_menu.profile.changeable").getString();
+            clanStatusStr = Component.translatable("naruto.gui.ninja_menu.profile.clan_label", clanDisplay + " " + lockBadge).getString();
         }
 
         int clanStrW = this.font.width(clanStatusStr);
@@ -373,17 +376,20 @@ public class NinjaMenuScreen extends Screen {
         NinjaRank rank = NinjaRank.fromString(ninjaData.getRank());
         float cBonus = rank.getChakraBonus();
         float sBonus = rank.getStaminaBonus();
-        String bonusNote = (cBonus > 0 || sBonus > 0) ? " §7(+" + (int)cBonus + " Çakra, +" + (int)sBonus + " Kondisyon)" : "";
-        graphics.drawString(this.font, Component.literal("§bNinja Rütbesi: §f").append(Component.translatable(rank.getTranslationKey())).append(Component.literal(bonusNote)), x, y, 0xFFFFFFFF);
+        String bonusNote = (cBonus > 0 || sBonus > 0)
+                ? " " + Component.translatable("naruto.gui.ninja_menu.profile.rank_bonus", (int) cBonus, (int) sBonus).getString()
+                : "";
+        graphics.drawString(this.font, Component.translatable("naruto.gui.ninja_menu.profile.rank_label",
+                Component.translatable(rank.getTranslationKey())).append(Component.literal(bonusNote)), x, y, 0xFFFFFFFF);
         y += 14;
 
         // 1. Stat Bar: Chakra
         float chakra = ninjaData.getChakra();
         float maxChakra = ninjaData.getMaxChakra();
         float baseChakra = ninjaData.getBaseMaxChakra();
-        float chakraPct = maxChakra > 0 ? (chakra / maxChakra) * 100f : 0f;
-        String chakraValStr = String.format("§f%.0f / %.0f §7(Taban: %.0f)", chakra, maxChakra, baseChakra);
-        graphics.drawString(this.font, "§9Çakra", x, y, 0xFFFFFFFF);
+        String chakraValStr = Component.translatable("naruto.gui.ninja_menu.profile.stat_value",
+                String.format("%.0f", chakra), String.format("%.0f", maxChakra), String.format("%.0f", baseChakra)).getString();
+        graphics.drawString(this.font, Component.translatable("naruto.gui.ninja_menu.profile.chakra"), x, y, 0xFFFFFFFF);
         graphics.drawString(this.font, chakraValStr, boxX + BOX_WIDTH - 12 - this.font.width(chakraValStr), y, 0xFFFFFFFF);
         y += 10;
         renderBar(graphics, x, y, contentW, 5, maxChakra > 0 ? chakra / maxChakra : 0f, 0xFF2255FF, 0xFF001144);
@@ -393,8 +399,9 @@ public class NinjaMenuScreen extends Screen {
         float stamina = ninjaData.getStamina();
         float maxStamina = ninjaData.getMaxStamina();
         float baseStamina = ninjaData.getBaseMaxStamina();
-        String staminaValStr = String.format("§f%.0f / %.0f §7(Taban: %.0f)", stamina, maxStamina, baseStamina);
-        graphics.drawString(this.font, "§aKondisyon", x, y, 0xFFFFFFFF);
+        String staminaValStr = Component.translatable("naruto.gui.ninja_menu.profile.stat_value",
+                String.format("%.0f", stamina), String.format("%.0f", maxStamina), String.format("%.0f", baseStamina)).getString();
+        graphics.drawString(this.font, Component.translatable("naruto.gui.ninja_menu.profile.stamina"), x, y, 0xFFFFFFFF);
         graphics.drawString(this.font, staminaValStr, boxX + BOX_WIDTH - 12 - this.font.width(staminaValStr), y, 0xFFFFFFFF);
         y += 10;
         renderBar(graphics, x, y, contentW, 5, maxStamina > 0 ? stamina / maxStamina : 0f, 0xFF22DD44, 0xFF003311);

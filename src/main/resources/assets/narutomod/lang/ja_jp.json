@@ -258,5 +258,13 @@
   "naruto.gui.ninja_menu.mastery.level": "§e熟練度レベル: §aLv.%s §7(%s pt)",
   "naruto.gui.ninja_menu.mastery.chakra_discount": "§bチャクラ効率: %s",
   "naruto.gui.ninja_menu.mastery.power_bonus": "§6威力ボーナス: %s",
-  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dクールダウン短縮: %s"
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dクールダウン短縮: %s",
+  "naruto.gui.ninja_menu.profile.clan_label": "§e一族: §f%s",
+  "naruto.gui.ninja_menu.profile.sealed": "§2[封印済]",
+  "naruto.gui.ninja_menu.profile.changeable": "§e[変更可]",
+  "naruto.gui.ninja_menu.profile.rank_label": "§b忍ランク: §f%s",
+  "naruto.gui.ninja_menu.profile.rank_bonus": "§7(+%s チャクラ, +%s スタミナ)",
+  "naruto.gui.ninja_menu.profile.chakra": "§9チャクラ",
+  "naruto.gui.ninja_menu.profile.stamina": "§aスタミナ",
+  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(基礎: %s)"
 }

@@ -258,5 +258,13 @@
   "naruto.gui.ninja_menu.mastery.level": "§eUstalık Seviyesi: §aLv.%s §7(%s puan)",
   "naruto.gui.ninja_menu.mastery.chakra_discount": "§bÇakra Tasarrufu: %s",
   "naruto.gui.ninja_menu.mastery.power_bonus": "§6Güç Bonusu: %s",
-  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dBekleme Süresi: %s"
+  "naruto.gui.ninja_menu.mastery.cooldown_reduction": "§dBekleme Süresi: %s",
+  "naruto.gui.ninja_menu.profile.clan_label": "§eKlan: §f%s",
+  "naruto.gui.ninja_menu.profile.sealed": "§2[Mühürlü]",
+  "naruto.gui.ninja_menu.profile.changeable": "§e[Değiştirilebilir]",
+  "naruto.gui.ninja_menu.profile.rank_label": "§bNinja Rütbesi: §f%s",
+  "naruto.gui.ninja_menu.profile.rank_bonus": "§7(+%s Çakra, +%s Kondisyon)",
+  "naruto.gui.ninja_menu.profile.chakra": "§9Çakra",
+  "naruto.gui.ninja_menu.profile.stamina": "§aKondisyon",
+  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(Taban: %s)"
 }
