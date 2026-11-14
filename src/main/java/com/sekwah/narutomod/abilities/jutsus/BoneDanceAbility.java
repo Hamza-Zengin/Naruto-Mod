@@ -102,7 +102,7 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
                 if (!(p.level() instanceof ServerLevel sLevel)) return;
                 double radius = rIndex * (2.2D + (getMasteryTier(mastery) >= 3 ? 0.3D : 0.0D));
 
-                sLevel.playSound(null, p.blockPosition(), SoundEvents.SKELETON_HURT, SoundSource.PLAYERS, 1.5f, 0.55f);
+                sLevel.playSound(null, p.blockPosition(), com.sekwah.narutomod.sounds.NarutoSounds.BONE_DANCE_ERUPT.get(), SoundSource.PLAYERS, 1.4f, 0.95f);
                 sLevel.playSound(null, p.blockPosition(), SoundEvents.TRIDENT_HIT_GROUND, SoundSource.PLAYERS, 1.5f, 0.8f);
 
                 int spikes = 10 + rIndex * 4;

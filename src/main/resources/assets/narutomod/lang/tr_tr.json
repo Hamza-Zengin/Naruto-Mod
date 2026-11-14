@@ -266,5 +266,10 @@
   "naruto.gui.ninja_menu.profile.rank_bonus": "§7(+%s Çakra, +%s Kondisyon)",
   "naruto.gui.ninja_menu.profile.chakra": "§9Çakra",
   "naruto.gui.ninja_menu.profile.stamina": "§aKondisyon",
-  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(Taban: %s)"
+  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(Taban: %s)",
+  "narutomod.subtitle.amaterasu_ignite": "Amaterasu Tutuşuyor",
+  "narutomod.subtitle.susanoo_activate": "Susanoo Beliriyor",
+  "narutomod.subtitle.wood_prison_erupt": "Tahta Hapishane Yükseliyor",
+  "narutomod.subtitle.bone_dance_erupt": "Kemik Ormanı Fışkırıyor",
+  "narutomod.subtitle.mud_wall_rise": "Toprak Duvarı Yükseliyor"
 }

@@ -266,5 +266,10 @@
   "naruto.gui.ninja_menu.profile.rank_bonus": "§7(+%s チャクラ, +%s スタミナ)",
   "naruto.gui.ninja_menu.profile.chakra": "§9チャクラ",
   "naruto.gui.ninja_menu.profile.stamina": "§aスタミナ",
-  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(基礎: %s)"
+  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(基礎: %s)",
+  "narutomod.subtitle.amaterasu_ignite": "天照が燃え上がる",
+  "narutomod.subtitle.susanoo_activate": "須佐能乎が顕現する",
+  "narutomod.subtitle.wood_prison_erupt": "木遁の牢が出現する",
+  "narutomod.subtitle.bone_dance_erupt": "早蕨の舞が炸裂する",
+  "narutomod.subtitle.mud_wall_rise": "土流壁が隆起する"
 }

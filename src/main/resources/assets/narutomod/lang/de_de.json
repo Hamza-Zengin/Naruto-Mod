@@ -266,5 +266,10 @@
   "naruto.gui.ninja_menu.profile.rank_bonus": "§7(+%s Chakra, +%s Ausdauer)",
   "naruto.gui.ninja_menu.profile.chakra": "§9Chakra",
   "naruto.gui.ninja_menu.profile.stamina": "§aAusdauer",
-  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(Basis: %s)"
+  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(Basis: %s)",
+  "narutomod.subtitle.amaterasu_ignite": "Amaterasu entzündet sich",
+  "narutomod.subtitle.susanoo_activate": "Susanoo manifestiert sich",
+  "narutomod.subtitle.wood_prison_erupt": "Holzgefängnis bricht hervor",
+  "narutomod.subtitle.bone_dance_erupt": "Knochenwald bricht hervor",
+  "narutomod.subtitle.mud_wall_rise": "Erdwall erhebt sich"
 }

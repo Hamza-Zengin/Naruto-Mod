@@ -266,5 +266,10 @@
   "naruto.gui.ninja_menu.profile.rank_bonus": "§7(+%s чакры, +%s выносливости)",
   "naruto.gui.ninja_menu.profile.chakra": "§9Чакра",
   "naruto.gui.ninja_menu.profile.stamina": "§aВыносливость",
-  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(База: %s)"
+  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(База: %s)",
+  "narutomod.subtitle.amaterasu_ignite": "Аматэрасу воспламеняется",
+  "narutomod.subtitle.susanoo_activate": "Сусаноо проявляется",
+  "narutomod.subtitle.wood_prison_erupt": "Деревянная тюрьма вырастает",
+  "narutomod.subtitle.bone_dance_erupt": "Костяной лес прорывается",
+  "narutomod.subtitle.mud_wall_rise": "Земляная стена поднимается"
 }

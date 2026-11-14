@@ -146,7 +146,7 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         }
 
         // Play sinister ignition sound
-        serverLevel.playSound(null, player.blockPosition(), SoundEvents.ENDERMAN_SCREAM, SoundSource.PLAYERS, 1.2f, 0.6f);
+        serverLevel.playSound(null, player.blockPosition(), com.sekwah.narutomod.sounds.NarutoSounds.AMATERASU_IGNITE.get(), SoundSource.PLAYERS, 1.4f, 0.9f);
         serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 2.0f, 0.5f);
         serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 1.2f, 0.6f);
         serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.2f, 0.5f);

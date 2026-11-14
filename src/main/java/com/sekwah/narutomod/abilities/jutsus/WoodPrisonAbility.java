@@ -85,7 +85,7 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
         BlockHitResult hit = serverLevel.clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
         Vec3 center = hit.getType() != HitResult.Type.MISS ? hit.getLocation() : player.position().add(player.getLookAngle().scale(7.0));
 
-        serverLevel.playSound(null, BlockPos.containing(center), SoundEvents.ROOTED_DIRT_BREAK, SoundSource.PLAYERS, 1.8f, 0.6f);
+        serverLevel.playSound(null, BlockPos.containing(center), com.sekwah.narutomod.sounds.NarutoSounds.WOOD_PRISON_ERUPT.get(), SoundSource.PLAYERS, 1.6f, 0.9f);
         serverLevel.playSound(null, BlockPos.containing(center), SoundEvents.CHERRY_WOOD_PLACE, SoundSource.PLAYERS, 1.8f, 0.7f);
 
         // Erupt 3D Intertwined Wood Prison Root Dome & Pillars (WoodPrisonEntity handles periodic constriction damage & healing)

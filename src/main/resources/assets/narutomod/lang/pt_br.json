@@ -266,5 +266,10 @@
   "naruto.gui.ninja_menu.profile.rank_bonus": "§7(+%s Chakra, +%s Vigor)",
   "naruto.gui.ninja_menu.profile.chakra": "§9Chakra",
   "naruto.gui.ninja_menu.profile.stamina": "§aVigor",
-  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(Base: %s)"
+  "naruto.gui.ninja_menu.profile.stat_value": "§f%s / %s §7(Base: %s)",
+  "narutomod.subtitle.amaterasu_ignite": "Amaterasu se acende",
+  "narutomod.subtitle.susanoo_activate": "Susanoo se manifesta",
+  "narutomod.subtitle.wood_prison_erupt": "Prisão de Madeira irrompe",
+  "narutomod.subtitle.bone_dance_erupt": "Floresta de Ossos irrompe",
+  "narutomod.subtitle.mud_wall_rise": "Muro de Terra se ergue"
 }

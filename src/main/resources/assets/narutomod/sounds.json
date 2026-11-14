@@ -123,5 +123,35 @@
       "narutomod:jutsu/sharingan_activate"
     ],
     "subtitle": "narutomod.subtitle.sharingan_activate"
+  },
+  "jutsu.amaterasu.ignite": {
+    "subtitle": "narutomod.subtitle.amaterasu_ignite",
+    "sounds": [
+      "narutomod:jutsu/amaterasu_ignite"
+    ]
+  },
+  "jutsu.susanoo.activate": {
+    "subtitle": "narutomod.subtitle.susanoo_activate",
+    "sounds": [
+      "narutomod:jutsu/susanoo_activate"
+    ]
+  },
+  "jutsu.wood_prison.erupt": {
+    "subtitle": "narutomod.subtitle.wood_prison_erupt",
+    "sounds": [
+      "narutomod:jutsu/wood_prison_erupt"
+    ]
+  },
+  "jutsu.bone_dance.erupt": {
+    "subtitle": "narutomod.subtitle.bone_dance_erupt",
+    "sounds": [
+      "narutomod:jutsu/bone_dance_erupt"
+    ]
+  },
+  "jutsu.mud_wall.rise": {
+    "subtitle": "narutomod.subtitle.mud_wall_rise",
+    "sounds": [
+      "narutomod:jutsu/mud_wall_rise"
+    ]
   }
 }

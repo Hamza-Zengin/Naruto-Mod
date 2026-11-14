@@ -37,6 +37,11 @@ public class NarutoSounds {
     public static final RegistryObject<SoundEvent> FIREBALL_CAST = register("jutsu.fireball.cast");
     public static final RegistryObject<SoundEvent> KIRIN_STRIKE = register("jutsu.kirin.strike");
     public static final RegistryObject<SoundEvent> SHARINGAN_ACTIVATE = register("jutsu.sharingan.activate");
+    public static final RegistryObject<SoundEvent> AMATERASU_IGNITE = register("jutsu.amaterasu.ignite");
+    public static final RegistryObject<SoundEvent> SUSANOO_ACTIVATE = register("jutsu.susanoo.activate");
+    public static final RegistryObject<SoundEvent> WOOD_PRISON_ERUPT = register("jutsu.wood_prison.erupt");
+    public static final RegistryObject<SoundEvent> BONE_DANCE_ERUPT = register("jutsu.bone_dance.erupt");
+    public static final RegistryObject<SoundEvent> MUD_WALL_RISE = register("jutsu.mud_wall.rise");
 
     private static RegistryObject<SoundEvent> register(String key) {
         return SOUNDS.register(key, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, key)));
