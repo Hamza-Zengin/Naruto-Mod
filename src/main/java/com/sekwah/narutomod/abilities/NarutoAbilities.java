@@ -60,6 +60,7 @@ public class NarutoAbilities {
     public static final RegistryObject<RasenshurikenAbility> RASENSHURIKEN = ABILITY.register("rasenshuriken", RasenshurikenAbility::new);
     public static final RegistryObject<TsukuyomiAbility> TSUKUYOMI = ABILITY.register("tsukuyomi", TsukuyomiAbility::new);
     public static final RegistryObject<HakkeKushoAbility> HAKKE_KUSHO = ABILITY.register("hakke_kusho", HakkeKushoAbility::new);
+    public static final RegistryObject<SummoningAbility> SUMMONING = ABILITY.register("summoning", SummoningAbility::new);
 
     public static void register(IEventBus eventBus) {
         ABILITY.register(eventBus);
