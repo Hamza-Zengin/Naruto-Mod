@@ -1003,10 +1003,10 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify utility abilities require zero activation delay")
     public void testUtilityAbilitiesRequireZeroDelay() {
-        com.sekwah.narutomod.abilities.utility.ChakraDashAbility dashAbility = new com.sekwah.narutomod.abilities.utility.ChakraDashAbility();
-        assertFalse(dashAbility.requiresSealActivationDelay());
-        assertEquals(0, dashAbility.getScaledActivationDelay(0));
-        assertEquals(0, dashAbility.getScaledActivationDelay(500));
+        com.sekwah.narutomod.abilities.utility.LeapAbility leapAbility = new com.sekwah.narutomod.abilities.utility.LeapAbility();
+        assertFalse(leapAbility.requiresSealActivationDelay());
+        assertEquals(0, leapAbility.getScaledActivationDelay(0));
+        assertEquals(0, leapAbility.getScaledActivationDelay(500));
     }
 
     @Test
@@ -1109,8 +1109,8 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify Ability.COMPLEXITY_COMPARATOR sorts from simplest (2-key) to most complex (5-key)")
     public void testAbilityComplexityComparator() {
-        Ability dash = new com.sekwah.narutomod.abilities.utility.ChakraDashAbility();
-        dash.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "chakra_dash")); // 2 keys
+        Ability charge = new com.sekwah.narutomod.abilities.utility.ChakraChargeAbility();
+        charge.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "chakra_charge")); // 1 key
 
         Ability fireball = new com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility();
         fireball.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "fireball")); // 3 keys
@@ -1121,10 +1121,10 @@ public class NinjaDataLogicTest {
         Ability amaterasu = new AmaterasuAbility();
         amaterasu.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "amaterasu")); // 5 keys
 
-        java.util.List<Ability> list = new java.util.ArrayList<>(List.of(amaterasu, fireball, chidori, dash));
+        java.util.List<Ability> list = new java.util.ArrayList<>(List.of(amaterasu, fireball, chidori, charge));
         list.sort(Ability.COMPLEXITY_COMPARATOR);
 
-        assertEquals(List.of(dash, fireball, chidori, amaterasu), list);
+        assertEquals(List.of(charge, fireball, chidori, amaterasu), list);
     }
 
     @Test
@@ -1177,5 +1177,33 @@ public class NinjaDataLogicTest {
         assertEquals("", restored.getActiveMissionId());
         assertEquals(0, restored.getMissionProgress());
         assertEquals("NONE", restored.getMissionStatus());
+    }
+
+    @Test
+    @DisplayName("Verify rank requirements: Rasengan & Chidori require Chunin, Tsukuyomi requires Jonin")
+    public void testRankRequirementsForJutsus() {
+        Ability rasengan = new com.sekwah.narutomod.abilities.jutsus.RasenganAbility();
+        Ability chidori = new com.sekwah.narutomod.abilities.jutsus.ChidoriAbility();
+        Ability tsukuyomi = new com.sekwah.narutomod.abilities.jutsus.TsukuyomiAbility();
+
+        ninjaData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "uchiha"));
+        ninjaData.setSharinganActive(true);
+        ninjaData.setMastery(new ResourceLocation(NarutoMod.MOD_ID, "sharingan"), 1000);
+
+        ninjaData.setRank(NinjaRank.GENIN.name());
+        assertFalse(rasengan.canActivate(null, ninjaData), "Genin cannot use Rasengan");
+        assertFalse(chidori.canActivate(null, ninjaData), "Genin cannot use Chidori");
+        assertFalse(tsukuyomi.canActivate(null, ninjaData), "Genin cannot use Tsukuyomi");
+
+        ninjaData.setRank(NinjaRank.CHUNIN.name());
+        assertTrue(rasengan.canActivate(null, ninjaData), "Chunin can use Rasengan");
+        assertTrue(chidori.canActivate(null, ninjaData), "Chunin can use Chidori");
+        assertFalse(tsukuyomi.canActivate(null, ninjaData), "Chunin cannot use Tsukuyomi");
+
+        ninjaData.setRank(NinjaRank.JONIN.name());
+        assertTrue(rasengan.canActivate(null, ninjaData), "Jonin can use Rasengan");
+        assertTrue(chidori.canActivate(null, ninjaData), "Jonin can use Chidori");
+        assertEquals(NinjaRank.JONIN, tsukuyomi.getRequiredRank());
+        assertTrue(NinjaRank.fromString(ninjaData.getRank()).isAtLeast(tsukuyomi.getRequiredRank()), "Jonin meets Tsukuyomi rank requirement");
     }
 }

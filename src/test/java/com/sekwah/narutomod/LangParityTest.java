@@ -47,7 +47,7 @@ public class LangParityTest {
                 .filter(k -> k.startsWith("narutomod:"))
                 .sorted()
                 .toList();
-        Assertions.assertEquals(26, jutsuNameKeys.size(), "Expected 26 canonical jutsu name keys");
+        Assertions.assertEquals(25, jutsuNameKeys.size(), "Expected 25 canonical jutsu name keys");
 
         for (String jutsuKey : jutsuNameKeys) {
             String val = enKeys.get(jutsuKey);

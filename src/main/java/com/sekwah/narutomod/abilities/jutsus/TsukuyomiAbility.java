@@ -30,6 +30,11 @@ public class TsukuyomiAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
+        return com.sekwah.narutomod.capabilities.NinjaRank.JONIN;
+    }
+
+    @Override
     public long defaultCombo() {
         return 32132;
     }
@@ -51,6 +56,7 @@ public class TsukuyomiAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public boolean canActivate(Player player, INinjaData ninjaData) {
+        if (!super.canActivate(player, ninjaData)) return false;
         if (ninjaData == null) return false;
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
             if (player != null) {

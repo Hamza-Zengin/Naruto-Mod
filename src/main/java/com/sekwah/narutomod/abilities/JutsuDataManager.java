@@ -24,7 +24,7 @@ public class JutsuDataManager extends SimpleJsonResourceReloadListener {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Map<ResourceLocation, JutsuData> JUTSU_DATA = new ConcurrentHashMap<>();
 
-    public record JutsuData(float chakraCost, float staminaCost, int cooldown, float damage) {}
+    public record JutsuData(float chakraCost, float staminaCost, int cooldown, float damage, String requiredRank) {}
 
     public JutsuDataManager() {
         super(GSON, "jutsus");
@@ -42,7 +42,8 @@ public class JutsuDataManager extends SimpleJsonResourceReloadListener {
                     float stamina = obj.has("stamina_cost") ? obj.get("stamina_cost").getAsFloat() : -1f;
                     int cooldown = obj.has("cooldown") ? obj.get("cooldown").getAsInt() : -1;
                     float damage = obj.has("damage") ? obj.get("damage").getAsFloat() : -1f;
-                    newMap.put(id, new JutsuData(chakra, stamina, cooldown, damage));
+                    String requiredRank = obj.has("requiredRank") ? obj.get("requiredRank").getAsString() : null;
+                    newMap.put(id, new JutsuData(chakra, stamina, cooldown, damage, requiredRank));
                 }
             } catch (Exception e) {
                 NarutoMod.LOGGER.error("Failed to parse jutsu data for {}", id, e);

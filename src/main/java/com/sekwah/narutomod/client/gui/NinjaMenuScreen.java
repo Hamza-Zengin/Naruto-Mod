@@ -846,43 +846,57 @@ public class NinjaMenuScreen extends Screen {
                 com.sekwah.narutomod.capabilities.NinjaMission.fromId(ninjaData.getActiveMissionId());
 
         if (active != null) {
-            int cardY = boxY + 38;
+            int cardY = boxY + 34;
             boolean completed = active.isCompleted(ninjaData);
             int borderCol = completed ? 0xFF33AA33 : 0xFFCC9922;
-            graphics.fill(boxX + 10, cardY, boxX + BOX_WIDTH - 10, cardY + 76, 0xCC181824);
-            graphics.renderOutline(boxX + 10, cardY, BOX_WIDTH - 20, 76, borderCol);
+            graphics.fill(boxX + 10, cardY, boxX + BOX_WIDTH - 10, cardY + 106, 0xCC181824);
+            graphics.renderOutline(boxX + 10, cardY, BOX_WIDTH - 20, 106, borderCol);
 
             String title = "§6§l[" + active.getRankLabel() + "] §f"
-                    + Component.translatable(active.getTranslationKey()).getString();
-            graphics.drawString(this.font, title, boxX + 20, cardY + 10, 0xFFFFFFFF);
+                    + active.getTitleComponent().getString();
+            graphics.drawString(this.font, title, boxX + 20, cardY + 8, 0xFFFFFFFF);
+
+            java.util.List<net.minecraft.util.FormattedCharSequence> descLines =
+                    this.font.split(active.getDescriptionComponent(), BOX_WIDTH - 40);
+            int descY = cardY + 22;
+            for (int l = 0; l < Math.min(2, descLines.size()); l++) {
+                graphics.drawString(this.font, descLines.get(l), boxX + 20, descY + l * 10, 0xFFBBBBCC);
+            }
 
             int progress = active.getProgress(ninjaData);
             int target = active.getTargetCount();
             float ratio = target > 0 ? (float) progress / target : 1.0f;
             String progText = (completed ? "§a✔ Tamamlandı: " : "§eİlerleme: ") + progress + " / " + target
                     + "   §bÖdül: +" + active.getRewardXp() + " XP";
-            graphics.drawString(this.font, progText, boxX + 20, cardY + 28, 0xFFDDDDDD);
+            graphics.drawString(this.font, progText, boxX + 20, cardY + 52, 0xFFDDDDDD);
 
-            renderBar(graphics, boxX + 20, cardY + 46, BOX_WIDTH - 40, 10, ratio,
+            renderBar(graphics, boxX + 20, cardY + 68, BOX_WIDTH - 40, 10, ratio,
                     completed ? 0xFF33CC33 : 0xFF3399FF, 0xFF222233);
         } else {
             com.sekwah.narutomod.capabilities.NinjaMission[] missions =
                     com.sekwah.narutomod.capabilities.NinjaMission.values();
-            int startY = boxY + 36;
-            int rowH = 30;
+            int startY = boxY + 32;
+            int rowH = 34;
             for (int i = 0; i < missions.length; i++) {
                 com.sekwah.narutomod.capabilities.NinjaMission m = missions[i];
                 int rowY = startY + i * rowH;
                 boolean eligible = m.canAccept(rank);
-                graphics.fill(boxX + 8, rowY, boxX + BOX_WIDTH - 96, rowY + 26, 0xCC181822);
-                graphics.renderOutline(boxX + 8, rowY, BOX_WIDTH - 104, 26, eligible ? 0xFF447744 : 0xFF553333);
+                graphics.fill(boxX + 8, rowY, boxX + BOX_WIDTH - 96, rowY + 31, 0xCC181822);
+                graphics.renderOutline(boxX + 8, rowY, BOX_WIDTH - 104, 31, eligible ? 0xFF447744 : 0xFF553333);
 
                 String mName = (eligible ? "§6[" + m.getRankLabel() + "] §f" : "§8[" + m.getRankLabel() + "] ")
-                        + Component.translatable(m.getTranslationKey()).getString();
-                graphics.drawString(this.font, mName, boxX + 14, rowY + 4, 0xFFFFFFFF);
+                        + m.getTitleComponent().getString();
+                graphics.drawString(this.font, mName, boxX + 14, rowY + 3, 0xFFFFFFFF);
+
+                java.util.List<net.minecraft.util.FormattedCharSequence> descLines =
+                        this.font.split(m.getDescriptionComponent(), BOX_WIDTH - 116);
+                if (!descLines.isEmpty()) {
+                    graphics.drawString(this.font, descLines.get(0), boxX + 14, rowY + 13, 0xFF9999AA);
+                }
+
                 String mMeta = "§7Hedef: " + m.getTargetCount() + " | Ödül: +" + m.getRewardXp() + " XP"
                         + (eligible ? "" : " §c(" + m.getRequiredRank().getEnglishName() + ")");
-                graphics.drawString(this.font, mMeta, boxX + 14, rowY + 15, 0xFFAAAAAA);
+                graphics.drawString(this.font, mMeta, boxX + 14, rowY + 22, 0xFFAAAAAA);
             }
         }
     }

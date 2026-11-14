@@ -69,7 +69,6 @@
   "jutsu.cast.debug": "Girilen kombo: %s",
   "jutsu.error.notfound": "Geçersiz jutsu kombosu (%s).",
   "narutomod:leap": "Choyaku",
-  "narutomod:chakra_dash": "Shunshin",
   "narutomod:water_walk": "Suimen Hoko",
   "narutomod:chakra_charge": "Chakra Kyuin",
   "narutomod:fireball": "Katon: Gokakyu",
@@ -286,5 +285,16 @@
   "naruto.mission.reward_claimed": "%s görevinin ödülü alındı (+%s XP)!",
   "naruto.mission.abandoned": "Görev iptal edildi.",
   "naruto.mission.already_active": "Zaten aktif bir görevin var!",
-  "naruto.mission.rank_too_low": "Ninja rütben bu görev için yetersiz (Gereken: %s)."
+  "naruto.mission.rank_too_low": "Ninja rütben bu görev için yetersiz (Gereken: %s).",
+  "jutsu.fail.rank": "Gereken Rütbe: %s",
+  "mission.narutomod.d_rank_patrol.title": "D-Rütbe: Köy Çevresi Devriyesi",
+  "mission.narutomod.d_rank_patrol.desc": "Devriye güvenliğini sağlamak için köy çevresindeki düşmanları etkisiz hale getir.",
+  "mission.narutomod.c_rank_rogue_hunt.title": "C-Rütbe: Haydut Ninja Avı",
+  "mission.narutomod.c_rank_rogue_hunt.desc": "Köy dışındaki yolcuları tehdit eden haydut ninjaları takip edip alt et.",
+  "mission.narutomod.b_rank_jutsu_drill.title": "B-Rütbe: Jutsu Ustalık Talimi",
+  "mission.narutomod.b_rank_jutsu_drill.desc": "Chakra kontrolünü geliştirmek için savaşta veya talimde art arda jutsu kullan.",
+  "mission.narutomod.a_rank_akatsuki_recon.title": "A-Rütbe: Akatsuki Keşfi",
+  "mission.narutomod.a_rank_akatsuki_recon.desc": "Yüksek riskli bölgelerde görülen Akatsuki ajanlarını durdur ve yen.",
+  "mission.narutomod.s_rank_akatsuki_bounty.title": "S-Rütbe: Akatsuki Ödül Avı",
+  "mission.narutomod.s_rank_akatsuki_bounty.desc": "Shinobi dünyasına yönelik büyük tehdidi bitirmek için elit Akatsuki üyelerini avla."
 }

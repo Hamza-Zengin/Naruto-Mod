@@ -24,7 +24,7 @@ public class LeapAbility extends Ability {
 
     @Override
     public long defaultCombo() {
-        return 33;
+        return 22L;
     }
 
     @Override

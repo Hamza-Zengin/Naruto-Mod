@@ -28,7 +28,6 @@ public class NarutoAbilities {
 
     // Utility
     public static final RegistryObject<LeapAbility> LEAP = ABILITY.register("leap", LeapAbility::new);
-    public static final RegistryObject<ChakraDashAbility> CHAKRA_DASH = ABILITY.register("chakra_dash", ChakraDashAbility::new);
     public static final RegistryObject<WaterWalkAbility> WATER_WALK = ABILITY.register("water_walk", WaterWalkAbility::new);
     public static final RegistryObject<ChakraChargeAbility> CHAKRA_CHARGE = ABILITY.register("chakra_charge", ChakraChargeAbility::new);
 

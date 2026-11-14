@@ -21,7 +21,7 @@ public class ChakraChargeAbility extends Ability implements Ability.Channeled {
 
     @Override
     public long defaultCombo() {
-        return 11;
+        return 1L;
     }
 
     @Override

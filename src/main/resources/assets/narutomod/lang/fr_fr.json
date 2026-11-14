@@ -69,7 +69,6 @@
   "jutsu.cast.debug": "Combinaison : %s",
   "jutsu.error.notfound": "Combinaison de jutsu invalide (%s).",
   "narutomod:leap": "Choyaku",
-  "narutomod:chakra_dash": "Shunshin",
   "narutomod:water_walk": "Suimen Hoko",
   "narutomod:chakra_charge": "Chakra Kyuin",
   "narutomod:fireball": "Katon: Gokakyu",
@@ -286,5 +285,16 @@
   "naruto.mission.reward_claimed": "Claimed reward for %s (+%s XP)!",
   "naruto.mission.abandoned": "Mission abandoned.",
   "naruto.mission.already_active": "You already have an active mission!",
-  "naruto.mission.rank_too_low": "Your ninja rank is too low (Requires: %s)."
+  "naruto.mission.rank_too_low": "Your ninja rank is too low (Requires: %s).",
+  "jutsu.fail.rank": "Rang requis : %s",
+  "mission.narutomod.d_rank_patrol.title": "D-Rank: Village Perimeter Patrol",
+  "mission.narutomod.d_rank_patrol.desc": "Defeat hostile enemies near the village perimeter to keep the patrol route safe.",
+  "mission.narutomod.c_rank_rogue_hunt.title": "C-Rank: Rogue Ninja Hunt",
+  "mission.narutomod.c_rank_rogue_hunt.desc": "Track down and eliminate rogue ninjas threatening travelers outside the village.",
+  "mission.narutomod.b_rank_jutsu_drill.title": "B-Rank: Jutsu Mastery Drill",
+  "mission.narutomod.b_rank_jutsu_drill.desc": "Cast jutsus repeatedly in combat or training to sharpen your chakra control.",
+  "mission.narutomod.a_rank_akatsuki_recon.title": "A-Rank: Akatsuki Recon",
+  "mission.narutomod.a_rank_akatsuki_recon.desc": "Intercept and defeat Akatsuki operatives spotted in high-risk territories.",
+  "mission.narutomod.s_rank_akatsuki_bounty.title": "S-Rank: Akatsuki Bounty",
+  "mission.narutomod.s_rank_akatsuki_bounty.desc": "Hunt down elite Akatsuki members to neutralize a major threat to the shinobi world."
 }

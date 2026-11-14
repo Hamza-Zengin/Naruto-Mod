@@ -33,7 +33,6 @@ public class JutsuComboAuditTest {
             Map.entry("chakra_charge", new ChakraChargeAbility()),
             Map.entry("water_walk", new WaterWalkAbility()),
             Map.entry("leap", new LeapAbility()),
-            Map.entry("chakra_dash", new ChakraDashAbility()),
             Map.entry("kawarimi", new KawarimiJutsuAbility()),
             Map.entry("fireball", new FireballJutsuAbility()),
             Map.entry("water_bullet", new WaterBulletAbility()),
@@ -111,6 +110,8 @@ public class JutsuComboAuditTest {
                 assertEquals(5, jsonCombo.size(), "Ultimate jutsu " + name + " must have 5 keys");
             } else if (HIGH_LEVEL.contains(name)) {
                 assertTrue(jsonCombo.size() >= 4, "High-level jutsu " + name + " must have >= 4 keys");
+            } else if ("chakra_charge".equals(name) || "water_walk".equals(name)) {
+                assertEquals(1, jsonCombo.size(), "Starter utility " + name + " must have 1 key");
             } else {
                 assertTrue(jsonCombo.size() >= 2 && jsonCombo.size() <= 3,
                         "Basic/movement ability " + name + " must have 2-3 keys");

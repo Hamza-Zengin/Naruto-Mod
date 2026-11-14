@@ -41,7 +41,7 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public long defaultCombo() {
-        return 323;
+        return 12L;
     }
 
     @Override

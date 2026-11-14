@@ -74,6 +74,17 @@ public abstract class Ability {
      * Determines whether this ability can currently be activated by the player.
      */
     public boolean canActivate(Player player, INinjaData ninjaData) {
+        NinjaRank required = this.getRequiredRank();
+        if (required != null && ninjaData != null) {
+            NinjaRank current = NinjaRank.fromString(ninjaData.getRank());
+            if (!current.isAtLeast(required)) {
+                if (player != null) {
+                    player.displayClientMessage(Component.translatable("jutsu.fail.rank",
+                            Component.translatable(required.getTranslationKey()).withStyle(ChatFormatting.RED)), true);
+                }
+                return false;
+            }
+        }
         return true;
     }
 

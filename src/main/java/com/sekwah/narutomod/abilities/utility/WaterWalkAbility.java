@@ -35,7 +35,7 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
 
     @Override
     public long defaultCombo() {
-        return 22;
+        return 3L;
     }
     private final int CHARKA_COOLDOWN = 15;
 

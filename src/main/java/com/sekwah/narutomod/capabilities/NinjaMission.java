@@ -54,6 +54,10 @@ public enum NinjaMission {
     public int getTargetCount() { return targetCount; }
     public int getRewardXp() { return rewardXp; }
     public String getTranslationKey() { return "naruto.mission." + id; }
+    public String getTitleKey() { return "mission.narutomod." + id + ".title"; }
+    public String getDescriptionKey() { return "mission.narutomod." + id + ".desc"; }
+    public net.minecraft.network.chat.Component getTitleComponent() { return net.minecraft.network.chat.Component.translatable(getTitleKey()); }
+    public net.minecraft.network.chat.Component getDescriptionComponent() { return net.minecraft.network.chat.Component.translatable(getDescriptionKey()); }
 
     public boolean canAccept(NinjaRank playerRank) {
         return playerRank != null && playerRank.getLevel() >= this.requiredRank.getLevel();

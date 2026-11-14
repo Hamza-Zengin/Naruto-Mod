@@ -35,6 +35,10 @@ public enum NinjaRank {
         return level;
     }
 
+    public boolean isAtLeast(NinjaRank requiredRank) {
+        return requiredRank == null || this.level >= requiredRank.level;
+    }
+
     public String getEnglishName() {
         return englishName;
     }
