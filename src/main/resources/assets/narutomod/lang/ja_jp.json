@@ -274,5 +274,10 @@
   "narutomod.subtitle.mud_wall_rise": "土流壁が隆起する",
   "narutomod:tsukuyomi": "月読",
   "narutomod:hakke_kusho": "八卦空掌",
-  "narutomod:summoning": "口寄せの術・忍犬"
+  "narutomod:summoning": "口寄せの術・忍犬",
+  "naruto.mission.d_rank_patrol": "Dランク：里の巡回（敵10体撃破）",
+  "naruto.mission.c_rank_rogue_hunt": "Cランク：抜け忍討伐（抜け忍5体撃破）",
+  "naruto.mission.b_rank_jutsu_drill": "Bランク：忍術鍛錬（忍術20回発動）",
+  "naruto.mission.a_rank_akatsuki_recon": "Aランク：暁の偵察（暁2体撃破）",
+  "naruto.mission.s_rank_akatsuki_bounty": "Sランク：暁の賞金首（暁5体撃破）"
 }

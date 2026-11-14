@@ -274,5 +274,10 @@
   "narutomod.subtitle.mud_wall_rise": "Toprak Duvarı Yükseliyor",
   "narutomod:tsukuyomi": "Tsukuyomi",
   "narutomod:hakke_kusho": "Sekiz Trigram Vakum Avucu",
-  "narutomod:summoning": "Kuchiyose: Ninken Çağrısı"
+  "narutomod:summoning": "Kuchiyose: Ninken Çağrısı",
+  "naruto.mission.d_rank_patrol": "D-Rank: Köy Devriyesi (10 Düşman Yen)",
+  "naruto.mission.c_rank_rogue_hunt": "C-Rank: Kaçak Ninja Avı (5 Kaçak Ninja Yen)",
+  "naruto.mission.b_rank_jutsu_drill": "B-Rank: Jutsu Talimi (20 Jutsu Kullan)",
+  "naruto.mission.a_rank_akatsuki_recon": "A-Rank: Akatsuki Keşfi (2 Akatsuki Yen)",
+  "naruto.mission.s_rank_akatsuki_bounty": "S-Rank: Akatsuki Ödül Avı (5 Akatsuki Yen)"
 }

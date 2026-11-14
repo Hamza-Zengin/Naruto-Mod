@@ -274,5 +274,10 @@
   "narutomod.subtitle.mud_wall_rise": "Erdwall erhebt sich",
   "narutomod:tsukuyomi": "Tsukuyomi",
   "narutomod:hakke_kusho": "Acht Trigramme Vakuum-Handfläche",
-  "narutomod:summoning": "Kuchiyose: Ninken-Beschwörung"
+  "narutomod:summoning": "Kuchiyose: Ninken-Beschwörung",
+  "naruto.mission.d_rank_patrol": "D-Rang: Dorfpatrouille (10 Gegner besiegen)",
+  "naruto.mission.c_rank_rogue_hunt": "C-Rang: Abtrünnigen-Jagd (5 Abtrünnige besiegen)",
+  "naruto.mission.b_rank_jutsu_drill": "B-Rang: Jutsu-Übung (20 Jutsus wirken)",
+  "naruto.mission.a_rank_akatsuki_recon": "A-Rang: Akatsuki-Aufklärung (2 Akatsuki besiegen)",
+  "naruto.mission.s_rank_akatsuki_bounty": "S-Rang: Akatsuki-Kopfgeld (5 Akatsuki besiegen)"
 }

@@ -274,5 +274,10 @@
   "narutomod.subtitle.mud_wall_rise": "Earth Wall Rises",
   "narutomod:tsukuyomi": "Tsukuyomi",
   "narutomod:hakke_kusho": "Eight Trigrams Vacuum Palm",
-  "narutomod:summoning": "Kuchiyose: Ninken Summon"
+  "narutomod:summoning": "Kuchiyose: Ninken Summon",
+  "naruto.mission.d_rank_patrol": "D-Rank: Village Patrol (Defeat 10 Enemies)",
+  "naruto.mission.c_rank_rogue_hunt": "C-Rank: Rogue Ninja Hunt (Defeat 5 Rogue Ninjas)",
+  "naruto.mission.b_rank_jutsu_drill": "B-Rank: Jutsu Mastery Drill (Cast 20 Jutsus)",
+  "naruto.mission.a_rank_akatsuki_recon": "A-Rank: Akatsuki Recon (Defeat 2 Akatsuki)",
+  "naruto.mission.s_rank_akatsuki_bounty": "S-Rank: Akatsuki Bounty (Defeat 5 Akatsuki)"
 }

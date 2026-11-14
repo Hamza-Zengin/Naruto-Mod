@@ -274,5 +274,10 @@
   "narutomod.subtitle.mud_wall_rise": "Muro de Terra se ergue",
   "narutomod:tsukuyomi": "Tsukuyomi",
   "narutomod:hakke_kusho": "Palma de Vácuo dos Oito Trigramas",
-  "narutomod:summoning": "Kuchiyose: Invocação Ninken"
+  "narutomod:summoning": "Kuchiyose: Invocação Ninken",
+  "naruto.mission.d_rank_patrol": "Rank D: Patrulha da Vila (Derrote 10 Inimigos)",
+  "naruto.mission.c_rank_rogue_hunt": "Rank C: Caça aos Renegados (Derrote 5 Renegados)",
+  "naruto.mission.b_rank_jutsu_drill": "Rank B: Treino de Jutsu (Lance 20 Jutsus)",
+  "naruto.mission.a_rank_akatsuki_recon": "Rank A: Reconhecimento Akatsuki (Derrote 2 Akatsuki)",
+  "naruto.mission.s_rank_akatsuki_bounty": "Rank S: Recompensa Akatsuki (Derrote 5 Akatsuki)"
 }

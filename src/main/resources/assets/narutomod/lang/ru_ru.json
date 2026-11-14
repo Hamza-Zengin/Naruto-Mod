@@ -274,5 +274,10 @@
   "narutomod.subtitle.mud_wall_rise": "Земляная стена поднимается",
   "narutomod:tsukuyomi": "Цукуёми",
   "narutomod:hakke_kusho": "Вакуумная ладонь восьми триграмм",
-  "narutomod:summoning": "Кучиёсе: Призыв Нинкэна"
+  "narutomod:summoning": "Кучиёсе: Призыв Нинкэна",
+  "naruto.mission.d_rank_patrol": "Ранг D: Патруль деревни (Победить 10 врагов)",
+  "naruto.mission.c_rank_rogue_hunt": "Ранг C: Охота на отступников (Победить 5 отступников)",
+  "naruto.mission.b_rank_jutsu_drill": "Ранг B: Тренировка дзюцу (Применить 20 дзюцу)",
+  "naruto.mission.a_rank_akatsuki_recon": "Ранг A: Разведка Акацуки (Победить 2 Акацуки)",
+  "naruto.mission.s_rank_akatsuki_bounty": "Ранг S: Награда за Акацуки (Победить 5 Акацуки)"
 }
