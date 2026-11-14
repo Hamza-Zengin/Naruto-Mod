@@ -18,36 +18,47 @@ import net.minecraft.resources.ResourceLocation;
  * Renders glowing crimson Sharingan eyes on the player whenever Sharingan is active.
  * Uses vanilla Minecraft glowing eye shaders (like Enderman/Spider eyes).
  */
-public class SharinganEyesLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
+public class SharinganEyesLayer<T extends net.minecraft.world.entity.LivingEntity, M extends PlayerModel<T>> extends RenderLayer<T, M> {
 
-    private static final ResourceLocation SHARINGAN_EYES_TEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/sharingan_eyes.png");
-    private static final ResourceLocation BYAKUGAN_EYES_TEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/byakugan_eyes.png");
+    private static final ResourceLocation SHARINGAN_EYES_TEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_1_tomoe.png");
+    private static final ResourceLocation BYAKUGAN_EYES_TEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/byakugan_eyes.png");
 
-    public SharinganEyesLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent) {
+    public SharinganEyesLayer(RenderLayerParent<T, M> parent) {
         super(parent);
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player,
+    public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T entity,
                        float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        if (player.isInvisible()) {
+        if (entity.isInvisible()) {
             return;
         }
-        player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-            boolean sharingan = ninjaData.isSharinganActive();
-            boolean byakugan = ninjaData.isByakuganActive();
-            // Early Exit: skip buffer lookup and model render if neither dojutsu eye is active
-            if (!sharingan && !byakugan) {
-                return;
-            }
+        if (entity instanceof AbstractClientPlayer player) {
+            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+                boolean sharingan = ninjaData.isSharinganActive();
+                boolean byakugan = ninjaData.isByakuganActive();
+                if (!sharingan && !byakugan) return;
+                ResourceLocation texture = sharingan
+                        ? com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(ninjaData).getTexture()
+                        : BYAKUGAN_EYES_TEXTURE;
+                renderIrisQuads(poseStack, buffer, texture);
+            });
+        } else if (entity instanceof com.sekwah.narutomod.entity.ShadowCloneEntity clone) {
+            boolean sharingan = clone.hasActiveAbility("sharingan") || clone.getSharinganStage() > 0;
+            boolean byakugan = clone.hasActiveAbility("byakugan");
+            if (!sharingan && !byakugan) return;
             ResourceLocation texture;
             if (sharingan) {
-                com.sekwah.narutomod.abilities.jutsus.SharinganAbility.SharinganStage stage =
-                        com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(ninjaData);
-                texture = stage.getTexture();
+                int stageIdx = Math.max(0, Math.min(3, clone.getSharinganStage() - 1));
+                texture = com.sekwah.narutomod.abilities.jutsus.SharinganAbility.SharinganStage.values()[stageIdx].getTexture();
             } else {
                 texture = BYAKUGAN_EYES_TEXTURE;
             }
+            renderIrisQuads(poseStack, buffer, texture);
+        }
+    }
+
+    private void renderIrisQuads(PoseStack poseStack, MultiBufferSource buffer, ResourceLocation texture) {
             VertexConsumer consumer = buffer.getBuffer(RenderType.entityTranslucent(texture));
             poseStack.pushPose();
             this.getParentModel().head.translateAndRotate(poseStack);
@@ -66,7 +77,6 @@ public class SharinganEyesLayer extends RenderLayer<AbstractClientPlayer, Player
             drawEyeQuad(consumer, matrix, normal, 1.0F / 16.0F, 2.0F / 16.0F, yTop, yBottom, z, fullBright);
 
             poseStack.popPose();
-        });
     }
 
     private static void drawEyeQuad(VertexConsumer consumer, org.joml.Matrix4f matrix, org.joml.Matrix3f normal,

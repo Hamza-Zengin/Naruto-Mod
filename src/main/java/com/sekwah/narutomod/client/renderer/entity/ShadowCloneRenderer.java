@@ -36,6 +36,8 @@ public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, 
                 new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_INNER_ARMOR)),
                 new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)),
                 context.getModelManager()));
+        this.addLayer(new com.sekwah.narutomod.client.renderer.entity.layers.SharinganEyesLayer<>(this));
+        this.addLayer(new com.sekwah.narutomod.client.renderer.entity.layers.SusanooRibcageLayer<>(this, context.getModelSet()));
     }
 
     public boolean isSlimSkin(ShadowCloneEntity entity) {

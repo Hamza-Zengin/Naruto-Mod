@@ -96,7 +96,7 @@ public class ShadowCloneEntity extends PathfinderMob {
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 6.0D) // 3 hearts base health
+                .add(Attributes.MAX_HEALTH, 4.0D) // 2 hearts base health
                 .add(Attributes.MOVEMENT_SPEED, 0.32D)
                 .add(Attributes.ATTACK_DAMAGE, 5.0D)
                 .add(Attributes.FOLLOW_RANGE, 24.0D);
