@@ -3,6 +3,7 @@
   "pools": [
     {
       "rolls": {
+        "type": "minecraft:uniform",
         "min": 3,
         "max": 5
       },
@@ -26,23 +27,27 @@
           "type": "minecraft:item",
           "weight": 12,
           "name": "narutomod:chakra_metal",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": { "min": 2, "max": 5 }
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 5
             }
-          ]
+          }
         },
         {
           "type": "minecraft:item",
           "weight": 10,
           "name": "narutomod:kunai",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": { "min": 4, "max": 10 }
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 4,
+              "max": 10
             }
-          ]
+          }
         }
       ]
     }

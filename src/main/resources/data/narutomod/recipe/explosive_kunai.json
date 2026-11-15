@@ -1,15 +1,11 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    {
-      "item": "narutomod:kunai"
-    },
-    {
-      "item": "narutomod:paper_bomb"
-    }
+    "narutomod:kunai",
+    "narutomod:paper_bomb"
   ],
   "result": {
-    "item": "narutomod:explosive_kunai",
+    "id": "narutomod:explosive_kunai",
     "count": 1
   }
 }

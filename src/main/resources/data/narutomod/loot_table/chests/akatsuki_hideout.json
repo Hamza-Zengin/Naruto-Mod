@@ -3,6 +3,7 @@
   "pools": [
     {
       "rolls": {
+        "type": "minecraft:uniform",
         "min": 3,
         "max": 6
       },
@@ -11,34 +12,40 @@
           "type": "minecraft:item",
           "weight": 12,
           "name": "narutomod:chakra_metal",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": { "min": 2, "max": 6 }
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 6
             }
-          ]
+          }
         },
         {
           "type": "minecraft:item",
           "weight": 10,
           "name": "narutomod:explosive_kunai",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": { "min": 2, "max": 5 }
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 5
             }
-          ]
+          }
         },
         {
           "type": "minecraft:item",
           "weight": 8,
           "name": "narutomod:military_rations_pill",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": { "min": 1, "max": 3 }
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 3
             }
-          ]
+          }
         },
         {
           "type": "minecraft:item",
@@ -54,12 +61,14 @@
           "type": "minecraft:item",
           "weight": 10,
           "name": "minecraft:gold_ingot",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": { "min": 2, "max": 7 }
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 7
             }
-          ]
+          }
         }
       ]
     }

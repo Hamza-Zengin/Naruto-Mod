@@ -6,15 +6,11 @@
     " S "
   ],
   "key": {
-    "S": {
-      "item": "narutomod:shuriken"
-    },
-    "C": {
-      "item": "narutomod:chakra_metal"
-    }
+    "S": "narutomod:shuriken",
+    "C": "narutomod:chakra_metal"
   },
   "result": {
-    "item": "narutomod:fuma_shuriken",
+    "id": "narutomod:fuma_shuriken",
     "count": 2
   }
 }

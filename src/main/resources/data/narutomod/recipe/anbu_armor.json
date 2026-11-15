@@ -6,18 +6,12 @@
     "CKC"
   ],
   "key": {
-    "C": {
-      "item": "narutomod:chakra_metal"
-    },
-    "I": {
-      "item": "minecraft:iron_ingot"
-    },
-    "K": {
-      "item": "narutomod:kunai"
-    }
+    "C": "narutomod:chakra_metal",
+    "I": "minecraft:iron_ingot",
+    "K": "narutomod:kunai"
   },
   "result": {
-    "item": "narutomod:anbu_armor",
+    "id": "narutomod:anbu_armor",
     "count": 1
   }
 }

@@ -6,15 +6,11 @@
     "GGG"
   ],
   "key": {
-    "G": {
-      "item": "minecraft:gunpowder"
-    },
-    "P": {
-      "item": "minecraft:paper"
-    }
+    "G": "minecraft:gunpowder",
+    "P": "minecraft:paper"
   },
   "result": {
-    "item": "narutomod:paper_bomb",
+    "id": "narutomod:paper_bomb",
     "count": 3
   }
 }

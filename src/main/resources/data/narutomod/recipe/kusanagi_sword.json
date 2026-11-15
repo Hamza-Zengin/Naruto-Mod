@@ -6,15 +6,11 @@
     " D "
   ],
   "key": {
-    "C": {
-      "item": "narutomod:chakra_metal"
-    },
-    "D": {
-      "item": "minecraft:diamond_sword"
-    }
+    "C": "narutomod:chakra_metal",
+    "D": "minecraft:diamond_sword"
   },
   "result": {
-    "item": "narutomod:kusanagi_sword",
+    "id": "narutomod:kusanagi_sword",
     "count": 1
   }
 }

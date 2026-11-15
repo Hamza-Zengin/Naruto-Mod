@@ -6,18 +6,12 @@
     " B "
   ],
   "key": {
-    "C": {
-      "item": "narutomod:chakra_metal"
-    },
-    "D": {
-      "item": "minecraft:diamond_sword"
-    },
-    "B": {
-      "item": "minecraft:prismarine_shard"
-    }
+    "C": "narutomod:chakra_metal",
+    "D": "minecraft:diamond_sword",
+    "B": "minecraft:prismarine_shard"
   },
   "result": {
-    "item": "narutomod:samehada",
+    "id": "narutomod:samehada",
     "count": 1
   }
 }

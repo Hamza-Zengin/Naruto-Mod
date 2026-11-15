@@ -6,12 +6,10 @@
     "N  "
   ],
   "key": {
-    "N": {
-      "item": "minecraft:iron_nugget"
-    }
+    "N": "minecraft:iron_nugget"
   },
   "result": {
-    "item": "narutomod:senbon",
+    "id": "narutomod:senbon",
     "count": 16
   }
 }

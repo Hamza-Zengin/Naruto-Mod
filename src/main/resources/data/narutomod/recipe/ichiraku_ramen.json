@@ -1,21 +1,13 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    {
-      "item": "minecraft:bowl"
-    },
-    {
-      "item": "minecraft:wheat"
-    },
-    {
-      "item": "minecraft:cooked_porkchop"
-    },
-    {
-      "item": "minecraft:egg"
-    }
+    "minecraft:bowl",
+    "minecraft:wheat",
+    "minecraft:cooked_porkchop",
+    "minecraft:egg"
   ],
   "result": {
-    "item": "narutomod:ichiraku_ramen",
+    "id": "narutomod:ichiraku_ramen",
     "count": 1
   }
 }

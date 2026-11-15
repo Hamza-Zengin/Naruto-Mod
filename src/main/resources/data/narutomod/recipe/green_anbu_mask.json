@@ -6,15 +6,11 @@
     " W "
   ],
   "key": {
-    "W": {
-      "item": "minecraft:white_terracotta"
-    },
-    "G": {
-      "item": "minecraft:green_dye"
-    }
+    "W": "minecraft:white_terracotta",
+    "G": "minecraft:green_dye"
   },
   "result": {
-    "item": "narutomod:green_anbu_mask",
+    "id": "narutomod:green_anbu_mask",
     "count": 1
   }
 }

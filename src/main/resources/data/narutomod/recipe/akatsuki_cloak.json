@@ -6,18 +6,12 @@
     "BBB"
   ],
   "key": {
-    "B": {
-      "item": "minecraft:black_wool"
-    },
-    "R": {
-      "item": "minecraft:red_dye"
-    },
-    "C": {
-      "item": "narutomod:chakra_metal"
-    }
+    "B": "minecraft:black_wool",
+    "R": "minecraft:red_dye",
+    "C": "narutomod:chakra_metal"
   },
   "result": {
-    "item": "narutomod:akatsuki_cloak",
+    "id": "narutomod:akatsuki_cloak",
     "count": 1
   }
 }

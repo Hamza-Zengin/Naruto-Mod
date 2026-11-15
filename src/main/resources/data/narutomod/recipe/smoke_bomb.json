@@ -6,18 +6,12 @@
     " P "
   ],
   "key": {
-    "P": {
-      "item": "minecraft:paper"
-    },
-    "G": {
-      "item": "minecraft:gunpowder"
-    },
-    "C": {
-      "item": "minecraft:coal"
-    }
+    "P": "minecraft:paper",
+    "G": "minecraft:gunpowder",
+    "C": "minecraft:coal"
   },
   "result": {
-    "item": "narutomod:smoke_bomb",
+    "id": "narutomod:smoke_bomb",
     "count": 4
   }
 }
