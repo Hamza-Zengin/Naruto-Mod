@@ -8,15 +8,21 @@
       "spawns": [
         {
           "type": "narutomod:akatsuki_ninja",
-          "weight": 10,
-          "minCount": 1,
-          "maxCount": 2
+          "count": {
+            "type": "minecraft:uniform",
+            "min_inclusive": 1,
+            "max_inclusive": 2
+          },
+          "weight": 10
         },
         {
           "type": "narutomod:rogue_ninja",
-          "weight": 20,
-          "minCount": 1,
-          "maxCount": 3
+          "count": {
+            "type": "minecraft:uniform",
+            "min_inclusive": 1,
+            "max_inclusive": 3
+          },
+          "weight": 20
         }
       ]
     }

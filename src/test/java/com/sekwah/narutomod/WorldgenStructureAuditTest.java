@@ -80,4 +80,43 @@ public class WorldgenStructureAuditTest {
 
         Assertions.assertFalse(checkedLocations.isEmpty(), "Expected at least one structure location to be audited!");
     }
+
+    @Test
+    public void testAllStructureSpawnOverridesUseCountSchema() throws IOException {
+        Path structureDir = DATA_DIR.resolve("narutomod/worldgen/structure");
+        Assertions.assertTrue(Files.isDirectory(structureDir), "worldgen/structure directory must exist!");
+
+        try (Stream<Path> walk = Files.walk(structureDir)) {
+            List<Path> structureFiles = walk
+                    .filter(Files::isRegularFile)
+                    .filter(p -> p.toString().endsWith(".json"))
+                    .sorted()
+                    .toList();
+            Assertions.assertFalse(structureFiles.isEmpty(), "At least one structure JSON must exist!");
+
+            for (Path structureFile : structureFiles) {
+                JsonObject root = JsonParser.parseString(Files.readString(structureFile)).getAsJsonObject();
+                if (!root.has("spawn_overrides")) {
+                    continue;
+                }
+                JsonObject overrides = root.getAsJsonObject("spawn_overrides");
+                for (String category : overrides.keySet()) {
+                    JsonObject catObj = overrides.getAsJsonObject(category);
+                    if (!catObj.has("spawns")) {
+                        continue;
+                    }
+                    JsonArray spawns = catObj.getAsJsonArray("spawns");
+                    for (JsonElement elem : spawns) {
+                        JsonObject spawn = elem.getAsJsonObject();
+                        Assertions.assertFalse(spawn.has("minCount") || spawn.has("maxCount"),
+                                structureFile.getFileName() + " uses legacy 1.20.1 minCount/maxCount instead of 26.3 'count'");
+                        Assertions.assertTrue(spawn.has("count"),
+                                structureFile.getFileName() + " spawn entry missing required 26.3 'count' field");
+                        Assertions.assertTrue(spawn.has("weight"),
+                                structureFile.getFileName() + " spawn entry missing 'weight' field");
+                    }
+                }
+            }
+        }
+    }
 }
