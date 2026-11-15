@@ -207,15 +207,15 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
             if (ninjaData != null) {
                 ninjaData.addChakra(getScaledChakraCost(ninjaData));
             }
-            player.displayClientMessage(Component.translatable("jutsu.fail.notonground",
-                    Component.translatable(this.getTranslationKey())).withStyle(ChatFormatting.GRAY), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.fail.notonground",
+                    Component.translatable(this.getTranslationKey())).withStyle(ChatFormatting.GRAY));
             return;
         }
 
         // Spawn silent decoy ShadowCloneEntity at oldPos before teleporting
-        ShadowCloneEntity decoy = NarutoEntities.SHADOW_CLONE.get().create(serverLevel);
+        ShadowCloneEntity decoy = NarutoEntities.SHADOW_CLONE.get().create(serverLevel, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
         if (decoy != null) {
-            decoy.moveTo(oldPos.x, oldPos.y, oldPos.z, player.getYRot(), player.getXRot());
+            decoy.snapTo(oldPos.x, oldPos.y, oldPos.z, player.getYRot(), player.getXRot());
             decoy.yHeadRot = player.yHeadRot;
             decoy.yBodyRot = player.yBodyRot;
             decoy.setOwner(player);
@@ -234,6 +234,6 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
 
         // Silent teleport with zero particles and zero sound
         player.teleportTo(safePos.x, safePos.y, safePos.z);
-        player.fallDistance = 0.0f;
+        player.resetFallDistance();
     }
 }

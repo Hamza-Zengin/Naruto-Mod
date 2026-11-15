@@ -13,7 +13,7 @@ public class KeyBindingTickHeld extends KeyMapping {
     private Runnable onClick = null;
     private Runnable onHeldRelease = null;
 
-    public KeyBindingTickHeld(String name, int keyCode, String category) {
+    public KeyBindingTickHeld(String name, int keyCode, KeyMapping.Category category) {
         super(name, keyCode, category);
     }
 
@@ -48,11 +48,10 @@ public class KeyBindingTickHeld extends KeyMapping {
             hasConsumedClickState = true;
             return KeyState.CLICK;
         } else {
-            if(this.clickCount == 0) {
-                return KeyState.NOT_PRESSED;
-            } else {
-                --this.clickCount;
+            if(this.consumeClick()) {
                 return KeyState.CLICK;
+            } else {
+                return KeyState.NOT_PRESSED;
             }
         }
     }
@@ -94,8 +93,10 @@ public class KeyBindingTickHeld extends KeyMapping {
     public void setDown(boolean down) {
         // Resets clicks to 0 if extra clicks are a result of a consumed click state. Should account for lag properly.
         if(this.isDown() && !down) {
-            if(hasConsumedClickState && this.clickCount > 0) {
-                this.clickCount = 0;
+            if(hasConsumedClickState) {
+                while(this.consumeClick()) {
+                    // Drain any queued clicks already handled via consumeClickState
+                }
             }
             hasConsumedClickState = false;
         }

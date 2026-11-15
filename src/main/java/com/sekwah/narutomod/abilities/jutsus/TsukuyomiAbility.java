@@ -60,15 +60,15 @@ public class TsukuyomiAbility extends Ability implements Ability.Cooldown {
         if (ninjaData == null) return false;
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
             if (player != null) {
-                player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
-                        Component.literal("Uchiha").withStyle(ChatFormatting.RED)), true);
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
+                        Component.literal("Uchiha").withStyle(ChatFormatting.RED)));
             }
             return false;
         }
         if (!ninjaData.isSharinganActive() || !SharinganAbility.hasMangekyou(ninjaData)) {
             if (player != null) {
-                player.displayClientMessage(Component.translatable("narutomod.ability.amaterasu.requires_mangekyo")
-                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), true);
+                player.sendOverlayMessage(Component.translatable("narutomod.ability.amaterasu.requires_mangekyo")
+                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
             }
             return false;
         }
@@ -104,15 +104,17 @@ public class TsukuyomiAbility extends Ability implements Ability.Cooldown {
         }
 
         serverLevel.playSound(null, player.blockPosition(), SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 0.8f, 1.5f);
-        serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE, eyePos.x, eyePos.y, eyePos.z, 15, 0.2, 0.2, 0.2, 0.05);
+        serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE, eyePos.x, eyePos.y, eyePos.z, 15, 0.2, 0.2, 0.2, 0.05,
+                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
         if (bestTarget != null) {
             bestTarget.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, duration, 1));
             bestTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, duration, 0));
-            bestTarget.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, duration, 5));
+            bestTarget.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, duration, 5));
             bestTarget.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, duration, 2));
-            bestTarget.hurt(player.damageSources().magic(), mentalDamage);
-            serverLevel.sendParticles(ParticleTypes.PORTAL, bestTarget.getX(), bestTarget.getEyeY(), bestTarget.getZ(), 35, 0.4, 0.6, 0.4, 0.2);
+            bestTarget.hurtServer(serverLevel, player.damageSources().magic(), mentalDamage);
+            serverLevel.sendParticles(ParticleTypes.PORTAL, bestTarget.getX(), bestTarget.getEyeY(), bestTarget.getZ(), 35, 0.4, 0.6, 0.4, 0.2,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
     }
 }

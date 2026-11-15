@@ -6,22 +6,22 @@ import com.sekwah.narutomod.capabilities.NinjaRank;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 
 public abstract class Ability {
 
-    private ResourceLocation registryName;
+    private Identifier registryName;
 
     public Ability() {
     }
 
-    public ResourceLocation getRegistryName() {
+    public Identifier getRegistryName() {
         if (this.registryName == null) {
             try {
-                for (net.minecraftforge.registries.RegistryObject<Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
-                    if (entry.isPresent() && entry.get() == this) {
+                for (net.neoforged.neoforge.registries.DeferredHolder<Ability, ? extends Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
+                    if (entry.isBound() && entry.get() == this) {
                         this.registryName = entry.getId();
                         break;
                     }
@@ -33,7 +33,7 @@ public abstract class Ability {
         return this.registryName;
     }
 
-    public Ability setRegistryName(ResourceLocation registryName) {
+    public Ability setRegistryName(Identifier registryName) {
         this.registryName = registryName;
         return this;
     }
@@ -42,7 +42,7 @@ public abstract class Ability {
         return NinjaRank.GENIN;
     }
 
-    public java.util.List<ResourceLocation> getPrerequisites() {
+    public java.util.List<Identifier> getPrerequisites() {
         return java.util.Collections.emptyList();
     }
 
@@ -52,12 +52,12 @@ public abstract class Ability {
 
     public boolean meetsPrerequisites(INinjaData ninjaData) {
         if (ninjaData == null) return false;
-        java.util.List<ResourceLocation> prereqs = getPrerequisites();
+        java.util.List<Identifier> prereqs = getPrerequisites();
         if (prereqs == null || prereqs.isEmpty()) {
             return true;
         }
         int reqMastery = getRequiredMastery();
-        for (ResourceLocation prereq : prereqs) {
+        for (Identifier prereq : prereqs) {
             boolean unlocked = (ninjaData.getUnlockedAbilities() != null && ninjaData.getUnlockedAbilities().contains(prereq))
                     || ninjaData.isAbilityUnlocked(prereq);
             if (!unlocked) {
@@ -79,8 +79,8 @@ public abstract class Ability {
             NinjaRank current = NinjaRank.fromString(ninjaData.getRank());
             if (!current.isAtLeast(required)) {
                 if (player != null) {
-                    player.displayClientMessage(Component.translatable("jutsu.fail.rank",
-                            Component.translatable(required.getTranslationKey()).withStyle(ChatFormatting.RED)), true);
+                    player.sendOverlayMessage(Component.translatable("jutsu.fail.rank",
+                            Component.translatable(required.getTranslationKey()).withStyle(ChatFormatting.RED)));
                 }
                 return false;
             }
@@ -193,7 +193,7 @@ public abstract class Ability {
     }
 
     public float getChakraCost() {
-        ResourceLocation reg = getRegistryName();
+        Identifier reg = getRegistryName();
         if (reg != null) {
             JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
             if (data != null && data.chakraCost() >= 0) {
@@ -204,7 +204,7 @@ public abstract class Ability {
     }
 
     public float getStaminaCost() {
-        ResourceLocation reg = getRegistryName();
+        Identifier reg = getRegistryName();
         if (reg != null) {
             JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
             if (data != null && data.staminaCost() >= 0) {
@@ -215,7 +215,7 @@ public abstract class Ability {
     }
 
     public float getDamage() {
-        ResourceLocation reg = getRegistryName();
+        Identifier reg = getRegistryName();
         if (reg != null) {
             JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
             if (data != null && data.damage() >= 0) {
@@ -228,7 +228,7 @@ public abstract class Ability {
     public float getDamage(INinjaData ninjaData) {
         float base = getDamage();
         if (ninjaData == null) return base;
-        ResourceLocation reg = getRegistryName();
+        Identifier reg = getRegistryName();
         int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
         return base * getPowerMultiplier(mastery);
     }
@@ -238,7 +238,7 @@ public abstract class Ability {
     }
 
     public int getCooldown() {
-        ResourceLocation reg = getRegistryName();
+        Identifier reg = getRegistryName();
         if (reg != null) {
             JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
             if (data != null && data.cooldown() >= 0) {
@@ -251,7 +251,7 @@ public abstract class Ability {
     public int getCooldown(INinjaData ninjaData) {
         int base = getCooldown();
         if (ninjaData == null) return base;
-        ResourceLocation reg = getRegistryName();
+        Identifier reg = getRegistryName();
         int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
         return getCooldown(mastery);
     }
@@ -320,7 +320,7 @@ public abstract class Ability {
     public float getScaledChakraCost(INinjaData ninjaData) {
         float baseCost = getEffectiveChakraCost(ninjaData);
         if (ninjaData == null) return baseCost;
-        ResourceLocation reg = getRegistryName();
+        Identifier reg = getRegistryName();
         int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
         return Math.max(1.0f, baseCost * getChakraCostMultiplier(mastery));
     }
@@ -358,7 +358,7 @@ public abstract class Ability {
 
     public int getActivationDelayTicks(INinjaData ninjaData) {
         if (ninjaData == null || !this.requiresSealActivationDelay()) return 0;
-        ResourceLocation reg = getRegistryName();
+        Identifier reg = getRegistryName();
         int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
         return getScaledActivationDelay(mastery);
     }
@@ -376,13 +376,13 @@ public abstract class Ability {
      */
     public boolean tryConsume(Player player, INinjaData ninjaData, float chakraCost, float staminaCost, int regenDelay) {
         if (ninjaData.getChakra() < chakraCost) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra",
+                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
             return false;
         }
         if (ninjaData.getStamina() < staminaCost) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughstamina",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughstamina",
+                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
             return false;
         }
 
@@ -400,7 +400,7 @@ public abstract class Ability {
     }
 
     public String getTranslationKey() {
-        ResourceLocation reg = this.getRegistryName();
+        Identifier reg = this.getRegistryName();
         return reg != null ? reg.toString() : "ability.unknown";
     }
 
@@ -413,7 +413,7 @@ public abstract class Ability {
     public void perform(Player player, INinjaData ninjaData, int ticksActive) {
         this.performServer(player, ninjaData, ticksActive);
         if (ninjaData != null && this.activationType() != ActivationType.TOGGLE) {
-            ResourceLocation reg = this.getRegistryName();
+            Identifier reg = this.getRegistryName();
             if (reg != null) {
                 ninjaData.incrementJutsuMastery(reg, false);
             }
@@ -461,10 +461,10 @@ public abstract class Ability {
 
         default boolean checkCooldown(Player player, INinjaData ninjaData, String translationKey) {
             if (getCooldown(ninjaData) > 0 && ninjaData.getCooldownEvents().containsKey(translationKey)) {
-                player.displayClientMessage(Component.translatable("jutsu.fail.cooldown",
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.cooldown",
                         Component.translatable(translationKey).withStyle(ChatFormatting.YELLOW),
                         Component.literal(String.valueOf((int) Math.ceil(ninjaData.getCooldownEvents().get(translationKey).ticks / 20f))).withStyle(ChatFormatting.YELLOW)
-                ), true);
+                ));
                 return true;
             }
             return false;

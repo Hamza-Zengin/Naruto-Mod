@@ -2,28 +2,24 @@ package com.sekwah.narutomod.entity.jutsuprojectile;
 
 import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.sounds.NarutoSounds;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,8 +51,8 @@ public class JutsuVisualEffectEntity extends Entity {
             SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_YAW =
             SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Optional<UUID>> DATA_CASTER_UUID =
-            SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Optional<net.minecraft.world.entity.EntityReference<LivingEntity>>> DATA_CASTER_UUID =
+            SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
     public JutsuVisualEffectEntity(EntityType<? extends JutsuVisualEffectEntity> type, Level level) {
         super(type, level);
@@ -78,20 +74,20 @@ public class JutsuVisualEffectEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_VISUAL_TYPE, TYPE_KIRIN_DRAGON);
-        this.entityData.define(DATA_MAX_LIFE, 40);
-        this.entityData.define(DATA_TARGET_ID, -1);
-        this.entityData.define(DATA_YAW, 0.0F);
-        this.entityData.define(DATA_CASTER_UUID, Optional.empty());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_VISUAL_TYPE, TYPE_KIRIN_DRAGON);
+        builder.define(DATA_MAX_LIFE, 40);
+        builder.define(DATA_TARGET_ID, -1);
+        builder.define(DATA_YAW, 0.0F);
+        builder.define(DATA_CASTER_UUID, Optional.empty());
     }
 
     public Optional<UUID> getCasterUUID() {
-        return this.entityData.get(DATA_CASTER_UUID);
+        return this.entityData.get(DATA_CASTER_UUID).map(net.minecraft.world.entity.EntityReference::getUUID);
     }
 
     public void setCasterUUID(UUID uuid) {
-        this.entityData.set(DATA_CASTER_UUID, Optional.ofNullable(uuid));
+        this.entityData.set(DATA_CASTER_UUID, Optional.ofNullable(uuid).map(net.minecraft.world.entity.EntityReference::of));
     }
 
     public Player getCasterPlayer() {
@@ -123,7 +119,7 @@ public class JutsuVisualEffectEntity extends Entity {
         }
 
         // 2. Server-side Jutsu Combat & Physical Functionality (Modularized entities handled in their own classes)
-        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
             Player caster = this.getCasterPlayer();
 
             switch (type) {
@@ -136,10 +132,10 @@ public class JutsuVisualEffectEntity extends Entity {
                     List<Entity> entities = serverLevel.getEntities(this, gustBox);
                     for (Entity e : entities) {
                         if (e instanceof LivingEntity living && living.isAlive() && (caster == null || living != caster)) {
-                            living.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().generic(), 10.0F);
+                            living.hurtServer(serverLevel, caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().generic(), 10.0F);
                             Vec3 push = this.getDeltaMovement().normalize().scale(2.2D).add(0, 0.45D, 0);
                             living.setDeltaMovement(push);
-                            living.hurtMarked = true;
+                            living.needsSync = true;
                         } else if (e instanceof Projectile projectile) {
                             projectile.setDeltaMovement(this.getDeltaMovement().scale(1.8D));
                         }
@@ -154,10 +150,10 @@ public class JutsuVisualEffectEntity extends Entity {
                         List<LivingEntity> victims = serverLevel.getEntitiesOfClass(LivingEntity.class, ringBox,
                                 e -> e.isAlive() && (caster == null || e != caster));
                         for (LivingEntity v : victims) {
-                            v.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().generic(), 7.0F);
+                            v.hurtServer(serverLevel, caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().generic(), 7.0F);
                             v.setDeltaMovement(v.getDeltaMovement().x, 0.48D, v.getDeltaMovement().z);
-                            v.hurtMarked = true;
-                            v.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 50, 1));
+                            v.needsSync = true;
+                            v.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 50, 1));
                         }
                     }
                 }
@@ -169,7 +165,7 @@ public class JutsuVisualEffectEntity extends Entity {
                         List<LivingEntity> burning = serverLevel.getEntitiesOfClass(LivingEntity.class, flameBox,
                                 e -> e.isAlive() && (caster == null || e != caster));
                         for (LivingEntity b : burning) {
-                            b.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().inFire(), 5.0F);
+                            b.hurtServer(serverLevel, caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().inFire(), 5.0F);
                             b.setRemainingFireTicks(240);
                             b.addEffect(new MobEffectInstance(MobEffects.WITHER, 100, 2));
                         }
@@ -182,13 +178,13 @@ public class JutsuVisualEffectEntity extends Entity {
                         // Ground slam moment
                         serverLevel.playSound(null, this.blockPosition(), NarutoSounds.KIRIN_STRIKE.get(), SoundSource.WEATHER, 3.5F, 0.85F);
                         serverLevel.playSound(null, this.blockPosition(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 3.5F, 0.75F);
-                        serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.6F, 1.0F);
+                        serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 1.6F, 1.0F);
 
                         AABB slamBox = this.getBoundingBox().inflate(6.5D, 3.0D, 6.5D);
                         List<LivingEntity> struck = serverLevel.getEntitiesOfClass(LivingEntity.class, slamBox,
                                 e -> e.isAlive() && (caster == null || e != caster));
                         for (LivingEntity s : struck) {
-                            s.hurt(serverLevel.damageSources().lightningBolt(), 32.0F);
+                            s.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), 32.0F);
                             double dx = s.getX() - this.getX();
                             double dz = s.getZ() - this.getZ();
                             double distSq = dx * dx + dz * dz;
@@ -200,7 +196,7 @@ public class JutsuVisualEffectEntity extends Entity {
                                 s.push(0, 0.75D, 0);
                             }
                             s.setRemainingFireTicks(100);
-                            s.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 2));
+                            s.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 80, 2));
                         }
                     }
                 }
@@ -268,26 +264,23 @@ public class JutsuVisualEffectEntity extends Entity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
-        this.setVisualType(tag.getInt("VisualType"));
-        this.setMaxLife(tag.getInt("MaxLife"));
-        this.setEffectYaw(tag.getFloat("EffectYaw"));
-        if (tag.hasUUID("CasterUUID")) {
-            this.setCasterUUID(tag.getUUID("CasterUUID"));
-        }
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return false;
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
-        tag.putInt("VisualType", this.getVisualType());
-        tag.putInt("MaxLife", this.getMaxLife());
-        tag.putFloat("EffectYaw", this.getEffectYaw());
-        Optional<UUID> uuidOpt = this.getCasterUUID();
-        uuidOpt.ifPresent(uuid -> tag.putUUID("CasterUUID", uuid));
+    protected void readAdditionalSaveData(ValueInput input) {
+        this.setVisualType(input.getIntOr("VisualType", TYPE_KIRIN_DRAGON));
+        this.setMaxLife(input.getIntOr("MaxLife", 40));
+        this.setEffectYaw(input.getFloatOr("EffectYaw", 0.0F));
+        input.read("CasterUUID", UUIDUtil.CODEC).ifPresent(this::setCasterUUID);
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    protected void addAdditionalSaveData(ValueOutput output) {
+        output.putInt("VisualType", this.getVisualType());
+        output.putInt("MaxLife", this.getMaxLife());
+        output.putFloat("EffectYaw", this.getEffectYaw());
+        this.getCasterUUID().ifPresent(uuid -> output.store("CasterUUID", UUIDUtil.CODEC, uuid));
     }
 }

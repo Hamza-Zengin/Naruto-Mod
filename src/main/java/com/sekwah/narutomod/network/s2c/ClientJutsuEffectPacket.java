@@ -1,31 +1,34 @@
 package com.sekwah.narutomod.network.s2c;
 
-import com.sekwah.narutomod.client.events.ClientEffectHandler;
+import com.sekwah.narutomod.NarutoMod;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 /**
  * Lightweight S2C packet for instant client-side jutsu visual/particle bursts
  * without spawning server-ticked visual entities.
  */
-public class ClientJutsuEffectPacket {
+public class ClientJutsuEffectPacket implements CustomPacketPayload {
+
+    public static final CustomPacketPayload.Type<ClientJutsuEffectPacket> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "client_jutsu_effect"));
+
+    public static final StreamCodec<FriendlyByteBuf, ClientJutsuEffectPacket> STREAM_CODEC =
+            StreamCodec.ofMember(ClientJutsuEffectPacket::encode, ClientJutsuEffectPacket::decode);
 
     private static final int FIXED_TAIL_BYTES = (3 * Double.BYTES) + (3 * Double.BYTES) + Float.BYTES + Integer.BYTES; // 56 bytes
 
-    public final ResourceLocation effectId;
+    public final Identifier effectId;
     public final Vec3 position;
     public final Vec3 direction;
     public final float scale;
     public final int colorHex;
 
-    public ClientJutsuEffectPacket(ResourceLocation effectId, Vec3 position, Vec3 direction, float scale, int colorHex) {
+    public ClientJutsuEffectPacket(Identifier effectId, Vec3 position, Vec3 direction, float scale, int colorHex) {
         this.effectId = effectId;
         this.position = position;
         this.direction = direction;
@@ -33,8 +36,13 @@ public class ClientJutsuEffectPacket {
         this.colorHex = colorHex;
     }
 
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
     public static void encode(ClientJutsuEffectPacket msg, FriendlyByteBuf buf) {
-        buf.writeResourceLocation(msg.effectId);
+        buf.writeIdentifier(msg.effectId);
         buf.writeDouble(msg.position.x);
         buf.writeDouble(msg.position.y);
         buf.writeDouble(msg.position.z);
@@ -49,7 +57,7 @@ public class ClientJutsuEffectPacket {
         if (buf.readableBytes() < 1) {
             throw new DecoderException("Empty ClientJutsuEffectPacket buffer");
         }
-        ResourceLocation effectId = buf.readResourceLocation();
+        Identifier effectId = buf.readIdentifier();
         if (buf.readableBytes() < FIXED_TAIL_BYTES) {
             throw new DecoderException("Truncated ClientJutsuEffectPacket payload: expected "
                     + FIXED_TAIL_BYTES + " bytes, got " + buf.readableBytes());
@@ -70,14 +78,5 @@ public class ClientJutsuEffectPacket {
         }
 
         return new ClientJutsuEffectPacket(effectId, new Vec3(px, py, pz), new Vec3(dx, dy, dz), scale, colorHex);
-    }
-
-    public static class Handler {
-        public static void handle(ClientJutsuEffectPacket msg, Supplier<NetworkEvent.Context> ctx) {
-            ctx.get().enqueueWork(() ->
-                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientEffectHandler.handleJutsuEffect(msg))
-            );
-            ctx.get().setPacketHandled(true);
-        }
     }
 }

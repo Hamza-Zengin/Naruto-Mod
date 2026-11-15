@@ -2,12 +2,12 @@ package com.sekwah.narutomod.config;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.client.gui.BarDesigns;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
-@Mod.EventBusSubscriber(modid = NarutoMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = NarutoMod.MOD_ID)
 public class NarutoConfig {
 
     public static final String SERVER = "server";
@@ -21,67 +21,67 @@ public class NarutoConfig {
     public static final String CATEGORY_UI = "ui";
     public static final String ENERGY_BARS = "energy_bars";
 
-    public static final ForgeConfigSpec MOD_CONFIG;
+    public static final ModConfigSpec MOD_CONFIG;
 
-    private static final ForgeConfigSpec.DoubleValue CONFIG_MAX_CHAKRA;
+    private static final ModConfigSpec.DoubleValue CONFIG_MAX_CHAKRA;
     public static float maxChakra = 1000.0f;
 
-    private static final ForgeConfigSpec.DoubleValue CONFIG_MAX_STAMINA;
+    private static final ModConfigSpec.DoubleValue CONFIG_MAX_STAMINA;
     public static float maxStamina = 800.0f;
 
-    private static final ForgeConfigSpec.DoubleValue CONFIG_CHAKRA_REGEN_RATE;
+    private static final ModConfigSpec.DoubleValue CONFIG_CHAKRA_REGEN_RATE;
     public static float chakraRegenRate = 0.05f;
 
-    private static final ForgeConfigSpec.DoubleValue CONFIG_STAMINA_REGEN_RATE;
+    private static final ModConfigSpec.DoubleValue CONFIG_STAMINA_REGEN_RATE;
     public static float staminaRegenRate = 0.4f;
 
-    private static final ForgeConfigSpec.BooleanValue CONFIG_KUNAI_BLOCK_DAMAGE;
+    private static final ModConfigSpec.BooleanValue CONFIG_KUNAI_BLOCK_DAMAGE;
     public static boolean kunaiBlockDamage = true;
 
-    private static final ForgeConfigSpec.DoubleValue CONFIG_KUNAI_EXPLOSION_RADIUS;
+    private static final ModConfigSpec.DoubleValue CONFIG_KUNAI_EXPLOSION_RADIUS;
     public static float kunaiExplosionRadius = 3.0f;
 
-    private static final ForgeConfigSpec.DoubleValue CONFIG_PAPERBOMB_EXPLOSION_RADIUS;
+    private static final ModConfigSpec.DoubleValue CONFIG_PAPERBOMB_EXPLOSION_RADIUS;
     public static float paperbombExplosionRadius = 4.0f;
 
-    private static final ForgeConfigSpec.BooleanValue CONFIG_PAPERBOMB_BLOCK_DAMAGE;
+    private static final ModConfigSpec.BooleanValue CONFIG_PAPERBOMB_BLOCK_DAMAGE;
     public static boolean paperbombBlockDamage = true;
 
-    private static final ForgeConfigSpec.IntValue CONFIG_JUTSU_KEYBIND_HOLD_THRESHOLD;
+    private static final ModConfigSpec.IntValue CONFIG_JUTSU_KEYBIND_HOLD_THRESHOLD;
     public static int jutsuKeybindHoldThreshold = 15;
 
-    private static final ForgeConfigSpec.IntValue CONFIG_JUTSU_CAST_DELAY;
+    private static final ModConfigSpec.IntValue CONFIG_JUTSU_CAST_DELAY;
     public static int jutsuCastDelay = 20;
 
-    private static final ForgeConfigSpec.IntValue CONFIG_CHAKRA_BAR_DESIGN;
+    private static final ModConfigSpec.IntValue CONFIG_CHAKRA_BAR_DESIGN;
     public static int chakraBarDesign = 0;
 
-    private static final ForgeConfigSpec.DoubleValue CONFIG_WATER_WALK_SPEED;
+    private static final ModConfigSpec.DoubleValue CONFIG_WATER_WALK_SPEED;
     public static float waterWalkSpeed = 1.0f;
 
-    private static final ForgeConfigSpec.IntValue CONFIG_SEAL_TIMEOUT_MS;
+    private static final ModConfigSpec.IntValue CONFIG_SEAL_TIMEOUT_MS;
     public static int sealTimeoutMs = 1500;
 
-    private static final ForgeConfigSpec.DoubleValue CONFIG_KAWARIMI_MIN_DISTANCE;
+    private static final ModConfigSpec.DoubleValue CONFIG_KAWARIMI_MIN_DISTANCE;
     public static double kawarimiMinDistance = 5.0d;
 
-    private static final ForgeConfigSpec.DoubleValue CONFIG_KAWARIMI_MAX_DISTANCE;
+    private static final ModConfigSpec.DoubleValue CONFIG_KAWARIMI_MAX_DISTANCE;
     public static double kawarimiMaxDistance = 14.0d;
 
-    private static final ForgeConfigSpec.IntValue CONFIG_KAWARIMI_MIN_COOLDOWN;
+    private static final ModConfigSpec.IntValue CONFIG_KAWARIMI_MIN_COOLDOWN;
     public static int kawarimiMinCooldownTicks = 60;
 
-    private static final ForgeConfigSpec.IntValue CONFIG_KAWARIMI_MAX_COOLDOWN;
+    private static final ModConfigSpec.IntValue CONFIG_KAWARIMI_MAX_COOLDOWN;
     public static int kawarimiMaxCooldownTicks = 200;
 
-    private static final ForgeConfigSpec.IntValue CONFIG_KAWARIMI_MIN_CAST;
+    private static final ModConfigSpec.IntValue CONFIG_KAWARIMI_MIN_CAST;
     public static int kawarimiMinCastTicks = 2;
 
-    private static final ForgeConfigSpec.IntValue CONFIG_KAWARIMI_MAX_CAST;
+    private static final ModConfigSpec.IntValue CONFIG_KAWARIMI_MAX_CAST;
     public static int kawarimiMaxCastTicks = 15;
 
     static {
-        ForgeConfigSpec.Builder configBuilder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder configBuilder = new ModConfigSpec.Builder();
 
         // ===========================================================
         // Server Settings
@@ -93,10 +93,10 @@ public class NarutoConfig {
         configBuilder.comment("Stuff such as regen rates and maximum (will likely change with updates, e.g. stats system)").push(ENERGY_BARS);
 
         CONFIG_MAX_CHAKRA = configBuilder.comment("Max Chakra")
-                .defineInRange("maxChakra",  1000F ,  0d, Integer.MAX_VALUE);
+                .defineInRange("maxChakra", 1000F, 0d, Integer.MAX_VALUE);
 
         CONFIG_MAX_STAMINA = configBuilder.comment("Max Stamina")
-                .defineInRange("maxStamina",  800F ,  0d, Integer.MAX_VALUE);
+                .defineInRange("maxStamina", 800F, 0d, Integer.MAX_VALUE);
 
         CONFIG_CHAKRA_REGEN_RATE = configBuilder.comment("Chakra regeneration per tick")
                 .defineInRange("chakraRegenRate", 0.05d, 0.001d, 100d);
@@ -138,10 +138,10 @@ public class NarutoConfig {
                 .define("kunaiExplosionBreakBlocks", true);
 
         CONFIG_KUNAI_EXPLOSION_RADIUS = configBuilder.comment("Explosive Kunai explosion radius")
-                .defineInRange("kunaiExplosionRadius",  3d ,  1d, 100d);
+                .defineInRange("kunaiExplosionRadius", 3d, 1d, 100d);
 
         CONFIG_PAPERBOMB_EXPLOSION_RADIUS = configBuilder.comment("Paper Bomb explosion radius")
-                .defineInRange("paperBombExplosionRadius",  4.0F ,  1d, 100d);
+                .defineInRange("paperBombExplosionRadius", 4.0F, 1d, 100d);
 
         CONFIG_PAPERBOMB_BLOCK_DAMAGE = configBuilder.comment("Paper Bomb block damage")
                 .define("paperBombExplosionBreakBlocks", true);
@@ -163,7 +163,7 @@ public class NarutoConfig {
 
         configBuilder.comment("Variables for UI").push(CATEGORY_UI);
         CONFIG_CHAKRA_BAR_DESIGN = configBuilder.comment("Design for the chakra bar")
-                .defineInRange("chakraBarDesign", 0, 0,  BarDesigns.BarInfo.values().length);
+                .defineInRange("chakraBarDesign", 0, 0, BarDesigns.BarInfo.values().length);
 
         configBuilder.pop();
 

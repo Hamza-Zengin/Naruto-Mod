@@ -39,13 +39,13 @@ public class LeapAbility extends Ability {
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         if(!player.onGround()) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notonground", Component.translatable("jutsu.leap").withStyle(ChatFormatting.YELLOW)), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.fail.notonground", Component.translatable("jutsu.leap").withStyle(ChatFormatting.YELLOW)));
             return false;
         }
         int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
         float staminaCost = Math.max(5.0f, 10.0f * getChakraCostMultiplier(mastery));
         if(ninjaData.getStamina() < staminaCost) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughstamina", Component.translatable("jutsu.leap").withStyle(ChatFormatting.YELLOW)), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughstamina", Component.translatable("jutsu.leap").withStyle(ChatFormatting.YELLOW)));
             return false;
         }
         ninjaData.useStamina(staminaCost, 40);

@@ -3,9 +3,6 @@ package com.sekwah.narutomod.entity.jutsuprojectile;
 import com.sekwah.narutomod.abilities.ChakraElement;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -15,16 +12,18 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 
 import java.util.List;
 
@@ -61,14 +60,16 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
 
     @Override
     public void explodeAndDiscard() {
-        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
             serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_SPLASH, SoundSource.PLAYERS, 1.5F, 1.0F);
             serverLevel.sendParticles(ParticleTypes.SPLASH,
                     this.getX(), this.getY() + 0.4D, this.getZ(),
-                    25, 0.5D, 0.5D, 0.5D, 0.15D);
+                    25, 0.5D, 0.5D, 0.5D, 0.15D,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             serverLevel.sendParticles(ParticleTypes.BUBBLE,
                     this.getX(), this.getY() + 0.4D, this.getZ(),
-                    15, 0.4D, 0.4D, 0.4D, 0.1D);
+                    15, 0.4D, 0.4D, 0.4D, 0.1D,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
         this.discard();
     }
@@ -78,20 +79,20 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
     }
 
     public WaterBulletEntity(Level level, LivingEntity shooter) {
-        super(NarutoEntities.WATER_BULLET.get(), shooter, level);
+        super(NarutoEntities.WATER_BULLET.get(), shooter, level, new ItemStack(Items.WATER_BUCKET));
         this.setNoGravity(true);
     }
 
     public WaterBulletEntity(Level level, double x, double y, double z) {
-        super(NarutoEntities.WATER_BULLET.get(), x, y, z, level);
+        super(NarutoEntities.WATER_BULLET.get(), x, y, z, level, new ItemStack(Items.WATER_BUCKET));
         this.setNoGravity(true);
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_MAX_LIFE, 40);
-        this.entityData.define(DATA_DAMAGE, 12.0F);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_MAX_LIFE, 40);
+        builder.define(DATA_DAMAGE, 12.0F);
     }
 
     @Override
@@ -126,15 +127,15 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
     }
 
     @Override
-    protected float getGravity() {
-        return this.isNoGravity() ? 0.0F : 0.02F;
+    protected double getDefaultGravity() {
+        return this.isNoGravity() ? 0.0D : 0.02D;
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (this.level().isClientSide) {
+        if (this.level().isClientSide()) {
             for (int i = 0; i < 3; i++) {
                 this.level().addParticle(ParticleTypes.SPLASH,
                         this.getX() + (this.random.nextDouble() - 0.5D) * 0.6D,
@@ -150,12 +151,14 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
         } else if (this.level() instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ParticleTypes.SPLASH,
                     this.getX(), this.getY() + 0.4D, this.getZ(),
-                    8, 0.35D, 0.35D, 0.35D, 0.08D);
+                    8, 0.35D, 0.35D, 0.35D, 0.08D,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             serverLevel.sendParticles(ParticleTypes.DRIPPING_WATER,
                     this.getX(), this.getY() + 0.4D, this.getZ(),
-                    4, 0.25D, 0.25D, 0.25D, 0.04D);
+                    4, 0.25D, 0.25D, 0.25D, 0.04D,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
-            if (!this.level().isClientSide && this.isAlive()) {
+            if (!this.level().isClientSide() && this.isAlive()) {
                 AABB clashBox = this.getBoundingBox().inflate(0.35D);
                 List<Entity> others = this.level().getEntities(this, clashBox,
                         e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
@@ -178,7 +181,7 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
             Entity hitEntity = result.getEntity();
             Entity owner = this.getOwner();
             if (hitEntity == owner) {
@@ -187,16 +190,16 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
 
             float dmg = this.getDamage();
             if (owner instanceof LivingEntity livingOwner) {
-                hitEntity.hurt(serverLevel.damageSources().mobProjectile(this, livingOwner), dmg);
+                hitEntity.hurtServer(serverLevel, serverLevel.damageSources().mobProjectile(this, livingOwner), dmg);
             } else {
-                hitEntity.hurt(serverLevel.damageSources().drown(), dmg);
+                hitEntity.hurtServer(serverLevel, serverLevel.damageSources().drown(), dmg);
             }
 
             hitEntity.clearFire();
             if (hitEntity instanceof LivingEntity livingTarget) {
                 Vec3 push = this.getDeltaMovement().normalize().scale(1.4D).add(0.0D, 0.35D, 0.0D);
                 livingTarget.setDeltaMovement(push);
-                livingTarget.hurtMarked = true;
+                livingTarget.needsSync = true;
             }
         }
     }
@@ -209,38 +212,31 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
     @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
-        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
             serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_SPLASH, SoundSource.PLAYERS, 1.5F, 1.0F);
             serverLevel.sendParticles(ParticleTypes.SPLASH,
                     this.getX(), this.getY() + 0.5D, this.getZ(),
-                    25, 0.5D, 0.5D, 0.5D, 0.15D);
+                    25, 0.5D, 0.5D, 0.5D, 0.15D,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             serverLevel.sendParticles(ParticleTypes.BUBBLE,
                     this.getX(), this.getY() + 0.5D, this.getZ(),
-                    12, 0.4D, 0.4D, 0.4D, 0.1D);
+                    12, 0.4D, 0.4D, 0.4D, 0.1D,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             this.discard();
         }
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
-        tag.putInt("MaxLife", this.getMaxLife());
-        tag.putFloat("Damage", this.getDamage());
+    public void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putInt("MaxLife", this.getMaxLife());
+        output.putFloat("Damage", this.getDamage());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
-        if (tag.contains("MaxLife")) {
-            this.setMaxLife(tag.getInt("MaxLife"));
-        }
-        if (tag.contains("Damage")) {
-            this.setDamage(tag.getFloat("Damage"));
-        }
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    public void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        this.setMaxLife(input.getIntOr("MaxLife", 40));
+        this.setDamage(input.getFloatOr("Damage", 12.0F));
     }
 }

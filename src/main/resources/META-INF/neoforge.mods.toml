@@ -1,38 +1,45 @@
 modLoader="javafml"
-loaderVersion="[47,)"
+loaderVersion="${loader_version_range}"
 issueTrackerURL="https://github.com/Hamza-Zengin/Naruto-Mod/issues"
-license="All rights reserved"
+license="${mod_license}"
+
 [[mods]]
-    modId="narutomod"
-    version="${file.jarVersion}"
-    displayName="Naruto Mod"
+    modId="${mod_id}"
+    version="${mod_version}"
+    displayName="${mod_name}"
     updateJSONURL="https://raw.githubusercontent.com/Hamza-Zengin/Naruto-Mod/master/docs/forgeupdatefile/narutomod.json"
     displayURL="https://github.com/Hamza-Zengin/Naruto-Mod"
-    authors="Hamza Zengin, Sekwah41 (Original 1.16 Author)"
+    authors="${mod_authors}"
     logoFile="narutologo.png"
     description='''
-A comprehensive Naruto Shinobi Universe mod for Minecraft 1.20.1 Forge.
+A comprehensive Naruto Shinobi Universe mod for Minecraft 26.3 NeoForge.
 Features 18+ signature jutsus, 7 ninja clan bloodlines (Uchiha, Hyūga, Uzumaki, Senju, Nara, Kaguya, Wandering Shinobi), 3D weapons (Kunai, Shuriken, Fūma Shuriken, Samehada, Kusanagi), tactical armors, chakra system, custom animations, sounds, and rogue shinobi entities.
 '''
 
-[[dependencies.narutomod]]
-    modId="forge"
-    mandatory=true
-    versionRange="[47,)"
+[[mixins]]
+    config="mixins.narutomod.json"
+
+[[accessTransformers]]
+    file="META-INF/accesstransformer.cfg"
+
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="${neo_version_range}"
     ordering="NONE"
     side="BOTH"
 
 # https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html
-[[dependencies.narutomod]]
+[[dependencies.${mod_id}]]
     modId="minecraft"
-    mandatory=true
-    versionRange="[1.20.1,1.21)"
+    type="required"
+    versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.narutomod]]
+[[dependencies.${mod_id}]]
     modId="sekclib"
-    mandatory=true
-    versionRange="[1.1.0-SNAPSHOT,2.0.0)"
+    type="required"
+    versionRange="${sekclib_version_range}"
     ordering="AFTER"
     side="BOTH"

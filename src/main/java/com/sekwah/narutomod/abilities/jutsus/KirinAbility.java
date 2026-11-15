@@ -72,7 +72,7 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
         // Summoning sound at caster position: crackling thunder from the sky
-        serverLevel.playSound(null, player.blockPosition(), SoundEvents.TRIDENT_THUNDER, SoundSource.PLAYERS, 2.0f, 0.85f);
+        serverLevel.playSound(null, player.blockPosition(), SoundEvents.TRIDENT_THUNDER.value(), SoundSource.PLAYERS, 2.0f, 0.85f);
 
         double maxRange = 36.0D;
         Vec3 eyePos = player.getEyePosition();
@@ -116,9 +116,9 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
         serverLevel.addFreshEntity(kirinDragon);
 
         // Lightning strike
-        LightningBolt lightningBolt = EntityType.LIGHTNING_BOLT.create(serverLevel);
+        LightningBolt lightningBolt = net.minecraft.world.entity.EntityTypes.LIGHTNING_BOLT.create(serverLevel, net.minecraft.world.entity.EntitySpawnReason.TRIGGERED);
         if (lightningBolt != null) {
-            lightningBolt.moveTo(targetPos);
+            lightningBolt.snapTo(targetPos);
             lightningBolt.setVisualOnly(false);
             serverLevel.addFreshEntity(lightningBolt);
         }
@@ -126,12 +126,12 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
         // Thunderous boom and electric particles (majestic, fitting, crisp audio)
         serverLevel.playSound(null, targetBlock, NarutoSounds.KIRIN_STRIKE.get(), SoundSource.WEATHER, 3.5f, 0.85f);
         serverLevel.playSound(null, targetBlock, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 3.5f, 0.75f);
-        serverLevel.playSound(null, targetBlock, SoundEvents.TRIDENT_RIPTIDE_3, SoundSource.WEATHER, 1.8f, 0.6f);
-        serverLevel.playSound(null, targetBlock, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.4f, 1.1f);
+        serverLevel.playSound(null, targetBlock, SoundEvents.TRIDENT_RIPTIDE_3.value(), SoundSource.WEATHER, 1.8f, 0.6f);
+        serverLevel.playSound(null, targetBlock, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 1.4f, 1.1f);
 
         com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
                 new com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket(
-                        new net.minecraft.resources.ResourceLocation("narutomod", "kirin_impact"),
+                        net.minecraft.resources.Identifier.fromNamespaceAndPath("narutomod", "kirin_impact"),
                         targetPos, new Vec3(0, 1, 0), 1.6f, 0x66CCFF),
                 player);
         com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
@@ -139,13 +139,17 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
                 player);
 
         // Huge vertical electric dragon beam
+        net.minecraft.core.particles.ColorParticleOption flashParticle =
+                net.minecraft.core.particles.ColorParticleOption.create(ParticleTypes.FLASH, 0xFF88DDFF);
         for (double y = targetPos.y; y < targetPos.y + 25; y += 0.5) {
             serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
                     targetPos.x, y, targetPos.z,
-                    6, 0.5, 0.2, 0.5, 0.08);
-            serverLevel.sendParticles(ParticleTypes.FLASH,
+                    6, 0.5, 0.2, 0.5, 0.08,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+            serverLevel.sendParticles(flashParticle,
                     targetPos.x, y, targetPos.z,
-                    1, 0.1, 0.1, 0.1, 0.0);
+                    1, 0.1, 0.1, 0.1, 0.0,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         // Expanding circular electric spark ring
@@ -157,7 +161,8 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
                     targetPos.x + Math.cos(angle) * 1.5,
                     targetPos.y + 0.2,
                     targetPos.z + Math.sin(angle) * 1.5,
-                    1, vx, 0.04, vz, 0.12);
+                    1, vx, 0.04, vz, 0.12,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         // Sky-charging arc: lightning guides from caster's hand up towards the heavens
@@ -166,7 +171,8 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
                     eyePos.x + (player.getRandom().nextDouble() - 0.5) * 0.4,
                     y,
                     eyePos.z + (player.getRandom().nextDouble() - 0.5) * 0.4,
-                    2, 0.05, 0.1, 0.05, 0.04);
+                    2, 0.05, 0.1, 0.05, 0.04,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
@@ -174,9 +180,9 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
 
         // Direct damage if mob directly struck: 50.0f damage * powerMultiplier
         if (directEntity != null) {
-            directEntity.hurt(serverLevel.damageSources().lightningBolt(), 50.0f * powerMult);
+            directEntity.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), 50.0f * powerMult);
             directEntity.setRemainingFireTicks(140);
-            directEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 3)); // Slowness IV
+            directEntity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 80, 3)); // Slowness IV
         }
 
         // Massive electric shockwave blast: 28.0f damage * powerMultiplier in scaled radius
@@ -187,11 +193,11 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
         List<LivingEntity> victims = serverLevel.getEntitiesOfClass(LivingEntity.class, blastArea, e -> e != player && e != finalDirectTarget && e.isAlive());
 
         for (LivingEntity victim : victims) {
-            victim.hurt(serverLevel.damageSources().lightningBolt(), 28.0f * powerMult);
+            victim.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), 28.0f * powerMult);
             Vec3 knockback = victim.position().subtract(targetPos).normalize().scale(2.2);
             victim.push(knockback.x, 0.85, knockback.z);
             victim.setRemainingFireTicks(80);
-            victim.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 3));
+            victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 3));
             victim.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 80, 1));
         }
     }

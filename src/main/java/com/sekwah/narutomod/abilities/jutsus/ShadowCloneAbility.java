@@ -70,11 +70,11 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
         double radius = count > 1 ? 3.2D : 2.2D;
         double angleStep = (2 * Math.PI) / count;
 
-        java.util.List<net.minecraft.resources.ResourceLocation> cloneJutsus = new java.util.ArrayList<>();
+        java.util.List<net.minecraft.resources.Identifier> cloneJutsus = new java.util.ArrayList<>();
         if (ninjaData != null && mastery >= 300) {
             String[] basicPool = {"fireball", "water_bullet", "wind_breaker", "rasengan", "chidori"};
             for (String jutsuName : basicPool) {
-                net.minecraft.resources.ResourceLocation id = new net.minecraft.resources.ResourceLocation(com.sekwah.narutomod.NarutoMod.MOD_ID, jutsuName);
+                net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.fromNamespaceAndPath(com.sekwah.narutomod.NarutoMod.MOD_ID, jutsuName);
                 if (ninjaData.getMastery(id) >= 250) {
                     cloneJutsus.add(id);
                 }
@@ -88,7 +88,7 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
             double spawnZ = player.getZ() + Math.cos(angle) * radius;
 
             ShadowCloneEntity clone = new ShadowCloneEntity(NarutoEntities.SHADOW_CLONE.get(), serverLevel);
-            clone.moveTo(spawnX, spawnY, spawnZ, yaw, player.getXRot());
+            clone.snapTo(spawnX, spawnY, spawnZ, yaw, player.getXRot());
             clone.setOwner(player);
             clone.setMaxLifespan(lifespan);
             clone.setUnlockedCloneJutsus(cloneJutsus);
@@ -103,7 +103,8 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
             serverLevel.addFreshEntity(clone);
 
             serverLevel.sendParticles(ParticleTypes.POOF, spawnX, spawnY + 0.8, spawnZ,
-                    25, 0.4, 0.6, 0.4, 0.05);
+                    25, 0.4, 0.6, 0.4, 0.05,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CLONE_POOF.get(), SoundSource.PLAYERS, 1.0f, 1.0f);

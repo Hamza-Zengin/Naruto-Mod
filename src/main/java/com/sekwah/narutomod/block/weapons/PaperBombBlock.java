@@ -11,9 +11,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -22,21 +22,19 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.apache.logging.log4j.core.jmx.Server;
 
 import javax.annotation.Nullable;
+import java.util.function.BiConsumer;
 import net.minecraft.util.RandomSource;
 
 public class PaperBombBlock extends FaceAttachedHorizontalDirectionalBlock {
@@ -64,7 +62,7 @@ public class PaperBombBlock extends FaceAttachedHorizontalDirectionalBlock {
     }
 
     @Override
-    public void wasExploded(Level levelIn, BlockPos pos, Explosion explosionIn) {
+    protected void onExplosionHit(BlockState state, ServerLevel levelIn, BlockPos pos, Explosion explosionIn, BiConsumer<ItemStack, BlockPos> dropConsumer) {
         spawnPaperbomb(null, levelIn, pos, explosionIn.getIndirectSourceEntity(), true);
     }
 
@@ -117,37 +115,39 @@ public class PaperBombBlock extends FaceAttachedHorizontalDirectionalBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+    protected void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, @Nullable Orientation orientation, boolean isMoving) {
         if (worldIn.hasNeighborSignal(pos)) {
-            onCaughtFire(state, worldIn, pos, null, null);
+            onCaughtFire(state, worldIn, pos, null, null, ItemStack.EMPTY);
             worldIn.removeBlock(pos, false);
         }
 
     }
 
     @Override
-    public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+    protected void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, worldIn, pos, oldState, isMoving);
-        worldIn.scheduleTick(new BlockPos(pos), this, TRANSPARENT_DELAY);
+        worldIn.scheduleTick(pos, this, TRANSPARENT_DELAY);
     }
 
     @Override
-    public void onCaughtFire(BlockState state, Level worldIn, BlockPos pos, @Nullable Direction face, @Nullable LivingEntity igniter) {
+    public boolean onCaughtFire(BlockState state, Level worldIn, BlockPos pos, @Nullable Direction face, @Nullable LivingEntity igniter, ItemStack tool) {
         spawnPaperbomb(state, worldIn, pos, igniter);
+        return true;
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-        if(!worldIn.isClientSide) {
+    protected InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!worldIn.isClientSide()) {
             spawnPaperbomb(state, worldIn, pos, player);
             worldIn.removeBlock(pos, false);
+            return InteractionResult.SUCCESS_SERVER;
         }
-        return InteractionResult.sidedSuccess(worldIn.isClientSide);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn) {
-        if(!worldIn.isClientSide) {
+    protected void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
+        if (!worldIn.isClientSide()) {
             spawnPaperbomb(state, worldIn, pos, entityIn instanceof LivingEntity ? (LivingEntity) entityIn : null, true);
             worldIn.removeBlock(pos, false);
         }
@@ -165,15 +165,15 @@ public class PaperBombBlock extends FaceAttachedHorizontalDirectionalBlock {
 
     @Override
     public void handlePrecipitation(BlockState blockState, Level level, BlockPos pos, Biome.Precipitation precipitation) {
-        if (precipitation == Biome.Precipitation.RAIN && level instanceof ServerLevel serverLevel) {
+        if (precipitation == Biome.Precipitation.RAIN && level instanceof ServerLevel) {
             level.destroyBlock(pos, true);
         }
     }
 
     public void spawnPaperbomb(@Nullable BlockState state, Level worldIn, BlockPos pos, @Nullable LivingEntity igniter, boolean shortFuse) {
-        if (!worldIn.isClientSide) {
+        if (!worldIn.isClientSide()) {
             Direction dir = state != null ? state.getValue(FACING) : Direction.NORTH;
-            Vec3i dirVec = dir.getNormal();
+            Vec3i dirVec = dir.getUnitVec3i();
             AttachFace face = state != null ? state.getValue(FACE) : AttachFace.FLOOR;
 
             BlockPos attachBlock;

@@ -73,7 +73,9 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
         serverLevel.addFreshEntity(waterBullet);
 
         // Spawn initial splash particles at launch point
-        serverLevel.sendParticles(ParticleTypes.SPLASH, spawnPos.x, spawnPos.y, spawnPos.z, 20, 0.4, 0.4, 0.4, 0.1);
-        serverLevel.sendParticles(ParticleTypes.DRIPPING_WATER, spawnPos.x, spawnPos.y, spawnPos.z, 10, 0.3, 0.3, 0.3, 0.05);
+        serverLevel.sendParticles(ParticleTypes.SPLASH, spawnPos.x, spawnPos.y, spawnPos.z, 20, 0.4, 0.4, 0.4, 0.1,
+                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+        serverLevel.sendParticles(ParticleTypes.DRIPPING_WATER, spawnPos.x, spawnPos.y, spawnPos.z, 10, 0.3, 0.3, 0.3, 0.05,
+                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
     }
 }

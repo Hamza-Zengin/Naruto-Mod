@@ -1,5 +1,6 @@
 package com.sekwah.narutomod.abilities.jutsus;
 
+import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.ChakraElement;
 import com.sekwah.narutomod.capabilities.INinjaData;
@@ -10,6 +11,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -73,8 +76,8 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public List<net.minecraft.resources.ResourceLocation> getPrerequisites() {
-        return List.of(new net.minecraft.resources.ResourceLocation(com.sekwah.narutomod.NarutoMod.MOD_ID, "sharingan"));
+    public List<Identifier> getPrerequisites() {
+        return List.of(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan"));
     }
 
     @Override
@@ -87,15 +90,15 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         if (ninjaData == null) return false;
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
             if (player != null) {
-                player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
-                        Component.literal("Uchiha").withStyle(ChatFormatting.RED)), true);
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
+                        Component.literal("Uchiha").withStyle(ChatFormatting.RED)));
             }
             return false;
         }
         if (!ninjaData.isSharinganActive() || !SharinganAbility.hasMangekyou(ninjaData)) {
             if (player != null) {
-                player.displayClientMessage(Component.translatable("narutomod.ability.amaterasu.requires_mangekyo")
-                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), true);
+                player.sendOverlayMessage(Component.translatable("narutomod.ability.amaterasu.requires_mangekyo")
+                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
             }
             return false;
         }
@@ -146,25 +149,25 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         }
 
         // Play sinister ignition sound
-        serverLevel.playSound(null, player.blockPosition(), com.sekwah.narutomod.sounds.NarutoSounds.AMATERASU_IGNITE.get(), SoundSource.PLAYERS, 1.4f, 0.9f);
+        serverLevel.playSound(null, player.blockPosition(), NarutoSounds.AMATERASU_IGNITE.get(), SoundSource.PLAYERS, 1.4f, 0.9f);
         serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 2.0f, 0.5f);
         serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 1.2f, 0.6f);
-        serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.2f, 0.5f);
+        serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 1.2f, 0.5f);
 
         // Mangekyo Ocular Bleeding visual: subtle crimson blood drop and dark spark from caster eye
-        serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE, eyePos.x, eyePos.y - 0.1, eyePos.z, 6, 0.05, 0.05, 0.05, 0.02);
-        serverLevel.sendParticles(ParticleTypes.DAMAGE_INDICATOR, eyePos.x, eyePos.y - 0.15, eyePos.z, 1, 0.0, 0.0, 0.0, 0.0);
+        serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE, eyePos.x, eyePos.y - 0.1, eyePos.z, 6, 0.05, 0.05, 0.05, 0.02, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+        serverLevel.sendParticles(ParticleTypes.DAMAGE_INDICATOR, eyePos.x, eyePos.y - 0.15, eyePos.z, 1, 0.0, 0.0, 0.0, 0.0, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
         // Dark chakra burst at impact
-        serverLevel.sendParticles(ParticleTypes.SQUID_INK, targetPos.x, targetPos.y + 0.6, targetPos.z, 20, 0.4, 0.4, 0.4, 0.08);
+        serverLevel.sendParticles(ParticleTypes.SQUID_INK, targetPos.x, targetPos.y + 0.6, targetPos.z, 20, 0.4, 0.4, 0.4, 0.08, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
         // Black flame & smoke beam from caster's eye to target
         double dist = eyePos.distanceTo(targetPos);
         Vec3 dir = targetPos.subtract(eyePos).normalize();
         for (double d = 0; d < dist; d += 0.7) {
             Vec3 point = eyePos.add(dir.scale(d));
-            serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, point.x, point.y, point.z, 2, 0.05, 0.05, 0.05, 0.01);
-            serverLevel.sendParticles(ParticleTypes.SMOKE, point.x, point.y, point.z, 1, 0.04, 0.04, 0.04, 0.01);
+            serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, point.x, point.y, point.z, 2, 0.05, 0.05, 0.05, 0.01, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+            serverLevel.sendParticles(ParticleTypes.SMOKE, point.x, point.y, point.z, 1, 0.04, 0.04, 0.04, 0.01, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         // Spawn 3D Inextinguishable Black-Flame Shroud & Pillars at focal target
@@ -187,18 +190,18 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
 
         // Direct Entity Target Impact: damage scaled with mastery
         if (directEntity != null) {
-            directEntity.hurt(NarutoDamageSource.amaterasu(serverLevel, player, player), directDamage);
+            directEntity.hurtServer(serverLevel, NarutoDamageSource.amaterasu(serverLevel, player, player), directDamage);
             directEntity.setRemainingFireTicks(fireTicks); // Inextinguishable black flames
             directEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, witherTicks, 3)); // Wither IV
-            directEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 2)); // Slowness III
+            directEntity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 120, 2)); // Slowness III
             directEntity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 160, 0));
 
             serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
                     directEntity.getX(), directEntity.getY() + directEntity.getBbHeight() * 0.5, directEntity.getZ(),
-                    35, 0.4, 0.6, 0.4, 0.05);
+                    35, 0.4, 0.6, 0.4, 0.05, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE,
                     directEntity.getX(), directEntity.getY() + directEntity.getBbHeight() * 0.5, directEntity.getZ(),
-                    15, 0.3, 0.4, 0.3, 0.02);
+                    15, 0.3, 0.4, 0.3, 0.02, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         // Area Blast around target point: splash damage (approx 47% of direct damage)
@@ -208,14 +211,14 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         List<LivingEntity> splashTargets = serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox, e -> e != player && e != finalDirectTarget && e.isAlive());
 
         for (LivingEntity splash : splashTargets) {
-            splash.hurt(NarutoDamageSource.amaterasu(serverLevel, player, player), directDamage * 0.47f);
+            splash.hurtServer(serverLevel, NarutoDamageSource.amaterasu(serverLevel, player, player), directDamage * 0.47f);
             splash.setRemainingFireTicks((int) (200 * powerMult));
             splash.addEffect(new MobEffectInstance(MobEffects.WITHER, (int) (140 * powerMult), 1)); // Wither II
-            splash.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));
+            splash.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100, 1));
 
             serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
                     splash.getX(), splash.getY() + 1.0, splash.getZ(),
-                    20, 0.3, 0.5, 0.3, 0.03);
+                    20, 0.3, 0.5, 0.3, 0.03, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         // Set Soul Fire at targeted ground blocks
@@ -223,9 +226,9 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {
                 BlockPos firePos = hitBlockPos.offset(dx, 0, dz);
-                if (serverLevel.isEmptyBlock(firePos.above()) && serverLevel.getBlockState(firePos).isSolidRender(serverLevel, firePos)) {
+                if (serverLevel.isEmptyBlock(firePos.above()) && serverLevel.getBlockState(firePos).isSolidRender()) {
                     serverLevel.setBlockAndUpdate(firePos.above(), Blocks.SOUL_FIRE.defaultBlockState());
-                } else if (serverLevel.isEmptyBlock(firePos) && serverLevel.getBlockState(firePos.below()).isSolidRender(serverLevel, firePos.below())) {
+                } else if (serverLevel.isEmptyBlock(firePos) && serverLevel.getBlockState(firePos.below()).isSolidRender()) {
                     serverLevel.setBlockAndUpdate(firePos, Blocks.SOUL_FIRE.defaultBlockState());
                 }
             }

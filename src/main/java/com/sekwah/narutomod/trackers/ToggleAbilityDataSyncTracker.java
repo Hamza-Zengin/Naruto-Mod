@@ -4,9 +4,11 @@ import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.tracker.SyncTrackerClone;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.tracker.SyncTrackerSerializer;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class ToggleAbilityDataSyncTracker implements SyncTrackerSerializer<ToggleAbilityData>, SyncTrackerClone<ToggleAbilityData> {
+
+    private static final int MAX_ELEMENTS = 256;
 
     @Override
     public void encode(ToggleAbilityData objectToSend, FriendlyByteBuf outBuffer) {
@@ -14,21 +16,26 @@ public class ToggleAbilityDataSyncTracker implements SyncTrackerSerializer<Toggl
             outBuffer.writeInt(0);
             return;
         }
-        outBuffer.writeInt(objectToSend.getAbilitiesHashSet().size());
-        for (ResourceLocation ability : objectToSend.getAbilitiesHashSet()) {
-            outBuffer.writeUtf(ability.toString());
+        int count = Math.min(objectToSend.getAbilitiesHashSet().size(), MAX_ELEMENTS);
+        outBuffer.writeInt(count);
+        int written = 0;
+        for (Identifier ability : objectToSend.getAbilitiesHashSet()) {
+            if (written++ >= MAX_ELEMENTS) {
+                break;
+            }
+            outBuffer.writeIdentifier(ability);
         }
     }
 
     @Override
     public ToggleAbilityData decode(FriendlyByteBuf inBuffer) {
         final int size = inBuffer.readInt();
-        if (size <= 0 || size > 256) {
+        if (size <= 0 || size > MAX_ELEMENTS) {
             return new ToggleAbilityData(0);
         }
         ToggleAbilityData data = new ToggleAbilityData(size);
-        for(int i = 0; i < size; i++) {
-            data.getAbilitiesHashSet().add(new ResourceLocation(inBuffer.readUtf(256)));
+        for (int i = 0; i < size; i++) {
+            data.getAbilitiesHashSet().add(inBuffer.readIdentifier());
         }
         return data;
     }

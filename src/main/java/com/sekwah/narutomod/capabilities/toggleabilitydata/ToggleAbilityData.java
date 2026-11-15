@@ -4,10 +4,12 @@ import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -15,7 +17,7 @@ import java.util.Objects;
  */
 public class ToggleAbilityData {
 
-    private HashSet<ResourceLocation> abilities;
+    private HashSet<Identifier> abilities;
 
     public ToggleAbilityData(int size) {
         this.abilities = new HashSet<>(size);
@@ -25,7 +27,7 @@ public class ToggleAbilityData {
         this.abilities = new HashSet<>();
     }
 
-    public boolean addAbility(ResourceLocation ability) {
+    public boolean addAbility(Identifier ability) {
         return this.abilities.add(ability);
     }
 
@@ -44,19 +46,19 @@ public class ToggleAbilityData {
         return this.removeAbility(ability.getRegistryName());
     }
 
-    public boolean removeAbility(ResourceLocation ability) {
+    public boolean removeAbility(Identifier ability) {
         return this.abilities.remove(ability);
     }
 
-    public HashSet<ResourceLocation> getAbilitiesHashSet() {
+    public HashSet<Identifier> getAbilitiesHashSet() {
         return abilities;
     }
 
-    public java.util.List<ResourceLocation> getAbilitiesSnapshot() {
-        return this.abilities != null ? new java.util.ArrayList<>(this.abilities) : new java.util.ArrayList<>();
+    public List<Identifier> getAbilitiesSnapshot() {
+        return this.abilities != null ? new ArrayList<>(this.abilities) : new ArrayList<>();
     }
 
-    public boolean hasToggleAbility(ResourceLocation ability) {
+    public boolean hasToggleAbility(Identifier ability) {
         return this.abilities != null && this.abilities.contains(ability);
     }
 

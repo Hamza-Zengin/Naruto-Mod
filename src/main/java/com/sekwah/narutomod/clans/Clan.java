@@ -1,10 +1,10 @@
 package com.sekwah.narutomod.clans;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class Clan {
-    private ResourceLocation registryName;
+    private Identifier registryName;
     private final Component name;
     private final Component description;
 
@@ -13,11 +13,11 @@ public class Clan {
         this.description = description;
     }
 
-    public ResourceLocation getRegistryName() {
+    public Identifier getRegistryName() {
         return registryName;
     }
 
-    public Clan setRegistryName(ResourceLocation registryName) {
+    public Clan setRegistryName(Identifier registryName) {
         this.registryName = registryName;
         return this;
     }

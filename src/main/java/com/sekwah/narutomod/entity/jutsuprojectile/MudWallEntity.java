@@ -2,11 +2,9 @@ package com.sekwah.narutomod.entity.jutsuprojectile;
 
 import com.sekwah.narutomod.abilities.ChakraElement;
 import com.sekwah.narutomod.entity.NarutoEntities;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -16,6 +14,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
@@ -23,9 +22,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.network.NetworkHooks;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,7 +55,9 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
 
     @Override
     public void weaken(int amount) {
-        this.hurt(this.damageSources().generic(), (float) amount);
+        if (this.level() instanceof ServerLevel serverLevel) {
+            this.hurtServer(serverLevel, this.damageSources().generic(), (float) amount);
+        }
     }
 
     @Override
@@ -72,8 +75,8 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
             SynchedEntityData.defineId(MudWallEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_WALL_YAW =
             SynchedEntityData.defineId(MudWallEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Optional<UUID>> DATA_CASTER_UUID =
-            SynchedEntityData.defineId(MudWallEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_CASTER_UUID =
+            SynchedEntityData.defineId(MudWallEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
     public MudWallEntity(EntityType<? extends MudWallEntity> type, Level level) {
         super(type, level);
@@ -93,11 +96,11 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_HEALTH, DEFAULT_MAX_HEALTH);
-        this.entityData.define(DATA_MAX_LIFE, DEFAULT_MAX_LIFE);
-        this.entityData.define(DATA_WALL_YAW, 0.0F);
-        this.entityData.define(DATA_CASTER_UUID, Optional.empty());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_HEALTH, DEFAULT_MAX_HEALTH);
+        builder.define(DATA_MAX_LIFE, DEFAULT_MAX_LIFE);
+        builder.define(DATA_WALL_YAW, 0.0F);
+        builder.define(DATA_CASTER_UUID, Optional.empty());
     }
 
     @Override
@@ -110,7 +113,7 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
     }
 
     @Override
-    public boolean canBeCollidedWith() {
+    public boolean canBeCollidedWith(@Nullable Entity other) {
         return this.isAlive();
     }
 
@@ -121,14 +124,14 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
 
     @Override
     public boolean canCollideWith(Entity other) {
-        return other != this && (other.canBeCollidedWith() || other.isPushable() || other instanceof Projectile);
+        return other != this && (other.canBeCollidedWith(this) || other.isPushable() || other instanceof Projectile);
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
             AABB wallBox = this.getPhysicalBarrierBox();
             List<Entity> collidingEntities = serverLevel.getEntities(this, wallBox);
 
@@ -141,9 +144,9 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
                 } else if (entity instanceof Projectile projectile) {
                     // Block & deflect incoming projectiles against the physical AABB box
                     projectile.setDeltaMovement(projectile.getDeltaMovement().scale(-0.5D));
-                    projectile.hasImpulse = true;
+                    projectile.needsSync = true;
                     serverLevel.playSound(null, this.blockPosition(), SoundEvents.STONE_HIT, SoundSource.BLOCKS, 1.2F, 0.85F);
-                    this.hurt(serverLevel.damageSources().thrown(projectile, projectile.getOwner()), 6.0F);
+                    this.hurtServer(serverLevel, serverLevel.damageSources().thrown(projectile, projectile.getOwner()), 6.0F);
                 } else if (entity instanceof LivingEntity living) {
                     // Physically push living entities out of the solid wall volume
                     double dx = entity.getX() - this.getX();
@@ -154,7 +157,7 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
                         double factor = 0.35D / dist;
                         living.setDeltaMovement(living.getDeltaMovement().add(dx * factor, 0.05D, dz * factor));
                     }
-                    living.hurtMarked = true;
+                    living.needsSync = true;
                 }
             }
 
@@ -165,24 +168,22 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (this.isInvulnerableTo(source) || amount <= 0.0F) {
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource source, float amount) {
+        if (this.isInvulnerableToBase(source) || amount <= 0.0F) {
             return false;
         }
-        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
-            this.markHurt();
-            float remaining = Math.max(0.0F, this.getHealth() - amount);
-            this.setHealth(remaining);
-            serverLevel.playSound(null, this.blockPosition(), SoundEvents.STONE_HIT, SoundSource.BLOCKS, 1.0F, 0.75F);
-            BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState());
-            serverLevel.sendParticles(rockParticle,
-                    this.getX(), this.getY() + 1.2D, this.getZ(),
-                    10, 0.8D, 0.8D, 0.8D, 0.1D);
+        this.markHurt();
+        float remaining = Math.max(0.0F, this.getHealth() - amount);
+        this.setHealth(remaining);
+        serverLevel.playSound(null, this.blockPosition(), SoundEvents.STONE_HIT, SoundSource.BLOCKS, 1.0F, 0.75F);
+        BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState());
+        serverLevel.sendParticles(rockParticle,
+                this.getX(), this.getY() + 1.2D, this.getZ(),
+                10, 0.8D, 0.8D, 0.8D, 0.1D,
+                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
-            if (remaining <= 0.0F) {
-                this.crumbleAndDiscard(serverLevel);
-            }
-            return true;
+        if (remaining <= 0.0F) {
+            this.crumbleAndDiscard(serverLevel);
         }
         return true;
     }
@@ -192,7 +193,8 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
         BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
         serverLevel.sendParticles(rockParticle,
                 this.getX(), this.getY() + 1.0D, this.getZ(),
-                30, 1.2D, 1.0D, 1.2D, 0.15D);
+                30, 1.2D, 1.0D, 1.2D, 0.15D,
+                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         this.discard();
     }
 
@@ -221,11 +223,11 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
     }
 
     public Optional<UUID> getCasterUUID() {
-        return this.entityData.get(DATA_CASTER_UUID);
+        return this.entityData.get(DATA_CASTER_UUID).map(EntityReference::getUUID);
     }
 
     public void setCasterUUID(UUID uuid) {
-        this.entityData.set(DATA_CASTER_UUID, Optional.ofNullable(uuid));
+        this.entityData.set(DATA_CASTER_UUID, Optional.ofNullable(uuid).map(EntityReference::of));
     }
 
     public Player getCasterPlayer() {
@@ -242,31 +244,18 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
-        if (tag.contains("Health")) {
-            this.setHealth(tag.getFloat("Health"));
-        }
-        if (tag.contains("MaxLife")) {
-            this.setMaxLife(tag.getInt("MaxLife"));
-        }
-        if (tag.contains("WallYaw")) {
-            this.setWallYaw(tag.getFloat("WallYaw"));
-        }
-        if (tag.hasUUID("CasterUUID")) {
-            this.setCasterUUID(tag.getUUID("CasterUUID"));
-        }
+    protected void readAdditionalSaveData(ValueInput input) {
+        this.setHealth(input.getFloatOr("Health", DEFAULT_MAX_HEALTH));
+        this.setMaxLife(input.getIntOr("MaxLife", DEFAULT_MAX_LIFE));
+        this.setWallYaw(input.getFloatOr("WallYaw", 0.0F));
+        input.read("CasterUUID", UUIDUtil.CODEC).ifPresent(this::setCasterUUID);
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
-        tag.putFloat("Health", this.getHealth());
-        tag.putInt("MaxLife", this.getMaxLife());
-        tag.putFloat("WallYaw", this.getWallYaw());
-        this.getCasterUUID().ifPresent(uuid -> tag.putUUID("CasterUUID", uuid));
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    protected void addAdditionalSaveData(ValueOutput output) {
+        output.putFloat("Health", this.getHealth());
+        output.putInt("MaxLife", this.getMaxLife());
+        output.putFloat("WallYaw", this.getWallYaw());
+        this.getCasterUUID().ifPresent(uuid -> output.store("CasterUUID", UUIDUtil.CODEC, uuid));
     }
 }

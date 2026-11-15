@@ -7,28 +7,22 @@ import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import com.sekwah.narutomod.config.NarutoConfig;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.annotation.Sync;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class NinjaData implements INinjaData, ICapabilityProvider {
+public class NinjaData implements INinjaData {
 
     @Sync(minTicks = 1)
     private float chakra;
@@ -43,7 +37,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private float maxStamina;
 
     @Sync
-    private ResourceLocation clan;
+    private Identifier clan;
 
     @Sync
     private boolean clanLocked = false;
@@ -73,7 +67,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private String unlockedJutsus = "";
 
     @Sync
-    private Map<ResourceLocation, Integer> jutsuMastery = new HashMap<>();
+    private Map<Identifier, Integer> jutsuMastery = new HashMap<>();
 
     @Sync
     private String activeMissionId = "";
@@ -90,7 +84,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private boolean creativeMode = false;
 
     @Sync(minTicks = 1)
-    private ResourceLocation currentlyChanneled;
+    private Identifier currentlyChanneled;
 
     @Sync(minTicks = 1)
     private int ticksChanneled;
@@ -116,13 +110,17 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private ArrayList<DelayedPlayerTickEvent> delayedTickEvents = new ArrayList<>();
     private HashMap<String, CooldownTickEvent> cooldownTickEvents = new HashMap<>();
 
+    public NinjaData() {
+        this(true);
+    }
+
     public NinjaData(boolean isServer) {
         if (isServer) {
             this.maxChakra = NarutoConfig.maxChakra > 0 ? NarutoConfig.maxChakra : 1000.0f;
             this.maxStamina = NarutoConfig.maxStamina > 0 ? NarutoConfig.maxStamina : 800.0f;
             this.chakra = this.getMaxChakra();
             this.stamina = this.getMaxStamina();
-            this.clan = new ResourceLocation(NarutoMod.MOD_ID, "shinobi");
+            this.clan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shinobi");
             this.clanLocked = false;
             this.unlockedJutsus = "";
             this.rank = "ACADEMY_STUDENT";
@@ -174,8 +172,6 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     private static final String SEAL_TIMEOUT_TAG = "sealTimeout";
     private static final String JUTSU_MASTERY_TAG = "jutsuMastery";
     private static final String CHAKRA_REGEN_COOLDOWN_TAG = "chakraRegenCooldown";
-
-    private final LazyOptional<INinjaData> holder = LazyOptional.of(() -> this);
 
     @Override
     public float getChakra() {
@@ -250,12 +246,12 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
-    public ResourceLocation getClan() {
+    public Identifier getClan() {
         return this.clan;
     }
 
     @Override
-    public void setClan(ResourceLocation clan) {
+    public void setClan(Identifier clan) {
         // Clan cannot be changed once locked by player
         if (this.clanLocked) {
             return;
@@ -264,7 +260,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
-    public void forceSetClan(ResourceLocation clan) {
+    public void forceSetClan(Identifier clan) {
         this.clan = clan;
         this.clanLocked = true;
     }
@@ -310,7 +306,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         return checkAbilityUnlocked(ability, ability.getRegistryName());
     }
 
-    public static boolean isScrollRequiredJutsu(ResourceLocation id) {
+    public static boolean isScrollRequiredJutsu(Identifier id) {
         if (id == null) return false;
         String path = id.getPath();
         return path.equals("rasengan") || path.equals("chidori") || path.equals("shadow_clone")
@@ -318,7 +314,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
                 || path.equals("eight_gates") || path.equals("eight_gates_death");
     }
 
-    public static boolean isClanRestrictedJutsu(ResourceLocation id) {
+    public static boolean isClanRestrictedJutsu(Identifier id) {
         if (id == null) return false;
         String path = id.getPath();
         return path.equals("amaterasu")
@@ -333,13 +329,13 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
-    public boolean isAbilityUnlocked(ResourceLocation abilityId) {
+    public boolean isAbilityUnlocked(Identifier abilityId) {
         if (abilityId == null) return false;
         Ability ability = null;
         try {
             ability = NarutoAbilities.getAbility(abilityId);
         } catch (Throwable ignored) {
-            // NarutoAbilities or Forge registry may not be initialized in standalone unit tests
+            // NarutoAbilities or registry may not be initialized in standalone unit tests
         }
         if (ability == null) {
             return getUnlockedAbilities().contains(abilityId);
@@ -347,7 +343,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         return checkAbilityUnlocked(ability, abilityId);
     }
 
-    private boolean checkAbilityUnlocked(Ability ability, ResourceLocation abilityId) {
+    private boolean checkAbilityUnlocked(Ability ability, Identifier abilityId) {
         if (ability == null) return false;
 
         // If ability specifies prerequisites and they are not met, it cannot be unlocked
@@ -439,9 +435,9 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
-    public void unlockAbility(ResourceLocation abilityId) {
+    public void unlockAbility(Identifier abilityId) {
         if (abilityId == null) return;
-        java.util.Set<ResourceLocation> unlocked = getUnlockedAbilities();
+        java.util.Set<Identifier> unlocked = getUnlockedAbilities();
         if (!unlocked.contains(abilityId)) {
             if (this.unlockedJutsus == null || this.unlockedJutsus.isEmpty()) {
                 this.unlockedJutsus = abilityId.toString();
@@ -452,12 +448,12 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
-    public void lockAbility(ResourceLocation abilityId) {
+    public void lockAbility(Identifier abilityId) {
         if (abilityId == null) return;
-        java.util.Set<ResourceLocation> unlocked = getUnlockedAbilities();
+        java.util.Set<Identifier> unlocked = getUnlockedAbilities();
         if (unlocked.remove(abilityId)) {
             StringBuilder sb = new StringBuilder();
-            for (ResourceLocation loc : unlocked) {
+            for (Identifier loc : unlocked) {
                 if (sb.length() > 0) sb.append(",");
                 sb.append(loc.toString());
             }
@@ -466,13 +462,17 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
-    public java.util.Set<ResourceLocation> getUnlockedAbilities() {
-        java.util.HashSet<ResourceLocation> set = new java.util.HashSet<>();
+    public java.util.Set<Identifier> getUnlockedAbilities() {
+        java.util.HashSet<Identifier> set = new java.util.HashSet<>();
         if (this.unlockedJutsus != null && !this.unlockedJutsus.isEmpty()) {
             String[] split = this.unlockedJutsus.split(",");
             for (String s : split) {
-                if (!s.trim().isEmpty()) {
-                    set.add(new ResourceLocation(s.trim()));
+                String trimmed = s.trim();
+                if (!trimmed.isEmpty()) {
+                    Identifier parsed = Identifier.tryParse(trimmed);
+                    if (parsed != null) {
+                        set.add(parsed);
+                    }
                 }
             }
         }
@@ -490,24 +490,24 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
-    public Map<ResourceLocation, Integer> getJutsuMasteryMap() {
+    public Map<Identifier, Integer> getJutsuMasteryMap() {
         return this.jutsuMastery;
     }
 
     @Override
-    public int getMastery(ResourceLocation jutsuId) {
+    public int getMastery(Identifier jutsuId) {
         if (jutsuId == null) return 0;
         return this.jutsuMastery.getOrDefault(jutsuId, 0);
     }
 
     @Override
-    public void setMastery(ResourceLocation jutsuId, int amount) {
+    public void setMastery(Identifier jutsuId, int amount) {
         if (jutsuId == null) return;
         this.jutsuMastery.put(jutsuId, Math.max(0, amount));
     }
 
     @Override
-    public void addMastery(ResourceLocation jutsuId, int amount) {
+    public void addMastery(Identifier jutsuId, int amount) {
         if (jutsuId == null || amount == 0) return;
         int current = getMastery(jutsuId);
         int updated = Math.max(0, current + amount);
@@ -515,7 +515,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
-    public void incrementJutsuMastery(ResourceLocation jutsuId, boolean isToggle) {
+    public void incrementJutsuMastery(Identifier jutsuId, boolean isToggle) {
         if (jutsuId == null) return;
         int current = getMastery(jutsuId);
         int gain;
@@ -709,7 +709,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         this.maxChakra = NarutoConfig.maxChakra;
         this.maxStamina = NarutoConfig.maxStamina;
         this.rank = "ACADEMY_STUDENT";
-        this.clan = new ResourceLocation(NarutoMod.MOD_ID, "shinobi");
+        this.clan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shinobi");
         this.clanLocked = false;
         this.chakraExp = 0;
         this.staminaExp = 0;
@@ -776,7 +776,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
-    public ResourceLocation getCurrentlyChanneledAbility() {
+    public Identifier getCurrentlyChanneledAbility() {
         return this.currentlyChanneled;
     }
 
@@ -853,7 +853,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             }
             if (this.activeHandJutsuTicks == 0) {
                 if ("chidori".equals(this.activeHandJutsu)) {
-                    player.removeEffect(net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED);
+                    player.removeEffect(net.minecraft.world.effect.MobEffects.SPEED);
                 }
                 this.activeHandJutsu = "";
             }
@@ -942,7 +942,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             boolean hasEightGates = false;
             boolean hasWaterWalk = false;
             boolean hasEightGatesDeath = false;
-            for (ResourceLocation id : this.toggleAbilityData.getAbilitiesHashSet()) {
+            for (Identifier id : this.toggleAbilityData.getAbilitiesHashSet()) {
                 String path = id.getPath();
                 if ("sharingan".equals(path)) hasSharingan = true;
                 else if ("byakugan".equals(path)) hasByakugan = true;
@@ -1004,7 +1004,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         nbt.putString("missionStatus", this.missionStatus != null ? this.missionStatus : "NONE");
 
         CompoundTag masteryTag = new CompoundTag();
-        for (Map.Entry<ResourceLocation, Integer> entry : this.jutsuMastery.entrySet()) {
+        for (Map.Entry<Identifier, Integer> entry : this.jutsuMastery.entrySet()) {
             if (entry.getKey() != null && entry.getValue() != null) {
                 masteryTag.putInt(entry.getKey().toString(), entry.getValue());
             }
@@ -1013,51 +1013,60 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
     }
 
     @Override
-    public Tag serializeNBT() {
+    public void serialize(ValueOutput output) {
         final CompoundTag nbt = new CompoundTag();
         saveNBTData(nbt);
-        return nbt;
+        output.store("ninjaData", CompoundTag.CODEC, nbt);
+    }
+
+    @Override
+    public void deserialize(ValueInput input) {
+        input.read("ninjaData", CompoundTag.CODEC).ifPresent(this::loadNBTData);
     }
 
     @Override
     public void loadNBTData(CompoundTag compoundTag) {
         if (compoundTag == null) return;
-        this.chakra = compoundTag.getFloat(CHAKRA_TAG);
-        this.stamina = compoundTag.getFloat(STAMINA_TAG);
+        this.shimonPenaltyActive = compoundTag.getBooleanOr("shimonPenaltyActive", false);
+        this.chakra = compoundTag.getFloatOr(CHAKRA_TAG, 0.0f);
+        this.stamina = compoundTag.getFloatOr(STAMINA_TAG, 0.0f);
         if (compoundTag.contains(MAX_CHAKRA_TAG)) {
-            this.maxChakra = compoundTag.getFloat(MAX_CHAKRA_TAG);
+            this.maxChakra = compoundTag.getFloatOr(MAX_CHAKRA_TAG, this.maxChakra);
         }
         if (compoundTag.contains(MAX_STAMINA_TAG)) {
-            this.maxStamina = compoundTag.getFloat(MAX_STAMINA_TAG);
+            this.maxStamina = compoundTag.getFloatOr(MAX_STAMINA_TAG, this.maxStamina);
         }
-        if (compoundTag.contains(CLAN_TAG)) {
-            this.clan = new ResourceLocation(compoundTag.getString(CLAN_TAG));
-        }
+        compoundTag.getString(CLAN_TAG).ifPresent(clanStr -> {
+            Identifier parsed = Identifier.tryParse(clanStr);
+            if (parsed != null) {
+                this.clan = parsed;
+            }
+        });
         if (compoundTag.contains(CLAN_LOCKED_TAG)) {
-            this.clanLocked = compoundTag.getBoolean(CLAN_LOCKED_TAG);
+            this.clanLocked = compoundTag.getBooleanOr(CLAN_LOCKED_TAG, false);
         }
         if (compoundTag.contains(RANK_TAG)) {
-            this.rank = compoundTag.getString(RANK_TAG);
+            this.rank = compoundTag.getStringOr(RANK_TAG, "ACADEMY_STUDENT");
         } else {
             this.rank = "ACADEMY_STUDENT";
         }
         if (compoundTag.contains(CHAKRA_EXP_TAG)) {
-            this.chakraExp = compoundTag.getFloat(CHAKRA_EXP_TAG);
+            this.chakraExp = compoundTag.getFloatOr(CHAKRA_EXP_TAG, 0.0f);
         }
         if (compoundTag.contains(STAMINA_EXP_TAG)) {
-            this.staminaExp = compoundTag.getFloat(STAMINA_EXP_TAG);
+            this.staminaExp = compoundTag.getFloatOr(STAMINA_EXP_TAG, 0.0f);
         }
         if (compoundTag.contains(ENEMIES_DEFEATED_TAG)) {
-            this.enemiesDefeated = compoundTag.getInt(ENEMIES_DEFEATED_TAG);
+            this.enemiesDefeated = compoundTag.getIntOr(ENEMIES_DEFEATED_TAG, 0);
         }
         if (compoundTag.contains(ROGUE_NINJAS_DEFEATED_TAG)) {
-            this.rogueNinjasDefeated = compoundTag.getInt(ROGUE_NINJAS_DEFEATED_TAG);
+            this.rogueNinjasDefeated = compoundTag.getIntOr(ROGUE_NINJAS_DEFEATED_TAG, 0);
         }
         if (compoundTag.contains(AKATSUKI_NINJAS_DEFEATED_TAG)) {
-            this.akatsukiNinjasDefeated = compoundTag.getInt(AKATSUKI_NINJAS_DEFEATED_TAG);
+            this.akatsukiNinjasDefeated = compoundTag.getIntOr(AKATSUKI_NINJAS_DEFEATED_TAG, 0);
         }
         if (compoundTag.contains(JUTSUS_CAST_TAG)) {
-            this.jutsusCastCount = compoundTag.getInt(JUTSUS_CAST_TAG);
+            this.jutsusCastCount = compoundTag.getIntOr(JUTSUS_CAST_TAG, 0);
         }
         NinjaRank current = NinjaRank.fromString(this.rank);
         if (current == NinjaRank.ACADEMY_STUDENT) {
@@ -1072,59 +1081,50 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
             if (this.enemiesDefeated > 300) this.enemiesDefeated = 300;
         }
         if (compoundTag.contains(UNLOCKED_JUTSUS_TAG)) {
-            this.unlockedJutsus = compoundTag.getString(UNLOCKED_JUTSUS_TAG);
+            this.unlockedJutsus = compoundTag.getStringOr(UNLOCKED_JUTSUS_TAG, "");
         }
         if (compoundTag.contains(ACTIVE_HAND_JUTSU_TAG)) {
-            this.activeHandJutsu = compoundTag.getString(ACTIVE_HAND_JUTSU_TAG);
+            this.activeHandJutsu = compoundTag.getStringOr(ACTIVE_HAND_JUTSU_TAG, "");
         }
         if (compoundTag.contains(ACTIVE_HAND_JUTSU_TICKS_TAG)) {
-            this.activeHandJutsuTicks = compoundTag.getInt(ACTIVE_HAND_JUTSU_TICKS_TAG);
+            this.activeHandJutsuTicks = compoundTag.getIntOr(ACTIVE_HAND_JUTSU_TICKS_TAG, 0);
         }
         if (compoundTag.contains(ACTIVE_JUTSUS_FLAG_TAG)) {
-            this.activeJutsusFlag = compoundTag.getInt(ACTIVE_JUTSUS_FLAG_TAG);
+            this.activeJutsusFlag = compoundTag.getIntOr(ACTIVE_JUTSUS_FLAG_TAG, 0);
         }
-        if (compoundTag.contains(ACTIVE_SEALS_TAG)) {
+        compoundTag.getByteArray(ACTIVE_SEALS_TAG).ifPresent(seals -> {
             this.activeSeals.clear();
-            byte[] seals = compoundTag.getByteArray(ACTIVE_SEALS_TAG);
             for (byte b : seals) {
                 this.activeSeals.add(b);
             }
-        }
+        });
         if (compoundTag.contains(SEAL_TIMEOUT_TAG)) {
-            this.sealTimeout = compoundTag.getInt(SEAL_TIMEOUT_TAG);
+            this.sealTimeout = compoundTag.getIntOr(SEAL_TIMEOUT_TAG, 0);
         }
         if (compoundTag.contains("activeMissionId")) {
-            this.activeMissionId = compoundTag.getString("activeMissionId");
+            this.activeMissionId = compoundTag.getStringOr("activeMissionId", "");
         }
         if (compoundTag.contains("missionProgress")) {
-            this.missionProgress = Math.max(0, compoundTag.getInt("missionProgress"));
+            this.missionProgress = Math.max(0, compoundTag.getIntOr("missionProgress", 0));
         }
         if (compoundTag.contains("completedMissionsCount")) {
-            this.completedMissionsCount = Math.max(0, compoundTag.getInt("completedMissionsCount"));
+            this.completedMissionsCount = Math.max(0, compoundTag.getIntOr("completedMissionsCount", 0));
         }
         if (compoundTag.contains("missionStatus")) {
-            this.missionStatus = compoundTag.getString("missionStatus");
+            this.missionStatus = compoundTag.getStringOr("missionStatus", "NONE");
         }
         if (compoundTag.contains(CHAKRA_REGEN_COOLDOWN_TAG)) {
-            this.chakraRegenInfo.cooldown = compoundTag.getInt(CHAKRA_REGEN_COOLDOWN_TAG);
+            this.chakraRegenInfo.cooldown = compoundTag.getIntOr(CHAKRA_REGEN_COOLDOWN_TAG, 0);
         }
-        if (compoundTag.contains(JUTSU_MASTERY_TAG, Tag.TAG_COMPOUND)) {
+        compoundTag.getCompound(JUTSU_MASTERY_TAG).ifPresent(masteryTag -> {
             this.jutsuMastery.clear();
-            CompoundTag masteryTag = compoundTag.getCompound(JUTSU_MASTERY_TAG);
-            for (String key : masteryTag.getAllKeys()) {
-                ResourceLocation id = ResourceLocation.tryParse(key);
+            for (String key : masteryTag.keySet()) {
+                Identifier id = Identifier.tryParse(key);
                 if (id != null) {
-                    this.jutsuMastery.put(id, masteryTag.getInt(key));
+                    this.jutsuMastery.put(id, masteryTag.getIntOr(key, 0));
                 }
             }
-        }
-    }
-
-    @Override
-    public void deserializeNBT(Tag tag) {
-        if (tag instanceof CompoundTag compoundTag) {
-            loadNBTData(compoundTag);
-        }
+        });
     }
 
     private boolean shimonPenaltyActive = false;
@@ -1235,12 +1235,6 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         setJutsuActive(JUTSU_FLAG_EIGHT_GATES_DEATH, active);
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        return NinjaCapabilityHandler.NINJA_DATA.orEmpty(cap, holder);
-    }
-
     @Override
     public HashMap<String, CooldownTickEvent> getCooldownEvents() {
         return cooldownTickEvents;
@@ -1305,7 +1299,7 @@ public class NinjaData implements INinjaData, ICapabilityProvider {
         future.setChakraExp(original.getChakraExp() * multiplier);
         future.setStaminaExp(original.getStaminaExp() * multiplier);
 
-        for (Map.Entry<ResourceLocation, Integer> entry : original.getJutsuMasteryMap().entrySet()) {
+        for (Map.Entry<Identifier, Integer> entry : original.getJutsuMasteryMap().entrySet()) {
             int penalized = (int) Math.floor(entry.getValue() * multiplier);
             future.setMastery(entry.getKey(), Math.max(0, penalized));
         }

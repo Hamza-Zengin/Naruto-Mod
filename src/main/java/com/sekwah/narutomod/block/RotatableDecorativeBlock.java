@@ -32,7 +32,7 @@ public class RotatableDecorativeBlock extends HorizontalDirectionalBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter blockGetter, BlockPos pos, CollisionContext context) {
-        Vec3 vector3d = state.getOffset(blockGetter, pos);
+        Vec3 vector3d = state.getOffset(pos);
         return SHAPE.move(vector3d.x, vector3d.y, vector3d.z);
     }
 

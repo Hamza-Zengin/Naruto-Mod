@@ -3,15 +3,12 @@ package com.sekwah.narutomod.entity.projectile;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.sounds.NarutoSounds;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkHooks;
 
 public class KunaiEntity extends AbstractArrow {
 
@@ -20,11 +17,15 @@ public class KunaiEntity extends AbstractArrow {
     }
 
     public KunaiEntity(Level worldIn, LivingEntity shooter) {
-        super(NarutoEntities.KUNAI.get(), shooter, worldIn);
+        super(NarutoEntities.KUNAI.get(), shooter, worldIn, new ItemStack(NarutoItems.KUNAI.get()), null);
     }
 
     public KunaiEntity(EntityType<? extends KunaiEntity> kunaiEntityEntityType, LivingEntity shooter, Level worldIn) {
-        super(kunaiEntityEntityType, shooter, worldIn);
+        super(kunaiEntityEntityType, shooter, worldIn, new ItemStack(NarutoItems.KUNAI.get()), null);
+    }
+
+    protected KunaiEntity(EntityType<? extends KunaiEntity> kunaiEntityEntityType, LivingEntity shooter, Level worldIn, ItemStack pickupItem) {
+        super(kunaiEntityEntityType, shooter, worldIn, pickupItem, null);
     }
 
     @Override
@@ -38,13 +39,7 @@ public class KunaiEntity extends AbstractArrow {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
-    }
-
-
-    @Override
-    protected ItemStack getPickupItem() {
+    protected ItemStack getDefaultPickupItem() {
         return new ItemStack(NarutoItems.KUNAI.get());
     }
 }

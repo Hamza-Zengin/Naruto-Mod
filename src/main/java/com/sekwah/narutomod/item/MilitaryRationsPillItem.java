@@ -6,17 +6,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
-import javax.annotation.Nullable;
-import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Military Rations Pill (Hyōrōgan - 兵糧丸)
@@ -29,34 +29,34 @@ public class MilitaryRationsPillItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (!level.isClientSide()) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-                ninjaData.addChakra(100.0f);
-                ninjaData.addStamina(100.0f);
+            var ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            ninjaData.addChakra(100.0f);
+            ninjaData.addStamina(100.0f);
 
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 20 * 30, 0)); // Speed I for 30 seconds
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 20 * 30, 0)); // Speed I for 30 seconds
 
-                level.playSound(null, player.blockPosition(), SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, 1.0f, 1.2f);
-                level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.8f, 1.1f);
+            level.playSound(null, player.blockPosition(), SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS, 1.0f, 1.2f);
+            level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.8f, 1.1f);
 
-                player.getCooldowns().addCooldown(this, 20 * 20); // 20 second cooldown between pills
-                player.displayClientMessage(Component.translatable("item.narutomod.military_rations_pill.used").withStyle(ChatFormatting.GREEN), true);
+            player.getCooldowns().addCooldown(stack, 20 * 20); // 20 second cooldown between pills
+            player.sendOverlayMessage(Component.translatable("item.narutomod.military_rations_pill.used").withStyle(ChatFormatting.GREEN));
 
-                if (!player.getAbilities().instabuild) {
-                    stack.shrink(1);
-                }
-            });
+            if (!player.getAbilities().instabuild) {
+                stack.shrink(1);
+            }
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("item.narutomod.military_rations_pill.desc1").withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("item.narutomod.military_rations_pill.desc2").withStyle(ChatFormatting.YELLOW));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltip, TooltipFlag flag) {
+        tooltip.accept(Component.translatable("item.narutomod.military_rations_pill.desc1").withStyle(ChatFormatting.GRAY));
+        tooltip.accept(Component.translatable("item.narutomod.military_rations_pill.desc2").withStyle(ChatFormatting.YELLOW));
     }
 }

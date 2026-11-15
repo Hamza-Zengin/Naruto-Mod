@@ -1,37 +1,40 @@
 package com.sekwah.narutomod.client.renderer.entity.jutsuprojectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.*;
 import com.sekwah.narutomod.client.renderer.NarutoRenderEvents;
 import com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 /**
  * Renders all 10 custom 3D Jutsu Models for JutsuVisualEffectEntity with
  * full-bright chakra illumination, smooth animations, and translucent shaders.
  */
-public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectEntity> {
+public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectEntity, JutsuVisualEffectRenderer.VisualEffectRenderState> {
 
-    public static final ResourceLocation TEX_KIRIN = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/kirin_dragon.png");
-    public static final ResourceLocation TEX_WOOD = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/wood_prison.png");
-    public static final ResourceLocation TEX_BONE = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/bone_forest.png");
-    public static final ResourceLocation TEX_RASENGAN = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/rasengan_sphere.png");
-    public static final ResourceLocation TEX_CHIDORI = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/chidori_burst.png");
-    public static final ResourceLocation TEX_WATER = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/water_vortex.png");
-    public static final ResourceLocation TEX_WIND = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/wind_shockwave.png");
-    public static final ResourceLocation TEX_AMATERASU = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/amaterasu_flame.png");
-    public static final ResourceLocation TEX_SHADOW = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/shadow_bind.png");
-    public static final ResourceLocation TEX_EARTH = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/jutsu/earth_wall.png");
+    public static final Identifier TEX_KIRIN = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/kirin_dragon.png");
+    public static final Identifier TEX_WOOD = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/wood_prison.png");
+    public static final Identifier TEX_BONE = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/bone_forest.png");
+    public static final Identifier TEX_RASENGAN = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/rasengan_sphere.png");
+    public static final Identifier TEX_CHIDORI = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/chidori_burst.png");
+    public static final Identifier TEX_WATER = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/water_vortex.png");
+    public static final Identifier TEX_WIND = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/wind_shockwave.png");
+    public static final Identifier TEX_AMATERASU = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/amaterasu_flame.png");
+    public static final Identifier TEX_SHADOW = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/shadow_bind.png");
+    public static final Identifier TEX_EARTH = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/earth_wall.png");
 
     private final KirinDragonModel kirinModel;
     private final WoodPrisonModel woodModel;
@@ -43,6 +46,13 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
     private final AmaterasuFlameModel amaterasuModel;
     private final ShadowBindModel shadowModel;
     private final EarthWallModel earthModel;
+
+    public static class VisualEffectRenderState extends EntityRenderState {
+        public int visualType;
+        public float effectYaw;
+        public float age;
+        public float progress;
+    }
 
     public JutsuVisualEffectRenderer(EntityRendererProvider.Context ctx) {
         super(ctx);
@@ -59,97 +69,109 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
     }
 
     @Override
-    public void render(JutsuVisualEffectEntity entity, float entityYaw, float partialTicks,
-                       PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    public VisualEffectRenderState createRenderState() {
+        return new VisualEffectRenderState();
+    }
+
+    @Override
+    public void extractRenderState(JutsuVisualEffectEntity entity, VisualEffectRenderState state, float partialTicks) {
+        super.extractRenderState(entity, state, partialTicks);
         float age = entity.tickCount + partialTicks;
         float maxLife = Math.max(1.0F, (float) entity.getMaxLife());
-        float progress = Mth.clamp(age / maxLife, 0.0F, 1.0F);
-        int type = entity.getVisualType();
+        state.visualType = entity.getVisualType();
+        state.effectYaw = entity.getEffectYaw();
+        state.age = age;
+        state.progress = Mth.clamp(age / maxLife, 0.0F, 1.0F);
+    }
 
-        ResourceLocation tex = getTextureLocation(entity);
-        RenderType renderType = (type == JutsuVisualEffectEntity.TYPE_EARTH_WALL || type == JutsuVisualEffectEntity.TYPE_BONE_FOREST || type == JutsuVisualEffectEntity.TYPE_WOOD_PRISON)
-                ? RenderType.entityCutoutNoCull(tex)
-                : RenderType.entityTranslucentCull(tex);
-        VertexConsumer consumer = buffer.getBuffer(renderType);
+    @Override
+    public void submit(VisualEffectRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector,
+                       CameraRenderState cameraRenderState) {
+        int type = state.visualType;
+        Identifier tex = getTextureLocation(type);
+        RenderType renderType = (type == JutsuVisualEffectEntity.TYPE_EARTH_WALL
+                || type == JutsuVisualEffectEntity.TYPE_BONE_FOREST
+                || type == JutsuVisualEffectEntity.TYPE_WOOD_PRISON)
+                ? RenderTypes.entityCutout(tex)
+                : RenderTypes.entityTranslucentCull(tex);
 
         poseStack.pushPose();
         try {
-            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - entity.getEffectYaw()));
+            poseStack.rotateDegrees(Axis.YP, 180.0F - state.effectYaw);
 
-            float fadeOut = progress > 0.82F ? (1.0F - ((progress - 0.82F) / 0.18F)) : 1.0F;
+            float fadeOut = state.progress > 0.82F ? (1.0F - ((state.progress - 0.82F) / 0.18F)) : 1.0F;
             int fullBright = 15728880; // 0x00F000F0 (Block 15, Sky 15)
-            int solidLight = Math.max(packedLight, 12583104); // Block 12, Sky 12 minimum ambient baseline
+            int solidLight = Math.max(state.lightCoords, 12583104); // Block 12, Sky 12 minimum ambient baseline
+            VisualState visualState = new VisualState(state.age, state.progress);
 
             switch (type) {
                 case JutsuVisualEffectEntity.TYPE_KIRIN_DRAGON -> {
                     float scale = 1.65F;
                     poseStack.scale(-scale, -scale, scale);
-                    this.kirinModel.setupAnim(age, progress);
-                    this.kirinModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.92F * fadeOut);
+                    int color = ARGB.colorFromFloat(0.92F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.kirinModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_WOOD_PRISON -> {
                     float scale = 1.25F;
                     poseStack.scale(-scale, -scale, scale);
-                    this.woodModel.setupAnim(age, progress);
-                    this.woodModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.woodModel, visualState, poseStack, renderType, solidLight, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_BONE_FOREST -> {
                     float scale = 1.2F;
                     poseStack.scale(-scale, -scale, scale);
-                    this.boneModel.setupAnim(age);
-                    this.boneModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.boneModel, visualState, poseStack, renderType, solidLight, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_RASENGAN_SPHERE -> {
                     poseStack.translate(0.0D, 1.0D, 0.0D);
-                    float scale = 0.85F + progress * 1.35F;
+                    float scale = 0.85F + state.progress * 1.35F;
                     poseStack.scale(-scale, -scale, scale);
-                    this.rasenganModel.setupAnim(age);
-                    this.rasenganModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.88F * fadeOut);
+                    float alpha = 0.88F * fadeOut;
+                    submitNodeCollector.submitCustomGeometry(poseStack, renderType, (pose, vc) ->
+                            this.rasenganModel.renderProcedural(pose, vc, state.age, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha));
                 }
                 case JutsuVisualEffectEntity.TYPE_CHIDORI_BURST -> {
                     poseStack.translate(0.0D, 1.0D, 0.0D);
-                    float scale = 1.05F + Mth.sin(age * 0.8F) * 0.18F;
+                    float scale = 1.05F + Mth.sin(state.age * 0.8F) * 0.18F;
                     poseStack.scale(-scale, -scale, scale);
-                    this.chidoriModel.setupAnim(age);
-                    this.chidoriModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.90F * fadeOut);
+                    int color = ARGB.colorFromFloat(0.90F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.chidoriModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_WATER_VORTEX -> {
                     poseStack.translate(0.0D, 0.9D, 0.0D);
-                    float scale = 1.15F + (progress > 0.7F ? (progress - 0.7F) * 2.2F : 0.0F);
+                    float scale = 1.15F + (state.progress > 0.7F ? (state.progress - 0.7F) * 2.2F : 0.0F);
                     poseStack.scale(-scale, -scale, scale);
-                    this.waterModel.setupAnim(age);
-                    this.waterModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.86F * fadeOut);
+                    int color = ARGB.colorFromFloat(0.86F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.waterModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_WIND_SHOCKWAVE -> {
                     poseStack.translate(0.0D, 1.0D, 0.0D);
-                    float scale = 0.85F + progress * 1.65F;
+                    float scale = 0.85F + state.progress * 1.65F;
                     poseStack.scale(-scale, -scale, scale);
-                    this.windModel.setupAnim(age);
-                    this.windModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.82F * fadeOut);
+                    int color = ARGB.colorFromFloat(0.82F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.windModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_AMATERASU_PILLAR -> {
                     float scale = 1.15F;
                     poseStack.scale(-scale, -scale, scale);
-                    this.amaterasuModel.setupAnim(age);
-                    this.amaterasuModel.renderToBuffer(poseStack, consumer, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.94F * fadeOut);
+                    int color = ARGB.colorFromFloat(0.94F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.amaterasuModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_SHADOW_BIND -> {
                     float scale = 1.1F;
                     poseStack.scale(-scale, -scale, scale);
-                    this.shadowModel.setupAnim(age, progress);
-                    this.shadowModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.92F * fadeOut);
+                    int color = ARGB.colorFromFloat(0.92F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.shadowModel, visualState, poseStack, renderType, solidLight, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_EARTH_WALL -> {
                     float scale = 1.0F;
                     poseStack.scale(-scale, -scale, scale);
-                    this.earthModel.setupAnim(progress);
-                    this.earthModel.renderToBuffer(poseStack, consumer, solidLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.earthModel, visualState, poseStack, renderType, solidLight, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
                 }
             }
         } finally {
             poseStack.popPose();
         }
-        super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
+        super.submit(state, poseStack, submitNodeCollector, cameraRenderState);
     }
 
     @Override
@@ -165,9 +187,8 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
         return super.getBlockLightLevel(entity, pos);
     }
 
-    @Override
-    public ResourceLocation getTextureLocation(JutsuVisualEffectEntity entity) {
-        return switch (entity.getVisualType()) {
+    private static Identifier getTextureLocation(int type) {
+        return switch (type) {
             case JutsuVisualEffectEntity.TYPE_KIRIN_DRAGON -> TEX_KIRIN;
             case JutsuVisualEffectEntity.TYPE_WOOD_PRISON -> TEX_WOOD;
             case JutsuVisualEffectEntity.TYPE_BONE_FOREST -> TEX_BONE;

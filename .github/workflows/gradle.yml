@@ -2,9 +2,9 @@ name: Build and Release
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, 'port/**' ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, 'port/**' ]
   workflow_dispatch:
 
 jobs:
@@ -20,10 +20,11 @@ jobs:
         with:
           path: Naruto-Mod
 
-      - name: Checkout SekCLib (Composite Build)
+      - name: Checkout SekCLib (26.3 NeoForge)
         uses: actions/checkout@v4
         with:
           repository: Hamza-Zengin/SekCLib
+          ref: master
           path: SekCLib
 
       - name: Cache Gradle packages
@@ -33,15 +34,19 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      - name: Set up JDK 17
+      - name: Set up JDK 25
         uses: actions/setup-java@v5
         with:
-          distribution: 'zulu'
-          java-version: 17
+          distribution: 'temurin'
+          java-version: 25
 
       - name: Prepare repository
         run: |
           git fetch --unshallow --tags || true
+
+      - name: Publish SekCLib 2.0.0 to mavenLocal
+        working-directory: SekCLib
+        run: ./gradlew publishToMavenLocal -PisRelease=true
 
       - name: Run Model, Language, and Sound Audits
         run: |
@@ -50,9 +55,6 @@ jobs:
           python3 scripts/check_sounds.py
           python3 scripts/check_item_models.py
           python3 scripts/check_unused_textures.py
-
-      - name: Download MC assets
-        run: ./gradlew downloadAssets || ./gradlew downloadAssets || (sleep 30s && ./gradlew downloadAssets)
 
       - name: Run Tests
         run: ./gradlew test
@@ -63,18 +65,14 @@ jobs:
       - name: Upload Playable Mod Jar
         uses: actions/upload-artifact@v4
         with:
-          name: NarutoMod-1.20.1-v12.2
+          name: NarutoMod-26.3-v12.2
           path: |
             Naruto-Mod/build/libs/NarutoMod-*.jar
-            !Naruto-Mod/build/libs/*-deobf.jar
             !Naruto-Mod/build/libs/*-sources.jar
 
-      - name: Upload Dev & Source Artifacts
+      - name: Upload Source Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: NarutoMod-1.20.1-v12.2-dev
+          name: NarutoMod-26.3-v12.2-sources
           path: |
-            Naruto-Mod/build/libs/*-deobf.jar
             Naruto-Mod/build/libs/*-sources.jar
-
-

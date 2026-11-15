@@ -4,46 +4,66 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.sekwah.narutomod.entity.projectile.ShurikenEntity;
 import com.sekwah.narutomod.item.NarutoItems;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ArrowRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
-public class ShurikenRenderer extends ArrowRenderer<ShurikenEntity> {
+public class ShurikenRenderer extends EntityRenderer<ShurikenEntity, ShurikenRenderer.ShurikenRenderState> {
 
-   private final ItemRenderer itemRenderer;
-   private ItemStack renderingItem;
+   private final ItemModelResolver itemModelResolver;
+   private final ItemStack renderingItem;
 
-   public static final ResourceLocation RES_ARROW = new ResourceLocation("narutomod", "textures/entity/projectiles/kunai.png");
+   public static final Identifier RES_ARROW = Identifier.fromNamespaceAndPath("narutomod", "textures/entity/projectiles/kunai.png");
+
+   public static class ShurikenRenderState extends EntityRenderState {
+      public float yRot;
+      public float xRot;
+      public float rotOffset;
+      public float spinDegrees;
+      public final ItemStackRenderState item = new ItemStackRenderState();
+   }
 
    public ShurikenRenderer(EntityRendererProvider.Context manager) {
       super(manager);
-      this.itemRenderer = Minecraft.getInstance().getItemRenderer();
+      this.itemModelResolver = manager.getItemModelResolver();
       this.renderingItem = new ItemStack(NarutoItems.SHURIKEN.get());
    }
 
    @Override
-   public void render(ShurikenEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
-      matrixStackIn.pushPose();
-      float rotateSpeed = -50;
-      matrixStackIn.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, entityIn.yRotO, entityIn.getYRot()) - 90.0F));
-      matrixStackIn.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(partialTicks, entityIn.xRotO, entityIn.getXRot())));
-      matrixStackIn.mulPose(Axis.XP.rotationDegrees(entityIn.getRotOffset()));
-      matrixStackIn.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(partialTicks, entityIn.getPrevRotateTicks() * rotateSpeed, entityIn.getRotateTicks() * rotateSpeed)));
-      matrixStackIn.scale(0.5f, 0.5f, 0.5f);
-      BakedModel ibakedmodel = itemRenderer.getModel(this.renderingItem, entityIn.level(), null, entityIn.getId());
-      itemRenderer.render(this.renderingItem, ItemDisplayContext.FIXED, false, matrixStackIn, bufferIn, packedLightIn, OverlayTexture.NO_OVERLAY, ibakedmodel);
-      matrixStackIn.popPose();
+   public ShurikenRenderState createRenderState() {
+      return new ShurikenRenderState();
    }
 
-   public ResourceLocation getTextureLocation(ShurikenEntity entity) {
-      return RES_ARROW;
+   @Override
+   public void extractRenderState(ShurikenEntity entity, ShurikenRenderState state, float partialTicks) {
+      super.extractRenderState(entity, state, partialTicks);
+      float rotateSpeed = -50.0F;
+      state.yRot = entity.getYRot(partialTicks);
+      state.xRot = entity.getXRot(partialTicks);
+      state.rotOffset = entity.getRotOffset();
+      state.spinDegrees = Mth.lerp(partialTicks, entity.getPrevRotateTicks() * rotateSpeed, entity.getRotateTicks() * rotateSpeed);
+      this.itemModelResolver.updateForNonLiving(state.item, this.renderingItem, ItemDisplayContext.FIXED, entity);
+   }
+
+   @Override
+   public void submit(ShurikenRenderState state, PoseStack matrixStackIn, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
+      matrixStackIn.pushPose();
+      matrixStackIn.rotateDegrees(Axis.YP, state.yRot - 90.0F);
+      matrixStackIn.rotateDegrees(Axis.ZP, state.xRot);
+      matrixStackIn.rotateDegrees(Axis.XP, state.rotOffset);
+      matrixStackIn.rotateDegrees(Axis.ZP, state.spinDegrees);
+      matrixStackIn.scale(0.5F, 0.5F, 0.5F);
+      state.item.submit(matrixStackIn, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor);
+      matrixStackIn.popPose();
+      super.submit(state, matrixStackIn, submitNodeCollector, cameraRenderState);
    }
 }

@@ -67,7 +67,7 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
 
         com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
                 new com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket(
-                        new net.minecraft.resources.ResourceLocation("narutomod", "wind_breaker"),
+                        net.minecraft.resources.Identifier.fromNamespaceAndPath("narutomod", "wind_breaker"),
                         player.getEyePosition(), look, Math.min(1.5f, powerMult), 0xD8F8E8),
                 player);
         com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
@@ -85,8 +85,10 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
 
         for (int i = 1; i <= maxRange; i++) {
             Vec3 pos = player.position().add(look.scale(i)).add(0, player.getEyeHeight() * 0.7, 0);
-            serverLevel.sendParticles(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 15, 0.5 * (i * 0.2), 0.5 * (i * 0.2), 0.5 * (i * 0.2), 0.15);
-            serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK, pos.x, pos.y, pos.z, 2, 0.3, 0.3, 0.3, 0.05);
+            serverLevel.sendParticles(ParticleTypes.CLOUD, pos.x, pos.y, pos.z, 15, 0.5 * (i * 0.2), 0.5 * (i * 0.2), 0.5 * (i * 0.2), 0.15,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+            serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK, pos.x, pos.y, pos.z, 2, 0.3, 0.3, 0.3, 0.05,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
             AABB box = new AABB(pos.x - (1.0 + i * 0.2), pos.y - 1.5, pos.z - (1.0 + i * 0.2),
                     pos.x + (1.0 + i * 0.2), pos.y + 1.5, pos.z + (1.0 + i * 0.2));
@@ -95,9 +97,9 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
             for (Entity entity : entities) {
                 if (entity instanceof LivingEntity living && living.isAlive()
                         && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(player, living)) {
-                    living.hurt(player.damageSources().playerAttack(player), damage);
+                    living.hurtServer(serverLevel, player.damageSources().playerAttack(player), damage);
                     living.setDeltaMovement(look.scale(2.2 * powerMult).add(0, 0.5 * powerMult, 0));
-                    living.hurtMarked = true;
+                    living.needsSync = true;
                 } else if (entity instanceof Projectile projectile) {
                     projectile.setDeltaMovement(look.scale(2.0 * powerMult));
                 }

@@ -1,38 +1,46 @@
 package com.sekwah.narutomod.item.armor;
 
 import com.sekwah.narutomod.NarutoMod;
-import com.sekwah.narutomod.client.renderer.NarutoRenderEvents;
 import com.sekwah.narutomod.item.interfaces.IShouldHideNameplate;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-public class NarutoArmorItem extends ArmorItem implements IShouldHideNameplate {
+public class NarutoArmorItem extends Item implements IShouldHideNameplate {
 
-    private HumanoidModel armorModel = null;
-    private String armorTexture = null;
+    @Nullable
+    private Object armorModel = null;
+    @Nullable
+    private Identifier armorTexture = null;
     private boolean forceHideName = false;
+    @Nullable
+    private String tooltipKey = null;
 
-    public NarutoArmorItem(ArmorMaterial material, ArmorItem.Type type, Properties properties) {
-        super(material, type, properties);
+    public NarutoArmorItem(ArmorMaterial material, ArmorType type, Properties properties) {
+        super(properties.humanoidArmor(material, type));
     }
 
     @Nullable
-    @Override
-    public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-        return armorTexture;
+    public Object getArmorModel() {
+        return this.armorModel;
     }
 
-    public NarutoArmorItem setArmorModel(HumanoidModel<? extends LivingEntity> armorModel) {
+    @Nullable
+    public Identifier getArmorTexture() {
+        return this.armorTexture;
+    }
+
+    public NarutoArmorItem setArmorModel(Object armorModel) {
         this.armorModel = armorModel;
         return this;
     }
@@ -43,7 +51,7 @@ public class NarutoArmorItem extends ArmorItem implements IShouldHideNameplate {
     }
 
     public NarutoArmorItem setArmorTexture(String armorTexture) {
-        this.armorTexture = NarutoMod.MOD_ID + ":" + armorTexture;
+        this.armorTexture = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, armorTexture);
         return this;
     }
 
@@ -52,28 +60,15 @@ public class NarutoArmorItem extends ArmorItem implements IShouldHideNameplate {
         return this.forceHideName;
     }
 
-    private String tooltipKey = null;
-
     public NarutoArmorItem setTooltipKey(String tooltipKey) {
         this.tooltipKey = tooltipKey;
         return this;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltip, TooltipFlag flag) {
         if (this.tooltipKey != null) {
-            tooltip.add(net.minecraft.network.chat.Component.translatable(this.tooltipKey).withStyle(net.minecraft.ChatFormatting.GOLD));
+            tooltip.accept(Component.translatable(this.tooltipKey).withStyle(ChatFormatting.GOLD));
         }
-    }
-
-    @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        super.initializeClient(consumer);
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public HumanoidModel<?> getHumanoidArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot, HumanoidModel<?> _default) {
-                return armorModel != null ? armorModel : _default;
-            }
-        });
     }
 }

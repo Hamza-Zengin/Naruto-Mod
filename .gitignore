@@ -19,3 +19,5 @@ logs/
 *.bundle
 *.patch
 /libs/*.jar
+.cache/
+config/

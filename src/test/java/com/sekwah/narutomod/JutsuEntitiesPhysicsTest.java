@@ -3,7 +3,7 @@ package com.sekwah.narutomod;
 import com.sekwah.narutomod.entity.jutsuprojectile.MudWallEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.WoodPrisonEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -70,12 +70,12 @@ public class JutsuEntitiesPhysicsTest {
     }
 
     @Test
-    @DisplayName("Verify NarutoRenderer registers EntityRenderers for the new jutsu entities")
+    @DisplayName("Verify NarutoRenderEvents registers EntityRenderers for the new jutsu entities")
     public void testNarutoRendererRegistrations() throws IOException {
-        String rendererContent = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/client/renderer/NarutoRenderer.java"));
-        assertTrue(rendererContent.contains("EntityRenderers.register(NarutoEntities.WATER_BULLET.get()"));
-        assertTrue(rendererContent.contains("EntityRenderers.register(NarutoEntities.MUD_WALL.get()"));
-        assertTrue(rendererContent.contains("EntityRenderers.register(NarutoEntities.WOOD_PRISON.get()"));
+        String rendererContent = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/client/renderer/NarutoRenderEvents.java"));
+        assertTrue(rendererContent.contains("event.registerEntityRenderer(NarutoEntities.WATER_BULLET.get()"));
+        assertTrue(rendererContent.contains("event.registerEntityRenderer(NarutoEntities.MUD_WALL.get()"));
+        assertTrue(rendererContent.contains("event.registerEntityRenderer(NarutoEntities.WOOD_PRISON.get()"));
     }
 
     @Test

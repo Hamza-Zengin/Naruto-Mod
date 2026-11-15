@@ -53,8 +53,8 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
         if (ninjaData == null) return false;
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("hyuga")) {
             if (player != null) {
-                player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
-                        Component.literal("Hyuga").withStyle(ChatFormatting.AQUA)), true);
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
+                        Component.literal("Hyuga").withStyle(ChatFormatting.AQUA)));
             }
             return false;
         }
@@ -76,11 +76,11 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
 
         Vec3 eyePos = player.getEyePosition();
         Vec3 look = player.getLookAngle();
-        serverLevel.playSound(null, player.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 0.9f, 1.6f);
+        serverLevel.playSound(null, player.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 0.9f, 1.6f);
 
         com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
                 new com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket(
-                        new net.minecraft.resources.ResourceLocation("narutomod", "hakke_kusho"),
+                        net.minecraft.resources.Identifier.fromNamespaceAndPath("narutomod", "hakke_kusho"),
                         eyePos, look, byakuganOn ? 1.3f : 1.0f, 0xA8E6FF),
                 player);
         com.sekwah.narutomod.network.PacketHandler.sendToTrackingAndSelf(
@@ -89,15 +89,16 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
 
         for (int i = 1; i <= 14; i++) {
             Vec3 pos = eyePos.add(look.scale(i));
-            serverLevel.sendParticles(ParticleTypes.SONIC_BOOM, pos.x, pos.y, pos.z, 1, 0.0, 0.0, 0.0, 0.0);
+            serverLevel.sendParticles(ParticleTypes.SONIC_BOOM, pos.x, pos.y, pos.z, 1, 0.0, 0.0, 0.0, 0.0,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             if (i % 2 == 0) {
                 AABB box = new AABB(pos.x - 1.3, pos.y - 1.3, pos.z - 1.3, pos.x + 1.3, pos.y + 1.3, pos.z + 1.3);
                 List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, box,
                         e -> e.isAlive() && e != player && !ShadowCloneEntity.areAllies(player, e));
                 for (LivingEntity target : targets) {
-                    target.hurt(player.damageSources().playerAttack(player), damage);
+                    target.hurtServer(serverLevel, player.damageSources().playerAttack(player), damage);
                     target.setDeltaMovement(look.scale(2.0 * powerMult).add(0, 0.45, 0));
-                    target.hurtMarked = true;
+                    target.needsSync = true;
                 }
             }
         }

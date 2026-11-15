@@ -11,10 +11,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
-import javax.annotation.Nullable;
-import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Ichiraku Miso Pork Ramen
@@ -24,8 +24,8 @@ public class IchirakuRamenItem extends Item {
 
     public static final FoodProperties RAMEN_FOOD = new FoodProperties.Builder()
             .nutrition(10)
-            .saturationMod(0.9F)
-            .alwaysEat()
+            .saturationModifier(0.9F)
+            .alwaysEdible()
             .build();
 
     public IchirakuRamenItem(Properties properties) {
@@ -35,13 +35,12 @@ public class IchirakuRamenItem extends Item {
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         ItemStack result = super.finishUsingItem(stack, level, entity);
-        if (!level.isClientSide && entity instanceof Player player) {
+        if (!level.isClientSide() && entity instanceof Player player) {
             player.heal(8.0F);
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 600, 0));
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-                ninjaData.addChakra(120.0f);
-                ninjaData.addStamina(120.0f);
-            });
+            var ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            ninjaData.addChakra(120.0f);
+            ninjaData.addStamina(120.0f);
             level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.8f, 1.0f);
 
             if (!player.getAbilities().instabuild) {
@@ -56,7 +55,7 @@ public class IchirakuRamenItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("item.narutomod.ichiraku_ramen.desc").withStyle(ChatFormatting.GOLD));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltip, TooltipFlag flag) {
+        tooltip.accept(Component.translatable("item.narutomod.ichiraku_ramen.desc").withStyle(ChatFormatting.GOLD));
     }
 }

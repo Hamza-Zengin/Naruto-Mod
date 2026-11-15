@@ -1,18 +1,22 @@
 package com.sekwah.narutomod.network.s2c;
 
-import com.sekwah.narutomod.client.events.CameraShakeManager;
+import com.sekwah.narutomod.NarutoMod;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
 /**
  * Lightweight S2C packet to trigger a damped client-side camera shake.
  */
-public class ClientCameraShakePacket {
+public class ClientCameraShakePacket implements CustomPacketPayload {
+
+    public static final CustomPacketPayload.Type<ClientCameraShakePacket> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "client_camera_shake"));
+
+    public static final StreamCodec<FriendlyByteBuf, ClientCameraShakePacket> STREAM_CODEC =
+            StreamCodec.ofMember(ClientCameraShakePacket::encode, ClientCameraShakePacket::decode);
 
     private static final int PAYLOAD_BYTES = Float.BYTES + Integer.BYTES; // 8 bytes
     private static final int MAX_DURATION_TICKS = 1200; // 60 seconds cap
@@ -23,6 +27,11 @@ public class ClientCameraShakePacket {
     public ClientCameraShakePacket(float intensity, int durationTicks) {
         this.intensity = intensity;
         this.durationTicks = durationTicks;
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     public static void encode(ClientCameraShakePacket msg, FriendlyByteBuf buf) {
@@ -44,14 +53,5 @@ public class ClientCameraShakePacket {
         }
 
         return new ClientCameraShakePacket(intensity, durationTicks);
-    }
-
-    public static class Handler {
-        public static void handle(ClientCameraShakePacket msg, Supplier<NetworkEvent.Context> ctx) {
-            ctx.get().enqueueWork(() ->
-                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CameraShakeManager.triggerShake(msg.intensity, msg.durationTicks))
-            );
-            ctx.get().setPacketHandled(true);
-        }
     }
 }

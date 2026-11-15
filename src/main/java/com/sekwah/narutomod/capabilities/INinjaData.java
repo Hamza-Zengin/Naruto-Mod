@@ -3,17 +3,16 @@ package com.sekwah.narutomod.capabilities;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public interface INinjaData extends INBTSerializable<Tag> {
+public interface INinjaData extends ValueIOSerializable {
     float getChakra();
     float getMaxChakra();
     float getBaseMaxChakra();
@@ -34,9 +33,9 @@ public interface INinjaData extends INBTSerializable<Tag> {
     int getChakraRegenCooldown();
     boolean isChakraRegenLocked();
 
-    ResourceLocation getClan();
-    void setClan(ResourceLocation clan);
-    void forceSetClan(ResourceLocation clan);
+    Identifier getClan();
+    void setClan(Identifier clan);
+    void forceSetClan(Identifier clan);
 
     boolean isClanLocked();
     void setClanLocked(boolean locked);
@@ -76,18 +75,18 @@ public interface INinjaData extends INBTSerializable<Tag> {
     void resetData();
 
     boolean isAbilityUnlocked(Ability ability);
-    boolean isAbilityUnlocked(ResourceLocation abilityId);
-    void unlockAbility(ResourceLocation abilityId);
-    void lockAbility(ResourceLocation abilityId);
-    java.util.Set<ResourceLocation> getUnlockedAbilities();
+    boolean isAbilityUnlocked(Identifier abilityId);
+    void unlockAbility(Identifier abilityId);
+    void lockAbility(Identifier abilityId);
+    java.util.Set<Identifier> getUnlockedAbilities();
     String getUnlockedJutsusString();
     void setUnlockedJutsusString(String jutsus);
 
-    Map<ResourceLocation, Integer> getJutsuMasteryMap();
-    int getMastery(ResourceLocation jutsuId);
-    void setMastery(ResourceLocation jutsuId, int amount);
-    void addMastery(ResourceLocation jutsuId, int amount);
-    void incrementJutsuMastery(ResourceLocation jutsuId, boolean isToggle);
+    Map<Identifier, Integer> getJutsuMasteryMap();
+    int getMastery(Identifier jutsuId);
+    void setMastery(Identifier jutsuId, int amount);
+    void addMastery(Identifier jutsuId, int amount);
+    void incrementJutsuMastery(Identifier jutsuId, boolean isToggle);
     default int getAbilityMastery(com.sekwah.narutomod.abilities.Ability ability) {
         if (ability == null || ability.getRegistryName() == null) return 0;
         return getMastery(ability.getRegistryName());
@@ -98,7 +97,7 @@ public interface INinjaData extends INBTSerializable<Tag> {
 
     HashMap<String, CooldownTickEvent> getCooldownEvents();
 
-    ResourceLocation getCurrentlyChanneledAbility();
+    Identifier getCurrentlyChanneledAbility();
     int getCurrentlyChanneledTicks();
     void setCurrentlyChanneledAbility(Player player, Ability ability);
 

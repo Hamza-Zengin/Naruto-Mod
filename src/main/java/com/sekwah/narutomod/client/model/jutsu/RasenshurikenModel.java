@@ -1,26 +1,24 @@
 package com.sekwah.narutomod.client.model.jutsu;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 /**
  * 3D Model for Fūton: Rasenshuriken
  * Features a dense spherical Rasengan core surrounded by 4 aerodynamic curved wind-chakra blades.
  */
-public class RasenshurikenModel extends Model {
+public class RasenshurikenModel extends Model<RasenshurikenModel.SpinState> {
 
-    private final ModelPart root;
+    public record SpinState(float coreSpin, float bladeSpin) {}
+
     private final ModelPart core;
     private final ModelPart blades;
 
     public RasenshurikenModel(ModelPart modelPart) {
-        super(RenderType::entityTranslucent);
-        this.root = modelPart;
+        super(modelPart, RenderTypes::entityTranslucent);
         this.core = modelPart.getChild("core");
         this.blades = modelPart.getChild("blades");
     }
@@ -70,15 +68,15 @@ public class RasenshurikenModel extends Model {
         return LayerDefinition.create(mesh, 64, 64);
     }
 
+    @Override
+    public void setupAnim(SpinState state) {
+        super.setupAnim(state);
+        setSpinAngle(state.coreSpin(), state.bladeSpin());
+    }
+
     public void setSpinAngle(float coreSpin, float bladeSpin) {
         this.core.yRot = coreSpin;
         this.core.xRot = coreSpin * 0.7F;
         this.blades.yRot = bladeSpin;
-    }
-
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay,
-                               float r, float g, float b, float a) {
-        this.root.render(poseStack, buffer, packedLight, packedOverlay, r, g, b, a);
     }
 }

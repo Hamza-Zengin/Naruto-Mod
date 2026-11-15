@@ -69,7 +69,7 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
 
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.RASENGAN.get(), SoundSource.PLAYERS, 1.2f, 1.0f);
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.RASENGAN_LOOP.get(), SoundSource.PLAYERS, 0.9f, 1.0f);
-        player.displayClientMessage(Component.translatable("jutsu.rasengan.ready").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD), true);
+        player.sendOverlayMessage(Component.translatable("jutsu.rasengan.ready").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
     }
 
     public static void executeStrike(Player player, INinjaData ninjaData, LivingEntity target) {
@@ -101,20 +101,22 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
         float powerMult = getPowerMultiplier(mastery);
         float strikeDamage = com.sekwah.narutomod.abilities.NarutoAbilities.RASENGAN.get().getDamage(ninjaData);
         for (LivingEntity hit : hitTargets) {
-            hit.hurt(player.damageSources().playerAttack(player), strikeDamage);
+            hit.hurtServer(serverLevel, player.damageSources().playerAttack(player), strikeDamage);
             Vec3 knockback = look.scale(2.5 * powerMult).add(0, 0.6 * powerMult, 0);
             if (hit instanceof Player targetPlayer) {
                 com.sekwah.sekclib.util.PlayerUtil.setVelocity(targetPlayer, knockback, true);
             } else {
                 hit.setDeltaMovement(knockback);
-                hit.hurtMarked = true;
+                hit.needsSync = true;
             }
-            serverLevel.sendParticles(ParticleTypes.EXPLOSION, hit.getX(), hit.getY() + 1.0, hit.getZ(), 1, 0, 0, 0, 0);
+            serverLevel.sendParticles(ParticleTypes.EXPLOSION, hit.getX(), hit.getY() + 1.0, hit.getZ(), 1, 0, 0, 0, 0,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
-        serverLevel.playSound(null, BlockPos.containing(strikePos), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.2f, 1.1f);
+        serverLevel.playSound(null, BlockPos.containing(strikePos), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 1.2f, 1.1f);
         serverLevel.playSound(null, BlockPos.containing(strikePos), NarutoSounds.RASENGAN.get(), SoundSource.PLAYERS, 1.4f, 1.2f);
-        serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK, strikePos.x, strikePos.y, strikePos.z, 8, 0.3, 0.3, 0.3, 0.05);
+        serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK, strikePos.x, strikePos.y, strikePos.z, 8, 0.3, 0.3, 0.3, 0.05,
+                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
         ninjaData.clearActiveHandJutsu();
     }
