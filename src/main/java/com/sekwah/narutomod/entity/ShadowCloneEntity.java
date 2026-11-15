@@ -1,9 +1,17 @@
 package com.sekwah.narutomod.entity;
 
 import com.sekwah.narutomod.sounds.NarutoSounds;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,14 +26,9 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
-
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -37,8 +40,8 @@ public class ShadowCloneEntity extends PathfinderMob {
     public static final int MODE_PATROL = 1;
     public static final int MODE_HOLD = 2;
 
-    private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER_UUID =
-            SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Optional<net.minecraft.world.entity.EntityReference<LivingEntity>>> DATA_OWNER_UUID =
+            SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
     private static final EntityDataAccessor<String> DATA_OWNER_NAME =
             SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> DATA_MAX_LIFESPAN =
@@ -51,7 +54,7 @@ public class ShadowCloneEntity extends PathfinderMob {
     @Nullable
     private UUID ownerUUID;
     private int lifeTicks = 600; // 30 seconds default
-    private final java.util.List<net.minecraft.resources.ResourceLocation> unlockedCloneJutsus = new java.util.ArrayList<>();
+    private final java.util.List<Identifier> unlockedCloneJutsus = new java.util.ArrayList<>();
     private int cloneJutsuCooldown = 0;
     private boolean fastJutsuCooldown = false;
     private boolean decoyMode = false;
@@ -71,14 +74,14 @@ public class ShadowCloneEntity extends PathfinderMob {
         super(type, level);
     }
 
-    public void setUnlockedCloneJutsus(java.util.List<net.minecraft.resources.ResourceLocation> jutsus) {
+    public void setUnlockedCloneJutsus(java.util.List<Identifier> jutsus) {
         this.unlockedCloneJutsus.clear();
         if (jutsus != null) {
             this.unlockedCloneJutsus.addAll(jutsus);
         }
     }
 
-    public java.util.List<net.minecraft.resources.ResourceLocation> getUnlockedCloneJutsus() {
+    public java.util.List<Identifier> getUnlockedCloneJutsus() {
         return this.unlockedCloneJutsus;
     }
 
@@ -94,16 +97,16 @@ public class ShadowCloneEntity extends PathfinderMob {
             SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.INT);
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_OWNER_UUID, Optional.empty());
-        this.entityData.define(DATA_OWNER_NAME, "");
-        this.entityData.define(DATA_MAX_LIFESPAN, 600);
-        this.entityData.define(DATA_IS_SLIM, false);
-        this.entityData.define(DATA_COMMAND_MODE, MODE_FOLLOW);
-        this.entityData.define(DATA_ACTIVE_ABILITIES, "");
-        this.entityData.define(DATA_SHARINGAN_STAGE, 0);
-        this.entityData.define(DATA_HACHIMON_GATE, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_OWNER_UUID, Optional.empty());
+        builder.define(DATA_OWNER_NAME, "");
+        builder.define(DATA_MAX_LIFESPAN, 600);
+        builder.define(DATA_IS_SLIM, false);
+        builder.define(DATA_COMMAND_MODE, MODE_FOLLOW);
+        builder.define(DATA_ACTIVE_ABILITIES, "");
+        builder.define(DATA_SHARINGAN_STAGE, 0);
+        builder.define(DATA_HACHIMON_GATE, 0);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -134,14 +137,14 @@ public class ShadowCloneEntity extends PathfinderMob {
         this.targetSelector.addGoal(2, new CloneOwnerHurtTargetGoal(this));
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false,
-                (target) -> target instanceof Enemy && !(target instanceof ShadowCloneEntity) && (this.ownerUUID == null || !target.getUUID().equals(this.ownerUUID))));
+                (target, serverLevel) -> target instanceof Enemy && !(target instanceof ShadowCloneEntity) && (this.ownerUUID == null || !target.getUUID().equals(this.ownerUUID))));
     }
 
     public void setOwner(Player player) {
         if (player != null) {
             this.ownerUUID = player.getUUID();
-            this.entityData.set(DATA_OWNER_UUID, Optional.of(player.getUUID()));
-            String name = player.getGameProfile().getName();
+            this.entityData.set(DATA_OWNER_UUID, Optional.of(net.minecraft.world.entity.EntityReference.of(player)));
+            String name = player.getGameProfile().name();
             this.entityData.set(DATA_OWNER_NAME, name);
             this.setCustomName(player.getName());
             this.setCustomNameVisible(true);
@@ -159,7 +162,7 @@ public class ShadowCloneEntity extends PathfinderMob {
 
     @Nullable
     public UUID getOwnerUUID() {
-        return this.entityData.get(DATA_OWNER_UUID).orElse(this.ownerUUID);
+        return this.entityData.get(DATA_OWNER_UUID).map(net.minecraft.world.entity.EntityReference::getUUID).orElse(this.ownerUUID);
     }
 
     public String getOwnerName() {
@@ -201,7 +204,7 @@ public class ShadowCloneEntity extends PathfinderMob {
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         if (player.getUUID().equals(this.getOwnerUUID()) && player.isCrouching()) {
-            if (!this.level().isClientSide) {
+            if (!this.level().isClientSide()) {
                 int nextMode = (this.getCommandMode() + 1) % 3;
                 java.util.List<ShadowCloneEntity> clones = this.level().getEntitiesOfClass(
                         ShadowCloneEntity.class,
@@ -218,60 +221,49 @@ public class ShadowCloneEntity extends PathfinderMob {
                     default -> "naruto.clone.mode.follow";
                 };
 
-                player.displayClientMessage(
+                player.sendOverlayMessage(
                         net.minecraft.network.chat.Component.translatable("naruto.clone.order",
-                                net.minecraft.network.chat.Component.translatable(modeKey)),
-                        true
+                                net.minecraft.network.chat.Component.translatable(modeKey))
                 );
                 this.level().playSound(null, player.blockPosition(), net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.8f, 1.2f);
             }
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
+            return InteractionResult.SUCCESS;
         }
         return super.mobInteract(player, hand);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
-        if (this.getOwnerUUID() != null) {
-            compound.putUUID("Owner", this.getOwnerUUID());
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        UUID owner = this.getOwnerUUID();
+        if (owner != null) {
+            output.store("Owner", UUIDUtil.CODEC, owner);
         }
-        compound.putString("OwnerName", this.getOwnerName());
-        compound.putInt("LifeTicks", this.lifeTicks);
-        compound.putInt("MaxLifespan", this.getMaxLifespan());
-        compound.putBoolean("IsSlim", this.isSlim());
-        compound.putInt("CommandMode", this.getCommandMode());
+        output.putString("OwnerName", this.getOwnerName());
+        output.putInt("LifeTicks", this.lifeTicks);
+        output.putInt("MaxLifespan", this.getMaxLifespan());
+        output.putBoolean("IsSlim", this.isSlim());
+        output.putInt("CommandMode", this.getCommandMode());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        if (compound.hasUUID("Owner")) {
-            UUID uuid = compound.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        input.read("Owner", UUIDUtil.CODEC).ifPresent(uuid -> {
             this.ownerUUID = uuid;
-            this.entityData.set(DATA_OWNER_UUID, Optional.of(uuid));
-        }
-        if (compound.contains("OwnerName")) {
-            this.entityData.set(DATA_OWNER_NAME, compound.getString("OwnerName"));
-        }
-        if (compound.contains("LifeTicks")) {
-            this.lifeTicks = compound.getInt("LifeTicks");
-        }
-        if (compound.contains("MaxLifespan")) {
-            this.entityData.set(DATA_MAX_LIFESPAN, compound.getInt("MaxLifespan"));
-        }
-        if (compound.contains("IsSlim")) {
-            this.entityData.set(DATA_IS_SLIM, compound.getBoolean("IsSlim"));
-        }
-        if (compound.contains("CommandMode")) {
-            this.setCommandMode(compound.getInt("CommandMode"));
-        }
+            this.entityData.set(DATA_OWNER_UUID, Optional.of(net.minecraft.world.entity.EntityReference.of(uuid)));
+        });
+        this.entityData.set(DATA_OWNER_NAME, input.getStringOr("OwnerName", ""));
+        this.lifeTicks = input.getIntOr("LifeTicks", 600);
+        this.entityData.set(DATA_MAX_LIFESPAN, input.getIntOr("MaxLifespan", 600));
+        this.entityData.set(DATA_IS_SLIM, input.getBooleanOr("IsSlim", false));
+        this.setCommandMode(input.getIntOr("CommandMode", MODE_FOLLOW));
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             if (this.cloneJutsuCooldown > 0) {
                 this.cloneJutsuCooldown--;
             }
@@ -306,12 +298,12 @@ public class ShadowCloneEntity extends PathfinderMob {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource source, float amount) {
         if (areAllies(this, source.getEntity()) || areAllies(this, source.getDirectEntity())) {
             return false;
         }
-        boolean result = super.hurt(source, amount);
-        if (result && !this.level().isClientSide && this.getHealth() <= 0.0F) {
+        boolean result = super.hurtServer(serverLevel, source, amount);
+        if (result && this.getHealth() <= 0.0F) {
             this.poof();
         }
         return result;
@@ -319,9 +311,9 @@ public class ShadowCloneEntity extends PathfinderMob {
 
     public void copyActiveAbilitiesFrom(Player owner, com.sekwah.narutomod.capabilities.INinjaData ninjaData) {
         if (ninjaData == null) return;
-        java.util.Set<net.minecraft.resources.ResourceLocation> toggles = ninjaData.getToggleAbilityData().getAbilitiesHashSet();
+        java.util.Set<Identifier> toggles = ninjaData.getToggleAbilityData().getAbilitiesHashSet();
         String joined = toggles.stream()
-                .map(net.minecraft.resources.ResourceLocation::toString)
+                .map(Identifier::toString)
                 .collect(java.util.stream.Collectors.joining(","));
         this.entityData.set(DATA_ACTIVE_ABILITIES, joined);
 
@@ -329,19 +321,19 @@ public class ShadowCloneEntity extends PathfinderMob {
             this.entityData.set(DATA_SHARINGAN_STAGE,
                     com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(ninjaData).ordinal() + 1);
             this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-                    net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED, 1200, 0, false, false));
+                    net.minecraft.world.effect.MobEffects.SPEED, 1200, 0, false, false));
         }
         if (hasActiveAbility("susanoo_ribcage")) {
             this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-                    net.minecraft.world.effect.MobEffects.DAMAGE_RESISTANCE, 1200, 1, false, false));
+                    net.minecraft.world.effect.MobEffects.RESISTANCE, 1200, 1, false, false));
         }
         if (hasActiveAbility("eight_gates")) {
             int gate = com.sekwah.narutomod.abilities.jutsus.EightGatesAbility.getStage(ninjaData).ordinal() + 1;
             this.entityData.set(DATA_HACHIMON_GATE, gate);
             this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-                    net.minecraft.world.effect.MobEffects.DAMAGE_BOOST, 1200, Math.min(2, gate / 3), false, false));
+                    net.minecraft.world.effect.MobEffects.STRENGTH, 1200, Math.min(2, gate / 3), false, false));
             this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-                    net.minecraft.world.effect.MobEffects.MOVEMENT_SPEED, 1200, Math.min(2, gate / 3), false, false));
+                    net.minecraft.world.effect.MobEffects.SPEED, 1200, Math.min(2, gate / 3), false, false));
         }
     }
 
@@ -365,24 +357,24 @@ public class ShadowCloneEntity extends PathfinderMob {
     }
 
     @Override
-    protected void dropAllDeathLoot(DamageSource damageSource) {
+    protected void dropAllDeathLoot(ServerLevel serverLevel, DamageSource damageSource) {
         // Shadow clones vanish into thin smoke and never drop copied gear
     }
 
     @Override
-    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
+    protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource source, boolean recentlyHit) {
         // Anti-dupe protection
     }
 
     @Override
-    protected void dropEquipment() {
+    protected void dropEquipment(ServerLevel serverLevel) {
         // Anti-dupe protection
     }
 
     public void poof() {
         if (!this.decoyMode && this.level() instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ParticleTypes.POOF, this.getX(), this.getY() + 0.8, this.getZ(),
-                    25, 0.4, 0.5, 0.4, 0.05);
+                    25, 0.4, 0.5, 0.4, 0.05, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             serverLevel.playSound(null, this.blockPosition(), NarutoSounds.CLONE_POOF.get(), SoundSource.PLAYERS, 1.0f, 1.0f);
         }
         this.discard();
@@ -466,7 +458,7 @@ public class ShadowCloneEntity extends PathfinderMob {
                 if (this.clone.level().getBlockState(targetPos).isAir()
                         && this.clone.level().getBlockState(targetPos.above()).isAir()
                         && !this.clone.level().getBlockState(targetPos.below()).isAir()) {
-                    this.clone.moveTo(targetPos.getX() + 0.5D, targetPos.getY(), targetPos.getZ() + 0.5D, this.clone.getYRot(), this.clone.getXRot());
+                    this.clone.snapTo(targetPos.getX() + 0.5D, targetPos.getY(), targetPos.getZ() + 0.5D, this.clone.getYRot(), this.clone.getXRot());
                     this.clone.getNavigation().stop();
                     return;
                 }
@@ -571,8 +563,8 @@ public class ShadowCloneEntity extends PathfinderMob {
             if (target == null || !(this.clone.level() instanceof ServerLevel serverLevel)) return;
 
             double dist = this.clone.distanceTo(target);
-            java.util.List<net.minecraft.resources.ResourceLocation> candidates = new java.util.ArrayList<>();
-            for (net.minecraft.resources.ResourceLocation id : this.clone.unlockedCloneJutsus) {
+            java.util.List<Identifier> candidates = new java.util.ArrayList<>();
+            for (Identifier id : this.clone.unlockedCloneJutsus) {
                 String path = id.getPath();
                 if ("fireball".equals(path) && dist >= 6.0D && dist <= 20.0D) candidates.add(id);
                 else if ("water_bullet".equals(path) && dist >= 5.0D && dist <= 20.0D) candidates.add(id);
@@ -582,9 +574,9 @@ public class ShadowCloneEntity extends PathfinderMob {
 
             if (candidates.isEmpty()) return;
 
-            net.minecraft.resources.ResourceLocation chosen = candidates.get(this.clone.getRandom().nextInt(candidates.size()));
+            Identifier chosen = candidates.get(this.clone.getRandom().nextInt(candidates.size()));
             this.clone.getLookControl().setLookAt(target, 30.0F, 30.0F);
-            this.clone.swing(InteractionHand.MAIN_HAND);
+            this.clone.swing(InteractionHand.MAIN_HAND, net.minecraft.world.item.component.SwingAnimation.DEFAULT, true);
             serverLevel.playSound(null, this.clone.blockPosition(), NarutoSounds.JUTSU_CAST.get(), SoundSource.PLAYERS, 0.9F, 1.1F);
 
             net.minecraft.world.phys.Vec3 dir = target.getEyePosition().subtract(this.clone.getEyePosition()).normalize();
@@ -606,16 +598,19 @@ public class ShadowCloneEntity extends PathfinderMob {
                 bullet.setDeltaMovement(dir.scale(1.1));
                 serverLevel.addFreshEntity(bullet);
             } else if ("wind_breaker".equals(path)) {
-                serverLevel.sendParticles(ParticleTypes.CLOUD, target.getX(), target.getY() + 1.0, target.getZ(), 18, 0.5, 0.5, 0.5, 0.15);
-                target.hurt(this.clone.damageSources().mobAttack(this.clone), 8.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
+                serverLevel.sendParticles(ParticleTypes.CLOUD, target.getX(), target.getY() + 1.0, target.getZ(), 18, 0.5, 0.5, 0.5, 0.15,
+                        ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                target.hurtServer(serverLevel, this.clone.damageSources().mobAttack(this.clone), 8.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
                 target.setDeltaMovement(dir.scale(1.6).add(0, 0.35, 0));
             } else if ("rasengan".equals(path)) {
-                serverLevel.sendParticles(ParticleTypes.END_ROD, target.getX(), target.getY() + 1.0, target.getZ(), 20, 0.3, 0.3, 0.3, 0.15);
-                target.hurt(this.clone.damageSources().mobAttack(this.clone), 14.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
+                serverLevel.sendParticles(ParticleTypes.END_ROD, target.getX(), target.getY() + 1.0, target.getZ(), 20, 0.3, 0.3, 0.3, 0.15,
+                        ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                target.hurtServer(serverLevel, this.clone.damageSources().mobAttack(this.clone), 14.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
                 serverLevel.playSound(null, target.blockPosition(), NarutoSounds.RASENGAN.get(), SoundSource.PLAYERS, 0.9F, 1.0F);
             } else if ("chidori".equals(path)) {
-                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getY() + 1.0, target.getZ(), 24, 0.4, 0.4, 0.4, 0.2);
-                target.hurt(this.clone.damageSources().mobAttack(this.clone), 14.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
+                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getY() + 1.0, target.getZ(), 24, 0.4, 0.4, 0.4, 0.2,
+                        ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                target.hurtServer(serverLevel, this.clone.damageSources().mobAttack(this.clone), 14.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
                 serverLevel.playSound(null, target.blockPosition(), NarutoSounds.CHIDORI.get(), SoundSource.PLAYERS, 0.9F, 1.0F);
             }
 

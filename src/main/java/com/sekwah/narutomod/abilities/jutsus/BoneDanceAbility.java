@@ -62,8 +62,8 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("kaguya")) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
-                    Component.literal("Kaguya").withStyle(ChatFormatting.WHITE)), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
+                    Component.literal("Kaguya").withStyle(ChatFormatting.WHITE)));
             return false;
         }
         return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 45);
@@ -79,7 +79,7 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
         int resistAmp = getMasteryTier(mastery) >= 4 ? 2 : 1;
 
         // Grant temporary calcified bone armor resistance and materialize Kaguya Bone Sword if empty handed
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, resistTicks, resistAmp));
+        player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, resistTicks, resistAmp));
         if (player.getMainHandItem().isEmpty()) {
             player.setItemInHand( net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(NarutoItems.BONE_SWORD.get()));
         }
@@ -111,9 +111,11 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
                     double sx = origin.x + Math.cos(angle) * radius;
                     double sz = origin.z + Math.sin(angle) * radius;
                     for (double h = 0.0; h <= 2.2; h += 0.45) {
-                        sLevel.sendParticles(boneParticle, sx, origin.y + h, sz, 3, 0.08, 0.15, 0.08, 0.02);
+                        sLevel.sendParticles(boneParticle, sx, origin.y + h, sz, 3, 0.08, 0.15, 0.08, 0.02,
+                                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
-                    sLevel.sendParticles(ParticleTypes.CRIT, sx, origin.y + 1.8, sz, 2, 0.05, 0.1, 0.05, 0.02);
+                    sLevel.sendParticles(ParticleTypes.CRIT, sx, origin.y + 1.8, sz, 2, 0.05, 0.1, 0.05, 0.02,
+                            net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 }
             }, (ring - 1) * 8);
         }

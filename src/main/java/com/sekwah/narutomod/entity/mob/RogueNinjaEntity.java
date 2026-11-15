@@ -4,7 +4,7 @@ import com.sekwah.narutomod.entity.projectile.KunaiEntity;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -67,9 +67,9 @@ public class RogueNinjaEntity extends Monster {
 
     @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason,
-                                        @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-        SpawnGroupData data = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason,
+                                        @Nullable SpawnGroupData spawnData) {
+        SpawnGroupData data = super.finalizeSpawn(level, difficulty, reason, spawnData);
         RandomSource random = level.getRandom();
         this.populateDefaultEquipmentSlots(random, difficulty);
         return data;
@@ -90,7 +90,7 @@ public class RogueNinjaEntity extends Monster {
     @Override
     public void tick() {
         super.tick();
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             if (this.kunaiCooldown > 0) {
                 this.kunaiCooldown--;
             }
@@ -119,32 +119,30 @@ public class RogueNinjaEntity extends Monster {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        boolean hurt = super.hurt(source, amount);
-        if (hurt && !this.level().isClientSide && !this.usedKawarimi && this.isAlive() && this.getHealth() < this.getMaxHealth() * 0.35F) {
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource source, float amount) {
+        boolean hurt = super.hurtServer(serverLevel, source, amount);
+        if (hurt && !this.usedKawarimi && this.isAlive() && this.getHealth() < this.getMaxHealth() * 0.35F) {
             this.usedKawarimi = true;
-            if (this.level() instanceof ServerLevel serverLevel) {
-                serverLevel.sendParticles(ParticleTypes.POOF, this.getX(), this.getY() + 0.9, this.getZ(), 20, 0.3, 0.5, 0.3, 0.04);
-                serverLevel.playSound(null, this.blockPosition(), NarutoSounds.CLONE_POOF.get(), SoundSource.HOSTILE, 1.0f, 1.0f);
-                Vec3 look = this.getLookAngle();
-                this.teleportTo(this.getX() - look.x * 3.5, this.getY() + 0.5, this.getZ() - look.z * 3.5);
-                this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 80, 1));
-            }
+            serverLevel.sendParticles(ParticleTypes.POOF, this.getX(), this.getY() + 0.9, this.getZ(), 20, 0.3, 0.5, 0.3, 0.04,
+                    ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+            serverLevel.playSound(null, this.blockPosition(), NarutoSounds.CLONE_POOF.get(), SoundSource.HOSTILE, 1.0f, 1.0f);
+            Vec3 look = this.getLookAngle();
+            this.teleportTo(this.getX() - look.x * 3.5, this.getY() + 0.5, this.getZ() - look.z * 3.5);
+            this.addEffect(new MobEffectInstance(MobEffects.SPEED, 80, 1));
         }
         return hurt;
     }
 
     @Override
-    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
-        super.dropCustomDeathLoot(source, looting, recentlyHit);
-        if (this.level().isClientSide) return;
+    protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource source, boolean recentlyHit) {
+        super.dropCustomDeathLoot(serverLevel, source, recentlyHit);
 
-        this.spawnAtLocation(new ItemStack(NarutoItems.KUNAI.get(), 2 + this.random.nextInt(4)));
+        this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.KUNAI.get(), 2 + this.random.nextInt(4)));
         if (this.random.nextFloat() < 0.45f) {
-            this.spawnAtLocation(new ItemStack(NarutoItems.CHAKRA_METAL.get(), 1 + this.random.nextInt(2)));
+            this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.CHAKRA_METAL.get(), 1 + this.random.nextInt(2)));
         }
         if (this.random.nextFloat() < 0.25f) {
-            this.spawnAtLocation(new ItemStack(NarutoItems.MILITARY_RATIONS_PILL.get(), 1));
+            this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.MILITARY_RATIONS_PILL.get(), 1));
         }
     }
 }

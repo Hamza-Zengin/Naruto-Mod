@@ -7,7 +7,7 @@ import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -30,18 +30,18 @@ import java.util.List;
 public class SharinganAbility extends Ability implements Ability.Toggled, Ability.HandleEnded {
 
     public enum SharinganStage {
-        ONE_TOMOE("1_tomoe", 0, 999, "1 Tomoe", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_1_tomoe.png")),
-        TWO_TOMOE("2_tomoe", 1000, 2499, "2 Tomoe", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_2_tomoe.png")),
-        THREE_TOMOE("3_tomoe", 2500, 4999, "3 Tomoe", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_3_tomoe.png")),
-        MANGEKYOU("mangekyou", 5000, Integer.MAX_VALUE, "Mangekyō Sharingan", new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_mangekyo.png"));
+        ONE_TOMOE("1_tomoe", 0, 999, "1 Tomoe", Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_1_tomoe.png")),
+        TWO_TOMOE("2_tomoe", 1000, 2499, "2 Tomoe", Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_2_tomoe.png")),
+        THREE_TOMOE("3_tomoe", 2500, 4999, "3 Tomoe", Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_3_tomoe.png")),
+        MANGEKYOU("mangekyou", 5000, Integer.MAX_VALUE, "Mangekyō Sharingan", Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_mangekyo.png"));
 
         private final String id;
         private final int minMastery;
         private final int maxMastery;
         private final String displayName;
-        private final ResourceLocation texture;
+        private final Identifier texture;
 
-        SharinganStage(String id, int minMastery, int maxMastery, String displayName, ResourceLocation texture) {
+        SharinganStage(String id, int minMastery, int maxMastery, String displayName, Identifier texture) {
             this.id = id;
             this.minMastery = minMastery;
             this.maxMastery = maxMastery;
@@ -65,7 +65,7 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
             return displayName;
         }
 
-        public ResourceLocation getTexture() {
+        public Identifier getTexture() {
             return texture;
         }
 
@@ -88,7 +88,7 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
 
     public static SharinganStage getStage(INinjaData ninjaData) {
         if (ninjaData == null) return SharinganStage.ONE_TOMOE;
-        int mastery = ninjaData.getMastery(new ResourceLocation(NarutoMod.MOD_ID, "sharingan"));
+        int mastery = ninjaData.getMastery(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan"));
         return getStage(mastery);
     }
 
@@ -114,8 +114,8 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
-                    Component.literal("Uchiha").withStyle(ChatFormatting.RED)), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
+                    Component.literal("Uchiha").withStyle(ChatFormatting.RED)));
             return false;
         }
 
@@ -126,8 +126,8 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
         }
 
         if (ninjaData.getChakra() < baseCost) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra",
+                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
             return false;
         }
 
@@ -144,7 +144,7 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
             boolean isMoving = player.getDeltaMovement().horizontalDistanceSqr() > 0.001;
             boolean inCombat = player.getLastHurtByMob() != null && (player.tickCount - player.getLastHurtByMobTimestamp() < 100);
             if (isMoving || inCombat) {
-                ResourceLocation reg = this.getRegistryName();
+                Identifier reg = this.getRegistryName();
                 if (reg != null) {
                     ninjaData.addMastery(reg, 1);
                 }
@@ -155,14 +155,14 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
         player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 220, 0, false, false, false));
 
         int speedAmp = (stage == SharinganStage.THREE_TOMOE || stage == SharinganStage.MANGEKYOU) ? 1 : 0;
-        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, speedAmp, false, false, false));
+        player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, speedAmp, false, false, false));
 
         if (stage == SharinganStage.THREE_TOMOE || stage == SharinganStage.MANGEKYOU) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 0, false, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 0, false, false, false));
         }
 
         if (stage == SharinganStage.MANGEKYOU) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 0, false, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 0, false, false, false));
         }
 
         if (player.level() instanceof ServerLevel serverLevel) {
@@ -192,13 +192,15 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
                             player.getX() + Math.cos(angle) * 0.25,
                             eyeY,
                             player.getZ() + Math.sin(angle) * 0.25,
-                            1, vx, 0.01, vz, 0.01);
+                            1, vx, 0.01, vz, 0.01,
+                            net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     if (stage == SharinganStage.MANGEKYOU) {
                         serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
                                 player.getX() + Math.cos(angle) * 0.35,
                                 eyeY,
                                 player.getZ() + Math.sin(angle) * 0.35,
-                                1, vx * 0.5, 0.005, vz * 0.5, 0.005);
+                                1, vx * 0.5, 0.005, vz * 0.5, 0.005,
+                                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
                 }
             }
@@ -214,15 +216,18 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
 
                 serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
                         leftEyePos.x, leftEyePos.y, leftEyePos.z,
-                        1, -look.x * 0.01, 0.003, -look.z * 0.01, 0.003);
+                        1, -look.x * 0.01, 0.003, -look.z * 0.01, 0.003,
+                        net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
                         rightEyePos.x, rightEyePos.y, rightEyePos.z,
-                        1, -look.x * 0.01, 0.003, -look.z * 0.01, 0.003);
+                        1, -look.x * 0.01, 0.003, -look.z * 0.01, 0.003,
+                        net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
                 if (stage == SharinganStage.MANGEKYOU) {
                     serverLevel.sendParticles(ParticleTypes.SQUID_INK,
                             leftEyePos.x, leftEyePos.y, leftEyePos.z,
-                            1, -look.x * 0.005, 0.002, -look.z * 0.005, 0.002);
+                            1, -look.x * 0.005, 0.002, -look.z * 0.005, 0.002,
+                            net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 }
             }
 
@@ -241,7 +246,7 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
                 AABB field = player.getBoundingBox().inflate(radius);
                 List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, field, e -> e != player && e.isAlive());
                 for (LivingEntity enemy : enemies) {
-                    enemy.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, slowAmp, false, false));
+                    enemy.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, slowAmp, false, false));
                     if (applyWeakness) {
                         enemy.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 0, false, false));
                     }
@@ -257,8 +262,8 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
     @Override
     public void handleAbilityEnded(Player player, INinjaData ninjaData, int ticksActive) {
         player.removeEffect(MobEffects.NIGHT_VISION);
-        player.removeEffect(MobEffects.MOVEMENT_SPEED);
-        player.removeEffect(MobEffects.DAMAGE_BOOST);
-        player.removeEffect(MobEffects.DAMAGE_RESISTANCE);
+        player.removeEffect(MobEffects.SPEED);
+        player.removeEffect(MobEffects.STRENGTH);
+        player.removeEffect(MobEffects.RESISTANCE);
     }
 }

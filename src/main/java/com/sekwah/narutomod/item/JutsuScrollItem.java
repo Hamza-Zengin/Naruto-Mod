@@ -5,24 +5,26 @@ import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Jutsu Scroll (Jutsu Emakimono)
@@ -32,17 +34,16 @@ import java.util.List;
  */
 public class JutsuScrollItem extends Item {
 
-    public static final String JUTSU_TAG = "Jutsu";
-    private final ResourceLocation fixedJutsuId;
+    private final Identifier fixedJutsuId;
     private final String requiredClan;
 
-    public JutsuScrollItem(Properties properties, @Nullable ResourceLocation fixedJutsuId, @Nullable String requiredClan) {
+    public JutsuScrollItem(Properties properties, @Nullable Identifier fixedJutsuId, @Nullable String requiredClan) {
         super(properties);
         this.fixedJutsuId = fixedJutsuId;
         this.requiredClan = requiredClan;
     }
 
-    public JutsuScrollItem(Properties properties, @Nullable ResourceLocation fixedJutsuId) {
+    public JutsuScrollItem(Properties properties, @Nullable Identifier fixedJutsuId) {
         this(properties, fixedJutsuId, null);
     }
 
@@ -50,165 +51,162 @@ public class JutsuScrollItem extends Item {
         this(properties, null, null);
     }
 
-    public static boolean isClanRestrictedJutsu(@Nullable ResourceLocation id) {
+    public static boolean isClanRestrictedJutsu(@Nullable Identifier id) {
         return com.sekwah.narutomod.capabilities.NinjaData.isClanRestrictedJutsu(id);
     }
 
-    public ResourceLocation getTargetJutsu(ItemStack stack) {
+    @Nullable
+    public Identifier getTargetJutsu(ItemStack stack) {
         if (this.fixedJutsuId != null) {
             return this.fixedJutsuId;
         }
-        if (stack.hasTag() && stack.getTag().contains(JUTSU_TAG)) {
-            String idStr = stack.getTag().getString(JUTSU_TAG);
-            return new ResourceLocation(idStr);
-        }
-        return null;
+        return stack.get(NarutoDataComponents.JUTSU_SCROLL_ABILITY.get());
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (!level.isClientSide()) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-                ResourceLocation targetJutsu = getTargetJutsu(stack);
+        if (!level.isClientSide() && level instanceof ServerLevel serverLevel) {
+            var ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            Identifier targetJutsu = getTargetJutsu(stack);
 
+            if (targetJutsu == null) {
+                List<Identifier> candidates = new ArrayList<>();
+                candidates.add(NarutoAbilities.RASENGAN.getId());
+                candidates.add(NarutoAbilities.CHIDORI.getId());
+                candidates.add(NarutoAbilities.SHADOW_CLONE.getId());
+                candidates.add(NarutoAbilities.KIRIN.getId());
+
+                for (Identifier c : candidates) {
+                    if (!ninjaData.isAbilityUnlocked(c)) {
+                        targetJutsu = c;
+                        break;
+                    }
+                }
                 if (targetJutsu == null) {
-                    List<ResourceLocation> candidates = new ArrayList<>();
-                    candidates.add(NarutoAbilities.RASENGAN.getId());
-                    candidates.add(NarutoAbilities.CHIDORI.getId());
-                    candidates.add(NarutoAbilities.SHADOW_CLONE.getId());
-                    candidates.add(NarutoAbilities.KIRIN.getId());
-
-                    for (ResourceLocation c : candidates) {
-                        if (!ninjaData.isAbilityUnlocked(c)) {
-                            targetJutsu = c;
-                            break;
-                        }
-                    }
-                    if (targetJutsu == null) {
-                        targetJutsu = NarutoAbilities.RASENGAN.getId();
-                    }
+                    targetJutsu = NarutoAbilities.RASENGAN.getId();
                 }
+            }
 
-                Ability ability = NarutoAbilities.getAbility(targetJutsu);
-                if (ability == null) {
-                    player.sendSystemMessage(Component.translatable("jutsu.scroll.invalid").withStyle(ChatFormatting.RED));
-                    return;
+            Ability ability = NarutoAbilities.getAbility(targetJutsu);
+            if (ability == null) {
+                player.sendSystemMessage(Component.translatable("jutsu.scroll.invalid").withStyle(ChatFormatting.RED));
+                return InteractionResult.PASS;
+            }
+
+            // Clan-restricted jutsus can only be awakened via clan progression, never via scrolls
+            if (isClanRestrictedJutsu(targetJutsu)) {
+                player.sendSystemMessage(Component.translatable("jutsu.scroll.invalid").withStyle(ChatFormatting.RED));
+                level.playSound(null, player.blockPosition(), SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1.0f, 1.0f);
+                return InteractionResult.PASS;
+            }
+
+            // Strict Clan Heritage check: Non-clan members suffer severe backlash!
+            if (this.requiredClan != null) {
+                if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase(this.requiredClan)) {
+                    String clanName = this.requiredClan.substring(0, 1).toUpperCase() + this.requiredClan.substring(1);
+                    player.sendSystemMessage(Component.translatable("jutsu.scroll.fail_clan",
+                            Component.literal(clanName).withStyle(ChatFormatting.RED)
+                    ).withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
+
+                    level.playSound(null, player.blockPosition(), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 1.0f, 0.5f);
+                    player.hurtServer(serverLevel, level.damageSources().magic(), 6.0f);
+                    player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 120, 0));
+                    return InteractionResult.PASS;
                 }
+            }
 
-                // Clan-restricted jutsus can only be awakened via clan progression, never via scrolls
-                if (isClanRestrictedJutsu(targetJutsu)) {
-                    player.sendSystemMessage(Component.translatable("jutsu.scroll.invalid").withStyle(ChatFormatting.RED));
-                    level.playSound(null, player.blockPosition(), SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1.0f, 1.0f);
-                    return;
+            // Strict Ninja Rank check: Must meet or exceed ability's required rank!
+            NinjaRank playerRank = NinjaRank.fromString(ninjaData.getRank());
+            if (playerRank.getLevel() < ability.getRequiredRank().getLevel()) {
+                player.sendSystemMessage(Component.translatable("jutsu.scroll.fail_rank",
+                        Component.literal(ability.getRequiredRank().getTurkishName() + " (" + ability.getRequiredRank().getEnglishName() + ")")
+                                .withStyle(ChatFormatting.GOLD)
+                ).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+                level.playSound(null, player.blockPosition(), SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1.0f, 1.0f);
+                return InteractionResult.PASS;
+            }
+
+            // Strict Prerequisite & Mastery check:
+            if (!ability.meetsPrerequisites(ninjaData)) {
+                List<Identifier> prereqs = ability.getPrerequisites();
+                StringBuilder prereqNames = new StringBuilder();
+                for (int i = 0; i < prereqs.size(); i++) {
+                    Identifier p = prereqs.get(i);
+                    Ability pa = NarutoAbilities.getAbility(p);
+                    String paName = pa != null ? Component.translatable(pa.getTranslationKey()).getString() : p.getPath();
+                    if (i > 0) prereqNames.append(", ");
+                    prereqNames.append(paName);
                 }
+                player.sendSystemMessage(Component.translatable("jutsu.scroll.fail_prerequisite",
+                        Component.literal(prereqNames.toString()).withStyle(ChatFormatting.YELLOW),
+                        Component.literal(String.valueOf(ability.getRequiredMastery())).withStyle(ChatFormatting.GOLD)
+                ).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+                level.playSound(null, player.blockPosition(), SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1.0f, 1.0f);
+                return InteractionResult.PASS;
+            }
 
-                // Strict Clan Heritage check: Non-clan members suffer severe backlash!
-                if (this.requiredClan != null) {
-                    if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase(this.requiredClan)) {
-                        String clanName = this.requiredClan.substring(0, 1).toUpperCase() + this.requiredClan.substring(1);
-                        player.sendSystemMessage(Component.translatable("jutsu.scroll.fail_clan",
-                                Component.literal(clanName).withStyle(ChatFormatting.RED)
-                        ).withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
+            if (ninjaData.isAbilityUnlocked(targetJutsu)) {
+                player.sendSystemMessage(Component.translatable("jutsu.scroll.already_known",
+                        Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.RED));
+                return InteractionResult.PASS;
+            }
 
-                        level.playSound(null, player.blockPosition(), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 1.0f, 0.5f);
-                        player.hurt(level.damageSources().magic(), 6.0f);
-                        player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 120, 0));
-                        return;
-                    }
-                }
+            // Learn and unlock jutsu permanently!
+            ninjaData.unlockAbility(targetJutsu);
 
-                // Strict Ninja Rank check: Must meet or exceed ability's required rank!
-                NinjaRank playerRank = NinjaRank.fromString(ninjaData.getRank());
-                if (playerRank.getLevel() < ability.getRequiredRank().getLevel()) {
-                    player.sendSystemMessage(Component.translatable("jutsu.scroll.fail_rank",
-                            Component.literal(ability.getRequiredRank().getTurkishName() + " (" + ability.getRequiredRank().getEnglishName() + ")")
-                                    .withStyle(ChatFormatting.GOLD)
-                    ).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
-                    level.playSound(null, player.blockPosition(), SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1.0f, 1.0f);
-                    return;
-                }
+            player.sendSystemMessage(Component.translatable("jutsu.scroll.unlocked",
+                    Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD));
 
-                // Strict Prerequisite & Mastery check:
-                if (!ability.meetsPrerequisites(ninjaData)) {
-                    List<ResourceLocation> prereqs = ability.getPrerequisites();
-                    StringBuilder prereqNames = new StringBuilder();
-                    for (int i = 0; i < prereqs.size(); i++) {
-                        ResourceLocation p = prereqs.get(i);
-                        Ability pa = NarutoAbilities.getAbility(p);
-                        String paName = pa != null ? Component.translatable(pa.getTranslationKey()).getString() : p.getPath();
-                        if (i > 0) prereqNames.append(", ");
-                        prereqNames.append(paName);
-                    }
-                    player.sendSystemMessage(Component.translatable("jutsu.scroll.fail_prerequisite",
-                            Component.literal(prereqNames.toString()).withStyle(ChatFormatting.YELLOW),
-                            Component.literal(String.valueOf(ability.getRequiredMastery())).withStyle(ChatFormatting.GOLD)
-                    ).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
-                    level.playSound(null, player.blockPosition(), SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1.0f, 1.0f);
-                    return;
-                }
+            level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0f, 1.0f);
+            level.playSound(null, player.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1.2f, 1.0f);
 
-                if (ninjaData.isAbilityUnlocked(targetJutsu)) {
-                    player.sendSystemMessage(Component.translatable("jutsu.scroll.already_known",
-                            Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.RED));
-                    return;
-                }
-
-                // Learn and unlock jutsu permanently!
-                ninjaData.unlockAbility(targetJutsu);
-
-                player.sendSystemMessage(Component.translatable("jutsu.scroll.unlocked",
-                        Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD));
-
-                level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0f, 1.0f);
-                level.playSound(null, player.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS, 1.2f, 1.0f);
-
-                if (!player.getAbilities().instabuild) {
-                    stack.shrink(1);
-                }
-            });
+            if (!player.getAbilities().instabuild) {
+                stack.shrink(1);
+            }
+            return InteractionResult.SUCCESS_SERVER;
         }
 
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        ResourceLocation jutsuId = getTargetJutsu(stack);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltip, TooltipFlag flag) {
+        Identifier jutsuId = getTargetJutsu(stack);
         if (jutsuId != null) {
             Ability ability = NarutoAbilities.getAbility(jutsuId);
             if (ability != null) {
-                tooltip.add(Component.translatable("jutsu.scroll.contains",
+                tooltip.accept(Component.translatable("jutsu.scroll.contains",
                         Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.GOLD)).withStyle(ChatFormatting.GRAY));
-                tooltip.add(Component.translatable("jutsu.scroll.requires_rank",
+                tooltip.accept(Component.translatable("jutsu.scroll.requires_rank",
                         Component.literal(ability.getRequiredRank().getTurkishName() + " (" + ability.getRequiredRank().getEnglishName() + ")").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.DARK_GRAY));
                 if (!ability.getPrerequisites().isEmpty()) {
-                    List<ResourceLocation> prereqs = ability.getPrerequisites();
+                    List<Identifier> prereqs = ability.getPrerequisites();
                     StringBuilder prereqNames = new StringBuilder();
                     for (int i = 0; i < prereqs.size(); i++) {
-                        ResourceLocation p = prereqs.get(i);
+                        Identifier p = prereqs.get(i);
                         Ability pa = NarutoAbilities.getAbility(p);
                         String paName = pa != null ? Component.translatable(pa.getTranslationKey()).getString() : p.getPath();
                         if (i > 0) prereqNames.append(", ");
                         prereqNames.append(paName);
                     }
-                    tooltip.add(Component.translatable("jutsu.scroll.requires_prerequisite",
+                    tooltip.accept(Component.translatable("jutsu.scroll.requires_prerequisite",
                             Component.literal(prereqNames.toString()).withStyle(ChatFormatting.YELLOW),
                             Component.literal(String.valueOf(ability.getRequiredMastery())).withStyle(ChatFormatting.GOLD)
                     ).withStyle(ChatFormatting.GOLD));
                 }
             }
         } else {
-            tooltip.add(Component.translatable("jutsu.scroll.desc").withStyle(ChatFormatting.GRAY));
+            tooltip.accept(Component.translatable("jutsu.scroll.desc").withStyle(ChatFormatting.GRAY));
         }
 
         if (this.requiredClan != null) {
             String clanName = this.requiredClan.substring(0, 1).toUpperCase() + this.requiredClan.substring(1);
-            tooltip.add(Component.translatable("jutsu.scroll.requires_clan",
+            tooltip.accept(Component.translatable("jutsu.scroll.requires_clan",
                     Component.literal(clanName).withStyle(ChatFormatting.RED, ChatFormatting.BOLD)).withStyle(ChatFormatting.DARK_RED));
         }
 
-        tooltip.add(Component.translatable("jutsu.scroll.instruction").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
+        tooltip.accept(Component.translatable("jutsu.scroll.instruction").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
     }
 }

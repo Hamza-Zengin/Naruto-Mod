@@ -3,21 +3,21 @@ package com.sekwah.narutomod.trackers;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.tracker.SyncTrackerClone;
 import com.sekwah.sekclib.capabilitysync.capabilitysync.tracker.SyncTrackerSerializer;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Sync tracker serializer and cloner for Map<ResourceLocation, Integer>,
+ * Sync tracker serializer and cloner for Map<Identifier, Integer>,
  * used by SekCLib to synchronize jutsu mastery data to the client.
  */
-public class ResourceLocationIntMapSyncTracker implements SyncTrackerSerializer<Map<ResourceLocation, Integer>>, SyncTrackerClone<Map<ResourceLocation, Integer>> {
+public class IdentifierIntMapSyncTracker implements SyncTrackerSerializer<Map<Identifier, Integer>>, SyncTrackerClone<Map<Identifier, Integer>> {
 
     private static final int MAX_ENTRIES = 2048;
 
     @Override
-    public void encode(Map<ResourceLocation, Integer> objectToSend, FriendlyByteBuf outBuffer) {
+    public void encode(Map<Identifier, Integer> objectToSend, FriendlyByteBuf outBuffer) {
         if (objectToSend == null) {
             outBuffer.writeInt(-1);
             return;
@@ -25,24 +25,24 @@ public class ResourceLocationIntMapSyncTracker implements SyncTrackerSerializer<
         int size = Math.min(objectToSend.size(), MAX_ENTRIES);
         outBuffer.writeInt(size);
         int written = 0;
-        for (Map.Entry<ResourceLocation, Integer> entry : objectToSend.entrySet()) {
+        for (Map.Entry<Identifier, Integer> entry : objectToSend.entrySet()) {
             if (written++ >= MAX_ENTRIES) {
                 break;
             }
-            outBuffer.writeResourceLocation(entry.getKey());
+            outBuffer.writeIdentifier(entry.getKey());
             outBuffer.writeInt(entry.getValue() != null ? entry.getValue() : 0);
         }
     }
 
     @Override
-    public Map<ResourceLocation, Integer> decode(FriendlyByteBuf inBuffer) {
+    public Map<Identifier, Integer> decode(FriendlyByteBuf inBuffer) {
         int size = inBuffer.readInt();
         if (size <= 0 || size > MAX_ENTRIES) {
             return new HashMap<>();
         }
-        Map<ResourceLocation, Integer> map = new HashMap<>(size);
+        Map<Identifier, Integer> map = new HashMap<>(size);
         for (int i = 0; i < size; i++) {
-            ResourceLocation key = inBuffer.readResourceLocation();
+            Identifier key = inBuffer.readIdentifier();
             int val = inBuffer.readInt();
             map.put(key, val);
         }
@@ -50,7 +50,7 @@ public class ResourceLocationIntMapSyncTracker implements SyncTrackerSerializer<
     }
 
     @Override
-    public Map<ResourceLocation, Integer> clone(Map<ResourceLocation, Integer> data) {
+    public Map<Identifier, Integer> clone(Map<Identifier, Integer> data) {
         return data != null ? new HashMap<>(data) : new HashMap<>();
     }
 }

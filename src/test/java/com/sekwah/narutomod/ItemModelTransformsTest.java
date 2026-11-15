@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Audit test ensuring that 3D weapons using forge:separate_transforms correctly point
+ * Audit test ensuring that 3D weapons using neoforge:separate_transforms correctly point
  * to existing 3D and GUI models, and that the 3D models define first-person hand perspectives.
  */
 public class ItemModelTransformsTest {
@@ -46,7 +46,7 @@ public class ItemModelTransformsTest {
                 try (Reader reader = Files.newBufferedReader(path)) {
                     JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
                     JsonElement loaderElem = json.get("loader");
-                    if (loaderElem != null && "forge:separate_transforms".equals(loaderElem.getAsString())) {
+                    if (loaderElem != null && "neoforge:separate_transforms".equals(loaderElem.getAsString())) {
                         separateTransformsCount++;
                         String baseParent = json.getAsJsonObject("base").get("parent").getAsString();
                         Path basePath = resolveModelPath(baseParent);
@@ -77,7 +77,7 @@ public class ItemModelTransformsTest {
         }
 
         Assertions.assertTrue(separateTransformsCount >= 8,
-                "Expected at least 8 weapon items to use forge:separate_transforms, but found " + separateTransformsCount);
+                "Expected at least 8 weapon items to use neoforge:separate_transforms, but found " + separateTransformsCount);
         Assertions.assertTrue(errors.isEmpty(),
                 "Found " + errors.size() + " separate_transforms model errors:\n" + String.join("\n", errors));
     }

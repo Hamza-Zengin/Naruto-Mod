@@ -1,355 +1,235 @@
-import org.apache.http.HttpEntity
-import org.apache.http.client.methods.CloseableHttpResponse
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.entity.ContentType
-import org.apache.http.entity.mime.MultipartEntityBuilder
-import org.apache.http.impl.client.CloseableHttpClient
-import org.apache.http.impl.client.HttpClients
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
-buildscript {
-    repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        maven { url = "https://repo.spongepowered.org/maven" }
-        //maven { url = 'https://sizableshrimp.me/maven' }
-        maven {url "https://plugins.gradle.org/m2/"}
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+'
-        //classpath group: 'me.sizableshrimp.parchmenttest', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath "org.spongepowered:mixingradle:0.7+"
-        classpath "org.apache.httpcomponents:httpmime:4.5.13"
-    }
-}
 plugins {
-    // id "com.matthewprenger.cursegradle" version "1.4.0"
-    // id 'net.researchgate.release' version '2.8.1'
+    id 'java-library'
+    id 'eclipse'
+    id 'net.neoforged.moddev' version '2.0.148'
 }
-
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: "java"
-apply plugin: 'eclipse'
-//apply plugin: 'maven-publish'
-
-// May be able to remove it
-apply plugin: "org.spongepowered.mixin"
 
 def branch = System.getenv("GITHUB_REF")
-if(branch != null) {
+if (branch != null) {
     branch = branch.replace('refs/heads/', '')
 }
 def isCanary = version.toString().contains('canary')
 
 group = project.package // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = project.archive
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+base {
+    archivesName = project.archive
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 repositories {
     mavenLocal()
-//    maven { url = "https://maven.sekwah.com" }
-    maven {
-        url "https://www.cursemaven.com"
-        content {
-            includeGroup "curse.maven"
-        }
-    }
-    maven {
-        name = "Illusive Soulworks"
-        url = "https://maven.theillusivec4.top/"
-    }
+    mavenCentral()
 }
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
-minecraft {
-    // The mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   Snapshot are built nightly.
-    // stable_#            Stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'official', version: '1.20.1'
-    //mappings channel: 'parchment', version: '2021.07.21-1.17'
 
-    // This is for personal local tests i was doing ignore it ;)
-    //mappings channel: 'snapshot', version: '20200706-unofficialtest-1.16.1'
+neoForge {
+    version = project.neo_version
 
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformers {
+        publish(file('src/main/resources/META-INF/accesstransformer.cfg'))
+    }
 
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
     runs {
         client {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
-
-            mods {
-                "${project.modid}" {
-                    source sourceSets.main
-                }
-            }
+            client()
         }
 
         server {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', ''
-            //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                "${project.modid}" {
-                    source sourceSets.main
-                }
-            }
+            server()
         }
 
         data {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', ''
-            //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            args '--mod', project.modid, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-
-            mods {
-                "${project.modid}" {
-                    source sourceSets.main
-                }
-            }
+            clientData()
+            programArguments.addAll '--mod', project.modid, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
+
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${project.modid}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+
+    unitTest {
+        enable()
+        testedMod = mods."${project.modid}"
     }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
-processResources {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
 dependencies {
-
-    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
-    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
-    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.20.1-47.3.0'
-
-    implementation 'org.spongepowered:mixin:0.8.5'
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-
-    // SekCLib core dependency (Composite Build when ../SekCLib exists, otherwise deobf artifact)
-    if (file('../SekCLib').exists()) {
-        implementation("com.sekwah:SekCLib:1.20.1-${project.sekclib_version}") {
-            exclude group: 'net.minecraftforge', module: 'forge'
-        }
-    } else {
-        implementation fg.deobf("com.sekwah:SekCLib:1.20.1-${project.sekclib_version}")
-    }
-
-    // Curios API (soft dependency)
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
+    // SekCLib 2.0.0 via mavenLocal() (no other external mod dependencies)
+    implementation "com.sekwah:SekCLib:${project.sekclib_version}"
 
     // Unit testing
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-test {
+tasks.named('test', Test).configure {
     useJUnitPlatform()
+    doFirst {
+        workingDir = projectDir
+    }
 }
 
-mixin {
-    add sourceSets.main, "mixins.${project.modid}.refmap.json"
+tasks.named('processResources', ProcessResources).configure {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    def replaceProperties = [
+            minecraft_version      : project.property('minecraft_version'),
+            minecraft_version_range: project.property('minecraft_version_range'),
+            neo_version            : project.property('neo_version'),
+            neo_version_range      : project.property('neo_version_range'),
+            loader_version_range   : project.property('loader_version_range'),
+            mod_id                 : project.property('modid'),
+            mod_name               : project.property('title'),
+            mod_license            : project.property('mod_license'),
+            mod_version            : version.toString(),
+            mod_authors            : project.property('mod_authors'),
+            sekclib_version_range  : project.property('sekclib_version_range')
+    ]
+    inputs.properties(replaceProperties)
 
-    debug.verbose = true
-    debug.export = true
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand(replaceProperties)
+    }
 }
 
-// Example for how to get properties into the manifest for reading by the runtime..
-jar {
-    finalizedBy 'reobfJar'
+tasks.named('jar', Jar).configure {
     archiveClassifier = ''
     exclude 'com/sekwah/narutomod/datagen/**'
     manifest {
         attributes([
-                "Specification-Title": project.modid,
-                "Specification-Vendor": project.vendor,
-                "Specification-Version": "1", // We are version 1 of ourselves
-                "Implementation-Title": project.name,
-                "Implementation-Version": "${version}",
-                "Implementation-Vendor" :project.vendor,
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "MixinConfigs": "mixins.${project.modid}.json"
+                "Specification-Title"    : project.modid,
+                "Specification-Vendor"   : project.vendor,
+                "Specification-Version"  : "1",
+                "Implementation-Title"   : project.name,
+                "Implementation-Version" : "${version}",
+                "Implementation-Vendor"  : project.vendor,
+                "Implementation-Timestamp": OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")),
+                "MixinConfigs"           : "mixins.${project.modid}.json"
         ])
     }
 }
 
-// Example configuration to allow publishing using the maven-publish task
-// we define a custom artifact that is sourced from the reobfJar output task
-// and then declare that to be published
-// Note you'll need to add a repository here
-def reobfFile = file("$buildDir/reobfJar/output.jar")
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'reobfJar'
-}
-
-task srcJar(type: Jar) {
-    build.dependsOn it
+def srcJar = tasks.register('srcJar', Jar) {
     from sourceSets.main.allSource
     archiveClassifier = 'sources'
     from file("LICENSE")
 }
 
-task deobfJar(type: Jar) {
-    build.dependsOn it
-    from sourceSets.main.output
-    archiveClassifier = 'deobf'
-    from file("LICENSE")
+tasks.named('assemble').configure {
+    dependsOn(srcJar)
 }
-// configurations.all {
-//     resolutionStrategy.dependencySubstitution {
-//         substitute module('cpw.mods:securejarhandler') using module('cpw.mods:securejarhandler:0.9.+') because "Fixes support for DCEVM"
-//     }
-// }
-
-//publishing {
-//    publications {
-//        mavenJava(MavenPublication) {
-//            artifact reobfArtifact
-//            artifact srcJar
-//            artifact deobfJar
-//        }
-//    }
-//    repositories {
-//        maven {
-//            url "s3://sekwah-maven/"
-//            authentication {
-//                awsIm(AwsImAuthentication)
-//            }
-//        }
-//    }
-//}
 
 /**
  * For pre-releases and testers to be able to try the latest commits if they want.
- * If the builds start exceeding 8MB then we may want to upload to s3 instead and periodically clear.
- * TODO possibly add a task that announces when builds are made?
- * Though add a note that it may take a while for Curse to approve the files.
  */
-task discordupload {
-    dependsOn(jar)
+tasks.register('discordupload') {
+    dependsOn(tasks.named('jar'))
     doLast {
         String discordWebhook = System.getenv("DISCORD_WEBHOOK")
 
-        if(discordWebhook != null) {
+        if (discordWebhook != null) {
             println("Logging Into Discord")
 
-            CloseableHttpClient httpClient = HttpClients.createDefault()
-            HttpPost uploadFile = new HttpPost(discordWebhook)
+            String content = isCanary
+                    ? "New canary Build"
+                    : "New release build\n\nCurrent Features: <${project.github}/blob/master/CHANGELOG.md>"
 
-            MultipartEntityBuilder builder = MultipartEntityBuilder.create()
-            if(isCanary) {
-                builder.addTextBody("content", "New canary Build")
-            } else {
-                builder.addTextBody("content", "New release build\n\n" +
-                        "Current Features: <${project.github}/blob/master/CHANGELOG.md>")
-            }
+            def jarTask = tasks.named('jar', Jar).get()
+            def jarPath = jarTask.archiveFile.get().asFile.toPath()
+            def jarName = jarPath.fileName.toString()
 
-            builder.addBinaryBody("file", file(jar.archiveFile).newInputStream(), ContentType.APPLICATION_OCTET_STREAM, jar.archiveName)
+            String boundary = "----NarutoModBoundary${System.currentTimeMillis()}"
+            def byteOut = new ByteArrayOutputStream()
+            byteOut.write(("--${boundary}\r\n" +
+                    "Content-Disposition: form-data; name=\"content\"\r\n\r\n" +
+                    "${content}\r\n" +
+                    "--${boundary}\r\n" +
+                    "Content-Disposition: form-data; name=\"file\"; filename=\"${jarName}\"\r\n" +
+                    "Content-Type: application/java-archive\r\n\r\n").getBytes(StandardCharsets.UTF_8))
+            byteOut.write(Files.readAllBytes(jarPath))
+            byteOut.write("\r\n--${boundary}--\r\n".getBytes(StandardCharsets.UTF_8))
 
-            HttpEntity multipart = builder.build()
+            def client = HttpClient.newHttpClient()
+            def request = HttpRequest.newBuilder()
+                    .uri(URI.create(discordWebhook))
+                    .header("Content-Type", "multipart/form-data; boundary=${boundary}")
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(byteOut.toByteArray()))
+                    .build()
 
-            uploadFile.setEntity(multipart)
-            CloseableHttpResponse response = httpClient.execute(uploadFile)
-            response.getEntity()
-
-            println("Posted build")
-
+            def response = client.send(request, HttpResponse.BodyHandlers.ofString())
+            println("Posted build (HTTP ${response.statusCode()})")
         } else {
             println("Discord webhook unspecified")
         }
     }
 }
 
-// tasks.curseforge.enabled = System.getenv("CURSE_API") != null
-// curseforge { ... }
-
-// https://github.com/researchgate/gradle-release
-// Only other plugin I can find using auto & gradle https://github.com/intuit/hooks
-//release {
-//    failOnPublishNeeded = false
-//    failOnSnapshotDependencies = false
-//    git {
-//        requireBranch = ''
-//    }
-//
-//
-//    // Disable tasks because something we have is causing -x to be ignored
-//    createReleaseTag.enabled = false
-//    preTagCommit.enabled = false
-//    commitNewVersion.enabled = false
-//}
-
-task publish {
+tasks.register('publish') {
     doLast {
         println "This is a dummy task to run others for version: ${version}"
     }
 }
 
-task cleanbuildfolder {
+tasks.register('cleanbuildfolder') {
     doLast {
         println "Cleaning up previous builds (to stop publishing old ones by mistake)"
         project.delete(files("${buildDir}/libs"))
     }
 }
 
-task checkModelParts(type: Exec) {
+tasks.register('checkModelParts', Exec) {
     commandLine 'python3', 'scripts/check_model_parts.py'
 }
 
-task checkLang(type: Exec) {
+tasks.register('checkLang', Exec) {
     commandLine 'python3', 'scripts/check_lang.py'
 }
 
-task checkSounds(type: Exec) {
+tasks.register('checkSounds', Exec) {
     commandLine 'python3', 'scripts/check_sounds.py'
 }
 
-task checkItemModels(type: Exec) {
+tasks.register('checkItemModels', Exec) {
     commandLine 'python3', 'scripts/check_item_models.py'
 }
 
-task checkUnusedTextures(type: Exec) {
+tasks.register('checkUnusedTextures', Exec) {
     commandLine 'python3', 'scripts/check_unused_textures.py'
 }
 
-task checkAllAssets {
+tasks.register('checkAllAssets') {
     dependsOn 'checkModelParts', 'checkLang', 'checkSounds', 'checkItemModels', 'checkUnusedTextures'
 }
 
-check.dependsOn 'checkAllAssets'
-compileJava.dependsOn 'cleanbuildfolder'
-compileJava.dependsOn 'checkAllAssets'
+tasks.named('check').configure {
+    dependsOn 'checkAllAssets'
+}
+tasks.named('compileJava').configure {
+    dependsOn 'cleanbuildfolder'
+}
 
-// Publish rules
-// Current behavior seems to be canary or release. Though pre-releases may break this pattern.
-publish.dependsOn 'build'
-publish.finalizedBy 'discordupload'
-// if (!isCanary) {
-//     publish.finalizedBy 'curseforge'
-// }
+tasks.named('publish').configure {
+    dependsOn 'build'
+    finalizedBy 'discordupload'
+}

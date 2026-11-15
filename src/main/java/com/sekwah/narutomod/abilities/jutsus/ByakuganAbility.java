@@ -7,7 +7,8 @@ import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -48,8 +49,8 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("hyuga")) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
-                    Component.literal("Hyūga").withStyle(ChatFormatting.AQUA)), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
+                    Component.literal("Hyūga").withStyle(ChatFormatting.AQUA)));
             return false;
         }
 
@@ -57,8 +58,8 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
         float drain = 0.25f * getChakraCostMultiplier(mastery);
 
         if (ninjaData.getChakra() < drain) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra",
+                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
             return false;
         }
 
@@ -70,7 +71,7 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         // Passive battle experience / training: grant +1 mastery every 10 seconds of sustained focus
         if (ticksActive > 0 && ticksActive % 200 == 0) {
-            ResourceLocation reg = this.getRegistryName();
+            Identifier reg = this.getRegistryName();
             if (reg != null) {
                 ninjaData.addMastery(reg, 1);
             }
@@ -105,29 +106,27 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
             // Subtle ethereal chakra injection burst at target heart/center
             serverLevel.sendParticles(ParticleTypes.ENCHANTED_HIT,
                     target.getX(), target.getY() + target.getBbHeight() * 0.5, target.getZ(),
-                    8, 0.2, 0.2, 0.2, 0.1);
+                    8, 0.2, 0.2, 0.2, 0.1, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
                     target.getX(), target.getY() + target.getBbHeight() * 0.5, target.getZ(),
-                    6, 0.2, 0.2, 0.2, 0.05);
+                    6, 0.2, 0.2, 0.2, 0.05, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         // Apply Gentle Fist tenketsu disruption: Weakness & Slowness
         target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 60, 0, false, false));
-        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 0, false, false));
+        target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 0, false, false));
 
         // If target is a Player, seal their chakra regeneration for 5 seconds (100 ticks)
         if (target instanceof Player targetPlayer) {
-            targetPlayer.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(targetData -> {
-                targetData.lockChakraRegen(CHAKRA_LOCK_TICKS);
-                targetPlayer.displayClientMessage(
-                        Component.translatable("jutsu.byakugan.chakra_locked").withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
-            });
+            var targetData = targetPlayer.getData(NinjaCapabilityHandler.NINJA_DATA);
+            targetData.lockChakraRegen(CHAKRA_LOCK_TICKS);
+            targetPlayer.sendOverlayMessage(
+                    Component.translatable("jutsu.byakugan.chakra_locked").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
         }
 
         // Grant combat mastery to the attacker
-        attacker.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(attackerData -> {
-            attackerData.addMastery(new ResourceLocation(NarutoMod.MOD_ID, "byakugan"), 1);
-        });
+        attacker.getData(NinjaCapabilityHandler.NINJA_DATA)
+                .addMastery(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "byakugan"), 1);
     }
 
     @Override

@@ -3,15 +3,12 @@ package com.sekwah.narutomod.entity.projectile;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.sounds.NarutoSounds;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkHooks;
 
 public class ShurikenEntity extends AbstractArrow {
 
@@ -23,23 +20,23 @@ public class ShurikenEntity extends AbstractArrow {
 
     public ShurikenEntity(EntityType<? extends ShurikenEntity> type, Level worldIn) {
         super(type, worldIn);
-        this.rotateTicks = worldIn.random.nextInt(140);
-        this.rotOffset = (worldIn.random.nextInt(100) - 50);
+        this.rotateTicks = worldIn.getRandom().nextInt(140);
+        this.rotOffset = (worldIn.getRandom().nextInt(100) - 50);
     }
 
     public ShurikenEntity(Level worldIn, LivingEntity shooter) {
-        super(NarutoEntities.SHURIKEN.get(), shooter, worldIn);
+        super(NarutoEntities.SHURIKEN.get(), shooter, worldIn, new ItemStack(NarutoItems.SHURIKEN.get()), null);
     }
 
     public ShurikenEntity(EntityType<? extends ShurikenEntity> kunaiEntityEntityType, LivingEntity shooter, Level worldIn) {
-        super(kunaiEntityEntityType, shooter, worldIn);
+        super(kunaiEntityEntityType, shooter, worldIn, new ItemStack(NarutoItems.SHURIKEN.get()), null);
     }
 
     @Override
     public void tick() {
         super.tick();
         this.prevRotateTicks = this.rotateTicks;
-        if (!this.inGround) {
+        if (!this.isInGround()) {
             this.rotateTicks += 1;
         }
     }
@@ -66,15 +63,8 @@ public class ShurikenEntity extends AbstractArrow {
         return NarutoSounds.KUNAI_THUD.get();
     }
 
-
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
-    }
-
-
-    @Override
-    protected ItemStack getPickupItem() {
+    protected ItemStack getDefaultPickupItem() {
         return new ItemStack(NarutoItems.SHURIKEN.get());
     }
 }

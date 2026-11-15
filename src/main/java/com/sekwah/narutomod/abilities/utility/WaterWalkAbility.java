@@ -54,7 +54,7 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
             fullCost = Math.max(0.01f, fullCost * getChakraCostMultiplier(mastery));
         }
         if(ninjaData.getChakra() < fullCost) {
-            player.displayClientMessage(Component.translatable("jutsu.fail.notenoughchakra", Component.translatable("jutsu.waterwalk").withStyle(ChatFormatting.YELLOW)), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra", Component.translatable("jutsu.waterwalk").withStyle(ChatFormatting.YELLOW)));
             return false;
         }
         ninjaData.useChakra(fullCost, CHARKA_COOLDOWN);
@@ -107,8 +107,6 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
             if(player.isFallFlying()) {
                 player.stopFallFlying();
             }
-            float f = (float)Math.min(0.1D, player.getDeltaMovement().horizontalDistance());
-            player.bob += (f - player.bob) * 0.4F;
         }
         int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
         double masteryBonus = 1.0 + (getPowerMultiplier(mastery) - 1.0) * 0.25;
@@ -128,7 +126,7 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
             WaterChecks checks = this.checkSteadyNormalFastPush(player);
             if ((checks.steadyCheck || checks.pushUpFast || checks.pushUpNormal)
                     && player.getDeltaMovement().horizontalDistanceSqr() > 0.001) {
-                net.minecraft.resources.ResourceLocation reg = this.getRegistryName();
+                net.minecraft.resources.Identifier reg = this.getRegistryName();
                 if (reg != null) {
                     ninjaData.addMastery(reg, 1);
                 }

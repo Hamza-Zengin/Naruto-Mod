@@ -18,9 +18,10 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.commands.arguments.IdentifierArgument;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +41,7 @@ public class NarutoCommands {
 
     private static final SuggestionProvider<CommandSourceStack> SUGGEST_CLANS = (ctx, builder) -> {
         List<String> clanNames = new ArrayList<>();
-        for (RegistryObject<Clan> entry : NarutoClans.CLANS.getEntries()) {
+        for (DeferredHolder<Clan, ? extends Clan> entry : NarutoClans.CLANS.getEntries()) {
             clanNames.add(entry.getId().getPath());
         }
         return SharedSuggestionProvider.suggest(clanNames, builder);
@@ -49,15 +50,15 @@ public class NarutoCommands {
     private static final SuggestionProvider<CommandSourceStack> SUGGEST_JUTSUS = (ctx, builder) -> {
         List<String> jutsuNames = new ArrayList<>();
         jutsuNames.add("all");
-        for (RegistryObject<Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
+        for (DeferredHolder<Ability, ? extends Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
             jutsuNames.add(entry.getId().getPath());
         }
         return SharedSuggestionProvider.suggest(jutsuNames, builder);
     };
 
     private static final SuggestionProvider<CommandSourceStack> SUGGEST_JUTSU_IDS = (ctx, builder) -> {
-        List<ResourceLocation> ids = new ArrayList<>();
-        for (RegistryObject<Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
+        List<Identifier> ids = new ArrayList<>();
+        for (DeferredHolder<Ability, ? extends Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
             ids.add(entry.getId());
         }
         return SharedSuggestionProvider.suggestResource(ids, builder);
@@ -73,7 +74,7 @@ public class NarutoCommands {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("naruto")
-                .requires(source -> source.hasPermission(2))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 
                 // === CHAKRA ===
                 .then(Commands.literal("chakra")
@@ -180,29 +181,29 @@ public class NarutoCommands {
                 .then(Commands.literal("mastery")
                         .then(Commands.literal("set")
                                 .then(Commands.argument("targets", EntityArgument.players())
-                                        .then(Commands.argument("jutsu", net.minecraft.commands.arguments.ResourceLocationArgument.id())
+                                        .then(Commands.argument("jutsu", IdentifierArgument.id())
                                                 .suggests(SUGGEST_JUTSU_IDS)
                                                 .then(Commands.argument("amount", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 10000))
                                                         .executes(ctx -> setJutsuMastery(ctx.getSource(),
                                                                 EntityArgument.getPlayers(ctx, "targets"),
-                                                                net.minecraft.commands.arguments.ResourceLocationArgument.getId(ctx, "jutsu"),
+                                                                IdentifierArgument.getId(ctx, "jutsu"),
                                                                 com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "amount")))))))
                         .then(Commands.literal("add")
                                 .then(Commands.argument("targets", EntityArgument.players())
-                                        .then(Commands.argument("jutsu", net.minecraft.commands.arguments.ResourceLocationArgument.id())
+                                        .then(Commands.argument("jutsu", IdentifierArgument.id())
                                                 .suggests(SUGGEST_JUTSU_IDS)
                                                 .then(Commands.argument("amount", com.mojang.brigadier.arguments.IntegerArgumentType.integer(-10000, 10000))
                                                         .executes(ctx -> addJutsuMastery(ctx.getSource(),
                                                                 EntityArgument.getPlayers(ctx, "targets"),
-                                                                net.minecraft.commands.arguments.ResourceLocationArgument.getId(ctx, "jutsu"),
+                                                                IdentifierArgument.getId(ctx, "jutsu"),
                                                                 com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "amount")))))))
                         .then(Commands.literal("get")
                                 .then(Commands.argument("targets", EntityArgument.players())
-                                        .then(Commands.argument("jutsu", net.minecraft.commands.arguments.ResourceLocationArgument.id())
+                                        .then(Commands.argument("jutsu", IdentifierArgument.id())
                                                 .suggests(SUGGEST_JUTSU_IDS)
                                                 .executes(ctx -> getJutsuMastery(ctx.getSource(),
                                                         EntityArgument.getPlayers(ctx, "targets"),
-                                                        net.minecraft.commands.arguments.ResourceLocationArgument.getId(ctx, "jutsu")))))))
+                                                        IdentifierArgument.getId(ctx, "jutsu")))))))
 
                 // === STATS & RESET ===
                 .then(Commands.literal("stats")
@@ -231,42 +232,38 @@ public class NarutoCommands {
     // === CHAKRA HANDLERS ===
     private static int getChakra(CommandSourceStack source, Collection<ServerPlayer> players) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                NinjaRank rank = NinjaRank.fromString(data.getRank());
-                float bonus = rank.getChakraBonus();
-                String bonusStr = bonus > 0 ? " (Taban: " + (int) data.getBaseMaxChakra() + ", Rütbe Bonusu: +" + (int) bonus + ")" : "";
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " Çakra: " + (int) data.getChakra() + " / " + (int) data.getMaxChakra() + bonusStr).withStyle(ChatFormatting.AQUA), false);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            NinjaRank rank = NinjaRank.fromString(data.getRank());
+            float bonus = rank.getChakraBonus();
+            String bonusStr = bonus > 0 ? " (Taban: " + (int) data.getBaseMaxChakra() + ", Rütbe Bonusu: +" + (int) bonus + ")" : "";
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " Çakra: " + (int) data.getChakra() + " / " + (int) data.getMaxChakra() + bonusStr).withStyle(ChatFormatting.AQUA), false);
         }
         return players.size();
     }
 
     private static int setChakra(CommandSourceStack source, Collection<ServerPlayer> players, float amount) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.setChakra(amount);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun çakrası " + (int) data.getChakra() + " / " + (int) data.getMaxChakra() + " olarak ayarlandı.").withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.setChakra(amount);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun çakrası " + (int) data.getChakra() + " / " + (int) data.getMaxChakra() + " olarak ayarlandı.").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
 
     private static int addChakra(CommandSourceStack source, Collection<ServerPlayer> players, float amount) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.addChakra(amount);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncuya " + (int) amount + " çakra eklendi (Mevcut: " + (int) data.getChakra() + " / " + (int) data.getMaxChakra() + ").").withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.addChakra(amount);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncuya " + (int) amount + " çakra eklendi (Mevcut: " + (int) data.getChakra() + " / " + (int) data.getMaxChakra() + ").").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
 
     private static int setMaxChakra(CommandSourceStack source, Collection<ServerPlayer> players, float amount) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.setBaseMaxChakra(amount);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun eğitilmiş taban çakrası " + (int) amount + " olarak ayarlandı (Toplam Maksimum: " + (int) data.getMaxChakra() + ").").withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.setBaseMaxChakra(amount);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun eğitilmiş taban çakrası " + (int) amount + " olarak ayarlandı (Toplam Maksimum: " + (int) data.getMaxChakra() + ").").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
@@ -274,42 +271,38 @@ public class NarutoCommands {
     // === STAMINA HANDLERS ===
     private static int getStamina(CommandSourceStack source, Collection<ServerPlayer> players) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                NinjaRank rank = NinjaRank.fromString(data.getRank());
-                float bonus = rank.getStaminaBonus();
-                String bonusStr = bonus > 0 ? " (Taban: " + (int) data.getBaseMaxStamina() + ", Rütbe Bonusu: +" + (int) bonus + ")" : "";
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " Kondisyon: " + (int) data.getStamina() + " / " + (int) data.getMaxStamina() + bonusStr).withStyle(ChatFormatting.YELLOW), false);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            NinjaRank rank = NinjaRank.fromString(data.getRank());
+            float bonus = rank.getStaminaBonus();
+            String bonusStr = bonus > 0 ? " (Taban: " + (int) data.getBaseMaxStamina() + ", Rütbe Bonusu: +" + (int) bonus + ")" : "";
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " Kondisyon: " + (int) data.getStamina() + " / " + (int) data.getMaxStamina() + bonusStr).withStyle(ChatFormatting.YELLOW), false);
         }
         return players.size();
     }
 
     private static int setStamina(CommandSourceStack source, Collection<ServerPlayer> players, float amount) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.setStamina(amount);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun kondisyonu " + (int) data.getStamina() + " / " + (int) data.getMaxStamina() + " olarak ayarlandı.").withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.setStamina(amount);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun kondisyonu " + (int) data.getStamina() + " / " + (int) data.getMaxStamina() + " olarak ayarlandı.").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
 
     private static int addStamina(CommandSourceStack source, Collection<ServerPlayer> players, float amount) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.addStamina(amount);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncuya " + (int) amount + " kondisyon eklendi (Mevcut: " + (int) data.getStamina() + " / " + (int) data.getMaxStamina() + ").").withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.addStamina(amount);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncuya " + (int) amount + " kondisyon eklendi (Mevcut: " + (int) data.getStamina() + " / " + (int) data.getMaxStamina() + ").").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
 
     private static int setMaxStamina(CommandSourceStack source, Collection<ServerPlayer> players, float amount) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.setBaseMaxStamina(amount);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun eğitilmiş taban kondisyonu " + (int) amount + " olarak ayarlandı (Toplam Maksimum: " + (int) data.getMaxStamina() + ").").withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.setBaseMaxStamina(amount);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun eğitilmiş taban kondisyonu " + (int) amount + " olarak ayarlandı (Toplam Maksimum: " + (int) data.getMaxStamina() + ").").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
@@ -317,39 +310,36 @@ public class NarutoCommands {
     // === CLAN HANDLERS ===
     private static int getClan(CommandSourceStack source, Collection<ServerPlayer> players) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                String clan = data.getClan() != null ? data.getClan().getPath() : "shinobi";
-                String locked = data.isClanLocked() ? "§c[Kilitli]" : "§a[Değiştirilebilir]";
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " Klanı: " + clan + " " + locked).withStyle(ChatFormatting.GOLD), false);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            String clan = data.getClan() != null ? data.getClan().getPath() : "shinobi";
+            String locked = data.isClanLocked() ? "§c[Kilitli]" : "§a[Değiştirilebilir]";
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " Klanı: " + clan + " " + locked).withStyle(ChatFormatting.GOLD), false);
         }
         return players.size();
     }
 
     private static int setClan(CommandSourceStack source, Collection<ServerPlayer> players, String clanName) {
-        ResourceLocation clanLoc = new ResourceLocation(NarutoMod.MOD_ID, clanName.toLowerCase());
+        Identifier clanLoc = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, clanName.toLowerCase());
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.forceSetClan(clanLoc);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun klanı '" + clanName + "' olarak ayarlandı ve mühürlendi.").withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.forceSetClan(clanLoc);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun klanı '" + clanName + "' olarak ayarlandı ve mühürlendi.").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
 
     private static int unlockClanSelection(CommandSourceStack source, Collection<ServerPlayer> players) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.setClanLocked(false);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için klan seçimi kilidi açıldı. Oyuncu 'J' menüsünden yeni klan seçebilir.").withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.setClanLocked(false);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için klan seçimi kilidi açıldı. Oyuncu 'J' menüsünden yeni klan seçebilir.").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
 
     private static int listClans(CommandSourceStack source) {
         source.sendSuccess(() -> Component.literal("=== Mevcut Klanlar ===").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);
-        for (RegistryObject<Clan> entry : NarutoClans.CLANS.getEntries()) {
+        for (DeferredHolder<Clan, ? extends Clan> entry : NarutoClans.CLANS.getEntries()) {
             source.sendSuccess(() -> Component.literal(" - " + entry.getId().getPath()).withStyle(ChatFormatting.YELLOW), false);
         }
         return 1;
@@ -358,10 +348,9 @@ public class NarutoCommands {
     // === RANK HANDLERS ===
     private static int getRank(CommandSourceStack source, Collection<ServerPlayer> players) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                NinjaRank rank = NinjaRank.fromString(data.getRank());
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " Rütbesi: " + rank.getTurkishName() + " (" + rank.getEnglishName() + ")").withStyle(ChatFormatting.LIGHT_PURPLE), false);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            NinjaRank rank = NinjaRank.fromString(data.getRank());
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " Rütbesi: " + rank.getTurkishName() + " (" + rank.getEnglishName() + ")").withStyle(ChatFormatting.LIGHT_PURPLE), false);
         }
         return players.size();
     }
@@ -374,14 +363,13 @@ public class NarutoCommands {
         }
 
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.setRank(parsed.name());
-                data.setJutsusCastCount(0);
-                data.setEnemiesDefeated(0);
-                data.setChakra(data.getMaxChakra());
-                data.setStamina(data.getMaxStamina());
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " rütbesi '" + parsed.getTurkishName() + "' yapıldı. Çakra/kondisyon yenilendi.").withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.setRank(parsed.name());
+            data.setJutsusCastCount(0);
+            data.setEnemiesDefeated(0);
+            data.setChakra(data.getMaxChakra());
+            data.setStamina(data.getMaxStamina());
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " rütbesi '" + parsed.getTurkishName() + "' yapıldı. Çakra/kondisyon yenilendi.").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
@@ -396,7 +384,7 @@ public class NarutoCommands {
 
     // === JUTSU HANDLERS ===
     private static int castJutsu(CommandSourceStack source, Collection<ServerPlayer> players, String jutsuId) {
-        ResourceLocation loc = new ResourceLocation(NarutoMod.MOD_ID, jutsuId.toLowerCase());
+        Identifier loc = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, jutsuId.toLowerCase());
         Ability ability = NarutoAbilities.getAbility(loc);
         if (ability == null) {
             source.sendFailure(Component.literal("Bilinmeyen jutsu: " + jutsuId));
@@ -404,30 +392,29 @@ public class NarutoCommands {
         }
 
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                if (ability.activationType() == Ability.ActivationType.TOGGLE) {
-                    com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData tracker = data.getToggleAbilityData();
-                    if (tracker.hasToggleAbility(ability.getRegistryName())) {
-                        tracker.removeAbilityEnded(player, data, ability);
-                        source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için " + jutsuId + " deaktif edildi.").withStyle(ChatFormatting.YELLOW), true);
-                    } else {
-                        tracker.addAbilityStarted(player, data, ability);
-                        data.addJutsuCast();
-                        source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için " + jutsuId + " aktif edildi.").withStyle(ChatFormatting.GREEN), true);
-                    }
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            if (ability.activationType() == Ability.ActivationType.TOGGLE) {
+                com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData tracker = data.getToggleAbilityData();
+                if (tracker.hasToggleAbility(ability.getRegistryName())) {
+                    tracker.removeAbilityEnded(player, data, ability);
+                    source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için " + jutsuId + " deaktif edildi.").withStyle(ChatFormatting.YELLOW), true);
                 } else {
-                    ability.perform(player, data, 0);
+                    tracker.addAbilityStarted(player, data, ability);
                     data.addJutsuCast();
-                    source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " tarafından " + jutsuId + " uygulandı.").withStyle(ChatFormatting.GREEN), true);
+                    source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için " + jutsuId + " aktif edildi.").withStyle(ChatFormatting.GREEN), true);
                 }
-            });
+            } else {
+                ability.perform(player, data, 0);
+                data.addJutsuCast();
+                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " tarafından " + jutsuId + " uygulandı.").withStyle(ChatFormatting.GREEN), true);
+            }
         }
         return players.size();
     }
 
     private static int listJutsus(CommandSourceStack source) {
         source.sendSuccess(() -> Component.literal("=== Mevcut Jutsular & Yetenekler ===").withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD), false);
-        for (RegistryObject<Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
+        for (DeferredHolder<Ability, ? extends Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
             Ability a = entry.get();
             String path = entry.getId().getPath();
             boolean isScroll = NinjaData.isScrollRequiredJutsu(entry.getId());
@@ -440,17 +427,16 @@ public class NarutoCommands {
     private static int unlockJutsu(CommandSourceStack source, Collection<ServerPlayer> players, String jutsuId) {
         if (jutsuId.equalsIgnoreCase("all")) {
             for (ServerPlayer player : players) {
-                player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                    for (RegistryObject<Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
-                        data.unlockAbility(entry.getId());
-                    }
-                    source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için TÜM jutsular açıldı.").withStyle(ChatFormatting.GREEN), true);
-                });
+                var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+                for (DeferredHolder<Ability, ? extends Ability> entry : NarutoAbilities.ABILITY.getEntries()) {
+                    data.unlockAbility(entry.getId());
+                }
+                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için TÜM jutsular açıldı.").withStyle(ChatFormatting.GREEN), true);
             }
             return players.size();
         }
 
-        ResourceLocation loc = new ResourceLocation(NarutoMod.MOD_ID, jutsuId.toLowerCase());
+        Identifier loc = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, jutsuId.toLowerCase());
         Ability ability = NarutoAbilities.getAbility(loc);
         if (ability == null) {
             source.sendFailure(Component.literal("Bilinmeyen jutsu: " + jutsuId));
@@ -458,10 +444,9 @@ public class NarutoCommands {
         }
 
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.unlockAbility(loc);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için '" + jutsuId + "' jutsusu açıldı.").withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.unlockAbility(loc);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için '" + jutsuId + "' jutsusu açıldı.").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
@@ -469,20 +454,18 @@ public class NarutoCommands {
     private static int lockJutsu(CommandSourceStack source, Collection<ServerPlayer> players, String jutsuId) {
         if (jutsuId.equalsIgnoreCase("all")) {
             for (ServerPlayer player : players) {
-                player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                    data.setUnlockedJutsusString("");
-                    source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için açılan parşömen jutsuları sıfırlandı.").withStyle(ChatFormatting.YELLOW), true);
-                });
+                var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+                data.setUnlockedJutsusString("");
+                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için açılan parşömen jutsuları sıfırlandı.").withStyle(ChatFormatting.YELLOW), true);
             }
             return players.size();
         }
 
-        ResourceLocation loc = new ResourceLocation(NarutoMod.MOD_ID, jutsuId.toLowerCase());
+        Identifier loc = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, jutsuId.toLowerCase());
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.lockAbility(loc);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için '" + jutsuId + "' jutsusu kilitlendi.").withStyle(ChatFormatting.YELLOW), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.lockAbility(loc);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için '" + jutsuId + "' jutsusu kilitlendi.").withStyle(ChatFormatting.YELLOW), true);
         }
         return players.size();
     }
@@ -490,82 +473,77 @@ public class NarutoCommands {
     // === FULL STATS & RESET ===
     private static int getFullStats(CommandSourceStack source, Collection<ServerPlayer> players) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                NinjaRank rank = NinjaRank.fromString(data.getRank());
-                String clan = data.getClan() != null ? data.getClan().getPath() : "shinobi";
-                String clanLock = data.isClanLocked() ? "§c[Kilitli]" : "§a[Seçilmedi]";
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            NinjaRank rank = NinjaRank.fromString(data.getRank());
+            String clan = data.getClan() != null ? data.getClan().getPath() : "shinobi";
+            String clanLock = data.isClanLocked() ? "§c[Kilitli]" : "§a[Seçilmedi]";
 
-                float baseChakra = data.getBaseMaxChakra();
-                float cExpNeeded = baseChakra < 150.0f
-                        ? 30.0f + (baseChakra - 100.0f) * 0.50f
-                        : 55.0f + (baseChakra - 150.0f) * 1.10f;
-                float sExpNeeded = 50.0f + (data.getBaseMaxStamina() - 100.0f) * 1.10f;
+            float baseChakra = data.getBaseMaxChakra();
+            float cExpNeeded = baseChakra < 150.0f
+                    ? 30.0f + (baseChakra - 100.0f) * 0.50f
+                    : 55.0f + (baseChakra - 150.0f) * 1.10f;
+            float sExpNeeded = 50.0f + (data.getBaseMaxStamina() - 100.0f) * 1.10f;
 
-                source.sendSuccess(() -> Component.literal("=== SHINOBI STATS: " + player.getScoreboardName() + " ===").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);
-                source.sendSuccess(() -> Component.literal("• Rütbe: §f" + rank.getTurkishName() + " (" + rank.getEnglishName() + ")").withStyle(ChatFormatting.AQUA), false);
-                source.sendSuccess(() -> Component.literal("• Klan: §f" + clan + " " + clanLock).withStyle(ChatFormatting.YELLOW), false);
-                source.sendSuccess(() -> Component.literal("• Çakra: §f" + (int) data.getChakra() + " / " + (int) data.getMaxChakra() + " §7(Taban: " + (int) data.getBaseMaxChakra() + ", Rütbe Bonusu: +" + (int) rank.getChakraBonus() + ")").withStyle(ChatFormatting.BLUE), false);
-                source.sendSuccess(() -> Component.literal("• Kondisyon: §f" + (int) data.getStamina() + " / " + (int) data.getMaxStamina() + " §7(Taban: " + (int) data.getBaseMaxStamina() + ", Rütbe Bonusu: +" + (int) rank.getStaminaBonus() + ")").withStyle(ChatFormatting.GREEN), false);
-                source.sendSuccess(() -> Component.literal("• Çakra Eğitimi: §f" + String.format("%.1f", data.getChakraExp()) + " / " + String.format("%.1f", cExpNeeded) + " EXP").withStyle(ChatFormatting.LIGHT_PURPLE), false);
-                source.sendSuccess(() -> Component.literal("• Kondisyon Eğitimi: §f" + String.format("%.1f", data.getStaminaExp()) + " / " + String.format("%.1f", sExpNeeded) + " EXP").withStyle(ChatFormatting.DARK_GREEN), false);
-                source.sendSuccess(() -> Component.literal("• Jutsu Pratiği: §f" + data.getJutsusCastCount() + " kez").withStyle(ChatFormatting.GRAY), false);
-                source.sendSuccess(() -> Component.literal("• Yenilen Düşman: §f" + data.getEnemiesDefeated()).withStyle(ChatFormatting.RED), false);
-                source.sendSuccess(() -> Component.literal("• Öğrenilen Parşömenler: §f" + data.getUnlockedAbilities().size() + " adet").withStyle(ChatFormatting.DARK_AQUA), false);
-            });
+            source.sendSuccess(() -> Component.literal("=== SHINOBI STATS: " + player.getScoreboardName() + " ===").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);
+            source.sendSuccess(() -> Component.literal("• Rütbe: §f" + rank.getTurkishName() + " (" + rank.getEnglishName() + ")").withStyle(ChatFormatting.AQUA), false);
+            source.sendSuccess(() -> Component.literal("• Klan: §f" + clan + " " + clanLock).withStyle(ChatFormatting.YELLOW), false);
+            source.sendSuccess(() -> Component.literal("• Çakra: §f" + (int) data.getChakra() + " / " + (int) data.getMaxChakra() + " §7(Taban: " + (int) data.getBaseMaxChakra() + ", Rütbe Bonusu: +" + (int) rank.getChakraBonus() + ")").withStyle(ChatFormatting.BLUE), false);
+            source.sendSuccess(() -> Component.literal("• Kondisyon: §f" + (int) data.getStamina() + " / " + (int) data.getMaxStamina() + " §7(Taban: " + (int) data.getBaseMaxStamina() + ", Rütbe Bonusu: +" + (int) rank.getStaminaBonus() + ")").withStyle(ChatFormatting.GREEN), false);
+            source.sendSuccess(() -> Component.literal("• Çakra Eğitimi: §f" + String.format("%.1f", data.getChakraExp()) + " / " + String.format("%.1f", cExpNeeded) + " EXP").withStyle(ChatFormatting.LIGHT_PURPLE), false);
+            source.sendSuccess(() -> Component.literal("• Kondisyon Eğitimi: §f" + String.format("%.1f", data.getStaminaExp()) + " / " + String.format("%.1f", sExpNeeded) + " EXP").withStyle(ChatFormatting.DARK_GREEN), false);
+            source.sendSuccess(() -> Component.literal("• Jutsu Pratiği: §f" + data.getJutsusCastCount() + " kez").withStyle(ChatFormatting.GRAY), false);
+            source.sendSuccess(() -> Component.literal("• Yenilen Düşman: §f" + data.getEnemiesDefeated()).withStyle(ChatFormatting.RED), false);
+            source.sendSuccess(() -> Component.literal("• Öğrenilen Parşömenler: §f" + data.getUnlockedAbilities().size() + " adet").withStyle(ChatFormatting.DARK_AQUA), false);
         }
         return players.size();
     }
 
     private static int resetData(CommandSourceStack source, Collection<ServerPlayer> players) {
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.resetData();
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun ninja verileri Akademi Öğrencisi başlangıç seviyesine sıfırlandı.").withStyle(ChatFormatting.GOLD), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.resetData();
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun ninja verileri Akademi Öğrencisi başlangıç seviyesine sıfırlandı.").withStyle(ChatFormatting.GOLD), true);
         }
         return players.size();
     }
 
     // === MASTERY HANDLERS ===
-    private static int setJutsuMastery(CommandSourceStack source, Collection<ServerPlayer> players, ResourceLocation jutsuId, int amount) {
+    private static int setJutsuMastery(CommandSourceStack source, Collection<ServerPlayer> players, Identifier jutsuId, int amount) {
         if (NarutoAbilities.ABILITY.getEntries().stream().noneMatch(e -> e.getId().equals(jutsuId))) {
             source.sendFailure(Component.literal("Geçersiz jutsu ID'si: " + jutsuId).withStyle(ChatFormatting.RED));
             return 0;
         }
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.setMastery(jutsuId, amount);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " - " + jutsuId + " ustalığı " + amount + " olarak ayarlandı.").withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.setMastery(jutsuId, amount);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " - " + jutsuId + " ustalığı " + amount + " olarak ayarlandı.").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
 
-    private static int addJutsuMastery(CommandSourceStack source, Collection<ServerPlayer> players, ResourceLocation jutsuId, int amount) {
+    private static int addJutsuMastery(CommandSourceStack source, Collection<ServerPlayer> players, Identifier jutsuId, int amount) {
         if (NarutoAbilities.ABILITY.getEntries().stream().noneMatch(e -> e.getId().equals(jutsuId))) {
             source.sendFailure(Component.literal("Geçersiz jutsu ID'si: " + jutsuId).withStyle(ChatFormatting.RED));
             return 0;
         }
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                data.addMastery(jutsuId, amount);
-                int updated = data.getMastery(jutsuId);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " - " + jutsuId + " ustalığı güncellendi: " + updated).withStyle(ChatFormatting.GREEN), true);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            data.addMastery(jutsuId, amount);
+            int updated = data.getMastery(jutsuId);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " - " + jutsuId + " ustalığı güncellendi: " + updated).withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
 
-    private static int getJutsuMastery(CommandSourceStack source, Collection<ServerPlayer> players, ResourceLocation jutsuId) {
+    private static int getJutsuMastery(CommandSourceStack source, Collection<ServerPlayer> players, Identifier jutsuId) {
         if (NarutoAbilities.ABILITY.getEntries().stream().noneMatch(e -> e.getId().equals(jutsuId))) {
             source.sendFailure(Component.literal("Geçersiz jutsu ID'si: " + jutsuId).withStyle(ChatFormatting.RED));
             return 0;
         }
         for (ServerPlayer player : players) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                int current = data.getMastery(jutsuId);
-                source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " - " + jutsuId + " ustalığı: " + current).withStyle(ChatFormatting.AQUA), false);
-            });
+            var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            int current = data.getMastery(jutsuId);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " - " + jutsuId + " ustalığı: " + current).withStyle(ChatFormatting.AQUA), false);
         }
         return players.size();
     }
@@ -576,37 +554,34 @@ public class NarutoCommands {
             source.sendFailure(Component.literal("Geçersiz görev ID'si: " + missionId).withStyle(ChatFormatting.RED));
             return 0;
         }
-        player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-            data.acceptMission(mission);
-            data.updateServerData(player);
-            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için görev atandı: " + mission.getId())
-                    .withStyle(ChatFormatting.GREEN), true);
-        });
+        var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+        data.acceptMission(mission);
+        data.updateServerData(player);
+        source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için görev atandı: " + mission.getId())
+                .withStyle(ChatFormatting.GREEN), true);
         return 1;
     }
 
     private static int completeMission(CommandSourceStack source, ServerPlayer player) {
-        player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-            com.sekwah.narutomod.capabilities.NinjaMission active = com.sekwah.narutomod.capabilities.NinjaMission.fromId(data.getActiveMissionId());
-            if (active == null) {
-                source.sendFailure(Component.literal(player.getScoreboardName() + " için aktif görev yok.").withStyle(ChatFormatting.RED));
-                return;
-            }
-            data.setMissionProgress(active.getTargetCount());
-            data.updateServerData(player);
-            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " görevi tamamlandı olarak işaretlendi: " + active.getId())
-                    .withStyle(ChatFormatting.GOLD), true);
-        });
+        var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+        com.sekwah.narutomod.capabilities.NinjaMission active = com.sekwah.narutomod.capabilities.NinjaMission.fromId(data.getActiveMissionId());
+        if (active == null) {
+            source.sendFailure(Component.literal(player.getScoreboardName() + " için aktif görev yok.").withStyle(ChatFormatting.RED));
+            return 0;
+        }
+        data.setMissionProgress(active.getTargetCount());
+        data.updateServerData(player);
+        source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " görevi tamamlandı olarak işaretlendi: " + active.getId())
+                .withStyle(ChatFormatting.GOLD), true);
         return 1;
     }
 
     private static int resetMission(CommandSourceStack source, ServerPlayer player) {
-        player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-            data.abandonMission();
-            data.updateServerData(player);
-            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " aktif görevi sıfırlandı.")
-                    .withStyle(ChatFormatting.YELLOW), true);
-        });
+        var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+        data.abandonMission();
+        data.updateServerData(player);
+        source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " aktif görevi sıfırlandı.")
+                .withStyle(ChatFormatting.YELLOW), true);
         return 1;
     }
 }

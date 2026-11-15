@@ -1,24 +1,32 @@
 package com.sekwah.narutomod.network.c2s;
 
+import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
+import com.sekwah.narutomod.capabilities.NinjaData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Tell the server that the user wants to cast a specific ability.
  */
-public class ServerAbilityChannelPacket {
+public class ServerAbilityChannelPacket implements CustomPacketPayload {
 
-    private final ResourceLocation abilityId;
-    private ChannelStatus status;
+    public static final CustomPacketPayload.Type<ServerAbilityChannelPacket> TYPE =
+            new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "server_ability_channel"));
+
+    public static final StreamCodec<FriendlyByteBuf, ServerAbilityChannelPacket> STREAM_CODEC =
+            StreamCodec.ofMember(ServerAbilityChannelPacket::encode, ServerAbilityChannelPacket::decode);
+
+    private final Identifier abilityId;
+    private final ChannelStatus status;
 
     public enum ChannelStatus {
         START,
@@ -26,18 +34,23 @@ public class ServerAbilityChannelPacket {
         MIN_ACTIVATE
     }
 
-    public ServerAbilityChannelPacket(ResourceLocation ability, ChannelStatus status) {
+    public ServerAbilityChannelPacket(Identifier ability, ChannelStatus status) {
         this.abilityId = ability;
         this.status = status;
     }
 
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
     public static void encode(ServerAbilityChannelPacket msg, FriendlyByteBuf outBuffer) {
-        outBuffer.writeResourceLocation(msg.abilityId);
+        outBuffer.writeIdentifier(msg.abilityId);
         outBuffer.writeInt(msg.status.ordinal());
     }
 
     public static ServerAbilityChannelPacket decode(FriendlyByteBuf inBuffer) {
-        ResourceLocation abilityId = inBuffer.readResourceLocation();
+        Identifier abilityId = inBuffer.readIdentifier();
         int status = inBuffer.readInt();
         ChannelStatus[] statuses = ChannelStatus.values();
         if (status < 0 || status >= statuses.length) {
@@ -46,45 +59,40 @@ public class ServerAbilityChannelPacket {
         return new ServerAbilityChannelPacket(abilityId, statuses[status]);
     }
 
-    public static class Handler {
-        public static void handle(ServerAbilityChannelPacket msg, Supplier<NetworkEvent.Context> ctx) {
-            ctx.get().enqueueWork(() -> {
-                final ServerPlayer player = ctx.get().getSender();
-                if (player == null) return;
-                player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
+    public static void handle(final ServerAbilityChannelPacket msg, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (!(context.player() instanceof ServerPlayer player)) return;
+            NinjaData ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
 
-                    Ability ability = NarutoAbilities.getAbility(msg.abilityId);
-                    if (ability == null) return;
+            Ability ability = NarutoAbilities.getAbility(msg.abilityId);
+            if (ability == null) return;
 
-                    // Silently ignore if player does not have the ability unlocked (no chat spam)
-                    if (!ninjaData.isAbilityUnlocked(ability)) {
+            // Silently ignore if player does not have the ability unlocked (no chat spam)
+            if (!ninjaData.isAbilityUnlocked(ability)) {
+                return;
+            }
+
+            if (ability.activationType() == Ability.ActivationType.CHANNELED) {
+                if (msg.status == ChannelStatus.START) {
+                    if (!ability.canActivate(player, ninjaData)) {
                         return;
                     }
-
-                    if (ability.activationType() == Ability.ActivationType.CHANNELED) {
-                        if (msg.status == ChannelStatus.START) {
-                            if (!ability.canActivate(player, ninjaData)) {
-                                return;
-                            }
-                            ninjaData.setCurrentlyChanneledAbility(player, ability);
-                        } else if (msg.status == ChannelStatus.STOP) {
-                            if(ninjaData.getCurrentlyChanneledAbility() != null && ninjaData.getCurrentlyChanneledAbility().equals(ability.getRegistryName())) {
-                                ability.performServer(player, ninjaData, ninjaData.getCurrentlyChanneledTicks());
-                                ninjaData.incrementJutsuMastery(ability.getRegistryName(), false);
-                                ninjaData.addJutsuCast();
-                                ninjaData.setCurrentlyChanneledAbility(player, null);
-                            }
-                        } else if(msg.status == ChannelStatus.MIN_ACTIVATE) {
-                            if (ability instanceof Ability.Channeled channeled && channeled.canActivateBelowMinCharge()) {
-                                ability.handleCost(player, ninjaData, 0);
-                            } else {
-                                player.sendSystemMessage(Component.translatable("jutsu.channel.needed", Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.RED));
-                            }
-                        }
+                    ninjaData.setCurrentlyChanneledAbility(player, ability);
+                } else if (msg.status == ChannelStatus.STOP) {
+                    if (ninjaData.getCurrentlyChanneledAbility() != null && ninjaData.getCurrentlyChanneledAbility().equals(ability.getRegistryName())) {
+                        ability.performServer(player, ninjaData, ninjaData.getCurrentlyChanneledTicks());
+                        ninjaData.incrementJutsuMastery(ability.getRegistryName(), false);
+                        ninjaData.addJutsuCast();
+                        ninjaData.setCurrentlyChanneledAbility(player, null);
                     }
-                });
-            });
-            ctx.get().setPacketHandled(true);
-        }
+                } else if (msg.status == ChannelStatus.MIN_ACTIVATE) {
+                    if (ability instanceof Ability.Channeled channeled && channeled.canActivateBelowMinCharge()) {
+                        ability.handleCost(player, ninjaData, 0);
+                    } else {
+                        player.sendSystemMessage(Component.translatable("jutsu.channel.needed", Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.RED));
+                    }
+                }
+            }
+        });
     }
 }

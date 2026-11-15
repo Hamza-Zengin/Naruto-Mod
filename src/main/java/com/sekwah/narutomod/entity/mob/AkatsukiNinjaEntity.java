@@ -6,12 +6,11 @@ import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.BossEvent;
@@ -40,6 +39,7 @@ import javax.annotation.Nullable;
 public class AkatsukiNinjaEntity extends Monster {
 
     private final ServerBossEvent bossEvent = new ServerBossEvent(
+            java.util.UUID.randomUUID(),
             Component.translatable("entity.narutomod.akatsuki_ninja"),
             BossEvent.BossBarColor.RED,
             BossEvent.BossBarOverlay.NOTCHED_10);
@@ -76,9 +76,9 @@ public class AkatsukiNinjaEntity extends Monster {
 
     @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason,
-                                        @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-        SpawnGroupData data = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason,
+                                        @Nullable SpawnGroupData spawnData) {
+        SpawnGroupData data = super.finalizeSpawn(level, difficulty, reason, spawnData);
         RandomSource random = level.getRandom();
         this.populateDefaultEquipmentSlots(random, difficulty);
         return data;
@@ -99,7 +99,7 @@ public class AkatsukiNinjaEntity extends Monster {
     @Override
     public void tick() {
         super.tick();
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
 
             if (this.jutsuCooldown > 0) this.jutsuCooldown--;
@@ -137,8 +137,9 @@ public class AkatsukiNinjaEntity extends Monster {
         if (this.level() instanceof ServerLevel serverLevel) {
             Vec3 dir = target.position().subtract(this.position()).normalize();
             this.setDeltaMovement(dir.x * 1.35D, 0.32D, dir.z * 1.35D);
-            this.hurtMarked = true;
-            serverLevel.sendParticles(ParticleTypes.CLOUD, this.getX(), this.getY() + 0.2, this.getZ(), 8, 0.2, 0.1, 0.2, 0.03);
+            this.needsSync = true;
+            serverLevel.sendParticles(ParticleTypes.CLOUD, this.getX(), this.getY() + 0.2, this.getZ(), 8, 0.2, 0.1, 0.2, 0.03,
+                    ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             serverLevel.playSound(null, this.blockPosition(), NarutoSounds.LEAP.get(), SoundSource.HOSTILE, 1.0f, 1.1f);
         }
     }
@@ -158,30 +159,28 @@ public class AkatsukiNinjaEntity extends Monster {
     @Override
     public void die(DamageSource source) {
         super.die(source);
-        if (!this.level().isClientSide && source.getEntity() instanceof Player killer) {
+        if (!this.level().isClientSide() && source.getEntity() instanceof Player killer) {
             // Award +4 bonus enemy defeats (+1 from standard LivingDeathEvent = +5 total exam progress)
-            killer.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(data -> {
-                for (int i = 0; i < 4; i++) {
-                    data.addEnemyDefeated();
-                }
-            });
+            var data = killer.getData(NinjaCapabilityHandler.NINJA_DATA);
+            for (int i = 0; i < 4; i++) {
+                data.addEnemyDefeated();
+            }
         }
     }
 
     @Override
-    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
-        super.dropCustomDeathLoot(source, looting, recentlyHit);
-        if (this.level().isClientSide) return;
+    protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource source, boolean recentlyHit) {
+        super.dropCustomDeathLoot(serverLevel, source, recentlyHit);
 
-        this.spawnAtLocation(new ItemStack(NarutoItems.CHAKRA_METAL.get(), 2 + this.random.nextInt(3)));
-        this.spawnAtLocation(new ItemStack(NarutoItems.ICHIRAKU_RAMEN.get(), 1 + this.random.nextInt(2)));
-        this.spawnAtLocation(new ItemStack(NarutoItems.FUMA_SHURIKEN.get(), 1 + this.random.nextInt(2)));
+        this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.CHAKRA_METAL.get(), 2 + this.random.nextInt(3)));
+        this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.ICHIRAKU_RAMEN.get(), 1 + this.random.nextInt(2)));
+        this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.FUMA_SHURIKEN.get(), 1 + this.random.nextInt(2)));
 
         float roll = this.random.nextFloat();
         if (roll < 0.35f) {
-            this.spawnAtLocation(new ItemStack(NarutoItems.SCROLL_RASENSHURIKEN.get(), 1));
+            this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.SCROLL_RASENSHURIKEN.get(), 1));
         } else if (roll < 0.65f) {
-            this.spawnAtLocation(new ItemStack(NarutoItems.SCROLL_KIRIN.get(), 1));
+            this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.SCROLL_KIRIN.get(), 1));
         }
     }
 }

@@ -1,16 +1,16 @@
 package com.sekwah.narutomod.client.events;
 
 import com.sekwah.narutomod.NarutoMod;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ViewportEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ViewportEvent;
 
 /**
  * Client-only camera shake manager hooked into ViewportEvent.ComputeCameraAngles.
  */
-@Mod.EventBusSubscriber(modid = NarutoMod.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = NarutoMod.MOD_ID, value = Dist.CLIENT)
 public class CameraShakeManager {
 
     private static float intensity = 0.0f;
@@ -32,8 +32,8 @@ public class CameraShakeManager {
     }
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && remainingTicks > 0) {
+    public static void onClientTick(ClientTickEvent.Post event) {
+        if (remainingTicks > 0) {
             remainingTicks--;
             if (remainingTicks <= 0) {
                 intensity = 0.0f;

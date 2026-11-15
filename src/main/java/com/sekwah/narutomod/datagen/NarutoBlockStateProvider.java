@@ -1,86 +1,109 @@
 package com.sekwah.narutomod.datagen;
 
+import com.mojang.math.Quadrant;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.block.NarutoBlocks;
 import com.sekwah.narutomod.block.RotatableDecorativeBlock;
 import com.sekwah.narutomod.block.weapons.PaperBombBlock;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
+import net.minecraft.client.data.models.blockstates.PropertyDispatch;
+import net.minecraft.client.renderer.block.dispatch.Variant;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.AttachFace;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.client.model.generators.VariantBlockStateBuilder;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
-public class NarutoBlockStateProvider extends BlockStateProvider {
+import java.util.stream.Stream;
 
-    public NarutoBlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
-        super(output, NarutoMod.MOD_ID, exFileHelper);
+public class NarutoBlockStateProvider extends ModelProvider {
+
+    public NarutoBlockStateProvider(PackOutput output) {
+        super(output, NarutoMod.MOD_ID);
     }
 
     @Override
-    protected void registerStatesAndModels() {
+    protected Stream<? extends Holder<Block>> getKnownBlocks() {
+        return Stream.of(NarutoBlocks.BONSAI_TREE, NarutoBlocks.PAPER_BOMB);
+    }
+
+    @Override
+    protected Stream<? extends Holder<Item>> getKnownItems() {
+        return Stream.empty();
+    }
+
+    @Override
+    protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
         // Bonsai Tree
-        VariantBlockStateBuilder bonsaiBuilder = getVariantBuilder(NarutoBlocks.BONSAI_TREE.get());
-        ModelFile bonsaiModel = models().getExistingFile(modLoc("block/bonsai_tree"));
-        bonsaiBuilder.partialState().with(RotatableDecorativeBlock.FACING, Direction.NORTH)
-                .modelForState().modelFile(bonsaiModel).addModel();
-        bonsaiBuilder.partialState().with(RotatableDecorativeBlock.FACING, Direction.SOUTH)
-                .modelForState().modelFile(bonsaiModel).rotationY(180).addModel();
-        bonsaiBuilder.partialState().with(RotatableDecorativeBlock.FACING, Direction.EAST)
-                .modelForState().modelFile(bonsaiModel).rotationY(90).addModel();
-        bonsaiBuilder.partialState().with(RotatableDecorativeBlock.FACING, Direction.WEST)
-                .modelForState().modelFile(bonsaiModel).rotationY(270).addModel();
+        Identifier bonsaiModel = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/bonsai_tree");
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(NarutoBlocks.BONSAI_TREE.get())
+                        .with(PropertyDispatch.initial(RotatableDecorativeBlock.FACING)
+                                .select(Direction.NORTH, BlockModelGenerators.plainVariant(bonsaiModel))
+                                .select(Direction.SOUTH, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(bonsaiModel).withYRot(Quadrant.R180)))
+                                .select(Direction.EAST, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(bonsaiModel).withYRot(Quadrant.R90)))
+                                .select(Direction.WEST, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(bonsaiModel).withYRot(Quadrant.R270))))
+        );
 
         // Paper Bomb
-        ModelFile paperBombVisible = models().getExistingFile(modLoc("block/paper_bomb"));
-        ModelFile paperBombHidden = models().getExistingFile(modLoc("block/paper_bomb_hidden"));
+        Identifier paperBombVisible = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/paper_bomb");
+        Identifier paperBombHidden = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/paper_bomb_hidden");
 
-        getVariantBuilder(NarutoBlocks.PAPER_BOMB.get()).forAllStates(state -> {
-            AttachFace face = state.getValue(PaperBombBlock.FACE);
-            Direction facing = state.getValue(PaperBombBlock.FACING);
-            boolean hidden = state.getValue(PaperBombBlock.HIDDEN);
-            ModelFile model = hidden ? paperBombHidden : paperBombVisible;
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(NarutoBlocks.PAPER_BOMB.get())
+                        .with(PropertyDispatch.initial(PaperBombBlock.FACE, PaperBombBlock.FACING, PaperBombBlock.HIDDEN)
+                                .generate((face, facing, hidden) -> {
+                                    Identifier model = hidden ? paperBombHidden : paperBombVisible;
+                                    Variant variant = BlockModelGenerators.plainModel(model);
+                                    Quadrant x = Quadrant.R0;
+                                    Quadrant y = Quadrant.R0;
+                                    boolean uvlock = false;
 
-            int x = 0;
-            int y = 0;
-            boolean uvlock = false;
+                                    if (face == AttachFace.CEILING) {
+                                        x = Quadrant.R180;
+                                        y = switch (facing) {
+                                            case EAST -> Quadrant.R270;
+                                            case NORTH -> Quadrant.R180;
+                                            case WEST -> Quadrant.R90;
+                                            default -> Quadrant.R0;
+                                        };
+                                    } else if (face == AttachFace.FLOOR) {
+                                        y = switch (facing) {
+                                            case EAST -> Quadrant.R90;
+                                            case SOUTH -> Quadrant.R180;
+                                            case WEST -> Quadrant.R270;
+                                            default -> Quadrant.R0;
+                                        };
+                                    } else if (face == AttachFace.WALL) {
+                                        x = Quadrant.R90;
+                                        uvlock = true;
+                                        y = switch (facing) {
+                                            case EAST -> Quadrant.R90;
+                                            case SOUTH -> Quadrant.R180;
+                                            case WEST -> Quadrant.R270;
+                                            default -> Quadrant.R0;
+                                        };
+                                    }
 
-            if (face == AttachFace.CEILING) {
-                x = 180;
-                switch (facing) {
-                    case EAST -> y = 270;
-                    case NORTH -> y = 180;
-                    case SOUTH -> y = 0;
-                    case WEST -> y = 90;
-                    default -> {}
-                }
-            } else if (face == AttachFace.FLOOR) {
-                switch (facing) {
-                    case EAST -> y = 90;
-                    case NORTH -> y = 0;
-                    case SOUTH -> y = 180;
-                    case WEST -> y = 270;
-                    default -> {}
-                }
-            } else if (face == AttachFace.WALL) {
-                x = 90;
-                uvlock = true;
-                switch (facing) {
-                    case EAST -> y = 90;
-                    case NORTH -> y = 0;
-                    case SOUTH -> y = 180;
-                    case WEST -> y = 270;
-                    default -> {}
-                }
-            }
-
-            ConfiguredModel.Builder<?> builder = ConfiguredModel.builder().modelFile(model);
-            if (x != 0) builder.rotationX(x);
-            if (y != 0) builder.rotationY(y);
-            if (uvlock) builder.uvLock(uvlock);
-            return builder.build();
-        });
+                                    if (x != Quadrant.R0) {
+                                        variant = variant.withXRot(x);
+                                    }
+                                    if (y != Quadrant.R0) {
+                                        variant = variant.withYRot(y);
+                                    }
+                                    if (uvlock) {
+                                        variant = variant.withUvLock(true);
+                                    }
+                                    return BlockModelGenerators.variant(variant);
+                                }))
+        );
     }
 }

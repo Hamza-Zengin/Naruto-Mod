@@ -1,42 +1,60 @@
 package com.sekwah.narutomod.client.renderer.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.sekwah.narutomod.entity.item.PaperBombEntity;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.MovingBlockRenderState;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
-import net.minecraft.util.RandomSource;
+public class PaperBombRenderer extends EntityRenderer<PaperBombEntity, PaperBombRenderer.PaperBombRenderState> {
 
-public class PaperBombRenderer extends EntityRenderer<PaperBombEntity> {
+    public static class PaperBombRenderState extends EntityRenderState {
+        public final MovingBlockRenderState movingBlockRenderState = new MovingBlockRenderState();
+        public AttachFace face = AttachFace.FLOOR;
+        public Vec3i dir = Vec3i.ZERO;
+    }
 
     public PaperBombRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-    public void render(PaperBombEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    public PaperBombRenderState createRenderState() {
+        return new PaperBombRenderState();
+    }
 
+    @Override
+    public void extractRenderState(PaperBombEntity entity, PaperBombRenderState state, float partialTick) {
+        super.extractRenderState(entity, state, partialTick);
+        BlockPos blockPos = BlockPos.containing(entity.getX(), entity.getBoundingBox().maxY, entity.getZ());
+        state.dir = entity.renderBlockState.getValue(BlockStateProperties.HORIZONTAL_FACING).getUnitVec3i();
+        state.face = entity.renderBlockState.getValue(FaceAttachedHorizontalDirectionalBlock.FACE);
+        state.movingBlockRenderState.randomSeedPos = entity.getOrigin();
+        state.movingBlockRenderState.blockPos = blockPos;
+        state.movingBlockRenderState.blockState = entity.renderBlockState;
+        if (entity.level() instanceof ClientLevel clientLevel) {
+            state.movingBlockRenderState.biome = clientLevel.getBiome(blockPos);
+            state.movingBlockRenderState.cardinalLighting = clientLevel.cardinalLighting();
+            state.movingBlockRenderState.lightEngine = clientLevel.getLightEngine();
+        }
+    }
+
+    @Override
+    public void submit(PaperBombRenderState state, PoseStack matrixStackIn, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
         matrixStackIn.pushPose();
 
         matrixStackIn.translate(-0.5D, -0.25D, -0.5D);
 
-        Vec3i dir = entityIn.renderBlockState.getValue(BlockStateProperties.HORIZONTAL_FACING).getNormal();
-        AttachFace face = entityIn.renderBlockState.getValue(FaceAttachedHorizontalDirectionalBlock.FACE);
-
-        switch (face) {
+        switch (state.face) {
             case FLOOR:
                 matrixStackIn.translate(0, 0.25D, 0);
                 break;
@@ -44,30 +62,13 @@ public class PaperBombRenderer extends EntityRenderer<PaperBombEntity> {
                 matrixStackIn.translate(0, -0.25D, 0);
                 break;
             case WALL:
-                matrixStackIn.translate(0.25D * dir.getX(), 0, 0.25D * dir.getZ());
+                matrixStackIn.translate(0.25D * state.dir.getX(), 0, 0.25D * state.dir.getZ());
                 break;
         }
 
-        BlockPos blockpos = BlockPos.containing(entityIn.getX(), entityIn.getBoundingBox().maxY, entityIn.getZ());
-        BlockRenderDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRenderer();
-
-        RenderType rendertype = ItemBlockRenderTypes.getMovingBlockRenderType(entityIn.renderBlockState);
-        VertexConsumer vertexconsumer = bufferIn.getBuffer(rendertype);
-        blockrendererdispatcher.getModelRenderer().tesselateBlock(entityIn.level(),
-                blockrendererdispatcher.getBlockModel(entityIn.renderBlockState),
-                entityIn.renderBlockState, blockpos, matrixStackIn,
-                vertexconsumer,
-                false,
-                RandomSource.create(),
-                entityIn.renderBlockState.getSeed(entityIn.getOrigin()),
-                OverlayTexture.NO_OVERLAY);
+        submitNodeCollector.submitMovingBlock(matrixStackIn, state.movingBlockRenderState, state.outlineColor);
 
         matrixStackIn.popPose();
-
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation(PaperBombEntity entity) {
-        return null;
+        super.submit(state, matrixStackIn, submitNodeCollector, cameraRenderState);
     }
 }

@@ -5,7 +5,6 @@ import com.sekwah.narutomod.damagesource.NarutoDamageSource;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -16,7 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -62,10 +61,12 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
 
     @Override
     public void explodeAndDiscard() {
-        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
-            serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0);
-            serverLevel.sendParticles(ParticleTypes.CLOUD, this.getX(), this.getY() + 0.5D, this.getZ(), 30, 0.8D, 0.8D, 0.8D, 0.1D);
-            serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2.5F, 1.2F);
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+            serverLevel.sendParticles(ParticleTypes.CLOUD, this.getX(), this.getY() + 0.5D, this.getZ(), 30, 0.8D, 0.8D, 0.8D, 0.1D,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+            serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 2.5F, 1.2F);
         }
         this.discard();
     }
@@ -76,22 +77,15 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_IMPACTED, false);
-        this.entityData.define(DATA_VORTEX_TICKS, 0);
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_IMPACTED, false);
+        builder.define(DATA_VORTEX_TICKS, 0);
     }
 
     public RasenshurikenEntity(EntityType<? extends AbstractHurtingProjectile> type, double x, double y, double z, double xVel, double yVel, double zVel, Level level) {
-        super(type, level);
-        this.moveTo(x, y, z, this.getYRot(), this.getXRot());
-        this.reapplyPosition();
-        double d0 = Math.sqrt(xVel * xVel + yVel * yVel + zVel * zVel);
-        if (d0 != 0.0D) {
-            this.xPower = xVel / d0 * 0.32D;
-            this.yPower = yVel / d0 * 0.32D;
-            this.zPower = zVel / d0 * 0.32D;
-        }
+        super(type, x, y, z, new Vec3(xVel, yVel, zVel), level);
+        this.accelerationPower = 0.32D;
     }
 
     public RasenshurikenEntity(LivingEntity shooter, double xVel, double yVel, double zVel) {
@@ -106,20 +100,17 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
             this.setDeltaMovement(Vec3.ZERO);
             this.time++;
             int vt = this.getVortexTicks() + 1;
-            if (!this.level().isClientSide) {
+            if (!this.level().isClientSide()) {
                 this.entityData.set(DATA_VORTEX_TICKS, vt);
             }
-            if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+            if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
                 Entity owner = this.getOwner();
                 double radius = 5.5D;
                 float baseDmg;
                 if (owner instanceof Player player) {
-                    baseDmg = player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA)
-                            .map(nd -> com.sekwah.narutomod.abilities.NarutoAbilities.RASENSHURIKEN.get().getDamage(nd))
-                            .orElse(com.sekwah.narutomod.abilities.NarutoAbilities.RASENSHURIKEN.get().getDamage());
-                    int mastery = player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA)
-                            .map(nd -> nd.getMastery(com.sekwah.narutomod.abilities.NarutoAbilities.RASENSHURIKEN.getId()))
-                            .orElse(0);
+                    var nd = player.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA);
+                    baseDmg = com.sekwah.narutomod.abilities.NarutoAbilities.RASENSHURIKEN.get().getDamage(nd);
+                    int mastery = nd.getMastery(com.sekwah.narutomod.abilities.NarutoAbilities.RASENSHURIKEN.getId());
                     int tier = com.sekwah.narutomod.abilities.Ability.getMasteryTier(mastery);
                     if (tier >= 5) radius = 7.0D;
                     else if (tier >= 3) radius = 6.2D;
@@ -134,8 +125,10 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
                     double px = this.getX() + Math.cos(angle) * r;
                     double pz = this.getZ() + Math.sin(angle) * r;
                     double py = this.getY() + (this.random.nextDouble() - 0.3) * 2.5;
-                    serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK, px, py, pz, 1, 0.1, 0.1, 0.1, 0.0);
-                    serverLevel.sendParticles(ParticleTypes.CLOUD, px, py, pz, 2, 0.15, 0.15, 0.15, 0.02);
+                    serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK, px, py, pz, 1, 0.1, 0.1, 0.1, 0.0,
+                            net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                    serverLevel.sendParticles(ParticleTypes.CLOUD, px, py, pz, 2, 0.15, 0.15, 0.15, 0.02,
+                            net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 }
 
                 // Multi-hit cellular wind blades & pull towards vortex center
@@ -164,24 +157,25 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
                             double factor = 0.35D / dist;
                             target.setDeltaMovement(dx * factor, 0.12, dz * factor);
                         }
-                        target.hurtMarked = true;
-                        target.invulnerableTime = 0;
-                        target.hurt(NarutoDamageSource.rasenshuriken(this, owner), baseDmg);
-                        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2));
+                        target.needsSync = true;
+                        target.setInvulnerableTime(0);
+                        target.hurtServer(serverLevel, NarutoDamageSource.rasenshuriken(this, owner), baseDmg);
+                        target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 2));
                     }
                     serverLevel.playSound(null, this.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.4f, 1.6f);
                 }
 
                 if (vt >= 28) {
-                    serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0);
-                    serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2.5f, 1.2f);
+                    serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0,
+                            net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                    serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 2.5f, 1.2f);
                     this.discard();
                 }
             }
             return;
         }
 
-        if (!this.level().isClientSide && !this.isImpacted()) {
+        if (!this.level().isClientSide() && !this.isImpacted()) {
             Vec3 start = this.position();
             Vec3 delta = this.getDeltaMovement();
             Vec3 end = start.add(delta);
@@ -195,7 +189,7 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
             if (entityHit != null) {
                 hitResult = entityHit;
             }
-            if (hitResult.getType() != HitResult.Type.MISS && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, hitResult)) {
+            if (hitResult.getType() != HitResult.Type.MISS && !net.neoforged.neoforge.event.EventHooks.onProjectileImpact(this, hitResult)) {
                 this.onHit(hitResult);
                 return;
             }
@@ -204,7 +198,7 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
         super.tick();
         ++this.time;
 
-        if (!this.level().isClientSide && !this.isImpacted() && this.isAlive()) {
+        if (!this.level().isClientSide() && !this.isImpacted() && this.isAlive()) {
             AABB clashBox = this.getBoundingBox().inflate(0.4D);
             List<Entity> others = this.level().getEntities(this, clashBox,
                     e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
@@ -218,10 +212,12 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
             }
         }
 
-        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
             if (this.time % 2 == 0) {
-                serverLevel.sendParticles(ParticleTypes.CLOUD, this.getX(), this.getY() + 0.3, this.getZ(), 3, 0.4, 0.1, 0.4, 0.02);
-                serverLevel.sendParticles(ParticleTypes.END_ROD, this.getX(), this.getY() + 0.3, this.getZ(), 2, 0.3, 0.1, 0.3, 0.01);
+                serverLevel.sendParticles(ParticleTypes.CLOUD, this.getX(), this.getY() + 0.3, this.getZ(), 3, 0.4, 0.1, 0.4, 0.02,
+                        net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                serverLevel.sendParticles(ParticleTypes.END_ROD, this.getX(), this.getY() + 0.3, this.getZ(), 2, 0.3, 0.1, 0.3, 0.01,
+                        net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             }
             if (this.time % 5 == 0) {
                 serverLevel.playSound(null, this.blockPosition(), SoundEvents.ELYTRA_FLYING, SoundSource.PLAYERS, 0.6f, 1.8f);
@@ -245,8 +241,8 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
             this.entityData.set(DATA_IMPACTED, true);
             this.entityData.set(DATA_VORTEX_TICKS, 0);
             this.setDeltaMovement(Vec3.ZERO);
-            if (!this.level().isClientSide) {
-                this.playSound(SoundEvents.TRIDENT_THUNDER, 2.0f, 1.5f);
+            if (!this.level().isClientSide()) {
+                this.playSound(SoundEvents.TRIDENT_THUNDER.value(), 2.0f, 1.5f);
             }
         }
     }
@@ -260,7 +256,7 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         return false;
     }
 
@@ -277,19 +273,5 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
     @Override
     protected boolean shouldBurn() {
         return false;
-    }
-
-    @Override
-    public void recreateFromPacket(ClientboundAddEntityPacket packet) {
-        super.recreateFromPacket(packet);
-        double d0 = packet.getXa();
-        double d1 = packet.getYa();
-        double d2 = packet.getZa();
-        double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
-        if (d3 != 0.0D) {
-            this.xPower = d0 / d3 * 0.32D;
-            this.yPower = d1 / d3 * 0.32D;
-            this.zPower = d2 / d3 * 0.32D;
-        }
     }
 }

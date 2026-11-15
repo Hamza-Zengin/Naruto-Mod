@@ -3,7 +3,7 @@ package com.sekwah.narutomod.capabilities;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,7 +146,7 @@ public enum NinjaRank {
 
     public static boolean hasMasteredAdvancedJutsu(INinjaData data, int minMastery) {
         if (data == null || data.getJutsuMasteryMap() == null) return false;
-        for (Map.Entry<ResourceLocation, Integer> entry : data.getJutsuMasteryMap().entrySet()) {
+        for (Map.Entry<Identifier, Integer> entry : data.getJutsuMasteryMap().entrySet()) {
             if (entry.getValue() != null && entry.getValue() >= minMastery && isAdvancedJutsu(entry.getKey())) {
                 return true;
             }
@@ -154,7 +154,7 @@ public enum NinjaRank {
         return false;
     }
 
-    public static boolean isAdvancedJutsu(ResourceLocation id) {
+    public static boolean isAdvancedJutsu(Identifier id) {
         if (id == null) return false;
         if (NinjaData.isScrollRequiredJutsu(id)) return true;
         String path = id.getPath();

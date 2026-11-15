@@ -40,8 +40,8 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
     }
 
     @Override
-    public List<net.minecraft.resources.ResourceLocation> getPrerequisites() {
-        return List.of(new net.minecraft.resources.ResourceLocation(com.sekwah.narutomod.NarutoMod.MOD_ID, "sharingan"));
+    public List<net.minecraft.resources.Identifier> getPrerequisites() {
+        return List.of(net.minecraft.resources.Identifier.fromNamespaceAndPath(com.sekwah.narutomod.NarutoMod.MOD_ID, "sharingan"));
     }
 
     @Override
@@ -54,15 +54,15 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
         if (ninjaData == null) return false;
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
             if (player != null) {
-                player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
-                        Component.literal("Uchiha").withStyle(ChatFormatting.RED)), true);
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
+                        Component.literal("Uchiha").withStyle(ChatFormatting.RED)));
             }
             return false;
         }
         if (!SharinganAbility.hasMangekyou(ninjaData)) {
             if (player != null) {
-                player.displayClientMessage(Component.translatable("jutsu.susanoo.requires_mangekyou")
-                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), true);
+                player.sendOverlayMessage(Component.translatable("jutsu.susanoo.requires_mangekyou")
+                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
             }
             return false;
         }
@@ -96,7 +96,7 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         // Godlike Defense: Resistance IV (80% damage reduction) + Fire immunity
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 3, false, false, true));
+        player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 3, false, false, true));
         player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 40, 0, false, false, false));
 
         int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
@@ -110,7 +110,7 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
             boolean isMoving = player.getDeltaMovement().horizontalDistanceSqr() > 0.001;
             boolean inCombat = player.getLastHurtByMob() != null && (player.tickCount - player.getLastHurtByMobTimestamp() < 100);
             if (isMoving || inCombat) {
-                net.minecraft.resources.ResourceLocation reg = this.getRegistryName();
+                net.minecraft.resources.Identifier reg = this.getRegistryName();
                 if (reg != null) {
                     ninjaData.addMastery(reg, 1);
                 }
@@ -130,7 +130,8 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
                     player.getX() + (player.getRandom().nextDouble() - 0.5) * 1.5,
                     player.getY() + 0.15,
                     player.getZ() + (player.getRandom().nextDouble() - 0.5) * 1.5,
-                    1, 0, 0.02, 0, 0.01);
+                    1, 0, 0.02, 0, 0.01,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
             // Repulsion shockwave aura: violently push back foes and deal scaled damage
             AABB auraBox = player.getBoundingBox().inflate(3.0);
@@ -140,7 +141,7 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
             for (LivingEntity enemy : enemies) {
                 Vec3 push = enemy.position().subtract(player.position()).normalize().scale(1.2);
                 enemy.push(push.x, 0.45, push.z);
-                enemy.hurt(serverLevel.damageSources().playerAttack(player), damage);
+                enemy.hurtServer(serverLevel, serverLevel.damageSources().playerAttack(player), damage);
             }
         }
     }
@@ -152,14 +153,14 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
     @Override
     public void handleAbilityEnded(Player player, INinjaData ninjaData, int ticksActive) {
         if (!player.level().isClientSide()) {
-            player.removeEffect(MobEffects.DAMAGE_RESISTANCE);
-            player.level().playSound(null, player.blockPosition(), SoundEvents.SHIELD_BREAK, SoundSource.PLAYERS, 1.2f, 0.8f);
+            player.removeEffect(MobEffects.RESISTANCE);
+            player.level().playSound(null, player.blockPosition(), SoundEvents.SHIELD_BREAK.value(), SoundSource.PLAYERS, 1.2f, 0.8f);
 
             // Mangekyo ocular exhaustion if drained to empty
             if (ninjaData.getChakra() <= 2.0f) {
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 1));
+                player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 80, 1));
                 player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 80, 0));
-                player.displayClientMessage(Component.translatable("jutsu.susanoo.exhaustion").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), true);
+                player.sendOverlayMessage(Component.translatable("jutsu.susanoo.exhaustion").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
             }
         }
     }

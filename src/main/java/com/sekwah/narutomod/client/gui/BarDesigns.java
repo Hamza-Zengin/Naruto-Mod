@@ -1,17 +1,17 @@
 package com.sekwah.narutomod.client.gui;
 
 import com.sekwah.narutomod.NarutoMod;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class BarDesigns {
-    private static final ResourceLocation DEFAULTTEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/gui/chakrabars/defaultbar.png");
-    private static final ResourceLocation KATANATEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/gui/chakrabars/katana.png");
-    private static final ResourceLocation KUBITEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/gui/chakrabars/kubi.png");
-    private static final ResourceLocation KUNAITEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/gui/chakrabars/kunai.png");
-    private static final ResourceLocation LAMPSHADETEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/gui/chakrabars/lampshade.png");
-    private static final ResourceLocation SCEPTERTEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/gui/chakrabars/scepter.png");
-    private static final ResourceLocation SCROLLTEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/gui/chakrabars/scroll.png");
-    private static final ResourceLocation UNNAMEDTEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/gui/chakrabars/unnamedbar.png");
+    private static final Identifier DEFAULTTEXTURE = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/gui/chakrabars/defaultbar.png");
+    private static final Identifier KATANATEXTURE = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/gui/chakrabars/katana.png");
+    private static final Identifier KUBITEXTURE = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/gui/chakrabars/kubi.png");
+    private static final Identifier KUNAITEXTURE = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/gui/chakrabars/kunai.png");
+    private static final Identifier LAMPSHADETEXTURE = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/gui/chakrabars/lampshade.png");
+    private static final Identifier SCEPTERTEXTURE = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/gui/chakrabars/scepter.png");
+    private static final Identifier SCROLLTEXTURE = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/gui/chakrabars/scroll.png");
+    private static final Identifier UNNAMEDTEXTURE = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/gui/chakrabars/unnamedbar.png");
 
     public enum BarInfo {
 
@@ -32,11 +32,11 @@ public class BarDesigns {
         UNNAMED(UNNAMEDTEXTURE, 74,23),
         ;
 
-        public final ResourceLocation texture;
+        public final Identifier texture;
         public final int width;
         public final int offset;
 
-        BarInfo(ResourceLocation texture, int width, int offset) {
+        BarInfo(Identifier texture, int width, int offset) {
 
             this.texture = texture;
             this.width = width;

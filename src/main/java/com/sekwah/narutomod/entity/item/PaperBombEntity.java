@@ -8,23 +8,22 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraftforge.network.NetworkHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import javax.annotation.Nullable;
 import static com.sekwah.narutomod.block.NarutoBlockStates.HIDDEN;
@@ -70,11 +69,11 @@ public class PaperBombEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_FUSE_ID, 80);
-        this.entityData.define(ROTATION, Direction.NORTH);
-        this.entityData.define(VERT_ROT, AttachFace.FLOOR);
-        this.entityData.define(ORIGIN, BlockPos.ZERO);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_FUSE_ID, 80);
+        builder.define(ROTATION, Direction.NORTH);
+        builder.define(VERT_ROT, AttachFace.FLOOR);
+        builder.define(ORIGIN, BlockPos.ZERO);
     }
 
     public void setOrigin(BlockPos origin) {
@@ -116,14 +115,14 @@ public class PaperBombEntity extends Entity {
         --this.life;
         if (this.life <= 0) {
             this.discard();
-            if (!this.level().isClientSide) {
+            if (!this.level().isClientSide()) {
                 this.explode();
             }
         } else {
-            this.updateInWaterStateAndDoFluidPushing();
-            if (this.level().isClientSide) {
+            this.updateFluidInteraction();
+            if (this.level().isClientSide()) {
                 if(this.random.nextFloat() < 0.3f) {
-                    Vec3i dir = this.renderBlockState.getValue(BlockStateProperties.HORIZONTAL_FACING).getNormal();
+                    Vec3i dir = this.renderBlockState.getValue(BlockStateProperties.HORIZONTAL_FACING).getUnitVec3i();
 
                     float yOffset = 0;
                     float dirMulti = 0.25f;
@@ -150,7 +149,7 @@ public class PaperBombEntity extends Entity {
             }
         }
 
-        if(!this.level().isClientSide) {
+        if(!this.level().isClientSide()) {
             if(anchorLoc != null) {
                 if (this.isAnchoredBlockAir()) {
                     this.setAnchored(false);
@@ -178,12 +177,12 @@ public class PaperBombEntity extends Entity {
         this.setNoGravity(anchored);
     }
 
-
+    @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
         if (DATA_FUSE_ID.equals(key)) {
             this.life = this.getFuse();
         }
-        else if((ROTATION.equals(key) || VERT_ROT.equals(key)) && this.level().isClientSide) {
+        else if((ROTATION.equals(key) || VERT_ROT.equals(key)) && this.level().isClientSide()) {
             this.renderBlockState = NarutoBlocks.PAPER_BOMB.get().defaultBlockState()
                     .setValue(HorizontalDirectionalBlock.FACING, this.getRotation())
                     .setValue(HIDDEN, Boolean.FALSE)
@@ -201,8 +200,13 @@ public class PaperBombEntity extends Entity {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
-        tag.putShort("Fuse", (short)this.getLife());
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return false;
+    }
+
+    @Override
+    protected void addAdditionalSaveData(ValueOutput output) {
+        output.putShort("Fuse", (short)this.getLife());
     }
 
     public int getLife() {
@@ -210,18 +214,13 @@ public class PaperBombEntity extends Entity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
-        this.setFuse(tag.getShort("Fuse"));
+    protected void readAdditionalSaveData(ValueInput input) {
+        this.setFuse(input.getShortOr("Fuse", (short) 80));
     }
 
     protected void explode() {
         this.level().explode(this, this.getX(), this.getY(0.0625D), this.getZ(),
                 NarutoConfig.paperbombExplosionRadius,
                 NarutoConfig.paperbombBlockDamage ? Level.ExplosionInteraction.BLOCK : Level.ExplosionInteraction.NONE);
-    }
-
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

@@ -1,28 +1,25 @@
 package com.sekwah.narutomod.client.model.jutsu;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 /**
  * 3D Model for Katon: Gōkakyū no Jutsu (Great Fireball)
  * Features an incandescent white-gold inner core, a roiling crimson-orange outer sphere,
  * and counter-rotating 3D solar-flare corona rings.
  */
-public class FireballJutsuModel extends Model {
+public class FireballJutsuModel extends Model<EntityRenderState> {
 
-    private final ModelPart root;
     private final ModelPart innerCore;
     private final ModelPart outerSphere;
     private final ModelPart flameCorona;
 
     public FireballJutsuModel(ModelPart modelPart) {
-        super(RenderType::entityTranslucent);
-        this.root = modelPart;
+        super(modelPart, RenderTypes::entityTranslucent);
         this.innerCore = modelPart.getChild("inner_core");
         this.outerSphere = modelPart.getChild("outer_sphere");
         this.flameCorona = modelPart.getChild("flame_corona");
@@ -70,6 +67,12 @@ public class FireballJutsuModel extends Model {
         return LayerDefinition.create(mesh, 128, 128);
     }
 
+    @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
+        setAnimationAngles(state.ageInTicks);
+    }
+
     public void setAnimationAngles(float ageInTicks) {
         this.innerCore.yRot = ageInTicks * 0.35F;
         this.innerCore.xRot = ageInTicks * 0.25F;
@@ -77,16 +80,6 @@ public class FireballJutsuModel extends Model {
         this.outerSphere.zRot = ageInTicks * 0.18F;
         this.flameCorona.yRot = ageInTicks * 0.48F;
         this.flameCorona.xRot = -ageInTicks * 0.32F;
-    }
-
-    @Override
-    public void renderToBuffer(PoseStack matrixStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay,
-                               float r, float g, float b, float a) {
-        matrixStack.pushPose();
-        float scale = 1.65F;
-        matrixStack.scale(scale, scale, scale);
-        this.root.render(matrixStack, vertexConsumer, packedLight, packedOverlay, r, g, b, a);
-        matrixStack.popPose();
     }
 }
 

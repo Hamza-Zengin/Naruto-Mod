@@ -54,21 +54,22 @@ public class ChakraChargeAbility extends Ability implements Ability.Channeled {
            // Meditation: If crouching quietly, focus chakra pathways and train chakra control
            if (player.isCrouching()) {
                ninjaData.addChakraExp(0.10f);
-               if (ticksChanneled % 10 == 0 && player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                   serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.ENCHANT,
-                           player.getX(), player.getY() + 0.5, player.getZ(),
-                           3, 0.3, 0.3, 0.3, 0.05);
-               }
-           }
-       }
+                if (ticksChanneled % 10 == 0 && player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                    serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.ENCHANT,
+                            player.getX(), player.getY() + 0.5, player.getZ(),
+                            3, 0.3, 0.3, 0.3, 0.05,
+                            net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                }
+            }
+        }
 
-       // Periodic mastery gain when actively restoring chakra
-       if (wasBelowMax && ticksChanneled > 0 && ticksChanneled % 60 == 0) {
-           net.minecraft.resources.ResourceLocation reg = this.getRegistryName();
-           if (reg != null) {
-               ninjaData.addMastery(reg, 1);
-           }
-       }
+        // Periodic mastery gain when actively restoring chakra
+        if (wasBelowMax && ticksChanneled > 0 && ticksChanneled % 60 == 0) {
+            net.minecraft.resources.Identifier reg = this.getRegistryName();
+            if (reg != null) {
+                ninjaData.addMastery(reg, 1);
+            }
+        }
     }
 
     @Override

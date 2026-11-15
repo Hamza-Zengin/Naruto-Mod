@@ -1,97 +1,116 @@
 package com.sekwah.narutomod.datagen;
 
 import com.sekwah.narutomod.NarutoMod;
+import com.sekwah.narutomod.block.NarutoBlocks;
+import com.sekwah.narutomod.item.NarutoItems;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.model.ItemModelUtils;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.data.models.model.TextureMapping;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
-public class NarutoItemModelProvider extends ItemModelProvider {
+import java.util.stream.Stream;
 
-    public NarutoItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
-        super(output, NarutoMod.MOD_ID, existingFileHelper);
+public class NarutoItemModelProvider extends ModelProvider {
+
+    public NarutoItemModelProvider(PackOutput output) {
+        super(output, NarutoMod.MOD_ID);
     }
 
     @Override
-    protected void registerModels() {
+    protected Stream<? extends Holder<Block>> getKnownBlocks() {
+        return Stream.empty();
+    }
+
+    @Override
+    protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
         // --- Jutsu Scrolls ---
-        simpleItemWithTexture("scroll_rasengan", "item/scrolls/scroll_rasengan");
-        simpleItemWithTexture("scroll_chidori", "item/scrolls/scroll_chidori");
-        simpleItemWithTexture("scroll_shadow_clone", "item/scrolls/scroll_shadow_clone");
-        simpleItemWithTexture("scroll_kirin", "item/scrolls/scroll_kirin");
-        simpleItemWithTexture("scroll_eight_gates", "item/scrolls/scroll_eight_gates");
-        simpleItemWithTexture("scroll_rasenshuriken", "item/scrolls/scroll_rasenshuriken");
-        simpleItemWithTexture("jutsu_scroll", "item/scrolls/scroll_rasengan");
+        simpleItemWithTexture(itemModels, NarutoItems.SCROLL_RASENGAN.get(), "item/scrolls/scroll_rasengan");
+        simpleItemWithTexture(itemModels, NarutoItems.SCROLL_CHIDORI.get(), "item/scrolls/scroll_chidori");
+        simpleItemWithTexture(itemModels, NarutoItems.SCROLL_SHADOW_CLONE.get(), "item/scrolls/scroll_shadow_clone");
+        simpleItemWithTexture(itemModels, NarutoItems.SCROLL_KIRIN.get(), "item/scrolls/scroll_kirin");
+        simpleItemWithTexture(itemModels, NarutoItems.SCROLL_EIGHT_GATES.get(), "item/scrolls/scroll_eight_gates");
+        simpleItemWithTexture(itemModels, NarutoItems.SCROLL_RASENSHURIKEN.get(), "item/scrolls/scroll_rasenshuriken");
 
         // --- Basic Items & Weapons (2D items) ---
-        simpleItemWithTexture("chakra_metal", "item/weapons/chakra_metal");
-        simpleItemWithTexture("ichiraku_ramen", "item/weapons/ichiraku_ramen");
-        simpleItemWithTexture("military_rations_pill", "item/weapons/military_rations_pill");
-        simpleItemWithTexture("smoke_bomb", "item/weapons/smoke_bomb");
-        simpleItemWithTexture("paper_bomb", "item/weapons/paperbomb");
-        simpleItemWithTexture("lonely_march", "item/lonely_march");
+        simpleItemWithTexture(itemModels, NarutoItems.CHAKRA_METAL.get(), "item/weapons/chakra_metal");
+        simpleItemWithTexture(itemModels, NarutoItems.ICHIRAKU_RAMEN.get(), "item/weapons/ichiraku_ramen");
+        simpleItemWithTexture(itemModels, NarutoItems.MILITARY_RATIONS_PILL.get(), "item/weapons/military_rations_pill");
+        simpleItemWithTexture(itemModels, NarutoItems.SMOKE_BOMB.get(), "item/weapons/smoke_bomb");
+        simpleItemWithTexture(itemModels, NarutoBlocks.ITEM_PAPER_BOMB.get(), "item/weapons/paperbomb");
+        simpleItemWithTexture(itemModels, NarutoItems.LONELY_MARCH.get(), "item/lonely_march");
 
         // --- Armor & Masks ---
-        simpleItemWithTexture("chunin_vest", "item/armor/chunin_vest");
-        simpleItemWithTexture("anbu_armor", "item/armor/anbu_armor");
-        simpleItemWithTexture("akatsuki_cloak", "item/armor/akatsuki_cloak");
-        simpleItemWithTexture("red_anbu_mask", "item/armor/red_anbu_mask");
-        simpleItemWithTexture("yellow_anbu_mask", "item/armor/yellow_anbu_mask");
-        simpleItemWithTexture("green_anbu_mask", "item/armor/green_anbu_mask");
-        simpleItemWithTexture("blue_anbu_mask", "item/armor/blue_anbu_mask");
-        simpleItemWithTexture("mist_anbu_mask", "item/armor/mist_anbu_mask");
+        simpleItemWithTexture(itemModels, NarutoItems.CHUNIN_VEST.get(), "item/armor/chunin_vest");
+        simpleItemWithTexture(itemModels, NarutoItems.ANBU_ARMOR.get(), "item/armor/anbu_armor");
+        simpleItemWithTexture(itemModels, NarutoItems.AKATSUKI_CLOAK.get(), "item/armor/akatsuki_cloak");
+        simpleItemWithTexture(itemModels, NarutoItems.RED_ANBU_MASK.get(), "item/armor/red_anbu_mask");
+        simpleItemWithTexture(itemModels, NarutoItems.YELLOW_ANBU_MASK.get(), "item/armor/yellow_anbu_mask");
+        simpleItemWithTexture(itemModels, NarutoItems.GREEN_ANBU_MASK.get(), "item/armor/green_anbu_mask");
+        simpleItemWithTexture(itemModels, NarutoItems.BLUE_ANBU_MASK.get(), "item/armor/blue_anbu_mask");
+        simpleItemWithTexture(itemModels, NarutoItems.MIST_ANBU_MASK.get(), "item/armor/mist_anbu_mask");
 
         // --- Spawn Eggs ---
-        withExistingParent("rogue_ninja_spawn_egg", mcLoc("item/template_spawn_egg"));
-        withExistingParent("akatsuki_ninja_spawn_egg", mcLoc("item/template_spawn_egg"));
+        Identifier spawnEggTemplate = Identifier.withDefaultNamespace("item/template_spawn_egg");
+        itemModels.itemModelOutput.accept(NarutoItems.ROGUE_NINJA_SPAWN_EGG.get(), ItemModelUtils.plainModel(spawnEggTemplate));
+        itemModels.itemModelOutput.accept(NarutoItems.AKATSUKI_NINJA_SPAWN_EGG.get(), ItemModelUtils.plainModel(spawnEggTemplate));
 
         // --- Block Items ---
-        withExistingParent("bonsai_tree", modLoc("block/bonsai_tree"));
+        itemModels.itemModelOutput.accept(NarutoBlocks.ITEM_BONSAI_TREE.get(),
+                ItemModelUtils.plainModel(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/bonsai_tree")));
 
         // --- Headbands (Blank / Custom) ---
-        simpleItemWithTexture("headband_black", "item/armor/headbands/headband_black_blank");
-        simpleItemWithTexture("headband_blue", "item/armor/headbands/headband_blue_blank");
-        simpleItemWithTexture("headband_red", "item/armor/headbands/headband_red_blank");
-        simpleItemWithTexture("headband_custard", "item/armor/headbands/headband_custard");
-        simpleItemWithTexture("headband_lava", "item/armor/headbands/headband_lava");
-        simpleItemWithTexture("headband_pride", "item/armor/headbands/headband_rainbow");
-        simpleItemWithTexture("headband_youtube", "item/armor/headbands/headband_youtube");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_BLACK.get(), "item/armor/headbands/headband_black_blank");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_BLUE.get(), "item/armor/headbands/headband_blue_blank");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_RED.get(), "item/armor/headbands/headband_red_blank");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_CUSTARD.get(), "item/armor/headbands/headband_custard");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_LAVA.get(), "item/armor/headbands/headband_lava");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_PRIDE.get(), "item/armor/headbands/headband_rainbow");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_YOUTUBE.get(), "item/armor/headbands/headband_youtube");
 
         // --- Headbands (Villages) ---
-        simpleItemWithTexture("headband_leaf", "item/armor/headbands/headband_blue");
-        simpleItemWithTexture("headband_leaf_black", "item/armor/headbands/headband_black");
-        simpleItemWithTexture("headband_rock", "item/armor/headbands/headband_rock");
-        simpleItemWithTexture("headband_sound", "item/armor/headbands/headband_sound");
-        simpleItemWithTexture("headband_sand", "item/armor/headbands/headband_black_rev");
-        simpleItemWithTexture("headband_cloud", "item/armor/headbands/headband_black_block");
-        simpleItemWithTexture("headband_grass", "item/armor/headbands/headband_black_block");
-        simpleItemWithTexture("headband_mist", "item/armor/headbands/headband_black_block");
-        simpleItemWithTexture("headband_rain", "item/armor/headbands/headband_black_block");
-        simpleItemWithTexture("headband_waterfall", "item/armor/headbands/headband_black_block");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_LEAF.get(), "item/armor/headbands/headband_blue");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_LEAF_BLACK.get(), "item/armor/headbands/headband_black");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_ROCK.get(), "item/armor/headbands/headband_rock");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_SOUND.get(), "item/armor/headbands/headband_sound");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_SAND.get(), "item/armor/headbands/headband_black_rev");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_CLOUD.get(), "item/armor/headbands/headband_black_block");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_GRASS.get(), "item/armor/headbands/headband_black_block");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_MIST.get(), "item/armor/headbands/headband_black_block");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_RAIN.get(), "item/armor/headbands/headband_black_block");
+        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_WATERFALL.get(), "item/armor/headbands/headband_black_block");
 
         // --- Headbands (Scratched Variants) ---
-        scratchedHeadband("headband_leaf_scratched", "headband_leaf");
-        scratchedHeadband("headband_leaf_black_scratched", "headband_leaf_black");
-        scratchedHeadband("headband_rock_scratched", "headband_rock");
-        scratchedHeadband("headband_sand_scratched", "headband_sand");
-        scratchedHeadband("headband_sound_scratched", "headband_sound");
-        scratchedHeadband("headband_mist_scratched", "headband_mist");
-        scratchedHeadband("headband_waterfall_scratched", "headband_waterfall");
-        scratchedHeadband("headband_cloud_scratched", "headband_cloud");
-        scratchedHeadband("headband_rain_scratched", "headband_rain");
-        scratchedHeadband("headband_grass_scratched", "headband_grass");
-
-        // NOTE: Hand-crafted 3D weapon models using forge:separate_transforms are intentionally
-        // preserved in src/main/resources/assets/narutomod/models/item/ and NOT generated here:
-        // - kunai, senbon, explosive_kunai, shuriken, fuma_shuriken, kusanagi_sword, samehada, bone_sword
+        scratchedHeadband(itemModels, NarutoItems.HEADBAND_LEAF_SCRATCHED.get(), NarutoItems.HEADBAND_LEAF.get());
+        scratchedHeadband(itemModels, NarutoItems.HEADBAND_LEAF_BLACK_SCRATCHED.get(), NarutoItems.HEADBAND_LEAF_BLACK.get());
+        scratchedHeadband(itemModels, NarutoItems.HEADBAND_ROCK_SCRATCHED.get(), NarutoItems.HEADBAND_ROCK.get());
+        scratchedHeadband(itemModels, NarutoItems.HEADBAND_SAND_SCRATCHED.get(), NarutoItems.HEADBAND_SAND.get());
+        scratchedHeadband(itemModels, NarutoItems.HEADBAND_SOUND_SCRATCHED.get(), NarutoItems.HEADBAND_SOUND.get());
+        scratchedHeadband(itemModels, NarutoItems.HEADBAND_MIST_SCRATCHED.get(), NarutoItems.HEADBAND_MIST.get());
+        scratchedHeadband(itemModels, NarutoItems.HEADBAND_WATERFALL_SCRATCHED.get(), NarutoItems.HEADBAND_WATERFALL.get());
+        scratchedHeadband(itemModels, NarutoItems.HEADBAND_CLOUD_SCRATCHED.get(), NarutoItems.HEADBAND_CLOUD.get());
+        scratchedHeadband(itemModels, NarutoItems.HEADBAND_RAIN_SCRATCHED.get(), NarutoItems.HEADBAND_RAIN.get());
+        scratchedHeadband(itemModels, NarutoItems.HEADBAND_GRASS_SCRATCHED.get(), NarutoItems.HEADBAND_GRASS.get());
     }
 
-    private ItemModelBuilder simpleItemWithTexture(String name, String texturePath) {
-        return withExistingParent(name, mcLoc("item/generated"))
-                .texture("layer0", modLoc(texturePath));
+    private void simpleItemWithTexture(ItemModelGenerators itemModels, Item item, String texturePath) {
+        Identifier modelId = ModelTemplates.FLAT_ITEM.create(
+                ModelLocationUtils.getModelLocation(item),
+                TextureMapping.layer0(new Material(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, texturePath))),
+                itemModels.modelOutput
+        );
+        itemModels.itemModelOutput.accept(item, ItemModelUtils.plainModel(modelId));
     }
 
-    private ItemModelBuilder scratchedHeadband(String name, String baseModelName) {
-        return withExistingParent(name, modLoc("item/" + baseModelName));
+    private void scratchedHeadband(ItemModelGenerators itemModels, Item item, Item baseItem) {
+        itemModels.itemModelOutput.accept(item, ItemModelUtils.plainModel(ModelLocationUtils.getModelLocation(baseItem)));
     }
 }

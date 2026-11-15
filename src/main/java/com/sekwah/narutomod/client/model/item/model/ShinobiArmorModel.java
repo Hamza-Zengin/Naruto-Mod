@@ -5,7 +5,7 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 
 /**
  * High-Detail 3D Armor Models with 100% Non-Overlapping 64x64 UV Islands:
@@ -13,7 +13,7 @@ import net.minecraft.world.entity.LivingEntity;
  * 2. ANBU Black Ops Battle Armor (Raised 3D chestplate, segmented waist tassets, forearm bracers, 3-part 3D Tanto on back)
  * 3. Akatsuki Cloak (High crimson-lined collar, pleated torso & flaring lower coat skirt, wide kimono sleeves)
  */
-public class ShinobiArmorModel<T extends LivingEntity> extends HumanoidModel<T> {
+public class ShinobiArmorModel extends HumanoidModel<HumanoidRenderState> {
 
     public ShinobiArmorModel(ModelPart root) {
         super(root);

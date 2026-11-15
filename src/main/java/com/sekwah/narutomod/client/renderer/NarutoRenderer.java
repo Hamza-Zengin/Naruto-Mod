@@ -3,43 +3,30 @@ package com.sekwah.narutomod.client.renderer;
 import com.sekwah.narutomod.client.model.item.model.AnbuMaskModel;
 import com.sekwah.narutomod.client.model.item.model.HeadbandModel;
 import com.sekwah.narutomod.client.model.item.model.ShinobiArmorModel;
-import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.MudWallRenderer;
-import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.WaterBulletRenderer;
-import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.WoodPrisonRenderer;
-import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.item.armor.NarutoArmorItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.RegistryObject;
 
-public class NarutoRenderer extends BlockEntityWithoutLevelRenderer {
+import java.util.function.Supplier;
 
-    public NarutoRenderer() {
-        super(null, null);
-    }
+public class NarutoRenderer implements ResourceManagerReloadListener {
 
-    public static void registerEntityRenderers() {
-        EntityRenderers.register(NarutoEntities.WATER_BULLET.get(), WaterBulletRenderer::new);
-        EntityRenderers.register(NarutoEntities.MUD_WALL.get(), MudWallRenderer::new);
-        EntityRenderers.register(NarutoEntities.WOOD_PRISON.get(), WoodPrisonRenderer::new);
-    }
-
+    @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {
         EntityModelSet modelSet = Minecraft.getInstance().getEntityModels();
 
         ((NarutoArmorItem) NarutoItems.CHUNIN_VEST.get())
-                .setArmorModel(new ShinobiArmorModel<>(modelSet.bakeLayer(NarutoRenderEvents.CHUNIN_VEST_LAYER)))
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.CHUNIN_VEST_LAYER)))
                 .setArmorTexture("textures/models/armor/chunin_vest.png");
         ((NarutoArmorItem) NarutoItems.ANBU_ARMOR.get())
-                .setArmorModel(new ShinobiArmorModel<>(modelSet.bakeLayer(NarutoRenderEvents.ANBU_ARMOR_LAYER)))
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.ANBU_ARMOR_LAYER)))
                 .setArmorTexture("textures/models/armor/anbu_armor.png");
         ((NarutoArmorItem) NarutoItems.AKATSUKI_CLOAK.get())
-                .setArmorModel(new ShinobiArmorModel<>(modelSet.bakeLayer(NarutoRenderEvents.AKATSUKI_CLOAK_LAYER)))
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.AKATSUKI_CLOAK_LAYER)))
                 .setArmorTexture("textures/models/armor/akatsuki_cloak.png");
 
         ((NarutoArmorItem) NarutoItems.RED_ANBU_MASK.get())
@@ -90,7 +77,7 @@ public class NarutoRenderer extends BlockEntityWithoutLevelRenderer {
         FirstPersonWorldRenderer.resetModels();
     }
 
-    private void setHeadbandRenderer(EntityModelSet modelSet, RegistryObject<Item> item, String texture) {
+    private void setHeadbandRenderer(EntityModelSet modelSet, Supplier<? extends Item> item, String texture) {
         ((NarutoArmorItem) item.get())
                 .setArmorModel(new HeadbandModel(modelSet.bakeLayer(NarutoRenderEvents.HEADBAND_LAYER)))
                 .setArmorTexture(texture);

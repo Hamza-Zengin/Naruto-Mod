@@ -4,17 +4,13 @@ import com.sekwah.narutomod.config.NarutoConfig;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.sounds.NarutoSounds;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraftforge.network.NetworkHooks;
 
 public class ExplosiveKunaiEntity extends KunaiEntity {
 
@@ -23,13 +19,13 @@ public class ExplosiveKunaiEntity extends KunaiEntity {
     }
 
     public ExplosiveKunaiEntity(Level worldIn, LivingEntity shooter) {
-        super(NarutoEntities.EXPLOSIVE_KUNAI.get(), shooter, worldIn);
+        super(NarutoEntities.EXPLOSIVE_KUNAI.get(), shooter, worldIn, new ItemStack(NarutoItems.EXPLOSIVE_KUNAI.get()));
     }
 
     @Override
     public void tick() {
         super.tick();
-        if(!this.level().isClientSide && this.inGroundTime >= 10) {
+        if(!this.level().isClientSide() && this.inGroundTime >= 10) {
             explodeKunai(this);
             this.discard();
         }
@@ -39,7 +35,7 @@ public class ExplosiveKunaiEntity extends KunaiEntity {
     protected void onHitEntity(EntityHitResult rayTraceResult) {
         super.onHitEntity(rayTraceResult);
 
-        if(!this.level().isClientSide) {
+        if(!this.level().isClientSide()) {
             explodeKunai(this);
             this.discard();
         }
@@ -61,13 +57,7 @@ public class ExplosiveKunaiEntity extends KunaiEntity {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
-    }
-
-
-    @Override
-    protected ItemStack getPickupItem() {
+    protected ItemStack getDefaultPickupItem() {
         return new ItemStack(NarutoItems.EXPLOSIVE_KUNAI.get());
     }
 }

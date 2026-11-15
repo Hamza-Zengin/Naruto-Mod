@@ -8,7 +8,7 @@ import com.sekwah.narutomod.entity.jutsuprojectile.RasenshurikenEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -40,8 +40,8 @@ public class RasenshurikenAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public List<ResourceLocation> getPrerequisites() {
-        return List.of(new ResourceLocation(NarutoMod.MOD_ID, "rasengan"));
+    public List<Identifier> getPrerequisites() {
+        return List.of(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan"));
     }
 
     @Override
@@ -81,7 +81,8 @@ public class RasenshurikenAbility extends Ability implements Ability.Cooldown {
         Vec3 look = player.getLookAngle();
         serverLevel.playSound(null, player.blockPosition(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.4f, 1.7f);
         serverLevel.sendParticles(ParticleTypes.CLOUD, player.getX() + look.x, player.getEyeY(), player.getZ() + look.z,
-                12, 0.3, 0.2, 0.3, 0.05);
+                12, 0.3, 0.2, 0.3, 0.05,
+                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
         RasenshurikenEntity projectile = new RasenshurikenEntity(player, look.x, look.y, look.z);
         serverLevel.addFreshEntity(projectile);

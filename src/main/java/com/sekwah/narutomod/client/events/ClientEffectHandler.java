@@ -5,9 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 /**
  * Client-only handler for lightweight S2C jutsu particle and visual effects.
@@ -21,15 +21,12 @@ public class ClientEffectHandler {
             return;
         }
 
-        RandomSource rand = level.random;
+        RandomSource rand = level.getRandom();
         Vec3 pos = msg.position;
         Vec3 dir = msg.direction.lengthSqr() > 1e-6 ? msg.direction.normalize() : new Vec3(0, 1, 0);
         float scale = Math.max(0.1f, Math.min(msg.scale, 10.0f));
 
-        float r = ((msg.colorHex >> 16) & 0xFF) / 255.0f;
-        float g = ((msg.colorHex >> 8) & 0xFF) / 255.0f;
-        float b = (msg.colorHex & 0xFF) / 255.0f;
-        DustParticleOptions coloredDust = new DustParticleOptions(new Vector3f(r, g, b), Math.min(2.5f, scale));
+        DustParticleOptions coloredDust = new DustParticleOptions(ARGB.opaque(msg.colorHex), Math.min(2.5f, scale));
 
         String path = msg.effectId.getPath();
         if ("hakke_kusho".equals(path)) {

@@ -74,17 +74,18 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
         ninjaData.setActiveHandJutsu("chidori", holdTicks);
 
         // Give high-speed burst effect for the window
-        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, holdTicks, speedAmp, false, false, true));
+        player.addEffect(new MobEffectInstance(MobEffects.SPEED, holdTicks, speedAmp, false, false, true));
 
         // Electric spark burst on activation
         serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK,
                 player.getX(), player.getY() + 1.0, player.getZ(),
-                24, 0.45, 0.45, 0.45, 0.15);
+                24, 0.45, 0.45, 0.45, 0.15,
+                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
         // Sound effect: initial Chidori activation chirp and continuous lightning surge
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CHIDORI.get(), SoundSource.PLAYERS, 1.2f, 1.0f);
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CHIDORI_LOOP.get(), SoundSource.PLAYERS, 0.9f, 1.1f);
-        player.displayClientMessage(Component.translatable("jutsu.chidori.ready").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD), true);
+        player.sendOverlayMessage(Component.translatable("jutsu.chidori.ready").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
     }
 
     public static void executeStrike(Player player, INinjaData ninjaData, LivingEntity target) {
@@ -93,7 +94,7 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
         Vec3 look = player.getLookAngle();
         // High velocity forward thrust with client-side prediction and ground drag avoidance
         com.sekwah.sekclib.util.PlayerUtil.setVelocity(player, look.x * 2.4, 0.22, look.z * 2.4, true);
-        player.hurtMarked = true;
+        player.needsSync = true;
 
         Vec3 strikePos = target != null ? target.position().add(0, target.getBbHeight() * 0.5, 0)
                 : player.position().add(look.scale(2.2)).add(0, player.getEyeHeight() * 0.7, 0);
@@ -118,8 +119,10 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
 
         float strikeDamage = com.sekwah.narutomod.abilities.NarutoAbilities.CHIDORI.get().getDamage(ninjaData);
         for (LivingEntity enemy : hitEnemies) {
-            enemy.hurt(player.damageSources().lightningBolt(), strikeDamage);
-            serverLevel.sendParticles(ParticleTypes.FLASH, enemy.getX(), enemy.getY() + 1.0, enemy.getZ(), 1, 0, 0, 0, 0);
+            enemy.hurtServer(serverLevel, player.damageSources().lightningBolt(), strikeDamage);
+            serverLevel.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(ParticleTypes.FLASH, 0xFF88DDFF),
+                    enemy.getX(), enemy.getY() + 1.0, enemy.getZ(), 1, 0, 0, 0, 0,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         // Minimalist lightning spark discharge
@@ -129,11 +132,12 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
             double oz = (player.getRandom().nextDouble() - 0.5) * 1.2;
             serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
                     strikePos.x + ox, strikePos.y + oy, strikePos.z + oz,
-                    1, 0, 0, 0, 0.15);
+                    1, 0, 0, 0, 0.15,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CHIDORI.get(), SoundSource.PLAYERS, 1.4f, 1.2f);
 
-        player.removeEffect(MobEffects.MOVEMENT_SPEED);
+        player.removeEffect(MobEffects.SPEED);
         ninjaData.clearActiveHandJutsu();
     }
 }

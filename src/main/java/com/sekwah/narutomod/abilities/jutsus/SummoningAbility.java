@@ -12,7 +12,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -53,11 +53,12 @@ public class SummoningAbility extends Ability implements Ability.Cooldown {
         Vec3 spawnPos = player.position().add(look.x * 2.0, 0.2, look.z * 2.0);
 
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CLONE_POOF.get(), SoundSource.PLAYERS, 1.4f, 0.85f);
-        serverLevel.sendParticles(ParticleTypes.CLOUD, spawnPos.x, spawnPos.y + 0.5, spawnPos.z, 30, 0.6, 0.5, 0.6, 0.08);
+        serverLevel.sendParticles(ParticleTypes.CLOUD, spawnPos.x, spawnPos.y + 0.5, spawnPos.z, 30, 0.6, 0.5, 0.6, 0.08,
+                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
-        Wolf ninken = EntityType.WOLF.create(serverLevel);
+        Wolf ninken = net.minecraft.world.entity.EntityTypes.WOLF.create(serverLevel, net.minecraft.world.entity.EntitySpawnReason.MOB_SUMMONED);
         if (ninken != null) {
-            ninken.moveTo(spawnPos.x, spawnPos.y, spawnPos.z, player.getYRot(), 0.0f);
+            ninken.snapTo(spawnPos.x, spawnPos.y, spawnPos.z, player.getYRot(), 0.0f);
             ninken.tame(player);
             ninken.setCustomName(Component.literal("Ninken").withStyle(ChatFormatting.GOLD));
             ninken.setCustomNameVisible(true);
@@ -72,8 +73,8 @@ public class SummoningAbility extends Ability implements Ability.Cooldown {
             }
 
             int durationTicks = (int) (600 * powerMult);
-            ninken.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, durationTicks, 1));
-            ninken.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, durationTicks, 0));
+            ninken.addEffect(new MobEffectInstance(MobEffects.SPEED, durationTicks, 1));
+            ninken.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, durationTicks, 0));
 
             serverLevel.addFreshEntity(ninken);
         }

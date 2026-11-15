@@ -3,63 +3,64 @@ package com.sekwah.narutomod.abilities;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.jutsus.*;
 import com.sekwah.narutomod.abilities.utility.*;
-import com.sekwah.narutomod.network.PacketHandler;
 import com.sekwah.narutomod.network.c2s.ServerAbilityActivatePacket;
 import com.sekwah.narutomod.network.c2s.ServerAbilityChannelPacket;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import com.sekwah.narutomod.registries.NarutoRegistries;
+import net.minecraft.resources.Identifier;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.sekwah.narutomod.NarutoMod.MOD_ID;
 
-@Mod.EventBusSubscriber(modid = NarutoMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = NarutoMod.MOD_ID)
 public class NarutoAbilities {
 
-    public static final DeferredRegister<Ability> ABILITY = DeferredRegister.create(new ResourceLocation(MOD_ID, "abilities"), MOD_ID);
+    public static final DeferredRegister<Ability> ABILITY = DeferredRegister.create(NarutoRegistries.ABILITY_KEY, MOD_ID);
 
-    public static final Map<Long, ResourceLocation> COMBO_MAP = new HashMap<>();
+    public static final Map<Long, Identifier> COMBO_MAP = new HashMap<>();
 
     // Utility
-    public static final RegistryObject<LeapAbility> LEAP = ABILITY.register("leap", LeapAbility::new);
-    public static final RegistryObject<WaterWalkAbility> WATER_WALK = ABILITY.register("water_walk", WaterWalkAbility::new);
-    public static final RegistryObject<ChakraChargeAbility> CHAKRA_CHARGE = ABILITY.register("chakra_charge", ChakraChargeAbility::new);
+    public static final DeferredHolder<Ability, LeapAbility> LEAP = ABILITY.register("leap", LeapAbility::new);
+    public static final DeferredHolder<Ability, WaterWalkAbility> WATER_WALK = ABILITY.register("water_walk", WaterWalkAbility::new);
+    public static final DeferredHolder<Ability, ChakraChargeAbility> CHAKRA_CHARGE = ABILITY.register("chakra_charge", ChakraChargeAbility::new);
 
     // Ninjutsu / Taijutsu
-    public static final RegistryObject<FireballJutsuAbility> FIREBALL = ABILITY.register("fireball", FireballJutsuAbility::new);
-    public static final RegistryObject<KawarimiJutsuAbility> KAWARIMI = ABILITY.register("kawarimi", KawarimiJutsuAbility::new);
-    public static final RegistryObject<RasenganAbility> RASENGAN = ABILITY.register("rasengan", RasenganAbility::new);
-    public static final RegistryObject<ChidoriAbility> CHIDORI = ABILITY.register("chidori", ChidoriAbility::new);
-    public static final RegistryObject<ShadowCloneAbility> SHADOW_CLONE = ABILITY.register("shadow_clone", ShadowCloneAbility::new);
+    public static final DeferredHolder<Ability, FireballJutsuAbility> FIREBALL = ABILITY.register("fireball", FireballJutsuAbility::new);
+    public static final DeferredHolder<Ability, KawarimiJutsuAbility> KAWARIMI = ABILITY.register("kawarimi", KawarimiJutsuAbility::new);
+    public static final DeferredHolder<Ability, RasenganAbility> RASENGAN = ABILITY.register("rasengan", RasenganAbility::new);
+    public static final DeferredHolder<Ability, ChidoriAbility> CHIDORI = ABILITY.register("chidori", ChidoriAbility::new);
+    public static final DeferredHolder<Ability, ShadowCloneAbility> SHADOW_CLONE = ABILITY.register("shadow_clone", ShadowCloneAbility::new);
 
     // Elemental
-    public static final RegistryObject<WaterBulletAbility> WATER_BULLET = ABILITY.register("water_bullet", WaterBulletAbility::new);
-    public static final RegistryObject<WindBreakerAbility> WIND_BREAKER = ABILITY.register("wind_breaker", WindBreakerAbility::new);
-    public static final RegistryObject<MudWallAbility> MUD_WALL = ABILITY.register("mud_wall", MudWallAbility::new);
+    public static final DeferredHolder<Ability, WaterBulletAbility> WATER_BULLET = ABILITY.register("water_bullet", WaterBulletAbility::new);
+    public static final DeferredHolder<Ability, WindBreakerAbility> WIND_BREAKER = ABILITY.register("wind_breaker", WindBreakerAbility::new);
+    public static final DeferredHolder<Ability, MudWallAbility> MUD_WALL = ABILITY.register("mud_wall", MudWallAbility::new);
 
     // Dōjutsu
-    public static final RegistryObject<SharinganAbility> SHARINGAN = ABILITY.register("sharingan", SharinganAbility::new);
-    public static final RegistryObject<ByakuganAbility> BYAKUGAN = ABILITY.register("byakugan", ByakuganAbility::new);
+    public static final DeferredHolder<Ability, SharinganAbility> SHARINGAN = ABILITY.register("sharingan", SharinganAbility::new);
+    public static final DeferredHolder<Ability, ByakuganAbility> BYAKUGAN = ABILITY.register("byakugan", ByakuganAbility::new);
 
     // Advanced & Forbidden Jutsus
-    public static final RegistryObject<AmaterasuAbility> AMATERASU = ABILITY.register("amaterasu", AmaterasuAbility::new);
-    public static final RegistryObject<SusanooRibcageAbility> SUSANOO_RIBCAGE = ABILITY.register("susanoo_ribcage", SusanooRibcageAbility::new);
-    public static final RegistryObject<EightGatesAbility> EIGHT_GATES = ABILITY.register("eight_gates", EightGatesAbility::new);
-    public static final RegistryObject<EighthGateOfDeathAbility> EIGHT_GATES_DEATH = ABILITY.register("eight_gates_death", EighthGateOfDeathAbility::new);
-    public static final RegistryObject<KirinAbility> KIRIN = ABILITY.register("kirin", KirinAbility::new);
-    public static final RegistryObject<WoodPrisonAbility> WOOD_PRISON = ABILITY.register("wood_prison", WoodPrisonAbility::new);
-    public static final RegistryObject<BoneDanceAbility> BONE_DANCE = ABILITY.register("bone_dance", BoneDanceAbility::new);
-    public static final RegistryObject<ShadowPossessionAbility> SHADOW_POSSESSION = ABILITY.register("shadow_possession", ShadowPossessionAbility::new);
-    public static final RegistryObject<RasenshurikenAbility> RASENSHURIKEN = ABILITY.register("rasenshuriken", RasenshurikenAbility::new);
-    public static final RegistryObject<TsukuyomiAbility> TSUKUYOMI = ABILITY.register("tsukuyomi", TsukuyomiAbility::new);
-    public static final RegistryObject<HakkeKushoAbility> HAKKE_KUSHO = ABILITY.register("hakke_kusho", HakkeKushoAbility::new);
-    public static final RegistryObject<SummoningAbility> SUMMONING = ABILITY.register("summoning", SummoningAbility::new);
+    public static final DeferredHolder<Ability, AmaterasuAbility> AMATERASU = ABILITY.register("amaterasu", AmaterasuAbility::new);
+    public static final DeferredHolder<Ability, SusanooRibcageAbility> SUSANOO_RIBCAGE = ABILITY.register("susanoo_ribcage", SusanooRibcageAbility::new);
+    public static final DeferredHolder<Ability, EightGatesAbility> EIGHT_GATES = ABILITY.register("eight_gates", EightGatesAbility::new);
+    public static final DeferredHolder<Ability, EighthGateOfDeathAbility> EIGHT_GATES_DEATH = ABILITY.register("eight_gates_death", EighthGateOfDeathAbility::new);
+    public static final DeferredHolder<Ability, KirinAbility> KIRIN = ABILITY.register("kirin", KirinAbility::new);
+    public static final DeferredHolder<Ability, WoodPrisonAbility> WOOD_PRISON = ABILITY.register("wood_prison", WoodPrisonAbility::new);
+    public static final DeferredHolder<Ability, BoneDanceAbility> BONE_DANCE = ABILITY.register("bone_dance", BoneDanceAbility::new);
+    public static final DeferredHolder<Ability, ShadowPossessionAbility> SHADOW_POSSESSION = ABILITY.register("shadow_possession", ShadowPossessionAbility::new);
+    public static final DeferredHolder<Ability, RasenshurikenAbility> RASENSHURIKEN = ABILITY.register("rasenshuriken", RasenshurikenAbility::new);
+    public static final DeferredHolder<Ability, TsukuyomiAbility> TSUKUYOMI = ABILITY.register("tsukuyomi", TsukuyomiAbility::new);
+    public static final DeferredHolder<Ability, HakkeKushoAbility> HAKKE_KUSHO = ABILITY.register("hakke_kusho", HakkeKushoAbility::new);
+    public static final DeferredHolder<Ability, SummoningAbility> SUMMONING = ABILITY.register("summoning", SummoningAbility::new);
 
     public static void register(IEventBus eventBus) {
         ABILITY.register(eventBus);
@@ -80,9 +81,9 @@ public class NarutoAbilities {
         });
     }
 
-    public static Ability getAbility(ResourceLocation id) {
+    public static Ability getAbility(Identifier id) {
         if (id == null) return null;
-        for (RegistryObject<Ability> entry : ABILITY.getEntries()) {
+        for (DeferredHolder<Ability, ? extends Ability> entry : ABILITY.getEntries()) {
             if (entry.getId().equals(id)) {
                 return entry.get();
             }
@@ -97,8 +98,8 @@ public class NarutoAbilities {
         return null;
     }
 
-    public static void triggerAbility(ResourceLocation ability) {
-        PacketHandler.sendToServer(new ServerAbilityActivatePacket(ability));
+    public static void triggerAbility(Identifier ability) {
+        ClientPacketDistributor.sendToServer(new ServerAbilityActivatePacket(ability));
     }
 
     public static boolean triggerAbility(long combo) {
@@ -111,8 +112,8 @@ public class NarutoAbilities {
 
     public static boolean handleCharging(long combo, ServerAbilityChannelPacket.ChannelStatus channelStatus) {
         if (COMBO_MAP.containsKey(combo)) {
-            ResourceLocation abilityResource = COMBO_MAP.get(combo);
-            PacketHandler.sendToServer(new ServerAbilityChannelPacket(abilityResource, channelStatus));
+            Identifier abilityResource = COMBO_MAP.get(combo);
+            ClientPacketDistributor.sendToServer(new ServerAbilityChannelPacket(abilityResource, channelStatus));
             return true;
         }
         return false;

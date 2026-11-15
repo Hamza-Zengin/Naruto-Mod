@@ -1,5 +1,5 @@
 {
-  "loader": "forge:separate_transforms",
+  "loader": "neoforge:separate_transforms",
   "base": {
     "parent": "narutomod:item/weapons/explosive_kunai_3d"
   },

@@ -2,49 +2,43 @@ package com.sekwah.narutomod.block;
 
 import com.sekwah.narutomod.block.weapons.PaperBombBlock;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import static com.sekwah.narutomod.NarutoMod.MOD_ID;
 
 public class NarutoBlocks {
 
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MOD_ID);
-    public static final DeferredRegister<Item> BLOCK_ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
+    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MOD_ID);
+    public static final DeferredRegister.Items BLOCK_ITEMS = DeferredRegister.createItems(MOD_ID);
 
-    public static final RegistryObject<Block> PAPER_BOMB = BLOCKS.register("paper_bomb",
-            () -> {
-                BlockBehaviour.Properties blockBehavior = BlockBehaviour.Properties.of()
-                        .mapColor(MapColor.FIRE)
-                        .noCollission()
-                        .instabreak()
-                        .strength(0.5F)
-                        .pushReaction(PushReaction.DESTROY)
-                        .sound(SoundType.CROP);
-                return new PaperBombBlock(blockBehavior);
-            });
+    public static final DeferredBlock<Block> PAPER_BOMB = BLOCKS.registerBlock("paper_bomb",
+            props -> new PaperBombBlock(props
+                    .mapColor(MapColor.FIRE)
+                    .noCollision()
+                    .instabreak()
+                    .strength(0.5F)
+                    .pushReaction(PushReaction.POPPED)
+                    .sound(SoundType.CROP)));
 
-    public static final RegistryObject<Item> ITEM_PAPER_BOMB = BLOCK_ITEMS.register("paper_bomb", ()
-            -> new BlockItem(PAPER_BOMB.get(), new Item.Properties()));
+    public static final DeferredItem<BlockItem> ITEM_PAPER_BOMB = BLOCK_ITEMS.registerSimpleBlockItem(PAPER_BOMB);
 
-    public static final RegistryObject<Block> BONSAI_TREE = BLOCKS.register("bonsai_tree",
-            () -> new RotatableDecorativeBlock(BlockBehaviour.Properties.of()
+    public static final DeferredBlock<Block> BONSAI_TREE = BLOCKS.registerBlock("bonsai_tree",
+            props -> new RotatableDecorativeBlock(props
                     .mapColor(MapColor.PLANT)
                     .noOcclusion()
                     .strength(0.5F)
                     .sound(SoundType.CROP),
                     Block.box(2.0D, 0.0D, 2.0D, 14.0D, 8.0D, 14.0D)));
 
-    public static final RegistryObject<Item> ITEM_BONSAI_TREE = BLOCK_ITEMS.register("bonsai_tree", ()
-            -> new BlockItem(BONSAI_TREE.get(), new Item.Properties()));
+    public static final DeferredItem<BlockItem> ITEM_BONSAI_TREE = BLOCK_ITEMS.registerSimpleBlockItem(BONSAI_TREE);
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);

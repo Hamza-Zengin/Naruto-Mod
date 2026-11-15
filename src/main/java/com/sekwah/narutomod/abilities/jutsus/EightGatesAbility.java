@@ -7,7 +7,8 @@ import com.sekwah.narutomod.capabilities.NinjaRank;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -70,7 +71,7 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
 
     public static GateStage getStage(INinjaData ninjaData) {
         if (ninjaData == null) return GateStage.GATE_1;
-        int mastery = ninjaData.getMastery(new ResourceLocation(NarutoMod.MOD_ID, "eight_gates"));
+        int mastery = ninjaData.getMastery(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates"));
         return getStage(mastery);
     }
 
@@ -111,8 +112,8 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
 
         if (ninjaData.getStamina() < cost) {
             // Stamina exhausted: deactivate technique safely without death penalty
-            player.displayClientMessage(Component.translatable("jutsu.eight_gates.stamina_exhausted")
-                    .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
+            player.sendOverlayMessage(Component.translatable("jutsu.eight_gates.stamina_exhausted")
+                    .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
             return false;
         }
 
@@ -132,7 +133,7 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
         }
 
         // Fast periodic mastery gain while active
-        ResourceLocation reg = this.getRegistryName();
+        Identifier reg = this.getRegistryName();
         if (reg != null) {
             int mastery = ninjaData.getMastery(reg);
             int interval;
@@ -155,49 +156,49 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
         // Apply progressive buffs according to gate stage
         switch (stage) {
             case GATE_1 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 0, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 0, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 0, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 0, false, false, false));
             }
             case GATE_2 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 0, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 1, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 0, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 1, false, false, false));
             }
             case GATE_3 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 1, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 1, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 0, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 1, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 1, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 0, false, false, false));
             }
             case GATE_4 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 1, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 2, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.JUMP, 40, 0, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 1, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 2, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 40, 0, false, false, false));
             }
             case GATE_5 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 2, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 3, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 1, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.JUMP, 40, 1, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 2, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 3, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 1, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 40, 1, false, false, false));
             }
             case GATE_6 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 2, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 4, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 1, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 40, 1, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 2, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 4, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 1, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.HASTE, 40, 1, false, false, false));
             }
             case GATE_7 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 3, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 5, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 2, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.JUMP, 40, 2, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 40, 2, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 3, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 5, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 2, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 40, 2, false, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.HASTE, 40, 2, false, false, false));
             }
         }
 
         if (player.level() instanceof ServerLevel serverLevel) {
             // Initial opening notification and audio feedback
             if (ticksActive == 1) {
-                player.displayClientMessage(Component.translatable("jutsu.eight_gates.opened",
-                        Component.translatable(stage.getTranslationKey())).withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), true);
+                player.sendOverlayMessage(Component.translatable("jutsu.eight_gates.opened",
+                        Component.translatable(stage.getTranslationKey())).withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
                 serverLevel.playSound(null, player.blockPosition(), SoundEvents.ENDER_DRAGON_GROWL, SoundSource.PLAYERS, 0.7f, 1.4f);
             }
 
@@ -207,15 +208,15 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
                     // Green vapor aura
                     serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER,
                             player.getX(), player.getY() + 0.9, player.getZ(),
-                            2, 0.25, 0.3, 0.25, 0.01);
+                            2, 0.25, 0.3, 0.25, 0.01, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 } else if (stage == GateStage.GATE_7) {
                     // Intense blue vapor steam
                     serverLevel.sendParticles(ParticleTypes.SPLASH,
                             player.getX(), player.getY() + 0.9, player.getZ(),
-                            4, 0.3, 0.4, 0.3, 0.05);
+                            4, 0.3, 0.4, 0.3, 0.05, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     serverLevel.sendParticles(ParticleTypes.CLOUD,
                             player.getX(), player.getY() + 0.7, player.getZ(),
-                            1, 0.2, 0.2, 0.2, 0.01);
+                            1, 0.2, 0.2, 0.2, 0.01, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 }
             }
         }
@@ -228,44 +229,43 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
     @Override
     public void handleAbilityEnded(Player player, INinjaData ninjaData, int ticksActive) {
         if (!player.level().isClientSide()) {
-            player.removeEffect(MobEffects.MOVEMENT_SPEED);
-            player.removeEffect(MobEffects.DAMAGE_BOOST);
-            player.removeEffect(MobEffects.DAMAGE_RESISTANCE);
-            player.removeEffect(MobEffects.JUMP);
-            player.removeEffect(MobEffects.DIG_SPEED);
+            player.removeEffect(MobEffects.SPEED);
+            player.removeEffect(MobEffects.STRENGTH);
+            player.removeEffect(MobEffects.RESISTANCE);
+            player.removeEffect(MobEffects.JUMP_BOOST);
+            player.removeEffect(MobEffects.HASTE);
 
             // Safe muscular fatigue (no death penalty)
             if (!player.isCreative() && !player.isSpectator()) {
                 player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 200, 1)); // 10s Weakness II
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 1)); // 10s Slowness II
-                player.displayClientMessage(Component.translatable("jutsu.eight_gates.closed")
-                        .withStyle(ChatFormatting.YELLOW), true);
+                player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 200, 1)); // 10s Slowness II
+                player.sendOverlayMessage(Component.translatable("jutsu.eight_gates.closed")
+                        .withStyle(ChatFormatting.YELLOW));
                 player.level().playSound(null, player.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.8f, 1.0f);
             }
         }
     }
 
-    @net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = NarutoMod.MOD_ID)
+    @net.neoforged.fml.common.EventBusSubscriber(modid = NarutoMod.MOD_ID)
     public static class EightGatesCombatEvents {
         private static final String LAST_COMBAT_MASTERY_TICK = "narutomod_eight_gates_last_hit_tick";
         private static final int COMBAT_MASTERY_COOLDOWN_TICKS = 20;
         private static final int COMBAT_MASTERY_GAIN = 2;
 
-        @net.minecraftforge.eventbus.api.SubscribeEvent
-        public static void onLivingHurt(net.minecraftforge.event.entity.living.LivingHurtEvent event) {
+        @net.neoforged.bus.api.SubscribeEvent
+        public static void onLivingHurt(net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent event) {
             if (event.getEntity().level().isClientSide()) return;
             if (!(event.getSource().getEntity() instanceof Player attacker)) return;
-            if (event.getSource().isIndirect()) return; // Melee only
+            if (!event.getSource().isDirect()) return; // Melee only
 
-            attacker.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-                if (ninjaData.isEightGatesActive()) {
-                    int lastTick = attacker.getPersistentData().getInt(LAST_COMBAT_MASTERY_TICK);
-                    if (attacker.tickCount - lastTick >= COMBAT_MASTERY_COOLDOWN_TICKS) {
-                        attacker.getPersistentData().putInt(LAST_COMBAT_MASTERY_TICK, attacker.tickCount);
-                        ninjaData.addMastery(new ResourceLocation(NarutoMod.MOD_ID, "eight_gates"), COMBAT_MASTERY_GAIN);
-                    }
+            var ninjaData = attacker.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA);
+            if (ninjaData.isEightGatesActive()) {
+                int lastTick = attacker.getPersistentData().getIntOr(LAST_COMBAT_MASTERY_TICK, 0);
+                if (attacker.tickCount - lastTick >= COMBAT_MASTERY_COOLDOWN_TICKS) {
+                    attacker.getPersistentData().putInt(LAST_COMBAT_MASTERY_TICK, attacker.tickCount);
+                    ninjaData.addMastery(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates"), COMBAT_MASTERY_GAIN);
                 }
-            });
+            }
         }
     }
 }

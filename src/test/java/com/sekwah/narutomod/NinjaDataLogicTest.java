@@ -14,8 +14,7 @@ import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
 import com.sekwah.narutomod.abilities.jutsus.SusanooRibcageAbility;
 import com.sekwah.narutomod.item.weapons.KusanagiSwordItem;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -82,10 +81,10 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify Uzumaki clan chakra bonus (+25% max chakra)")
     public void testUzumakiClanBonus() {
-        ninjaData.setClan(new ResourceLocation(NarutoMod.MOD_ID, "shinobi"));
+        ninjaData.setClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shinobi"));
         float baseMaxChakra = ninjaData.getMaxChakra();
 
-        ninjaData.setClan(new ResourceLocation(NarutoMod.MOD_ID, "uzumaki"));
+        ninjaData.setClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "uzumaki"));
         float uzumakiMaxChakra = ninjaData.getMaxChakra();
 
         assertEquals(baseMaxChakra * 1.25f, uzumakiMaxChakra, 0.01f,
@@ -95,8 +94,8 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify jutsu unlock tracking and persistence format")
     public void testJutsuUnlocks() {
-        ResourceLocation fireball = new ResourceLocation(NarutoMod.MOD_ID, "fireball");
-        ResourceLocation chidori = new ResourceLocation(NarutoMod.MOD_ID, "chidori");
+        Identifier fireball = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball");
+        Identifier chidori = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori");
 
         assertFalse(ninjaData.getUnlockedAbilities().contains(fireball));
         assertFalse(ninjaData.getUnlockedAbilities().contains(chidori));
@@ -206,11 +205,12 @@ public class NinjaDataLogicTest {
         ninjaData.setWaterWalkActive(true);
         assertEquals(INinjaData.JUTSU_FLAG_SHARINGAN | INinjaData.JUTSU_FLAG_WATER_WALK, ninjaData.getActiveJutsusFlag());
 
-        Tag serialized = ninjaData.serializeNBT();
+        CompoundTag serialized = new CompoundTag();
+        ninjaData.saveNBTData(serialized);
         assertNotNull(serialized);
 
         NinjaData restored = new NinjaData(false);
-        restored.deserializeNBT(serialized);
+        restored.loadNBTData(serialized);
 
         assertEquals(ninjaData.getActiveJutsusFlag(), restored.getActiveJutsusFlag());
         assertTrue(restored.isSharinganActive());
@@ -298,9 +298,10 @@ public class NinjaDataLogicTest {
         ninjaData.addSeal((byte) 2);
         ninjaData.addSeal((byte) 3);
 
-        Tag serialized = ninjaData.serializeNBT();
+        CompoundTag serialized = new CompoundTag();
+        ninjaData.saveNBTData(serialized);
         NinjaData restored = new NinjaData(false);
-        restored.deserializeNBT(serialized);
+        restored.loadNBTData(serialized);
 
         assertEquals(ninjaData.getActiveSeals().size(), restored.getActiveSeals().size());
         assertEquals(ninjaData.getActiveSeals(), restored.getActiveSeals());
@@ -311,7 +312,7 @@ public class NinjaDataLogicTest {
     @DisplayName("Verify Ability expected seals and 25% chakra cost discount")
     public void testHandSealComboCostDiscount() {
         com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility fireball = new com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility();
-        fireball.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "fireball"));
+        fireball.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball"));
 
         // 1. Verify canon expected seals: Snake (6) - Ram (8) - Monkey (9) - Boar (12) - Horse (7) - Tiger (3)
         assertArrayEquals(new byte[]{6, 8, 9, 12, 7, 3}, fireball.getExpectedSeals());
@@ -369,8 +370,8 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify jutsu mastery tracking, incrementing, and map retrieval")
     public void testJutsuMasteryTracking() {
-        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
-        ResourceLocation chidori = new ResourceLocation(NarutoMod.MOD_ID, "chidori");
+        Identifier rasengan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan");
+        Identifier chidori = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori");
 
         assertEquals(0, ninjaData.getMastery(rasengan), "Mastery should default to 0");
         assertEquals(0, ninjaData.getMastery(chidori), "Mastery should default to 0");
@@ -395,8 +396,8 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify jutsu mastery NBT serialization and deserialization via saveNBTData and loadNBTData")
     public void testJutsuMasteryNBT() {
-        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
-        ResourceLocation fireball = new ResourceLocation(NarutoMod.MOD_ID, "fireball");
+        Identifier rasengan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan");
+        Identifier fireball = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball");
 
         ninjaData.addMastery(rasengan, 150);
         ninjaData.addMastery(fireball, 30);
@@ -412,10 +413,11 @@ public class NinjaDataLogicTest {
         assertEquals(30, restored.getMastery(fireball));
         assertEquals(2, restored.getJutsuMasteryMap().size());
 
-        // Also test with serializeNBT and deserializeNBT
-        Tag serializedTag = ninjaData.serializeNBT();
+        // Also test with a second saveNBTData and loadNBTData round-trip
+        CompoundTag serializedTag = new CompoundTag();
+        ninjaData.saveNBTData(serializedTag);
         NinjaData restoredViaTag = new NinjaData(false);
-        restoredViaTag.deserializeNBT(serializedTag);
+        restoredViaTag.loadNBTData(serializedTag);
 
         assertEquals(150, restoredViaTag.getMastery(rasengan));
         assertEquals(30, restoredViaTag.getMastery(fireball));
@@ -424,7 +426,7 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify jutsu mastery cleared on resetData")
     public void testJutsuMasteryReset() {
-        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
+        Identifier rasengan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan");
         ninjaData.addMastery(rasengan, 120);
         assertEquals(120, ninjaData.getMastery(rasengan));
 
@@ -436,7 +438,7 @@ public class NinjaDataLogicTest {
     private static class DummyAbility extends Ability {
         public boolean executed = false;
 
-        public DummyAbility(ResourceLocation id) {
+        public DummyAbility(Identifier id) {
             this.setRegistryName(id);
         }
 
@@ -454,7 +456,7 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify Ability perform() and performServer() increment jutsu mastery dynamically (+3/+2/+1)")
     public void testAbilityPerformIncrementsMastery() {
-        ResourceLocation testJutsu = new ResourceLocation(NarutoMod.MOD_ID, "test_jutsu");
+        Identifier testJutsu = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "test_jutsu");
         DummyAbility ability = new DummyAbility(testJutsu);
 
         assertEquals(0, ninjaData.getMastery(testJutsu));
@@ -488,9 +490,9 @@ public class NinjaDataLogicTest {
     @DisplayName("Verify RasenshurikenAbility requires Rasengan with 100+ mastery")
     public void testRasenshurikenPrerequisites() {
         RasenshurikenAbility rasenshuriken = new RasenshurikenAbility();
-        rasenshuriken.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "rasenshuriken"));
+        rasenshuriken.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasenshuriken"));
 
-        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
+        Identifier rasengan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan");
 
         // Verify prerequisite configuration
         assertEquals(List.of(rasengan), rasenshuriken.getPrerequisites());
@@ -523,8 +525,8 @@ public class NinjaDataLogicTest {
     @DisplayName("Verify prerequisite locks prevent unlock until mastery and rank requirements are met")
     public void testPrerequisiteLockAndUnlockLogic() {
         RasenshurikenAbility rasenshuriken = new RasenshurikenAbility();
-        rasenshuriken.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "rasenshuriken"));
-        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
+        rasenshuriken.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasenshuriken"));
+        Identifier rasengan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan");
 
         // Genin rank, prerequisites not met
         ninjaData.setRank("GENIN");
@@ -555,7 +557,7 @@ public class NinjaDataLogicTest {
         assertEquals(SharinganAbility.SharinganStage.MANGEKYOU, SharinganAbility.getStage(5000));
         assertEquals(SharinganAbility.SharinganStage.MANGEKYOU, SharinganAbility.getStage(8000));
 
-        ResourceLocation sharingan = new ResourceLocation(NarutoMod.MOD_ID, "sharingan");
+        Identifier sharingan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
         assertFalse(SharinganAbility.hasMangekyou(ninjaData));
 
         ninjaData.addMastery(sharingan, 1000);
@@ -575,16 +577,16 @@ public class NinjaDataLogicTest {
     @DisplayName("Verify SusanooRibcageAbility requires Uchiha clan and Mangekyou stage")
     public void testSusanooRequiresMangekyou() {
         SusanooRibcageAbility susanoo = new SusanooRibcageAbility();
-        susanoo.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "susanoo_ribcage"));
-        ResourceLocation sharingan = new ResourceLocation(NarutoMod.MOD_ID, "sharingan");
+        susanoo.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "susanoo_ribcage"));
+        Identifier sharingan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
 
         // 1. Non-Uchiha clan cannot activate Susanoo
-        ninjaData.setClan(new ResourceLocation(NarutoMod.MOD_ID, "hyuga"));
+        ninjaData.setClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "hyuga"));
         assertFalse(susanoo.canActivate(null, ninjaData));
         assertFalse(ninjaData.isAbilityUnlocked(susanoo));
 
         // 2. Uchiha clan without Mangekyou (0 mastery)
-        ninjaData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "uchiha"));
+        ninjaData.forceSetClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "uchiha"));
         assertFalse(susanoo.canActivate(null, ninjaData));
         assertFalse(susanoo.meetsPrerequisites(ninjaData));
         assertFalse(ninjaData.isAbilityUnlocked(susanoo));
@@ -625,9 +627,10 @@ public class NinjaDataLogicTest {
         assertEquals(100, ninjaData.getChakraRegenCooldown());
 
         // NBT serialization test
-        Tag nbt = ninjaData.serializeNBT();
+        CompoundTag nbt = new CompoundTag();
+        ninjaData.saveNBTData(nbt);
         NinjaData restored = new NinjaData(false);
-        restored.deserializeNBT(nbt);
+        restored.loadNBTData(nbt);
         assertEquals(100, restored.getChakraRegenCooldown());
         assertTrue(restored.isChakraRegenLocked());
 
@@ -640,10 +643,10 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify Alt Asama 3.3 rank mission prerequisites: Genin->Chunin and Chunin->Jonin")
     public void testRankUpMissionPrerequisites() {
-        ResourceLocation fireball = new ResourceLocation(NarutoMod.MOD_ID, "fireball");
-        ResourceLocation waterBullet = new ResourceLocation(NarutoMod.MOD_ID, "water_bullet");
-        ResourceLocation bodyFlicker = new ResourceLocation(NarutoMod.MOD_ID, "body_flicker");
-        ResourceLocation rasengan = new ResourceLocation(NarutoMod.MOD_ID, "rasengan");
+        Identifier fireball = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball");
+        Identifier waterBullet = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "water_bullet");
+        Identifier bodyFlicker = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "body_flicker");
+        Identifier rasengan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan");
 
         // 1. Initial Academy Student
         assertEquals("ACADEMY_STUDENT", ninjaData.getRank());
@@ -771,35 +774,35 @@ public class NinjaDataLogicTest {
         drain = Math.min(targetChakra, 20.0f);
         assertEquals(0.0f, drain, 0.01f);
 
-        // 2. Kusanagi NBT and Chakra Flow Logic
+        // 2. Kusanagi Chakra Flow expiration Logic
         CompoundTag activeTag = new CompoundTag();
-        activeTag.putBoolean(KusanagiSwordItem.NBT_CHAKRA_ACTIVE, true);
-        activeTag.putLong(KusanagiSwordItem.NBT_ACTIVE_UNTIL, 500L);
+        activeTag.putBoolean("kusanagi_chakra_active", true);
+        activeTag.putLong("kusanagi_active_until", 500L);
 
-        assertTrue(activeTag.getBoolean(KusanagiSwordItem.NBT_CHAKRA_ACTIVE));
-        assertEquals(500L, activeTag.getLong(KusanagiSwordItem.NBT_ACTIVE_UNTIL));
+        assertTrue(activeTag.getBooleanOr("kusanagi_chakra_active", false));
+        assertEquals(500L, activeTag.getLongOr("kusanagi_active_until", 0L));
 
         // When expired (gameTime 600 > 500)
         long gameTime = 600L;
-        if (gameTime > activeTag.getLong(KusanagiSwordItem.NBT_ACTIVE_UNTIL)) {
-            activeTag.putBoolean(KusanagiSwordItem.NBT_CHAKRA_ACTIVE, false);
+        if (gameTime > activeTag.getLongOr("kusanagi_active_until", 0L)) {
+            activeTag.putBoolean("kusanagi_chakra_active", false);
         }
-        assertFalse(activeTag.getBoolean(KusanagiSwordItem.NBT_CHAKRA_ACTIVE));
+        assertFalse(activeTag.getBooleanOr("kusanagi_chakra_active", false));
     }
 
     @Test
     @DisplayName("Verify Amaterasu requires Uchiha clan, active Sharingan, and Mangekyo stage")
     public void testAmaterasuRequiresMangekyou() {
         AmaterasuAbility amaterasu = new AmaterasuAbility();
-        amaterasu.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "amaterasu"));
-        ResourceLocation sharingan = new ResourceLocation(NarutoMod.MOD_ID, "sharingan");
+        amaterasu.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "amaterasu"));
+        Identifier sharingan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
 
         // 1. Non-Uchiha clan cannot activate
-        ninjaData.setClan(new ResourceLocation(NarutoMod.MOD_ID, "hyuga"));
+        ninjaData.setClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "hyuga"));
         assertFalse(amaterasu.canActivate(null, ninjaData));
 
         // 2. Uchiha clan without active Sharingan
-        ninjaData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "uchiha"));
+        ninjaData.forceSetClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "uchiha"));
         ninjaData.unlockAbility(sharingan);
         ninjaData.addMastery(sharingan, 5000);
         assertFalse(amaterasu.canActivate(null, ninjaData)); // Sharingan not active
@@ -807,7 +810,7 @@ public class NinjaDataLogicTest {
         // 3. Sharingan active but mastery < 5000 (3-Tomoe)
         ninjaData.setJutsuActive(NinjaData.JUTSU_FLAG_SHARINGAN, true);
         NinjaData lowMasteryData = new NinjaData(true);
-        lowMasteryData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "uchiha"));
+        lowMasteryData.forceSetClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "uchiha"));
         lowMasteryData.unlockAbility(sharingan);
         lowMasteryData.addMastery(sharingan, 2500); // 3-Tomoe
         lowMasteryData.setJutsuActive(NinjaData.JUTSU_FLAG_SHARINGAN, true);
@@ -832,8 +835,8 @@ public class NinjaDataLogicTest {
         assertEquals(EightGatesAbility.GateStage.GATE_7, EightGatesAbility.getStage(1000));
 
         EighthGateOfDeathAbility deathGate = new EighthGateOfDeathAbility();
-        deathGate.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "eight_gates_death"));
-        ResourceLocation eightGates = new ResourceLocation(NarutoMod.MOD_ID, "eight_gates");
+        deathGate.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates_death"));
+        Identifier eightGates = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates");
 
         // Without mastery 5000 in eight_gates
         ninjaData.unlockAbility(eightGates);
@@ -963,7 +966,7 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify tiered mastery increment curve and setMastery")
     public void testTieredMasteryIncrementCurve() {
-        ResourceLocation jutsu = new ResourceLocation("narutomod", "fireball");
+        Identifier jutsu = Identifier.fromNamespaceAndPath("narutomod", "fireball");
         assertEquals(0, ninjaData.getMastery(jutsu));
 
         // < 100: +5 for instant, +2 for toggle
@@ -1034,7 +1037,7 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify normal death applies exact 5% penalty without increasing chakra/stamina")
     public void testNormalDeathPenalty5Percent() {
-        ResourceLocation fireball = new ResourceLocation(NarutoMod.MOD_ID, "fireball");
+        Identifier fireball = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball");
         ninjaData.setBaseMaxChakra(1000.0f);
         ninjaData.setBaseMaxStamina(800.0f);
         ninjaData.setMastery(fireball, 100);
@@ -1043,7 +1046,9 @@ public class NinjaDataLogicTest {
         ninjaData.setShimonPenaltyActive(false);
 
         NinjaData respawned = new NinjaData(true);
-        respawned.deserializeNBT(ninjaData.serializeNBT());
+        CompoundTag deathNbt = new CompoundTag();
+        ninjaData.saveNBTData(deathNbt);
+        respawned.loadNBTData(deathNbt);
         NinjaData.applyDeathPenalty(ninjaData, respawned, false);
 
         assertEquals(950.0f, respawned.getBaseMaxChakra(), 0.01f);
@@ -1057,7 +1062,7 @@ public class NinjaDataLogicTest {
     @Test
     @DisplayName("Verify Hachimon: Shimon death applies exact 25% penalty")
     public void testEighthGateDeathPenalty25Percent() {
-        ResourceLocation chidori = new ResourceLocation(NarutoMod.MOD_ID, "chidori");
+        Identifier chidori = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori");
         ninjaData.setBaseMaxChakra(1000.0f);
         ninjaData.setBaseMaxStamina(800.0f);
         ninjaData.setMastery(chidori, 200);
@@ -1066,7 +1071,9 @@ public class NinjaDataLogicTest {
         ninjaData.setShimonPenaltyActive(true);
 
         NinjaData respawned = new NinjaData(true);
-        respawned.deserializeNBT(ninjaData.serializeNBT());
+        CompoundTag deathNbt = new CompoundTag();
+        ninjaData.saveNBTData(deathNbt);
+        respawned.loadNBTData(deathNbt);
         NinjaData.applyDeathPenalty(ninjaData, respawned, false);
 
         assertEquals(750.0f, respawned.getBaseMaxChakra(), 0.01f);
@@ -1082,44 +1089,44 @@ public class NinjaDataLogicTest {
     public void testNaraShadowPossessionAndClanScrollRestriction() {
         com.sekwah.narutomod.abilities.jutsus.ShadowPossessionAbility shadowPossession =
                 new com.sekwah.narutomod.abilities.jutsus.ShadowPossessionAbility();
-        shadowPossession.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "shadow_possession"));
+        shadowPossession.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shadow_possession"));
 
         // Non-Nara cannot activate
-        ninjaData.setClan(new ResourceLocation(NarutoMod.MOD_ID, "shinobi"));
+        ninjaData.setClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shinobi"));
         assertFalse(shadowPossession.canActivate(null, ninjaData));
 
-        ninjaData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "uchiha"));
+        ninjaData.forceSetClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "uchiha"));
         assertFalse(shadowPossession.canActivate(null, ninjaData));
 
         // Nara clan can activate
-        ninjaData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "nara"));
+        ninjaData.forceSetClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "nara"));
         assertTrue(shadowPossession.canActivate(null, ninjaData));
 
         // Clan jutsus are rejected by NinjaData.isClanRestrictedJutsu (used by JutsuScrollItem)
         assertTrue(NinjaData.isClanRestrictedJutsu(
-                new ResourceLocation(NarutoMod.MOD_ID, "shadow_possession")));
+                Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shadow_possession")));
         assertTrue(NinjaData.isClanRestrictedJutsu(
-                new ResourceLocation(NarutoMod.MOD_ID, "amaterasu")));
+                Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "amaterasu")));
         assertTrue(NinjaData.isClanRestrictedJutsu(
-                new ResourceLocation(NarutoMod.MOD_ID, "susanoo_ribcage")));
+                Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "susanoo_ribcage")));
         assertFalse(NinjaData.isClanRestrictedJutsu(
-                new ResourceLocation(NarutoMod.MOD_ID, "rasengan")));
+                Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan")));
     }
 
     @Test
     @DisplayName("Verify Ability.COMPLEXITY_COMPARATOR sorts from simplest (2-key) to most complex (5-key)")
     public void testAbilityComplexityComparator() {
         Ability charge = new com.sekwah.narutomod.abilities.utility.ChakraChargeAbility();
-        charge.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "chakra_charge")); // 1 key
+        charge.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chakra_charge")); // 1 key
 
         Ability fireball = new com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility();
-        fireball.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "fireball")); // 3 keys
+        fireball.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball")); // 3 keys
 
         Ability chidori = new com.sekwah.narutomod.abilities.jutsus.ChidoriAbility();
-        chidori.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "chidori")); // 4 keys
+        chidori.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori")); // 4 keys
 
         Ability amaterasu = new AmaterasuAbility();
-        amaterasu.setRegistryName(new ResourceLocation(NarutoMod.MOD_ID, "amaterasu")); // 5 keys
+        amaterasu.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "amaterasu")); // 5 keys
 
         java.util.List<Ability> list = new java.util.ArrayList<>(List.of(amaterasu, fireball, chidori, charge));
         list.sort(Ability.COMPLEXITY_COMPARATOR);
@@ -1186,9 +1193,9 @@ public class NinjaDataLogicTest {
         Ability chidori = new com.sekwah.narutomod.abilities.jutsus.ChidoriAbility();
         Ability tsukuyomi = new com.sekwah.narutomod.abilities.jutsus.TsukuyomiAbility();
 
-        ninjaData.forceSetClan(new ResourceLocation(NarutoMod.MOD_ID, "uchiha"));
+        ninjaData.forceSetClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "uchiha"));
         ninjaData.setSharinganActive(true);
-        ninjaData.setMastery(new ResourceLocation(NarutoMod.MOD_ID, "sharingan"), 1000);
+        ninjaData.setMastery(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan"), 1000);
 
         ninjaData.setRank(NinjaRank.GENIN.name());
         assertFalse(rasengan.canActivate(null, ninjaData), "Genin cannot use Rasengan");

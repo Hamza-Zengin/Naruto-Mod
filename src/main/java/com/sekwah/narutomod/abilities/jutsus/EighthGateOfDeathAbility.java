@@ -7,7 +7,8 @@ import com.sekwah.narutomod.capabilities.NinjaRank;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -47,8 +48,8 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
     }
 
     @Override
-    public List<ResourceLocation> getPrerequisites() {
-        return List.of(new ResourceLocation(NarutoMod.MOD_ID, "eight_gates"));
+    public List<Identifier> getPrerequisites() {
+        return List.of(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates"));
     }
 
     @Override
@@ -64,8 +65,8 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
         if (ninjaData == null) return false;
         if (!meetsPrerequisites(ninjaData)) {
             if (player != null) {
-                player.displayClientMessage(Component.translatable("jutsu.eight_gates_death.requires_gate7")
-                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), true);
+                player.sendOverlayMessage(Component.translatable("jutsu.eight_gates_death.requires_gate7")
+                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
             }
             return false;
         }
@@ -97,18 +98,18 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
         }
 
         // Transcendent Taijutsu Buffs
-        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40, 4, false, false, false)); // Speed V
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 7, false, false, false)); // Strength VIII
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 2, false, false, false)); // Resistance III
-        player.addEffect(new MobEffectInstance(MobEffects.JUMP, 40, 3, false, false, false)); // Jump IV
-        player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 40, 3, false, false, false));
+        player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 4, false, false, false)); // Speed V
+        player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 7, false, false, false)); // Strength VIII
+        player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 2, false, false, false)); // Resistance III
+        player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 40, 3, false, false, false)); // Jump IV
+        player.addEffect(new MobEffectInstance(MobEffects.HASTE, 40, 3, false, false, false));
 
         // Anti-AFK mastery progression for 8th gate
         if (player.tickCount % 200 == 0) {
             boolean isMoving = player.getDeltaMovement().horizontalDistanceSqr() > 0.001;
             boolean inCombat = player.getLastHurtByMob() != null && (player.tickCount - player.getLastHurtByMobTimestamp() < 100);
             if (isMoving || inCombat) {
-                ResourceLocation reg = this.getRegistryName();
+                Identifier reg = this.getRegistryName();
                 if (reg != null) {
                     ninjaData.addMastery(reg, 1);
                 }
@@ -120,24 +121,24 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
             if (ticksActive == 1) {
                 serverLevel.playSound(null, player.blockPosition(), SoundEvents.ENDER_DRAGON_GROWL, SoundSource.PLAYERS, 1.5f, 0.6f);
                 serverLevel.playSound(null, player.blockPosition(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.PLAYERS, 1.0f, 0.8f);
-                player.displayClientMessage(Component.translatable("jutsu.eight_gates_death.activated")
-                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), false);
+                player.sendSystemMessage(Component.translatable("jutsu.eight_gates_death.activated")
+                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
             }
 
             // Crimson Blood Steam: pulsing crimson spores and flames
             if (ticksActive % 10 == 0) {
                 serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE,
                         player.getX(), player.getY() + 0.9, player.getZ(),
-                        3, 0.25, 0.35, 0.25, 0.02);
+                        3, 0.25, 0.35, 0.25, 0.02, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             }
 
             // Stamina exhausted: fatal thermal incineration begins
             if (ninjaData.getStamina() <= 0.01f && !player.isCreative()) {
                 ninjaData.setShimonPenaltyActive(true);
                 if (ticksActive % 20 == 0) {
-                    player.displayClientMessage(Component.translatable("jutsu.eight_gates_death.hp_drain")
-                            .withStyle(ChatFormatting.RED, ChatFormatting.BOLD), true);
-                    player.hurt(serverLevel.damageSources().magic(), 7.0f);
+                    player.sendOverlayMessage(Component.translatable("jutsu.eight_gates_death.hp_drain")
+                            .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+                    player.hurtServer(serverLevel, serverLevel.damageSources().magic(), 7.0f);
                     serverLevel.playSound(null, player.blockPosition(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1.2f, 0.7f);
                     serverLevel.playSound(null, player.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1.0f, 0.5f);
                 }
@@ -152,23 +153,23 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
     @Override
     public void handleAbilityEnded(Player player, INinjaData ninjaData, int ticksActive) {
         if (!player.level().isClientSide()) {
-            player.removeEffect(MobEffects.MOVEMENT_SPEED);
-            player.removeEffect(MobEffects.DAMAGE_BOOST);
-            player.removeEffect(MobEffects.DAMAGE_RESISTANCE);
-            player.removeEffect(MobEffects.JUMP);
-            player.removeEffect(MobEffects.DIG_SPEED);
+            player.removeEffect(MobEffects.SPEED);
+            player.removeEffect(MobEffects.STRENGTH);
+            player.removeEffect(MobEffects.RESISTANCE);
+            player.removeEffect(MobEffects.JUMP_BOOST);
+            player.removeEffect(MobEffects.HASTE);
 
             // Once the Gate of Death is closed or extinguishes: inevitable fatal decay
             if (!player.isCreative() && !player.isSpectator()) {
                 ninjaData.setShimonPenaltyActive(true);
                 player.addEffect(new MobEffectInstance(MobEffects.WITHER, 1200, 2, false, true, true)); // Fatal decay
-                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 600, 3));
+                player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 600, 3));
                 player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 600, 3));
                 player.addEffect(new MobEffectInstance(MobEffects.HUNGER, 600, 2));
 
                 player.level().playSound(null, player.blockPosition(), SoundEvents.SKELETON_DEATH, SoundSource.PLAYERS, 1.5f, 0.6f);
-                player.displayClientMessage(Component.translatable("jutsu.eight_gates_death.inevitable_death")
-                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), false);
+                player.sendSystemMessage(Component.translatable("jutsu.eight_gates_death.inevitable_death")
+                        .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
             }
         }
     }

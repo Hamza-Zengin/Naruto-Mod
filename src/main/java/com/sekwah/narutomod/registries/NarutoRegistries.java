@@ -1,27 +1,27 @@
 package com.sekwah.narutomod.registries;
 
 import com.sekwah.narutomod.NarutoMod;
-import com.sekwah.narutomod.clans.Clans;
 import com.sekwah.narutomod.abilities.Ability;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.NewRegistryEvent;
-import net.minecraftforge.registries.RegistryBuilder;
-
-import java.util.function.Supplier;
+import com.sekwah.narutomod.clans.Clan;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.neoforged.neoforge.registries.RegistryBuilder;
 
 public class NarutoRegistries {
 
-    public static Supplier<IForgeRegistry<Ability>> ABILITY;
-    public static Supplier<IForgeRegistry<Clans>> CLANS;
+    public static final ResourceKey<Registry<Ability>> ABILITY_KEY =
+            ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "abilities"));
+
+    public static final ResourceKey<Registry<Clan>> CLANS_KEY =
+            ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "clans"));
+
+    public static final Registry<Ability> ABILITY = new RegistryBuilder<>(ABILITY_KEY).create();
+    public static final Registry<Clan> CLANS = new RegistryBuilder<>(CLANS_KEY).create();
 
     public static void init(NewRegistryEvent event) {
-        RegistryBuilder<Ability> abilities = new RegistryBuilder<>();
-        abilities.setName(new ResourceLocation(NarutoMod.MOD_ID, "abilities"));
-        ABILITY = event.create(abilities);
-
-        RegistryBuilder<Clans> clans = new RegistryBuilder<>();
-        clans.setName(new ResourceLocation(NarutoMod.MOD_ID, "clans"));
-        CLANS = event.create(clans);
+        event.register(ABILITY);
+        event.register(CLANS);
     }
 }

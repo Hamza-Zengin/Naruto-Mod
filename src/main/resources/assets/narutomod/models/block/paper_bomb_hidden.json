@@ -1,5 +1,6 @@
 {
     "parent": "narutomod:block/paper_bomb",
+    "render_type": "minecraft:translucent",
     "textures": {
         "0": "narutomod:block/weapons/paperbomb_trans",
         "particle": "narutomod:block/weapons/paperbomb"

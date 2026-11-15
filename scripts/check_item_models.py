@@ -38,7 +38,7 @@ def main():
             errors.append(f"Invalid JSON in {fname}: {e}")
             continue
 
-        if data.get("loader") == "forge:separate_transforms":
+        if data.get("loader") == "neoforge:separate_transforms":
             separate_transforms += 1
             base = data.get("base", {}).get("parent")
             if not base:
@@ -62,7 +62,7 @@ def main():
                 if gui_path and not os.path.exists(gui_path):
                     errors.append(f"{fname}: gui parent '{gui}' does not exist at {gui_path}")
 
-    print(f"Checked {checked} item models. Found {separate_transforms} using forge:separate_transforms.")
+    print(f"Checked {checked} item models. Found {separate_transforms} using neoforge:separate_transforms.")
     if errors:
         print("ERRORS FOUND:")
         for err in errors:

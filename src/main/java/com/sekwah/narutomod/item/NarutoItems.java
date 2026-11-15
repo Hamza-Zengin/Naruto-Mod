@@ -6,168 +6,162 @@ import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.item.armor.NarutoArmorItem;
 import com.sekwah.narutomod.item.armor.NarutoArmorMaterial;
 import com.sekwah.narutomod.item.weapons.*;
-import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.*;
-import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import static com.sekwah.narutomod.NarutoMod.MOD_ID;
 
 public class NarutoItems {
 
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
+    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MOD_ID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
 
     // Weapons
-    public static final RegistryObject<Item> KUNAI = ITEMS.register("kunai", ()
-            -> new KunaiItem(new Item.Properties()));
+    public static final DeferredItem<Item> KUNAI = ITEMS.registerItem("kunai", KunaiItem::new);
 
-    public static final RegistryObject<Item> SENBON = ITEMS.register("senbon", ()
-            -> new SenbonItem(new Item.Properties()));
+    public static final DeferredItem<Item> SENBON = ITEMS.registerItem("senbon", SenbonItem::new);
 
-    public static final RegistryObject<Item> EXPLOSIVE_KUNAI = ITEMS.register("explosive_kunai", ()
-            -> new ExplosiveKunaiItem(new Item.Properties().stacksTo(16)));
+    public static final DeferredItem<Item> EXPLOSIVE_KUNAI = ITEMS.registerItem("explosive_kunai",
+            props -> new ExplosiveKunaiItem(props.stacksTo(16)));
 
-    public static final RegistryObject<Item> SHURIKEN = ITEMS.register("shuriken", ()
-            -> new ShurikenItem(new Item.Properties()));
+    public static final DeferredItem<Item> SHURIKEN = ITEMS.registerItem("shuriken", ShurikenItem::new);
 
-    public static final RegistryObject<Item> FUMA_SHURIKEN = ITEMS.register("fuma_shuriken", ()
-            -> new FumaShurikenItem(new Item.Properties()));
+    public static final DeferredItem<Item> FUMA_SHURIKEN = ITEMS.registerItem("fuma_shuriken", FumaShurikenItem::new);
 
-    public static final RegistryObject<Item> KUSANAGI_SWORD = ITEMS.register("kusanagi_sword", ()
-            -> new KusanagiSwordItem(new Item.Properties()));
+    public static final DeferredItem<Item> KUSANAGI_SWORD = ITEMS.registerItem("kusanagi_sword", KusanagiSwordItem::new);
 
-    public static final RegistryObject<Item> SAMEHADA = ITEMS.register("samehada", ()
-            -> new SamehadaItem(new Item.Properties()));
+    public static final DeferredItem<Item> SAMEHADA = ITEMS.registerItem("samehada", SamehadaItem::new);
 
-    public static final RegistryObject<Item> BONE_SWORD = ITEMS.register("bone_sword", ()
-            -> new BoneSwordItem(new Item.Properties()));
+    public static final DeferredItem<Item> BONE_SWORD = ITEMS.registerItem("bone_sword", BoneSwordItem::new);
 
-    public static final RegistryObject<Item> SMOKE_BOMB = ITEMS.register("smoke_bomb", ()
-            -> new com.sekwah.narutomod.item.weapons.SmokeBombItem(new Item.Properties().stacksTo(16)));
+    public static final DeferredItem<Item> SMOKE_BOMB = ITEMS.registerItem("smoke_bomb",
+            props -> new SmokeBombItem(props.stacksTo(16)));
 
-    public static final RegistryObject<Item> MILITARY_RATIONS_PILL = ITEMS.register("military_rations_pill", ()
-            -> new MilitaryRationsPillItem(new Item.Properties().stacksTo(16)));
+    public static final DeferredItem<Item> MILITARY_RATIONS_PILL = ITEMS.registerItem("military_rations_pill",
+            props -> new MilitaryRationsPillItem(props.stacksTo(16)));
 
-    public static final RegistryObject<Item> ICHIRAKU_RAMEN = ITEMS.register("ichiraku_ramen", ()
-            -> new IchirakuRamenItem(new Item.Properties()));
+    public static final DeferredItem<Item> ICHIRAKU_RAMEN = ITEMS.registerItem("ichiraku_ramen", IchirakuRamenItem::new);
 
-    public static final RegistryObject<Item> CHAKRA_METAL = ITEMS.register("chakra_metal", ()
-            -> new Item(new Item.Properties().rarity(Rarity.UNCOMMON)));
+    public static final DeferredItem<Item> CHAKRA_METAL = ITEMS.registerSimpleItem("chakra_metal",
+            props -> props.rarity(Rarity.UNCOMMON));
 
     // Jutsu Scrolls
-    public static final RegistryObject<Item> SCROLL_RASENGAN = ITEMS.register("scroll_rasengan", ()
-            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.RASENGAN.getId()));
+    public static final DeferredItem<Item> SCROLL_RASENGAN = ITEMS.registerItem("scroll_rasengan",
+            props -> new JutsuScrollItem(props.stacksTo(1), NarutoAbilities.RASENGAN.getId()));
 
-    public static final RegistryObject<Item> SCROLL_CHIDORI = ITEMS.register("scroll_chidori", ()
-            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.CHIDORI.getId()));
+    public static final DeferredItem<Item> SCROLL_CHIDORI = ITEMS.registerItem("scroll_chidori",
+            props -> new JutsuScrollItem(props.stacksTo(1), NarutoAbilities.CHIDORI.getId()));
 
-    public static final RegistryObject<Item> SCROLL_SHADOW_CLONE = ITEMS.register("scroll_shadow_clone", ()
-            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.SHADOW_CLONE.getId()));
+    public static final DeferredItem<Item> SCROLL_SHADOW_CLONE = ITEMS.registerItem("scroll_shadow_clone",
+            props -> new JutsuScrollItem(props.stacksTo(1), NarutoAbilities.SHADOW_CLONE.getId()));
 
-    public static final RegistryObject<Item> SCROLL_KIRIN = ITEMS.register("scroll_kirin", ()
-            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.KIRIN.getId()));
+    public static final DeferredItem<Item> SCROLL_KIRIN = ITEMS.registerItem("scroll_kirin",
+            props -> new JutsuScrollItem(props.stacksTo(1), NarutoAbilities.KIRIN.getId()));
 
-    public static final RegistryObject<Item> SCROLL_EIGHT_GATES = ITEMS.register("scroll_eight_gates", ()
-            -> new JutsuScrollItem(new Item.Properties().stacksTo(1), NarutoAbilities.EIGHT_GATES.getId()));
+    public static final DeferredItem<Item> SCROLL_EIGHT_GATES = ITEMS.registerItem("scroll_eight_gates",
+            props -> new JutsuScrollItem(props.stacksTo(1), NarutoAbilities.EIGHT_GATES.getId()));
 
-    public static final RegistryObject<Item> SCROLL_RASENSHURIKEN = ITEMS.register("scroll_rasenshuriken", ()
-            -> new JutsuScrollItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC), NarutoAbilities.RASENSHURIKEN.getId()));
+    public static final DeferredItem<Item> SCROLL_RASENSHURIKEN = ITEMS.registerItem("scroll_rasenshuriken",
+            props -> new JutsuScrollItem(props.stacksTo(1).rarity(Rarity.EPIC), NarutoAbilities.RASENSHURIKEN.getId()));
 
     // Spawn Eggs
-    public static final RegistryObject<Item> ROGUE_NINJA_SPAWN_EGG = ITEMS.register("rogue_ninja_spawn_egg", ()
-            -> new ForgeSpawnEggItem(NarutoEntities.ROGUE_NINJA, 0x222831, 0x768A96, new Item.Properties()));
+    public static final DeferredItem<Item> ROGUE_NINJA_SPAWN_EGG = ITEMS.registerItem("rogue_ninja_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.ROGUE_NINJA.get())));
 
-    public static final RegistryObject<Item> AKATSUKI_NINJA_SPAWN_EGG = ITEMS.register("akatsuki_ninja_spawn_egg", ()
-            -> new ForgeSpawnEggItem(NarutoEntities.AKATSUKI_NINJA, 0x151519, 0xCC1122, new Item.Properties()));
+    public static final DeferredItem<Item> AKATSUKI_NINJA_SPAWN_EGG = ITEMS.registerItem("akatsuki_ninja_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.AKATSUKI_NINJA.get())));
 
     // Armor
-    public static final RegistryObject<Item> RED_ANBU_MASK = ITEMS.register("red_anbu_mask", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
-            .setShouldHideNameplate(true));
+    public static final DeferredItem<Item> RED_ANBU_MASK = ITEMS.registerItem("red_anbu_mask",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.HELMET, props)
+                    .setShouldHideNameplate(true));
 
-    public static final RegistryObject<Item> YELLOW_ANBU_MASK = ITEMS.register("yellow_anbu_mask", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
-            .setShouldHideNameplate(true));
+    public static final DeferredItem<Item> YELLOW_ANBU_MASK = ITEMS.registerItem("yellow_anbu_mask",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.HELMET, props)
+                    .setShouldHideNameplate(true));
 
-    public static final RegistryObject<Item> GREEN_ANBU_MASK = ITEMS.register("green_anbu_mask", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
-            .setShouldHideNameplate(true));
+    public static final DeferredItem<Item> GREEN_ANBU_MASK = ITEMS.registerItem("green_anbu_mask",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.HELMET, props)
+                    .setShouldHideNameplate(true));
 
-    public static final RegistryObject<Item> BLUE_ANBU_MASK = ITEMS.register("blue_anbu_mask", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
-            .setShouldHideNameplate(true));
+    public static final DeferredItem<Item> BLUE_ANBU_MASK = ITEMS.registerItem("blue_anbu_mask",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.HELMET, props)
+                    .setShouldHideNameplate(true));
 
-    public static final RegistryObject<Item> MIST_ANBU_MASK = ITEMS.register("mist_anbu_mask", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.HELMET, new Item.Properties())
-            .setShouldHideNameplate(true));
+    public static final DeferredItem<Item> MIST_ANBU_MASK = ITEMS.registerItem("mist_anbu_mask",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.HELMET, props)
+                    .setShouldHideNameplate(true));
 
-    public static final RegistryObject<Item> CHUNIN_VEST = ITEMS.register("chunin_vest", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.CHUNIN_MAT, ArmorItem.Type.CHESTPLATE, new Item.Properties())
-            .setTooltipKey("item.narutomod.chunin_vest.desc"));
+    public static final DeferredItem<Item> CHUNIN_VEST = ITEMS.registerItem("chunin_vest",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.CHUNIN_MAT, ArmorType.CHESTPLATE, props)
+                    .setTooltipKey("item.narutomod.chunin_vest.desc"));
 
-    public static final RegistryObject<Item> ANBU_ARMOR = ITEMS.register("anbu_armor", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorItem.Type.CHESTPLATE, new Item.Properties())
-            .setTooltipKey("item.narutomod.anbu_armor.desc"));
+    public static final DeferredItem<Item> ANBU_ARMOR = ITEMS.registerItem("anbu_armor",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.CHESTPLATE, props)
+                    .setTooltipKey("item.narutomod.anbu_armor.desc"));
 
-    public static final RegistryObject<Item> AKATSUKI_CLOAK = ITEMS.register("akatsuki_cloak", ()
-            -> new NarutoArmorItem(NarutoArmorMaterial.AKATSUKI_MAT, ArmorItem.Type.CHESTPLATE, new Item.Properties().rarity(Rarity.RARE))
-            .setTooltipKey("item.narutomod.akatsuki_cloak.desc"));
+    public static final DeferredItem<Item> AKATSUKI_CLOAK = ITEMS.registerItem("akatsuki_cloak",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.AKATSUKI_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.RARE))
+                    .setTooltipKey("item.narutomod.akatsuki_cloak.desc"));
 
-    public static final RegistryObject<Item> LONELY_MARCH = ITEMS.register("lonely_march", ()
-            -> new RecordItem(14, NarutoSounds.LONELY_MARCH, new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 41 * 20));
+    public static final DeferredItem<Item> LONELY_MARCH = ITEMS.registerSimpleItem("lonely_march",
+            props -> props.stacksTo(1).rarity(Rarity.RARE)
+                    .jukeboxPlayable(ResourceKey.create(Registries.JUKEBOX_SONG, Identifier.fromNamespaceAndPath(MOD_ID, "lonely_march"))));
 
     // Ninja Headbands
-    private static RegistryObject<Item> createHeadband(String itemName) {
-        return ITEMS.register(itemName, ()
-                -> new NarutoArmorItem(NarutoArmorMaterial.HEADBAND, ArmorItem.Type.HELMET, new Item.Properties()));
+    private static DeferredItem<Item> createHeadband(String itemName) {
+        return ITEMS.registerItem(itemName,
+                props -> new NarutoArmorItem(NarutoArmorMaterial.HEADBAND, ArmorType.HELMET, props));
     }
 
-    public static final RegistryObject<Item> HEADBAND_BLUE = createHeadband("headband_blue");
-    public static final RegistryObject<Item> HEADBAND_BLACK = createHeadband("headband_black");
-    public static final RegistryObject<Item> HEADBAND_RED = createHeadband("headband_red");
-    public static final RegistryObject<Item> HEADBAND_CUSTARD = createHeadband("headband_custard");
+    public static final DeferredItem<Item> HEADBAND_BLUE = createHeadband("headband_blue");
+    public static final DeferredItem<Item> HEADBAND_BLACK = createHeadband("headband_black");
+    public static final DeferredItem<Item> HEADBAND_RED = createHeadband("headband_red");
+    public static final DeferredItem<Item> HEADBAND_CUSTARD = createHeadband("headband_custard");
 
-    public static final RegistryObject<Item> HEADBAND_LEAF = createHeadband("headband_leaf");
-    public static final RegistryObject<Item> HEADBAND_LEAF_SCRATCHED = createHeadband("headband_leaf_scratched");
-    public static final RegistryObject<Item> HEADBAND_LEAF_BLACK = createHeadband("headband_leaf_black");
-    public static final RegistryObject<Item> HEADBAND_LEAF_BLACK_SCRATCHED = createHeadband("headband_leaf_black_scratched");
+    public static final DeferredItem<Item> HEADBAND_LEAF = createHeadband("headband_leaf");
+    public static final DeferredItem<Item> HEADBAND_LEAF_SCRATCHED = createHeadband("headband_leaf_scratched");
+    public static final DeferredItem<Item> HEADBAND_LEAF_BLACK = createHeadband("headband_leaf_black");
+    public static final DeferredItem<Item> HEADBAND_LEAF_BLACK_SCRATCHED = createHeadband("headband_leaf_black_scratched");
 
-    public static final RegistryObject<Item> HEADBAND_ROCK = createHeadband("headband_rock");
-    public static final RegistryObject<Item> HEADBAND_ROCK_SCRATCHED = createHeadband("headband_rock_scratched");
+    public static final DeferredItem<Item> HEADBAND_ROCK = createHeadband("headband_rock");
+    public static final DeferredItem<Item> HEADBAND_ROCK_SCRATCHED = createHeadband("headband_rock_scratched");
 
-    public static final RegistryObject<Item> HEADBAND_SAND = createHeadband("headband_sand");
-    public static final RegistryObject<Item> HEADBAND_SAND_SCRATCHED = createHeadband("headband_sand_scratched");
+    public static final DeferredItem<Item> HEADBAND_SAND = createHeadband("headband_sand");
+    public static final DeferredItem<Item> HEADBAND_SAND_SCRATCHED = createHeadband("headband_sand_scratched");
 
-    public static final RegistryObject<Item> HEADBAND_SOUND = createHeadband("headband_sound");
-    public static final RegistryObject<Item> HEADBAND_SOUND_SCRATCHED = createHeadband("headband_sound_scratched");
+    public static final DeferredItem<Item> HEADBAND_SOUND = createHeadband("headband_sound");
+    public static final DeferredItem<Item> HEADBAND_SOUND_SCRATCHED = createHeadband("headband_sound_scratched");
 
-    public static final RegistryObject<Item> HEADBAND_MIST = createHeadband("headband_mist");
-    public static final RegistryObject<Item> HEADBAND_MIST_SCRATCHED = createHeadband("headband_mist_scratched");
+    public static final DeferredItem<Item> HEADBAND_MIST = createHeadband("headband_mist");
+    public static final DeferredItem<Item> HEADBAND_MIST_SCRATCHED = createHeadband("headband_mist_scratched");
 
-    public static final RegistryObject<Item> HEADBAND_WATERFALL = createHeadband("headband_waterfall");
-    public static final RegistryObject<Item> HEADBAND_WATERFALL_SCRATCHED = createHeadband("headband_waterfall_scratched");
+    public static final DeferredItem<Item> HEADBAND_WATERFALL = createHeadband("headband_waterfall");
+    public static final DeferredItem<Item> HEADBAND_WATERFALL_SCRATCHED = createHeadband("headband_waterfall_scratched");
 
-    public static final RegistryObject<Item> HEADBAND_CLOUD = createHeadband("headband_cloud");
-    public static final RegistryObject<Item> HEADBAND_CLOUD_SCRATCHED = createHeadband("headband_cloud_scratched");
+    public static final DeferredItem<Item> HEADBAND_CLOUD = createHeadband("headband_cloud");
+    public static final DeferredItem<Item> HEADBAND_CLOUD_SCRATCHED = createHeadband("headband_cloud_scratched");
 
-    public static final RegistryObject<Item> HEADBAND_RAIN = createHeadband("headband_rain");
-    public static final RegistryObject<Item> HEADBAND_RAIN_SCRATCHED = createHeadband("headband_rain_scratched");
+    public static final DeferredItem<Item> HEADBAND_RAIN = createHeadband("headband_rain");
+    public static final DeferredItem<Item> HEADBAND_RAIN_SCRATCHED = createHeadband("headband_rain_scratched");
 
-    public static final RegistryObject<Item> HEADBAND_GRASS = createHeadband("headband_grass");
-    public static final RegistryObject<Item> HEADBAND_GRASS_SCRATCHED = createHeadband("headband_grass_scratched");
+    public static final DeferredItem<Item> HEADBAND_GRASS = createHeadband("headband_grass");
+    public static final DeferredItem<Item> HEADBAND_GRASS_SCRATCHED = createHeadband("headband_grass_scratched");
 
-    public static final RegistryObject<Item> HEADBAND_PRIDE = createHeadband("headband_pride");
-    public static final RegistryObject<Item> HEADBAND_YOUTUBE = createHeadband("headband_youtube");
-    public static final RegistryObject<Item> HEADBAND_LAVA = createHeadband("headband_lava");
+    public static final DeferredItem<Item> HEADBAND_PRIDE = createHeadband("headband_pride");
+    public static final DeferredItem<Item> HEADBAND_YOUTUBE = createHeadband("headband_youtube");
+    public static final DeferredItem<Item> HEADBAND_LAVA = createHeadband("headband_lava");
 
     // Creative Tabs
-    public static final RegistryObject<CreativeModeTab> NINJA_WEAPONS_TAB = CREATIVE_MODE_TABS.register("narutomod_weapons", () ->
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> NINJA_WEAPONS_TAB = CREATIVE_MODE_TABS.register("narutomod_weapons", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.narutomod_weapons"))
                     .icon(() -> new ItemStack(KUSANAGI_SWORD.get()))
@@ -197,7 +191,7 @@ public class NarutoItems {
                     })
                     .build());
 
-    public static final RegistryObject<CreativeModeTab> NINJA_ARMOR_TAB = CREATIVE_MODE_TABS.register("narutomod_armor", () ->
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> NINJA_ARMOR_TAB = CREATIVE_MODE_TABS.register("narutomod_armor", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.narutomod_armor"))
                     .icon(() -> new ItemStack(RED_ANBU_MASK.get()))
@@ -214,7 +208,7 @@ public class NarutoItems {
                     })
                     .build());
 
-    public static final RegistryObject<CreativeModeTab> HEADBANDS_TAB = CREATIVE_MODE_TABS.register("narutomod_headbands", () ->
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> HEADBANDS_TAB = CREATIVE_MODE_TABS.register("narutomod_headbands", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.narutomod_headbands"))
                     .icon(() -> new ItemStack(HEADBAND_BLUE.get()))

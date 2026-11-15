@@ -1,23 +1,19 @@
 package com.sekwah.narutomod.client.model.jutsu;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 /**
  * 3D Model for Giant 4-Bladed Fūma Shuriken
  */
-public class FumaShurikenModel extends Model {
-
-    private final ModelPart root;
+public class FumaShurikenModel extends Model<EntityRenderState> {
 
     public FumaShurikenModel(ModelPart modelPart) {
-        super(RenderType::entityCutoutNoCull);
-        this.root = modelPart;
+        super(modelPart, RenderTypes::entityCutout);
     }
 
     public static LayerDefinition createLayer() {
@@ -52,11 +48,5 @@ public class FumaShurikenModel extends Model {
                 PartPose.ZERO);
 
         return LayerDefinition.create(mesh, 64, 32);
-    }
-
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay,
-                               float r, float g, float b, float a) {
-        this.root.render(poseStack, buffer, packedLight, packedOverlay, r, g, b, a);
     }
 }

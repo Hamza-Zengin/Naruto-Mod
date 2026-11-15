@@ -65,7 +65,8 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
         for (int i = 0; i < 16; i++) {
             double rx = basePos.getX() + 0.5 + (player.getRandom().nextDouble() - 0.5) * 2.5;
             double rz = basePos.getZ() + 0.5 + (player.getRandom().nextDouble() - 0.5) * 2.5;
-            serverLevel.sendParticles(rockParticle, rx, basePos.getY() + 0.2, rz, 4, 0.2, 0.3, 0.2, 0.08);
+            serverLevel.sendParticles(rockParticle, rx, basePos.getY() + 0.2, rz, 4, 0.2, 0.3, 0.2, 0.08,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         // Erupt 3D Sculpted Shinobi Earth Bulwark Entity (Physical Solid Barrier)

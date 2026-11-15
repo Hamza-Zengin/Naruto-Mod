@@ -1,6 +1,5 @@
 package com.sekwah.narutomod.network;
 
-import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.network.c2s.ServerAbilityActivatePacket;
 import com.sekwah.narutomod.network.c2s.ServerAbilityChannelPacket;
 import com.sekwah.narutomod.network.c2s.ServerJutsuCastingPacket;
@@ -10,61 +9,54 @@ import com.sekwah.narutomod.network.c2s.ServerSelectClanPacket;
 import com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket;
 import com.sekwah.narutomod.network.s2c.ClientCameraShakePacket;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
-
-import java.util.Optional;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class PacketHandler {
 
     public static final String PROTOCOL_VERSION = "1";
 
-    public static final SimpleChannel NARUTO_CHANNEL = NetworkRegistry.ChannelBuilder
-            .named(new ResourceLocation(NarutoMod.MOD_ID, "naruto_data"))
-            .networkProtocolVersion(() -> PROTOCOL_VERSION)
-            .clientAcceptedVersions(PROTOCOL_VERSION::equals)
-            .serverAcceptedVersions(PROTOCOL_VERSION::equals)
-            .simpleChannel();
+    public static void register(final RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
 
-    public static void init() {
         // Client to server packets
-        NARUTO_CHANNEL.registerMessage(100, ServerJutsuCastingPacket.class, ServerJutsuCastingPacket::encode, ServerJutsuCastingPacket::decode, ServerJutsuCastingPacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(101, ServerAbilityActivatePacket.class, ServerAbilityActivatePacket::encode, ServerAbilityActivatePacket::decode, ServerAbilityActivatePacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(102, ServerAbilityChannelPacket.class, ServerAbilityChannelPacket::encode, ServerAbilityChannelPacket::decode, ServerAbilityChannelPacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(103, ServerSelectClanPacket.class, ServerSelectClanPacket::encode, ServerSelectClanPacket::decode, ServerSelectClanPacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(104, ServerRankUpPacket.class, ServerRankUpPacket::encode, ServerRankUpPacket::decode, ServerRankUpPacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(105, ServerTriggerHandJutsuPacket.class, ServerTriggerHandJutsuPacket::encode, ServerTriggerHandJutsuPacket::decode, ServerTriggerHandJutsuPacket.Handler::handle);
-        NARUTO_CHANNEL.registerMessage(106, ServerMissionActionPacket.class, ServerMissionActionPacket::encode, ServerMissionActionPacket::decode, ServerMissionActionPacket.Handler::handle);
+        registrar.playToServer(ServerJutsuCastingPacket.TYPE, ServerJutsuCastingPacket.STREAM_CODEC, ServerJutsuCastingPacket::handle);
+        registrar.playToServer(ServerAbilityActivatePacket.TYPE, ServerAbilityActivatePacket.STREAM_CODEC, ServerAbilityActivatePacket::handle);
+        registrar.playToServer(ServerAbilityChannelPacket.TYPE, ServerAbilityChannelPacket.STREAM_CODEC, ServerAbilityChannelPacket::handle);
+        registrar.playToServer(ServerSelectClanPacket.TYPE, ServerSelectClanPacket.STREAM_CODEC, ServerSelectClanPacket::handle);
+        registrar.playToServer(ServerRankUpPacket.TYPE, ServerRankUpPacket.STREAM_CODEC, ServerRankUpPacket::handle);
+        registrar.playToServer(ServerTriggerHandJutsuPacket.TYPE, ServerTriggerHandJutsuPacket.STREAM_CODEC, ServerTriggerHandJutsuPacket::handle);
+        registrar.playToServer(ServerMissionActionPacket.TYPE, ServerMissionActionPacket.STREAM_CODEC, ServerMissionActionPacket::handle);
 
         // Server to client packets
-        NARUTO_CHANNEL.registerMessage(200, ClientJutsuEffectPacket.class, ClientJutsuEffectPacket::encode, ClientJutsuEffectPacket::decode, ClientJutsuEffectPacket.Handler::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
-        NARUTO_CHANNEL.registerMessage(201, ClientCameraShakePacket.class, ClientCameraShakePacket::encode, ClientCameraShakePacket::decode, ClientCameraShakePacket.Handler::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        registrar.playToClient(ClientJutsuEffectPacket.TYPE, ClientJutsuEffectPacket.STREAM_CODEC);
+        registrar.playToClient(ClientCameraShakePacket.TYPE, ClientCameraShakePacket.STREAM_CODEC);
     }
 
-    public static void sendToServer(Object obj) {
-        NARUTO_CHANNEL.sendToServer(obj);
+    public static void sendToServer(CustomPacketPayload payload) {
+        ClientPacketDistributor.sendToServer(payload);
     }
 
     // These are for handling from server side to players.
-    public static void sendToPlayer(Object obj, ServerPlayer player) {
-        NARUTO_CHANNEL.sendTo(obj, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+    public static void sendToPlayer(CustomPacketPayload payload, ServerPlayer player) {
+        PacketDistributor.sendToPlayer(player, payload);
     }
 
-    public static void sendToTrackingAndSelf(Object msg, Entity target) {
-        NARUTO_CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> target), msg);
+    public static void sendToTrackingAndSelf(CustomPacketPayload msg, Entity target) {
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(target, msg);
     }
 
-    public static void sentToTrackingAndSelf(Object obj, ServerPlayer player) {
-        NARUTO_CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), obj);
+    public static void sentToTrackingAndSelf(CustomPacketPayload obj, ServerPlayer player) {
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, obj);
     }
 
-    public static void sentToTracking(Object obj, Entity entity) {
-        NARUTO_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), obj);
+    public static void sentToTracking(CustomPacketPayload obj, Entity entity) {
+        PacketDistributor.sendToPlayersTrackingEntity(entity, obj);
     }
 
 }

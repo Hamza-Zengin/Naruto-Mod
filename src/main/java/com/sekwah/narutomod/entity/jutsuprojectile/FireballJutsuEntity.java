@@ -6,15 +6,15 @@ import com.sekwah.narutomod.entity.NarutoEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
@@ -62,10 +62,12 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
 
     @Override
     public void explodeAndDiscard() {
-        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
-            serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2.0F, 1.0F);
-            serverLevel.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + 0.5D, this.getZ(), 45, 0.8D, 0.8D, 0.8D, 0.12D);
-            serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY() + 0.5D, this.getZ(), 15, 0.5D, 0.5D, 0.5D, 0.05D);
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
+            serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 2.0F, 1.0F);
+            serverLevel.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + 0.5D, this.getZ(), 45, 0.8D, 0.8D, 0.8D, 0.12D,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+            serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY() + 0.5D, this.getZ(), 15, 0.5D, 0.5D, 0.5D, 0.05D,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
         this.discard();
     }
@@ -76,22 +78,15 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_IMPACTED, false);
-        this.entityData.define(DATA_IMPACT_TICKS, 0);
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_IMPACTED, false);
+        builder.define(DATA_IMPACT_TICKS, 0);
     }
 
     public FireballJutsuEntity(EntityType<? extends AbstractHurtingProjectile> p_36817_, double p_36818_, double p_36819_, double p_36820_, double p_36821_, double p_36822_, double p_36823_, Level p_36824_) {
-        super(p_36817_, p_36824_);
-        this.moveTo(p_36818_, p_36819_, p_36820_, this.getYRot(), this.getXRot());
-        this.reapplyPosition();
-        double d0 = Math.sqrt(p_36821_ * p_36821_ + p_36822_ * p_36822_ + p_36823_ * p_36823_);
-        if (d0 != 0.0D) {
-            this.xPower = p_36821_ / d0 * 0.24D;
-            this.yPower = p_36822_ / d0 * 0.24D;
-            this.zPower = p_36823_ / d0 * 0.24D;
-        }
+        super(p_36817_, p_36818_, p_36819_, p_36820_, new Vec3(p_36821_, p_36822_, p_36823_), p_36824_);
+        this.accelerationPower = 0.24D;
     }
 
     public FireballJutsuEntity(LivingEntity player, double xVel, double yVel, double zVel) {
@@ -100,6 +95,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         this.setRot(player.getYRot(), player.getXRot());
     }
 
+    @Override
     public EntityDimensions getDimensions(Pose p_19721_) {
         return EntityDimensions.scalable(ENTITY_SIZE, ENTITY_SIZE)
                 .scale(Math.min(INITIAL_SCALE + (GROW_SCALE - (GROW_SCALE * ((GROW_TIME - time) / GROW_TIME))), 1.0f));
@@ -108,10 +104,10 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
     @Override
     public void tick() {
         if (this.isImpacted()) {
-            this.setDeltaMovement( net.minecraft.world.phys.Vec3.ZERO);
+            this.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
             this.time++;
             int it = this.getImpactTicks() + 1;
-            if (!this.level().isClientSide) {
+            if (!this.level().isClientSide()) {
                 this.entityData.set(DATA_IMPACT_TICKS, it);
                 if (this.level() instanceof ServerLevel serverLevel) {
                     for (int i = 0; i < 8; i++) {
@@ -121,7 +117,8 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                                 this.getX() + Math.cos(angle) * r,
                                 this.getY() + 0.5 + (this.random.nextDouble() - 0.3) * 1.8,
                                 this.getZ() + Math.sin(angle) * r,
-                                2, 0.15, 0.15, 0.15, 0.03);
+                                2, 0.15, 0.15, 0.15, 0.03,
+                                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
                     if (it >= 18) {
                         this.discard();
@@ -131,7 +128,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
             return;
         }
 
-        if (!this.level().isClientSide && !this.isImpacted()) {
+        if (!this.level().isClientSide() && !this.isImpacted()) {
             Vec3 start = this.position();
             Vec3 delta = this.getDeltaMovement();
             Vec3 end = start.add(delta);
@@ -145,7 +142,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
             if (entityHit != null) {
                 hitResult = entityHit;
             }
-            if (hitResult.getType() != HitResult.Type.MISS && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, hitResult)) {
+            if (hitResult.getType() != HitResult.Type.MISS && !net.neoforged.neoforge.event.EventHooks.onProjectileImpact(this, hitResult)) {
                 this.onHit(hitResult);
                 return;
             }
@@ -155,7 +152,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         ++this.time;
         this.refreshDimensions();
 
-        if (!this.level().isClientSide && !this.isImpacted() && this.isAlive()) {
+        if (!this.level().isClientSide() && !this.isImpacted() && this.isAlive()) {
             AABB clashBox = this.getBoundingBox().inflate(0.35D);
             List<Entity> others = this.level().getEntities(this, clashBox,
                     e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
@@ -169,8 +166,9 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
             }
         }
 
-        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel && this.time % 2 == 0) {
-            serverLevel.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + 0.5, this.getZ(), 5, 0.35, 0.35, 0.35, 0.03);
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel && this.time % 2 == 0) {
+            serverLevel.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + 0.5, this.getZ(), 5, 0.35, 0.35, 0.35, 0.03,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         if (this.isInWaterOrRain()) {
@@ -187,7 +185,8 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                         this.getY() + this.getBbHeight() + 1,
                         this.getZ(),
                         40,
-                        0.5, 0.2, 0.5, 0);
+                        0.5, 0.2, 0.5, 0,
+                        net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             }
             this.playSound(SoundEvents.FIRE_EXTINGUISH, 1F, 1.0F);
             this.discard();
@@ -211,16 +210,16 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         if(this.level() instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ParticleTypes.FLAME,
                     this.getX(), this.getY() + this.getBbHeight() / 2, this.getZ(),
-                    85, 1.2, 1.0, 1.2, 0.15);
+                    85, 1.2, 1.0, 1.2, 0.15,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
             int flameRadius = 8;
             Entity owner = this.getOwner();
             if (owner instanceof Player player) {
-                int mastery = player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA)
-                        .map(nd -> nd.getMastery(com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.getId()))
-                        .orElse(0);
+                int mastery = player.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA)
+                        .getMastery(com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.getId());
                 int tier = com.sekwah.narutomod.abilities.Ability.getMasteryTier(mastery);
                 if (tier >= 5) flameRadius = 10;
                 else if (tier >= 3) flameRadius = 9;
@@ -247,18 +246,18 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                 float fireSecs = (float) (8f - (distance / 6f)) * 20;
                 float baseDamage;
                 if (owner instanceof Player player) {
-                    baseDamage = player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA)
-                            .map(nd -> com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.get().getDamage(nd))
-                            .orElse(com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.get().getDamage());
+                    baseDamage = com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.get().getDamage(
+                            player.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA));
                 } else {
                     baseDamage = com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.get().getDamage();
                 }
                 float fireDamage = (float) (baseDamage - (distance / 4f));
                 if(fireDamage > 0) {
                     Entity entity1 = this.getOwner();
-                    entity.hurt(NarutoDamageSource.fireball(this, entity1), fireDamage);
+                    DamageSource source = NarutoDamageSource.fireball(this, entity1);
+                    entity.hurtServer(serverLevel, source, fireDamage);
                     if (entity1 instanceof LivingEntity) {
-                        this.doEnchantDamageEffects((LivingEntity)entity1, entity);
+                        EnchantmentHelper.doPostAttackEffects(serverLevel, entity, source);
                     }
                 }
                 if(entity.getRemainingFireTicks() < fireSecs) {
@@ -266,7 +265,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                 }
             });
 
-            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level(), this.getOwner());
+            boolean flag = net.neoforged.neoforge.event.EventHooks.canEntityGrief(serverLevel, this.getOwner());
 
             if(flag) {
                 int fireSpread = 2;
@@ -283,7 +282,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                 }
             }
 
-            this.playSound(SoundEvents.GENERIC_EXPLODE, 3.0f, 0.9f);
+            this.playSound(SoundEvents.GENERIC_EXPLODE.value(), 3.0f, 0.9f);
             this.playSound(com.sekwah.narutomod.sounds.NarutoSounds.SIZZLE.get(), 2.0f, 1.1f);
         }
     }
@@ -306,7 +305,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
     }
 
     @Override
-    public boolean hurt(DamageSource p_36910_, float p_36911_) {
+    public boolean hurtServer(ServerLevel level, DamageSource p_36910_, float p_36911_) {
         return false;
     }
 
@@ -328,19 +327,5 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
     @Override
     protected boolean shouldBurn() {
         return false;
-    }
-
-    @Override
-    public void recreateFromPacket(ClientboundAddEntityPacket p_150128_) {
-        super.recreateFromPacket(p_150128_);
-        double d0 = p_150128_.getXa();
-        double d1 = p_150128_.getYa();
-        double d2 = p_150128_.getZa();
-        double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
-        if (d3 != 0.0D) {
-            this.xPower = d0 / d3 * 0.2D;
-            this.yPower = d1 / d3 * 0.2D;
-            this.zPower = d2 / d3 * 0.2D;
-        }
     }
 }

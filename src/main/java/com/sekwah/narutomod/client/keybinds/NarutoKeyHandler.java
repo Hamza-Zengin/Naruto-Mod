@@ -4,17 +4,17 @@ import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.config.NarutoConfig;
-import com.sekwah.narutomod.network.PacketHandler;
 import com.sekwah.narutomod.network.c2s.ServerAbilityChannelPacket;
 import com.sekwah.narutomod.network.c2s.ServerJutsuCastingPacket;
-import net.minecraft.ChatFormatting;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.resources.Identifier;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -22,12 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = NarutoMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(value = Dist.CLIENT, modid = NarutoMod.MOD_ID)
 public class NarutoKeyHandler {
 
     private static final Map<String, KeyBindingTickHeld> keys = new HashMap<>();
 
-    private static final String NARUTO_KEY_CATEGORY = "narutomod.keys.category";
+    private static final KeyMapping.Category NARUTO_KEY_CATEGORY = new KeyMapping.Category(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "keys"));
 
     private static final List<KeyBindingTickHeld> JUTSU_KEYS = new ArrayList<>();
 
@@ -69,8 +69,8 @@ public class NarutoKeyHandler {
 
         NINJA_MENU_KEY.registerClickConsumer(() -> {
             Minecraft mc = Minecraft.getInstance();
-            if (mc.player != null && mc.screen == null) {
-                mc.setScreen(new com.sekwah.narutomod.client.gui.NinjaMenuScreen());
+            if (mc.player != null && mc.gui.screen() == null) {
+                mc.gui.setScreen(new com.sekwah.narutomod.client.gui.NinjaMenuScreen());
             }
         });
     }
@@ -86,6 +86,7 @@ public class NarutoKeyHandler {
     }
 
     public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+        event.registerCategory(NARUTO_KEY_CATEGORY);
         registerKeyBinds();
         for (KeyBindingTickHeld key : JUTSU_KEYS) {
             event.register(key);
@@ -99,12 +100,10 @@ public class NarutoKeyHandler {
         if(isCurrentlyChargingAbility) {
             return;
         }
-        PacketHandler.sendToServer(new ServerJutsuCastingPacket(i));
+        ClientPacketDistributor.sendToServer(new ServerJutsuCastingPacket(i));
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
-            mc.player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-                ninjaData.addSeal((byte) i);
-            });
+            mc.player.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA).addSeal((byte) i);
         }
         ticksSinceLastKey = 0;
         if (currentJutsuCombo < MAX_JUTSU_VALUE) {
@@ -117,7 +116,7 @@ public class NarutoKeyHandler {
     }
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
+    public static void onClientTick(ClientTickEvent.Post event) {
         if(currentJutsuCombo != 0) {
             ticksSinceLastKey++;
         }
@@ -155,7 +154,9 @@ public class NarutoKeyHandler {
             }
             isCurrentlyChargingAbility = true;
         } else if(!isHoldingLastKey) {
-            currentKey.consumeReleaseDuration();
+            if (currentKey != null) {
+                currentKey.consumeReleaseDuration();
+            }
             if(isCurrentlyChargingAbility) {
                 NarutoAbilities.handleCharging(currentJutsuCombo, ServerAbilityChannelPacket.ChannelStatus.STOP);
                 resetJutsuCasting();
@@ -178,7 +179,7 @@ public class NarutoKeyHandler {
         isCurrentlyChargingAbility = false;
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
-            mc.player.getCapability(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA).ifPresent(com.sekwah.narutomod.capabilities.INinjaData::clearSeals);
+            mc.player.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA).clearSeals();
         }
     }
 

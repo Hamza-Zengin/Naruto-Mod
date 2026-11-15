@@ -58,7 +58,7 @@ public class WorldgenStructureAuditTest {
                 String[] parts = location.split(":", 2);
                 Assertions.assertEquals(2, parts.length, "Invalid ResourceLocation: " + location);
 
-                Path nbtPath = DATA_DIR.resolve(parts[0]).resolve("structures").resolve(parts[1] + ".nbt");
+                Path nbtPath = DATA_DIR.resolve(parts[0]).resolve("structure").resolve(parts[1] + ".nbt");
                 Assertions.assertTrue(Files.isRegularFile(nbtPath),
                         "Missing structure .nbt file for location '" + location + "' at " + nbtPath);
 

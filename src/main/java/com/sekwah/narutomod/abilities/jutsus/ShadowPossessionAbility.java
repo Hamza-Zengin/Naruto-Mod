@@ -15,7 +15,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ import java.util.List;
  */
 public class ShadowPossessionAbility extends Ability implements Ability.Cooldown {
 
-    private static final DustParticleOptions SHADOW_INK = new DustParticleOptions(new Vector3f(0.06F, 0.04F, 0.10F), 1.35F);
+    private static final DustParticleOptions SHADOW_INK = new DustParticleOptions(0xFF0F0A1A, 1.35F);
 
     @Override
     public ActivationType activationType() {
@@ -52,8 +51,8 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
     public boolean canActivate(Player player, INinjaData ninjaData) {
         if (ninjaData == null || ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("nara")) {
             if (player != null) {
-                player.displayClientMessage(Component.translatable("jutsu.fail.notclan",
-                        Component.literal("Nara").withStyle(ChatFormatting.DARK_GRAY)), true);
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
+                        Component.literal("Nara").withStyle(ChatFormatting.DARK_GRAY)));
             }
             return false;
         }
@@ -104,7 +103,8 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
         LivingEntity capturedTarget = null;
         for (double d = 1.0; d <= maxReach; d += 0.6) {
             Vec3 pos = player.position().add(horizDir.scale(d));
-            serverLevel.sendParticles(SHADOW_INK, pos.x, player.getY() + 0.1, pos.z, 3, 0.12, 0.02, 0.12, 0.0);
+            serverLevel.sendParticles(SHADOW_INK, pos.x, player.getY() + 0.1, pos.z, 3, 0.12, 0.02, 0.12, 0.0,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
             AABB checkBox = new AABB(pos.x - 1.1, player.getY() - 1.5, pos.z - 1.1,
                     pos.x + 1.1, player.getY() + 2.5, pos.z + 1.1);
@@ -139,8 +139,8 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
         serverLevel.addFreshEntity(shadowBind3D);
 
         serverLevel.playSound(null, boundEntity.blockPosition(), SoundEvents.WARDEN_TENDRIL_CLICKS, SoundSource.PLAYERS, 1.5f, 0.8f);
-        boundEntity.hurt(player.damageSources().magic(), baseDamage);
-        boundEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, holdTicks, 255, false, false));
+        boundEntity.hurtServer(serverLevel, player.damageSources().magic(), baseDamage);
+        boundEntity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, holdTicks, 255, false, false));
         boundEntity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, holdTicks, 2, false, false));
 
         // Lock target movement & draw shadow tether for full holdTicks
@@ -158,17 +158,19 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
                     double lx = pPos.x + (tPos.x - pPos.x) * f;
                     double ly = pPos.y + (tPos.y - pPos.y) * f + 0.1;
                     double lz = pPos.z + (tPos.z - pPos.z) * f;
-                    sLevel.sendParticles(SHADOW_INK, lx, ly, lz, 2, 0.06, 0.02, 0.06, 0.0);
+                    sLevel.sendParticles(SHADOW_INK, lx, ly, lz, 2, 0.06, 0.02, 0.06, 0.0,
+                            net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 }
 
                 // Full movement lock
                 boundEntity.setDeltaMovement(0.0, Math.min(0.0, boundEntity.getDeltaMovement().y), 0.0);
-                boundEntity.hurtMarked = true;
+                boundEntity.needsSync = true;
 
                 // Final Shadow Neck Bind (Kage Kubishibari) constriction damage
                 if (s == steps - 1) {
-                    boundEntity.hurt(p.damageSources().magic(), baseDamage * 1.5f);
-                    sLevel.sendParticles(SHADOW_INK, boundEntity.getX(), boundEntity.getY() + 1.0, boundEntity.getZ(), 12, 0.3, 0.4, 0.3, 0.02);
+                    boundEntity.hurtServer(sLevel, p.damageSources().magic(), baseDamage * 1.5f);
+                    sLevel.sendParticles(SHADOW_INK, boundEntity.getX(), boundEntity.getY() + 1.0, boundEntity.getZ(), 12, 0.3, 0.4, 0.3, 0.02,
+                            net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 }
             }, step * 5);
         }

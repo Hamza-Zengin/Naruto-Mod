@@ -1,25 +1,24 @@
 package com.sekwah.narutomod.client.model.entity;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.sekwah.sekclib.util.ModelUtils;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 
 /**
  * 3D Skeletal Chakra Ribcage of Susanoo enveloping the shinobi.
  * Engineered with 100% mathematical left/right symmetry and balanced front-to-back chest depth.
  */
-public class SusanooRibcageModel<T extends LivingEntity> extends HumanoidModel<T> {
+public class SusanooRibcageModel extends HumanoidModel<HumanoidRenderState> {
 
     public SusanooRibcageModel(ModelPart root) {
         super(root);
     }
 
     public static LayerDefinition createLayer() {
-        MeshDefinition mesh = HumanoidModel.createMesh(CubeDeformation.NONE, 0.0F);
+        MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
         PartDefinition root = mesh.getRoot();
 
         // Attach ribcage structure to the body part so it moves, rotates, and bends with player torso
@@ -126,13 +125,6 @@ public class SusanooRibcageModel<T extends LivingEntity> extends HumanoidModel<T
                 .texOffs(16, texY)
                 .addBox(-3.4F, -halfT, -halfT, 6.8F, thickness, thickness, CubeDeformation.NONE),
                 PartPose.offsetAndRotation(-4.4F, y + halfT, backZ, 0.0F, -0.15F, 0.0F));
-    }
-
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        poseStack.pushPose();
-        this.body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        poseStack.popPose();
     }
 }
 

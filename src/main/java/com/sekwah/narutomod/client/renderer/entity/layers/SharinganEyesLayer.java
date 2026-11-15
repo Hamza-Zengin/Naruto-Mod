@@ -3,91 +3,76 @@ package com.sekwah.narutomod.client.renderer.entity.layers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.sekwah.narutomod.NarutoMod;
-import com.sekwah.narutomod.abilities.NarutoAbilities;
-import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
-import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import com.sekwah.narutomod.client.renderer.NarutoRenderEvents;
+import net.minecraft.client.model.player.PlayerModel;
+import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import org.joml.Matrix4f;
 
 /**
- * Renders glowing crimson Sharingan eyes on the player whenever Sharingan is active.
- * Uses vanilla Minecraft glowing eye shaders (like Enderman/Spider eyes).
+ * Renders glowing crimson Sharingan and Byakugan eyes on the player whenever active.
  */
-public class SharinganEyesLayer<T extends net.minecraft.world.entity.LivingEntity, M extends PlayerModel<T>> extends RenderLayer<T, M> {
+public class SharinganEyesLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 
-    private static final ResourceLocation SHARINGAN_EYES_TEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/sharingan_1_tomoe.png");
-    private static final ResourceLocation BYAKUGAN_EYES_TEXTURE = new ResourceLocation(NarutoMod.MOD_ID, "textures/entity/eyes/byakugan_eyes.png");
+    private static final Identifier BYAKUGAN_EYES_TEXTURE =
+            Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/eyes/byakugan_eyes.png");
 
-    public SharinganEyesLayer(RenderLayerParent<T, M> parent) {
+    public SharinganEyesLayer(RenderLayerParent<AvatarRenderState, PlayerModel> parent) {
         super(parent);
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T entity,
-                       float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        if (entity.isInvisible()) {
+    public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight,
+                       AvatarRenderState state, float yRot, float xRot) {
+        if (state.isInvisible) {
             return;
         }
-        if (entity instanceof AbstractClientPlayer player) {
-            player.getCapability(NinjaCapabilityHandler.NINJA_DATA).ifPresent(ninjaData -> {
-                boolean sharingan = ninjaData.isSharinganActive();
-                boolean byakugan = ninjaData.isByakuganActive();
-                if (!sharingan && !byakugan) return;
-                ResourceLocation texture = sharingan
-                        ? com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(ninjaData).getTexture()
-                        : BYAKUGAN_EYES_TEXTURE;
-                renderIrisQuads(poseStack, buffer, texture);
-            });
-        } else if (entity instanceof com.sekwah.narutomod.entity.ShadowCloneEntity clone) {
-            boolean sharingan = clone.hasActiveAbility("sharingan") || clone.getSharinganStage() > 0;
-            boolean byakugan = clone.hasActiveAbility("byakugan");
-            if (!sharingan && !byakugan) return;
-            ResourceLocation texture;
-            if (sharingan) {
-                int stageIdx = Math.max(0, Math.min(3, clone.getSharinganStage() - 1));
-                texture = com.sekwah.narutomod.abilities.jutsus.SharinganAbility.SharinganStage.values()[stageIdx].getTexture();
-            } else {
-                texture = BYAKUGAN_EYES_TEXTURE;
-            }
-            renderIrisQuads(poseStack, buffer, texture);
+        NarutoRenderEvents.NinjaRenderStateData data = state.getRenderData(NarutoRenderEvents.NINJA_RENDER_DATA_KEY);
+        if (data == null || (!data.hasSharingan() && !data.hasByakugan())) {
+            return;
         }
+
+        Identifier texture = (data.hasSharingan() && data.eyeTexture() != null)
+                ? data.eyeTexture()
+                : BYAKUGAN_EYES_TEXTURE;
+        renderIrisQuads(poseStack, submitNodeCollector, texture);
     }
 
-    private void renderIrisQuads(PoseStack poseStack, MultiBufferSource buffer, ResourceLocation texture) {
-            VertexConsumer consumer = buffer.getBuffer(RenderType.entityTranslucent(texture));
-            poseStack.pushPose();
-            this.getParentModel().head.translateAndRotate(poseStack);
+    private void renderIrisQuads(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, Identifier texture) {
+        poseStack.pushPose();
+        this.getParentModel().head.translateAndRotate(poseStack);
 
-            org.joml.Matrix4f matrix = poseStack.last().pose();
-            org.joml.Matrix3f normal = poseStack.last().normal();
-
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture), (pose, consumer) -> {
+            Matrix4f matrix = pose.pose();
             float z = -4.003F / 16.0F;
             float yTop = -4.0F / 16.0F;
             float yBottom = -3.0F / 16.0F;
-            int fullBright = net.minecraft.client.renderer.LightTexture.FULL_BRIGHT;
+            int fullBright = LightCoordsUtil.FULL_BRIGHT;
 
             // Right Eye Iris: X = [-2/16 .. -1/16]
-            drawEyeQuad(consumer, matrix, normal, -2.0F / 16.0F, -1.0F / 16.0F, yTop, yBottom, z, fullBright);
+            drawEyeQuad(consumer, matrix, pose, -2.0F / 16.0F, -1.0F / 16.0F, yTop, yBottom, z, fullBright);
             // Left Eye Iris: X = [+1/16 .. +2/16]
-            drawEyeQuad(consumer, matrix, normal, 1.0F / 16.0F, 2.0F / 16.0F, yTop, yBottom, z, fullBright);
+            drawEyeQuad(consumer, matrix, pose, 1.0F / 16.0F, 2.0F / 16.0F, yTop, yBottom, z, fullBright);
+        });
 
-            poseStack.popPose();
+        poseStack.popPose();
     }
 
-    private static void drawEyeQuad(VertexConsumer consumer, org.joml.Matrix4f matrix, org.joml.Matrix3f normal,
+    private static void drawEyeQuad(VertexConsumer consumer, Matrix4f matrix, PoseStack.Pose pose,
                                     float x1, float x2, float y1, float y2, float z, int light) {
-        consumer.vertex(matrix, x1, y1, z).color(255, 255, 255, 255).uv(0.0F, 0.0F)
-                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normal, 0.0F, 0.0F, -1.0F).endVertex();
-        consumer.vertex(matrix, x1, y2, z).color(255, 255, 255, 255).uv(0.0F, 1.0F)
-                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normal, 0.0F, 0.0F, -1.0F).endVertex();
-        consumer.vertex(matrix, x2, y2, z).color(255, 255, 255, 255).uv(1.0F, 1.0F)
-                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normal, 0.0F, 0.0F, -1.0F).endVertex();
-        consumer.vertex(matrix, x2, y1, z).color(255, 255, 255, 255).uv(1.0F, 0.0F)
-                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(normal, 0.0F, 0.0F, -1.0F).endVertex();
+        consumer.addVertex(matrix, x1, y1, z).setColor(255, 255, 255, 255).setUv(0.0F, 0.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0.0F, 0.0F, -1.0F);
+        consumer.addVertex(matrix, x1, y2, z).setColor(255, 255, 255, 255).setUv(0.0F, 1.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0.0F, 0.0F, -1.0F);
+        consumer.addVertex(matrix, x2, y2, z).setColor(255, 255, 255, 255).setUv(1.0F, 1.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0.0F, 0.0F, -1.0F);
+        consumer.addVertex(matrix, x2, y1, z).setColor(255, 255, 255, 255).setUv(1.0F, 0.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0.0F, 0.0F, -1.0F);
     }
 }

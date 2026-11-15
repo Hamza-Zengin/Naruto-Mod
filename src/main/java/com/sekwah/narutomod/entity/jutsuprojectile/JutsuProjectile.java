@@ -26,7 +26,7 @@ public interface JutsuProjectile {
         if (!(this instanceof Entity thisEntity) || !(other instanceof Entity otherEntity)) {
             return;
         }
-        if (thisEntity.level().isClientSide || !thisEntity.isAlive() || !otherEntity.isAlive()) {
+        if (thisEntity.level().isClientSide() || !thisEntity.isAlive() || !otherEntity.isAlive()) {
             return;
         }
 

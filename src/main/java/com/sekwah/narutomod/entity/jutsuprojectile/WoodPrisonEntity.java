@@ -1,17 +1,16 @@
 package com.sekwah.narutomod.entity.jutsuprojectile;
 
 import com.sekwah.narutomod.entity.NarutoEntities;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -22,9 +21,10 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkHooks;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,8 +44,8 @@ public class WoodPrisonEntity extends Entity {
             SynchedEntityData.defineId(WoodPrisonEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_CAGE_YAW =
             SynchedEntityData.defineId(WoodPrisonEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Optional<UUID>> DATA_CASTER_UUID =
-            SynchedEntityData.defineId(WoodPrisonEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Optional<net.minecraft.world.entity.EntityReference<LivingEntity>>> DATA_CASTER_UUID =
+            SynchedEntityData.defineId(WoodPrisonEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
     public WoodPrisonEntity(EntityType<? extends WoodPrisonEntity> type, Level level) {
         super(type, level);
@@ -63,10 +63,10 @@ public class WoodPrisonEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_MAX_LIFE, DEFAULT_MAX_LIFE);
-        this.entityData.define(DATA_CAGE_YAW, 0.0F);
-        this.entityData.define(DATA_CASTER_UUID, Optional.empty());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_MAX_LIFE, DEFAULT_MAX_LIFE);
+        builder.define(DATA_CAGE_YAW, 0.0F);
+        builder.define(DATA_CASTER_UUID, Optional.empty());
     }
 
     @Override
@@ -91,14 +91,14 @@ public class WoodPrisonEntity extends Entity {
         double pinnedY = Math.min(target.getDeltaMovement().y, -0.3D);
         target.setDeltaMovement(new Vec3(pullX, pinnedY, pullZ));
         target.setJumping(false);
-        target.hurtMarked = true;
+        target.needsSync = true;
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (!this.level().isClientSide && this.level() instanceof ServerLevel serverLevel) {
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
             Player caster = this.getCasterPlayer();
             AABB cageBox = this.getCageTrapBox();
             List<LivingEntity> trappedTargets = serverLevel.getEntitiesOfClass(LivingEntity.class, cageBox,
@@ -107,7 +107,7 @@ public class WoodPrisonEntity extends Entity {
             // Every tick: strictly lock movement and block jumping inside the cage
             for (LivingEntity target : trappedTargets) {
                 this.restrainTarget(target);
-                target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 25, 6, false, false));
+                target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 25, 6, false, false));
             }
 
             // Periodic constriction wave: crushing nature damage, life siphon, and root particles
@@ -120,13 +120,15 @@ public class WoodPrisonEntity extends Entity {
                     double r = 2.0D;
                     double px = this.getX() + Math.cos(angle) * r;
                     double pz = this.getZ() + Math.sin(angle) * r;
-                    serverLevel.sendParticles(woodParticle, px, this.getY() + 1.2D, pz, 3, 0.2D, 0.5D, 0.2D, 0.05D);
-                    serverLevel.sendParticles(leafParticle, px, this.getY() + 1.8D, pz, 1, 0.2D, 0.2D, 0.2D, 0.02D);
+                    serverLevel.sendParticles(woodParticle, px, this.getY() + 1.2D, pz, 3, 0.2D, 0.5D, 0.2D, 0.05D,
+                            net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                    serverLevel.sendParticles(leafParticle, px, this.getY() + 1.8D, pz, 1, 0.2D, 0.2D, 0.2D, 0.02D,
+                            net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 }
 
                 for (LivingEntity target : trappedTargets) {
                     target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 0));
-                    target.hurt(caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().magic(), 3.5F);
+                    target.hurtServer(serverLevel, caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().magic(), 3.5F);
                     if (caster != null) {
                         caster.heal(0.8F);
                     }
@@ -157,11 +159,11 @@ public class WoodPrisonEntity extends Entity {
     }
 
     public Optional<UUID> getCasterUUID() {
-        return this.entityData.get(DATA_CASTER_UUID);
+        return this.entityData.get(DATA_CASTER_UUID).map(net.minecraft.world.entity.EntityReference::getUUID);
     }
 
     public void setCasterUUID(UUID uuid) {
-        this.entityData.set(DATA_CASTER_UUID, Optional.ofNullable(uuid));
+        this.entityData.set(DATA_CASTER_UUID, Optional.ofNullable(uuid).map(net.minecraft.world.entity.EntityReference::of));
     }
 
     public Player getCasterPlayer() {
@@ -178,27 +180,21 @@ public class WoodPrisonEntity extends Entity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
-        if (tag.contains("MaxLife")) {
-            this.setMaxLife(tag.getInt("MaxLife"));
-        }
-        if (tag.contains("CageYaw")) {
-            this.setCageYaw(tag.getFloat("CageYaw"));
-        }
-        if (tag.hasUUID("CasterUUID")) {
-            this.setCasterUUID(tag.getUUID("CasterUUID"));
-        }
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return false;
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
-        tag.putInt("MaxLife", this.getMaxLife());
-        tag.putFloat("CageYaw", this.getCageYaw());
-        this.getCasterUUID().ifPresent(uuid -> tag.putUUID("CasterUUID", uuid));
+    protected void readAdditionalSaveData(ValueInput input) {
+        this.setMaxLife(input.getIntOr("MaxLife", DEFAULT_MAX_LIFE));
+        this.setCageYaw(input.getFloatOr("CageYaw", 0.0F));
+        input.read("CasterUUID", UUIDUtil.CODEC).ifPresent(this::setCasterUUID);
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    protected void addAdditionalSaveData(ValueOutput output) {
+        output.putInt("MaxLife", this.getMaxLife());
+        output.putFloat("CageYaw", this.getCageYaw());
+        this.getCasterUUID().ifPresent(uuid -> output.store("CasterUUID", UUIDUtil.CODEC, uuid));
     }
 }

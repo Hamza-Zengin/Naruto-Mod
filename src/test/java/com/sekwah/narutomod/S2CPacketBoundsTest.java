@@ -5,7 +5,7 @@ import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ public class S2CPacketBoundsTest {
 
     @Test
     void testClientJutsuEffectPacketRoundTrip() {
-        ResourceLocation id = new ResourceLocation("narutomod", "kirin_impact");
+        Identifier id = Identifier.fromNamespaceAndPath("narutomod", "kirin_impact");
         Vec3 pos = new Vec3(12.5, 64.0, -30.25);
         Vec3 dir = new Vec3(0.0, 1.0, 0.0);
         ClientJutsuEffectPacket original = new ClientJutsuEffectPacket(id, pos, dir, 1.5f, 0x66CCFF);
@@ -42,7 +42,7 @@ public class S2CPacketBoundsTest {
         assertThrows(DecoderException.class, () -> ClientJutsuEffectPacket.decode(empty));
 
         FriendlyByteBuf truncated = new FriendlyByteBuf(Unpooled.buffer());
-        truncated.writeResourceLocation(new ResourceLocation("narutomod", "hakke_kusho"));
+        truncated.writeIdentifier(Identifier.fromNamespaceAndPath("narutomod", "hakke_kusho"));
         truncated.writeDouble(1.0); // Missing remaining fields
         assertThrows(DecoderException.class, () -> ClientJutsuEffectPacket.decode(truncated));
     }

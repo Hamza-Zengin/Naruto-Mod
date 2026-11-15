@@ -6,7 +6,7 @@ import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.util.Mth;
 
 /**
@@ -15,19 +15,19 @@ import net.minecraft.util.Mth;
  */
 public class JutsuVisualModels {
 
+    public record VisualState(float age, float progress) {}
+
     // =========================================================================
     // 1. RAITON: KIRIN — Colossal 3D Descending Lightning Dragon Model
     // =========================================================================
-    public static class KirinDragonModel extends Model {
-        private final ModelPart root;
+    public static class KirinDragonModel extends Model<VisualState> {
         private final ModelPart dragonHead;
         private final ModelPart dragonBody;
         private final ModelPart shockRingInner;
         private final ModelPart shockRingOuter;
 
         public KirinDragonModel(ModelPart part) {
-            super(RenderType::entityTranslucent);
-            this.root = part;
+            super(part, RenderTypes::entityTranslucent);
             this.dragonHead = part.getChild("dragon_head");
             this.dragonBody = part.getChild("dragon_body");
             this.shockRingInner = part.getChild("shock_ring_inner");
@@ -94,6 +94,12 @@ public class JutsuVisualModels {
             return LayerDefinition.create(mesh, 128, 128);
         }
 
+        @Override
+        public void setupAnim(VisualState state) {
+            super.setupAnim(state);
+            setupAnim(state.age(), state.progress());
+        }
+
         public void setupAnim(float age, float progress) {
             // Plunge from the sky during first 25% of life, then coil & roar
             float plunge = progress < 0.25F ? (1.0F - (progress / 0.25F)) * -48.0F : 0.0F;
@@ -104,25 +110,17 @@ public class JutsuVisualModels {
             this.shockRingInner.yRot = age * 0.45F;
             this.shockRingOuter.yRot = -age * 0.32F;
         }
-
-        @Override
-        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
-                                   float r, float g, float b, float a) {
-            this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
-        }
     }
 
     // =========================================================================
     // 2. MOKUTON: JUKAI KŌTAN — 3D Intertwined Deep Forest Root Cage & Pillars
     // =========================================================================
-    public static class WoodPrisonModel extends Model {
-        private final ModelPart root;
+    public static class WoodPrisonModel extends Model<VisualState> {
         private final ModelPart pillars;
         private final ModelPart vineRings;
 
         public WoodPrisonModel(ModelPart part) {
-            super(RenderType::entityTranslucent);
-            this.root = part;
+            super(part, RenderTypes::entityTranslucent);
             this.pillars = part.getChild("pillars");
             this.vineRings = part.getChild("vine_rings");
         }
@@ -168,6 +166,12 @@ public class JutsuVisualModels {
             return LayerDefinition.create(mesh, 128, 64);
         }
 
+        @Override
+        public void setupAnim(VisualState state) {
+            super.setupAnim(state);
+            setupAnim(state.age(), state.progress());
+        }
+
         public void setupAnim(float age, float progress) {
             float emerge = progress < 0.15F ? (1.0F - (progress / 0.15F)) * 32.0F : 0.0F;
             float sink = progress > 0.85F ? ((progress - 0.85F) / 0.15F) * 32.0F : 0.0F;
@@ -175,26 +179,18 @@ public class JutsuVisualModels {
             this.vineRings.y = emerge + sink;
             this.vineRings.yRot = Mth.sin(age * 0.15F) * 0.12F;
         }
-
-        @Override
-        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
-                                   float r, float g, float b, float a) {
-            this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
-        }
     }
 
     // =========================================================================
     // 3. SHIKOTSUMYAKU: SAWARABI NO MAI — 3D Calcified Bone Spire Forest
     // =========================================================================
-    public static class BoneForestModel extends Model {
-        private final ModelPart root;
+    public static class BoneForestModel extends Model<VisualState> {
         private final ModelPart ringInner;
         private final ModelPart ringMid;
         private final ModelPart ringOuter;
 
         public BoneForestModel(ModelPart part) {
-            super(RenderType::entityTranslucent);
-            this.root = part;
+            super(part, RenderTypes::entityTranslucent);
             this.ringInner = part.getChild("ring_inner");
             this.ringMid = part.getChild("ring_mid");
             this.ringOuter = part.getChild("ring_outer");
@@ -236,6 +232,12 @@ public class JutsuVisualModels {
             }
         }
 
+        @Override
+        public void setupAnim(VisualState state) {
+            super.setupAnim(state);
+            setupAnim(state.age());
+        }
+
         public void setupAnim(float age) {
             float inEmerge = Mth.clamp(age / 6.0F, 0.0F, 1.0F);
             float midEmerge = Mth.clamp((age - 7.0F) / 6.0F, 0.0F, 1.0F);
@@ -245,24 +247,16 @@ public class JutsuVisualModels {
             this.ringMid.y = (1.0F - midEmerge) * 42.0F;
             this.ringOuter.y = (1.0F - outEmerge) * 45.0F;
         }
-
-        @Override
-        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
-                                   float r, float g, float b, float a) {
-            this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
-        }
     }
 
     // =========================================================================
     // 4. RASENGAN — 3D Multi-Shell Swirling Chakra Sphere & Spiral Ribbons
     // =========================================================================
-    public static class RasenganSphereModel extends Model {
-        private final ModelPart root;
+    public static class RasenganSphereModel extends Model<VisualState> {
         private float age;
 
         public RasenganSphereModel(ModelPart part) {
-            super(RenderType::entityTranslucent);
-            this.root = part;
+            super(part, RenderTypes::entityTranslucent);
         }
 
         public static LayerDefinition createLayer() {
@@ -274,32 +268,54 @@ public class JutsuVisualModels {
             return LayerDefinition.create(mesh, 64, 64);
         }
 
+        @Override
+        public void setupAnim(VisualState state) {
+            super.setupAnim(state);
+            this.age = state.age();
+        }
+
         public void setupAnim(float age) {
             this.age = age;
         }
 
-        @Override
-        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
-                                   float r, float g, float b, float a) {
+        public void renderProcedural(PoseStack.Pose basePose, VertexConsumer buffer, int light, int overlay,
+                                     float r, float g, float b, float a) {
+            renderProcedural(basePose, buffer, this.age, light, overlay, r, g, b, a);
+        }
+
+        public void renderProcedural(PoseStack.Pose basePose, VertexConsumer buffer, float age, int light, int overlay,
+                                     float r, float g, float b, float a) {
+            PoseStack poseStack = new PoseStack();
+            poseStack.last().set(basePose);
+            renderProcedural(poseStack, buffer, age, light, overlay, r, g, b, a);
+        }
+
+        public void renderProcedural(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
+                                     float r, float g, float b, float a) {
+            renderProcedural(poseStack, buffer, this.age, light, overlay, r, g, b, a);
+        }
+
+        public void renderProcedural(PoseStack poseStack, VertexConsumer buffer, float age, int light, int overlay,
+                                     float r, float g, float b, float a) {
             // 1. Inner Core Sphere (r = 0.36F in model scale -> ~0.11F in hand scale)
             poseStack.pushPose();
-            poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(this.age * 25.0F));
+            poseStack.rotateDegrees(com.mojang.math.Axis.YP, age * 25.0F);
             renderSmoothSphere(poseStack, buffer, 0.36F, 16, 24, light, overlay,
                     0.80F * r, 0.96F * g, 1.0F * b, 0.95F * a);
             poseStack.popPose();
 
             // 2. Middle Chakra Layer (r = 0.48F in model scale -> ~0.145F in hand scale)
             poseStack.pushPose();
-            poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(35.0F));
-            poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-this.age * 18.0F));
+            poseStack.rotateDegrees(com.mojang.math.Axis.ZP, 35.0F);
+            poseStack.rotateDegrees(com.mojang.math.Axis.YP, -age * 18.0F);
             renderSmoothSphere(poseStack, buffer, 0.48F, 16, 24, light, overlay,
                     0.20F * r, 0.68F * g, 1.0F * b, 0.55F * a);
             poseStack.popPose();
 
             // 3. Outer Energy Halo (r = 0.58F in model scale -> ~0.175F in hand scale)
             poseStack.pushPose();
-            poseStack.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-35.0F));
-            poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(this.age * 12.0F));
+            poseStack.rotateDegrees(com.mojang.math.Axis.XP, -35.0F);
+            poseStack.rotateDegrees(com.mojang.math.Axis.YP, age * 12.0F);
             renderSmoothSphere(poseStack, buffer, 0.58F, 16, 24, light, overlay,
                     0.45F * r, 0.85F * g, 1.0F * b, 0.25F * a);
             poseStack.popPose();
@@ -310,7 +326,6 @@ public class JutsuVisualModels {
                                               float r, float g, float b, float a) {
             PoseStack.Pose pose = poseStack.last();
             org.joml.Matrix4f mat = pose.pose();
-            org.joml.Matrix3f normalMat = pose.normal();
 
             for (int i = 0; i < stacks; i++) {
                 float phi1 = (float) (Math.PI * i / stacks);
@@ -340,18 +355,18 @@ public class JutsuVisualModels {
                     float nx3 = sinPhi2 * cosT2, ny3 = cosPhi2, nz3 = sinPhi2 * sinT2;
                     float nx4 = sinPhi1 * cosT2, ny4 = cosPhi1, nz4 = sinPhi1 * sinT2;
 
-                    buffer.vertex(mat, nx1 * radius, ny1 * radius, nz1 * radius)
-                            .color(r, g, b, a).uv(u1, v1).overlayCoords(overlay).uv2(light)
-                            .normal(normalMat, nx1, ny1, nz1).endVertex();
-                    buffer.vertex(mat, nx2 * radius, ny2 * radius, nz2 * radius)
-                            .color(r, g, b, a).uv(u1, v2).overlayCoords(overlay).uv2(light)
-                            .normal(normalMat, nx2, ny2, nz2).endVertex();
-                    buffer.vertex(mat, nx3 * radius, ny3 * radius, nz3 * radius)
-                            .color(r, g, b, a).uv(u2, v2).overlayCoords(overlay).uv2(light)
-                            .normal(normalMat, nx3, ny3, nz3).endVertex();
-                    buffer.vertex(mat, nx4 * radius, ny4 * radius, nz4 * radius)
-                            .color(r, g, b, a).uv(u2, v1).overlayCoords(overlay).uv2(light)
-                            .normal(normalMat, nx4, ny4, nz4).endVertex();
+                    buffer.addVertex(mat, nx1 * radius, ny1 * radius, nz1 * radius)
+                            .setColor(r, g, b, a).setUv(u1, v1).setOverlay(overlay).setLight(light)
+                            .setNormal(pose, nx1, ny1, nz1);
+                    buffer.addVertex(mat, nx2 * radius, ny2 * radius, nz2 * radius)
+                            .setColor(r, g, b, a).setUv(u1, v2).setOverlay(overlay).setLight(light)
+                            .setNormal(pose, nx2, ny2, nz2);
+                    buffer.addVertex(mat, nx3 * radius, ny3 * radius, nz3 * radius)
+                            .setColor(r, g, b, a).setUv(u2, v2).setOverlay(overlay).setLight(light)
+                            .setNormal(pose, nx3, ny3, nz3);
+                    buffer.addVertex(mat, nx4 * radius, ny4 * radius, nz4 * radius)
+                            .setColor(r, g, b, a).setUv(u2, v1).setOverlay(overlay).setLight(light)
+                            .setNormal(pose, nx4, ny4, nz4);
                 }
             }
         }
@@ -360,14 +375,12 @@ public class JutsuVisualModels {
     // =========================================================================
     // 5. CHIDORI / RAIKIRI — 3D Crackling Lightning Blade & Electric Arcs
     // =========================================================================
-    public static class ChidoriBurstModel extends Model {
-        private final ModelPart root;
+    public static class ChidoriBurstModel extends Model<VisualState> {
         private final ModelPart core;
         private final ModelPart[] arcs = new ModelPart[14];
 
         public ChidoriBurstModel(ModelPart part) {
-            super(RenderType::entityTranslucent);
-            this.root = part;
+            super(part, RenderTypes::entityTranslucent);
             this.core = part.getChild("core");
             for (int i = 0; i < 14; i++) {
                 this.arcs[i] = part.getChild("arc_" + i);
@@ -409,6 +422,12 @@ public class JutsuVisualModels {
             return LayerDefinition.create(mesh, 64, 64);
         }
 
+        @Override
+        public void setupAnim(VisualState state) {
+            super.setupAnim(state);
+            setupAnim(state.age());
+        }
+
         public void setupAnim(float age) {
             // Vibrating plasma core
             this.core.yRot = age * 1.4F;
@@ -427,26 +446,18 @@ public class JutsuVisualModels {
                 this.arcs[i].zRot = (i * 0.63F) + (float) Math.sin(seed * 0.7F) * 0.45F;
             }
         }
-
-        @Override
-        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
-                                   float r, float g, float b, float a) {
-            this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
-        }
     }
 
     // =========================================================================
     // 6. SUITON: SUIKŌDAN — 3D Surging Water Shark / Hydro Vortex Torpedo
     // =========================================================================
-    public static class WaterVortexModel extends Model {
-        private final ModelPart root;
+    public static class WaterVortexModel extends Model<VisualState> {
         private final ModelPart hydroCore;
         private final ModelPart vortexFins;
         private final ModelPart wakeRings;
 
         public WaterVortexModel(ModelPart part) {
-            super(RenderType::entityTranslucent);
-            this.root = part;
+            super(part, RenderTypes::entityTranslucent);
             this.hydroCore = part.getChild("hydro_core");
             this.vortexFins = part.getChild("vortex_fins");
             this.wakeRings = part.getChild("wake_rings");
@@ -481,30 +492,28 @@ public class JutsuVisualModels {
             return LayerDefinition.create(mesh, 64, 64);
         }
 
+        @Override
+        public void setupAnim(VisualState state) {
+            super.setupAnim(state);
+            setupAnim(state.age());
+        }
+
         public void setupAnim(float age) {
             this.vortexFins.zRot = age * 0.65F;
             this.wakeRings.zRot = -age * 0.45F;
-        }
-
-        @Override
-        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
-                                   float r, float g, float b, float a) {
-            this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
         }
     }
 
     // =========================================================================
     // 7. FŪTON: DAITOPPA — 3D Sonic Wind Funnel & Expanding Blade Rings
     // =========================================================================
-    public static class WindShockwaveModel extends Model {
-        private final ModelPart root;
+    public static class WindShockwaveModel extends Model<VisualState> {
         private final ModelPart ringFront;
         private final ModelPart ringMid;
         private final ModelPart ringBack;
 
         public WindShockwaveModel(ModelPart part) {
-            super(RenderType::entityTranslucent);
-            this.root = part;
+            super(part, RenderTypes::entityTranslucent);
             this.ringFront = part.getChild("ring_front");
             this.ringMid = part.getChild("ring_mid");
             this.ringBack = part.getChild("ring_back");
@@ -532,30 +541,28 @@ public class JutsuVisualModels {
             return LayerDefinition.create(mesh, 64, 64);
         }
 
+        @Override
+        public void setupAnim(VisualState state) {
+            super.setupAnim(state);
+            setupAnim(state.age());
+        }
+
         public void setupAnim(float age) {
             this.ringFront.zRot = age * 0.75F;
             this.ringMid.zRot = -age * 0.65F;
             this.ringBack.zRot = age * 0.85F;
-        }
-
-        @Override
-        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
-                                   float r, float g, float b, float a) {
-            this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
         }
     }
 
     // =========================================================================
     // 8. AMATERASU — 3D Inextinguishable Black-Crimson Flame Shroud & Pillars
     // =========================================================================
-    public static class AmaterasuFlameModel extends Model {
-        private final ModelPart root;
+    public static class AmaterasuFlameModel extends Model<VisualState> {
         private final ModelPart innerPillars;
         private final ModelPart outerPillars;
 
         public AmaterasuFlameModel(ModelPart part) {
-            super(RenderType::entityTranslucent);
-            this.root = part;
+            super(part, RenderTypes::entityTranslucent);
             this.innerPillars = part.getChild("inner_pillars");
             this.outerPillars = part.getChild("outer_pillars");
         }
@@ -564,7 +571,7 @@ public class JutsuVisualModels {
             MeshDefinition mesh = new MeshDefinition();
             PartDefinition root = mesh.getRoot();
 
-            PartDefinition inner = root.addOrReplaceChild("inner_pillars",
+            root.addOrReplaceChild("inner_pillars",
                     CubeListBuilder.create()
                             .texOffs(0, 0).addBox(-3.0F, -22.0F, -3.0F, 6, 22, 6)
                             .texOffs(24, 0).addBox(-2.0F, -26.0F, -2.0F, 4, 26, 4),
@@ -584,29 +591,27 @@ public class JutsuVisualModels {
             return LayerDefinition.create(mesh, 64, 64);
         }
 
+        @Override
+        public void setupAnim(VisualState state) {
+            super.setupAnim(state);
+            setupAnim(state.age());
+        }
+
         public void setupAnim(float age) {
             this.innerPillars.yRot = age * 0.25F;
             this.outerPillars.yRot = -age * 0.18F;
             this.outerPillars.y = Mth.sin(age * 0.35F) * 1.5F;
-        }
-
-        @Override
-        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
-                                   float r, float g, float b, float a) {
-            this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
         }
     }
 
     // =========================================================================
     // 9. KAGE MANE NO JUTSU — 3D Shadow Ribbon & Coiling Shadow Claws
     // =========================================================================
-    public static class ShadowBindModel extends Model {
-        private final ModelPart root;
+    public static class ShadowBindModel extends Model<VisualState> {
         private final ModelPart claws;
 
         public ShadowBindModel(ModelPart part) {
-            super(RenderType::entityTranslucent);
-            this.root = part;
+            super(part, RenderTypes::entityTranslucent);
             this.claws = part.getChild("claws");
         }
 
@@ -635,29 +640,27 @@ public class JutsuVisualModels {
             return LayerDefinition.create(mesh, 128, 64);
         }
 
+        @Override
+        public void setupAnim(VisualState state) {
+            super.setupAnim(state);
+            setupAnim(state.age(), state.progress());
+        }
+
         public void setupAnim(float age, float progress) {
             float emerge = progress < 0.12F ? (1.0F - (progress / 0.12F)) * 22.0F : 0.0F;
             this.claws.y = emerge;
             this.claws.yRot = Mth.sin(age * 0.18F) * 0.22F;
-        }
-
-        @Override
-        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
-                                   float r, float g, float b, float a) {
-            this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
         }
     }
 
     // =========================================================================
     // 10. DOTON: DORYŪHEKI — 3D Sculpted Shinobi Earth Bulwark
     // =========================================================================
-    public static class EarthWallModel extends Model {
-        private final ModelPart root;
+    public static class EarthWallModel extends Model<VisualState> {
         private final ModelPart wallBody;
 
         public EarthWallModel(ModelPart part) {
-            super(RenderType::entityCutoutNoCull);
-            this.root = part;
+            super(part, RenderTypes::entityCutout);
             this.wallBody = part.getChild("wall_body");
         }
 
@@ -674,29 +677,27 @@ public class JutsuVisualModels {
             return LayerDefinition.create(mesh, 128, 64);
         }
 
+        @Override
+        public void setupAnim(VisualState state) {
+            super.setupAnim(state);
+            setupAnim(state.progress());
+        }
+
         public void setupAnim(float progress) {
             float emerge = progress < 0.08F ? (1.0F - (progress / 0.08F)) * 48.0F : 0.0F;
             this.wallBody.y = emerge;
-        }
-
-        @Override
-        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
-                                   float r, float g, float b, float a) {
-            this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
         }
     }
 
     // =========================================================================
     // 11. HACHIMON TONKŌ: EIGHT GATES — 3D Horizontal Ground Chakra Vapor Rings
     // =========================================================================
-    public static class EightGatesAuraModel extends Model {
-        private final ModelPart root;
+    public static class EightGatesAuraModel extends Model<VisualState> {
         private final ModelPart innerRing;
         private final ModelPart outerRing;
 
         public EightGatesAuraModel(ModelPart part) {
-            super(RenderType::entityTranslucent);
-            this.root = part;
+            super(part, RenderTypes::entityTranslucent);
             this.innerRing = part.getChild("inner_ring");
             this.outerRing = part.getChild("outer_ring");
         }
@@ -734,6 +735,12 @@ public class JutsuVisualModels {
             return LayerDefinition.create(mesh, 128, 64);
         }
 
+        @Override
+        public void setupAnim(VisualState state) {
+            super.setupAnim(state);
+            setupAnim(state.age());
+        }
+
         public void setupAnim(float age) {
             // Strictly rotate horizontally around the vertical Y axis (yRot)
             this.innerRing.yRot = age * 0.12F;
@@ -743,12 +750,6 @@ public class JutsuVisualModels {
             this.outerRing.yRot = -age * 0.08F;
             this.outerRing.xRot = 0.0F;
             this.outerRing.zRot = 0.0F;
-        }
-
-        @Override
-        public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int light, int overlay,
-                                   float r, float g, float b, float a) {
-            this.root.render(poseStack, buffer, light, overlay, r, g, b, a);
         }
     }
 }
