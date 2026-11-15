@@ -1,17 +1,3 @@
 {
-  "loader": "neoforge:separate_transforms",
-  "base": {
-    "parent": "narutomod:item/weapons/kusanagi_sword_3d"
-  },
-  "perspectives": {
-    "gui": {
-      "parent": "narutomod:item/weapons/kusanagi_sword_gui"
-    },
-    "ground": {
-      "parent": "narutomod:item/weapons/kusanagi_sword_gui"
-    },
-    "fixed": {
-      "parent": "narutomod:item/weapons/kusanagi_sword_gui"
-    }
-  }
+  "parent": "narutomod:item/weapons/kusanagi_sword_gui"
 }

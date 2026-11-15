@@ -1,5 +1,6 @@
 package com.sekwah.narutomod;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -12,15 +13,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- * Audit test ensuring that 3D weapons using neoforge:separate_transforms correctly point
- * to existing 3D and GUI models, and that the 3D models define first-person hand perspectives.
+ * Audit test ensuring that 3D weapons use Minecraft 26.3 Client Item definitions
+ * (minecraft:select with minecraft:display_context) pointing to existing 3D and GUI models,
+ * that the 3D models define first-person hand perspectives, and that no legacy
+ * neoforge:separate_transforms loaders remain in models/item.
  */
 public class ItemModelTransformsTest {
 
+    private static final Path ITEMS_DIR = Paths.get("src/main/resources/assets/narutomod/items");
     private static final Path MODELS_ITEM_DIR = Paths.get("src/main/resources/assets/narutomod/models/item");
 
     private Path resolveModelPath(String modelId) {
@@ -36,10 +42,84 @@ public class ItemModelTransformsTest {
     }
 
     @Test
-    public void testSeparateTransformsModelsIntegrity() throws IOException {
+    public void testClientItemModelsIntegrity() throws IOException {
         List<String> errors = new ArrayList<>();
-        int separateTransformsCount = 0;
+        int selectDisplayContextCount = 0;
 
+        Assertions.assertTrue(Files.isDirectory(ITEMS_DIR),
+                "Client items directory must exist: " + ITEMS_DIR);
+
+        try (Stream<Path> stream = Files.walk(ITEMS_DIR, 1)) {
+            List<Path> files = stream.filter(p -> p.toString().endsWith(".json")).toList();
+            for (Path path : files) {
+                try (Reader reader = Files.newBufferedReader(path)) {
+                    JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
+                    JsonObject modelObj = json.getAsJsonObject("model");
+                    if (modelObj == null) {
+                        errors.add(path.getFileName() + ": Missing 'model' object!");
+                        continue;
+                    }
+                    String type = modelObj.has("type") ? modelObj.get("type").getAsString() : "";
+                    String property = modelObj.has("property") ? modelObj.get("property").getAsString() : "";
+                    if ("minecraft:select".equals(type) && "minecraft:display_context".equals(property)) {
+                        selectDisplayContextCount++;
+
+                        // Validate fallback (3D model)
+                        JsonObject fallback = modelObj.getAsJsonObject("fallback");
+                        if (fallback == null || !fallback.has("model")) {
+                            errors.add(path.getFileName() + ": Missing 'fallback.model'!");
+                        } else {
+                            String fallbackModel = fallback.get("model").getAsString();
+                            Path fallbackPath = resolveModelPath(fallbackModel);
+                            if (fallbackPath == null || !Files.exists(fallbackPath)) {
+                                errors.add(path.getFileName() + ": Fallback 3D model '" + fallbackModel + "' does not resolve to an existing file!");
+                            } else {
+                                try (Reader baseReader = Files.newBufferedReader(fallbackPath)) {
+                                    JsonObject baseJson = JsonParser.parseReader(baseReader).getAsJsonObject();
+                                    if (!baseJson.has("display") || !baseJson.getAsJsonObject("display").has("firstperson_righthand")) {
+                                        errors.add(path.getFileName() + ": Fallback 3D model '" + fallbackModel + "' missing 'firstperson_righthand' display!");
+                                    }
+                                }
+                            }
+                        }
+
+                        // Validate cases (gui, ground, fixed -> _gui model)
+                        JsonArray cases = modelObj.getAsJsonArray("cases");
+                        if (cases == null || cases.isEmpty()) {
+                            errors.add(path.getFileName() + ": Missing 'cases' array!");
+                        } else {
+                            Set<String> coveredContexts = new HashSet<>();
+                            for (JsonElement caseElem : cases) {
+                                JsonObject caseObj = caseElem.getAsJsonObject();
+                                JsonArray whenArr = caseObj.getAsJsonArray("when");
+                                if (whenArr != null) {
+                                    for (JsonElement w : whenArr) {
+                                        coveredContexts.add(w.getAsString());
+                                    }
+                                }
+                                JsonObject caseModel = caseObj.getAsJsonObject("model");
+                                if (caseModel == null || !caseModel.has("model")) {
+                                    errors.add(path.getFileName() + ": Case missing 'model.model'!");
+                                } else {
+                                    String guiModel = caseModel.get("model").getAsString();
+                                    Path guiPath = resolveModelPath(guiModel);
+                                    if (guiPath == null || !Files.exists(guiPath)) {
+                                        errors.add(path.getFileName() + ": GUI model '" + guiModel + "' does not resolve to an existing file!");
+                                    }
+                                }
+                            }
+                            for (String expectedCtx : List.of("gui", "ground", "fixed")) {
+                                if (!coveredContexts.contains(expectedCtx)) {
+                                    errors.add(path.getFileName() + ": Missing display_context '" + expectedCtx + "' in cases!");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Ensure no legacy neoforge:separate_transforms remain in models/item
         try (Stream<Path> stream = Files.walk(MODELS_ITEM_DIR, 1)) {
             List<Path> files = stream.filter(p -> p.toString().endsWith(".json")).toList();
             for (Path path : files) {
@@ -47,38 +127,15 @@ public class ItemModelTransformsTest {
                     JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
                     JsonElement loaderElem = json.get("loader");
                     if (loaderElem != null && "neoforge:separate_transforms".equals(loaderElem.getAsString())) {
-                        separateTransformsCount++;
-                        String baseParent = json.getAsJsonObject("base").get("parent").getAsString();
-                        Path basePath = resolveModelPath(baseParent);
-                        if (basePath == null || !Files.exists(basePath)) {
-                            errors.add(path.getFileName() + ": Base parent '" + baseParent + "' does not resolve to an existing file!");
-                        } else {
-                            try (Reader baseReader = Files.newBufferedReader(basePath)) {
-                                JsonObject baseJson = JsonParser.parseReader(baseReader).getAsJsonObject();
-                                if (!baseJson.has("display") || !baseJson.getAsJsonObject("display").has("firstperson_righthand")) {
-                                    errors.add(path.getFileName() + ": Base 3D model '" + baseParent + "' missing 'firstperson_righthand' display!");
-                                }
-                            }
-                        }
-
-                        JsonObject perspectives = json.getAsJsonObject("perspectives");
-                        if (perspectives != null && perspectives.has("gui")) {
-                            String guiParent = perspectives.getAsJsonObject("gui").get("parent").getAsString();
-                            Path guiPath = resolveModelPath(guiParent);
-                            if (guiPath == null || !Files.exists(guiPath)) {
-                                errors.add(path.getFileName() + ": GUI parent '" + guiParent + "' does not resolve to an existing file!");
-                            }
-                        } else {
-                            errors.add(path.getFileName() + ": Missing 'perspectives.gui'!");
-                        }
+                        errors.add(path.getFileName() + ": Still uses removed 'neoforge:separate_transforms' loader!");
                     }
                 }
             }
         }
 
-        Assertions.assertTrue(separateTransformsCount >= 8,
-                "Expected at least 8 weapon items to use neoforge:separate_transforms, but found " + separateTransformsCount);
+        Assertions.assertTrue(selectDisplayContextCount >= 8,
+                "Expected at least 8 weapon items to use minecraft:select + minecraft:display_context, but found " + selectDisplayContextCount);
         Assertions.assertTrue(errors.isEmpty(),
-                "Found " + errors.size() + " separate_transforms model errors:\n" + String.join("\n", errors));
+                "Found " + errors.size() + " item model errors:\n" + String.join("\n", errors));
     }
 }

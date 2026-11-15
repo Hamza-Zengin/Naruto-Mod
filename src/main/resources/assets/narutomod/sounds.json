@@ -68,7 +68,10 @@
   "chidori": {
     "category": "player",
     "sounds": [
-      "minecraft:entity.lightning_bolt.thunder",
+      {
+        "name": "minecraft:entity.lightning_bolt.thunder",
+        "type": "event"
+      },
       "narutomod:jutsu/jutsu_cast"
     ],
     "subtitle": "narutomod.subtitle.chidori"
@@ -76,7 +79,10 @@
   "rasengan": {
     "category": "player",
     "sounds": [
-      "minecraft:entity.player.attack.sweep",
+      {
+        "name": "minecraft:entity.player.attack.sweep",
+        "type": "event"
+      },
       "narutomod:jutsu/jutsu_cast"
     ],
     "subtitle": "narutomod.subtitle.rasengan"
@@ -84,8 +90,14 @@
   "clone_poof": {
     "category": "player",
     "sounds": [
-      "minecraft:block.fire.extinguish",
-      "minecraft:entity.generic.explode"
+      {
+        "name": "minecraft:block.fire.extinguish",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity.generic.explode",
+        "type": "event"
+      }
     ],
     "subtitle": "narutomod.subtitle.clone_poof"
   },

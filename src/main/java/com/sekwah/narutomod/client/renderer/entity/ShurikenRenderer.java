@@ -20,7 +20,7 @@ import net.minecraft.world.item.ItemStack;
 public class ShurikenRenderer extends EntityRenderer<ShurikenEntity, ShurikenRenderer.ShurikenRenderState> {
 
    private final ItemModelResolver itemModelResolver;
-   private final ItemStack renderingItem;
+   private ItemStack renderingItem;
 
    public static final Identifier RES_ARROW = Identifier.fromNamespaceAndPath("narutomod", "textures/entity/projectiles/kunai.png");
 
@@ -35,7 +35,6 @@ public class ShurikenRenderer extends EntityRenderer<ShurikenEntity, ShurikenRen
    public ShurikenRenderer(EntityRendererProvider.Context manager) {
       super(manager);
       this.itemModelResolver = manager.getItemModelResolver();
-      this.renderingItem = new ItemStack(NarutoItems.SHURIKEN.get());
    }
 
    @Override
@@ -51,6 +50,9 @@ public class ShurikenRenderer extends EntityRenderer<ShurikenEntity, ShurikenRen
       state.xRot = entity.getXRot(partialTicks);
       state.rotOffset = entity.getRotOffset();
       state.spinDegrees = Mth.lerp(partialTicks, entity.getPrevRotateTicks() * rotateSpeed, entity.getRotateTicks() * rotateSpeed);
+      if (this.renderingItem == null) {
+         this.renderingItem = new ItemStack(NarutoItems.SHURIKEN.get());
+      }
       this.itemModelResolver.updateForNonLiving(state.item, this.renderingItem, ItemDisplayContext.FIXED, entity);
    }
 

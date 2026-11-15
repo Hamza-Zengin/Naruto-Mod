@@ -1,0 +1,23 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:display_context",
+    "cases": [
+      {
+        "when": [
+          "gui",
+          "ground",
+          "fixed"
+        ],
+        "model": {
+          "type": "minecraft:model",
+          "model": "narutomod:item/weapons/fuma_shuriken_gui"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "narutomod:item/weapons/fuma_shuriken_3d"
+    }
+  }
+}
