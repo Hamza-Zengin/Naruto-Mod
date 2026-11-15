@@ -33,12 +33,17 @@ public class ChakraAndStaminaGUI {
         this.minecraft = mc;
     }
 
+    private Minecraft getMinecraft() {
+        return this.minecraft != null ? this.minecraft : Minecraft.getInstance();
+    }
+
     public void render(GuiGraphicsExtractor guiGraphics) {
-        if(!shouldRender) {
+        Minecraft mc = this.getMinecraft();
+        if(!shouldRender || mc == null) {
             return;
         }
-        this.screenWidth = this.minecraft.getWindow().getGuiScaledWidth();
-        this.screenHeight = this.minecraft.getWindow().getGuiScaledHeight();
+        this.screenWidth = mc.getWindow().getGuiScaledWidth();
+        this.screenHeight = mc.getWindow().getGuiScaledHeight();
         int barDesign = Math.min(Math.max(NarutoConfig.chakraBarDesign, 0), barTypes.length - 1);
 
         float currentChakraPercent = maxChakra > 0 ? (chakra) / maxChakra : 0;
@@ -124,7 +129,8 @@ public class ChakraAndStaminaGUI {
     }
 
     public void tick() {
-        if(this.minecraft.getCameraEntity() instanceof Player player) {
+        Minecraft mc = this.getMinecraft();
+        if(mc != null && mc.getCameraEntity() instanceof Player player) {
             shouldRender = true;
             var ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
             chakra = ninjaData.getChakra();
@@ -141,6 +147,7 @@ public class ChakraAndStaminaGUI {
     }
 
     private Font getFont() {
-        return this.minecraft.font;
+        Minecraft mc = this.getMinecraft();
+        return mc != null ? mc.font : null;
     }
 }

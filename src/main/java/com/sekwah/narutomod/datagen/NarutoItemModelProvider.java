@@ -59,7 +59,7 @@ public class NarutoItemModelProvider extends ModelProvider {
         simpleItemWithTexture(itemModels, NarutoItems.MIST_ANBU_MASK.get(), "item/armor/mist_anbu_mask");
 
         // --- Spawn Eggs ---
-        Identifier spawnEggTemplate = Identifier.withDefaultNamespace("item/template_spawn_egg");
+        Identifier spawnEggTemplate = Identifier.withDefaultNamespace("item/egg");
         itemModels.itemModelOutput.accept(NarutoItems.ROGUE_NINJA_SPAWN_EGG.get(), ItemModelUtils.plainModel(spawnEggTemplate));
         itemModels.itemModelOutput.accept(NarutoItems.AKATSUKI_NINJA_SPAWN_EGG.get(), ItemModelUtils.plainModel(spawnEggTemplate));
 

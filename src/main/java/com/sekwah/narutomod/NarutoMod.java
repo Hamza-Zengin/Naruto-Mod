@@ -28,6 +28,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -63,7 +64,7 @@ public class NarutoMod {
         NeoForge.EVENT_BUS.addListener(NarutoMod::onServerStarting);
 
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
-            new NarutoInGameGUI();
+            modEventBus.addListener((FMLClientSetupEvent event) -> event.enqueueWork(NarutoInGameGUI::new));
         }
     }
 
