@@ -31,6 +31,17 @@ for root, dirs, files in os.walk(SRC_JAVA):
                     if f'addOrReplaceChild("{part}"' not in content:
                         errors.append(f"{f}:{idx+1} - ModelPart '{part}' requested via getChild() but never defined with addOrReplaceChild()!")
 
+            # Ensure HumanoidModel subclasses preserve head -> hat hierarchy
+            if "extends HumanoidModel" in content:
+                uses_humanoid_mesh = (
+                    "HumanoidModel.createMesh(" in content
+                    or "ModelUtils.createBlankHumanoidMesh()" in content
+                )
+                if not uses_humanoid_mesh:
+                    errors.append(f"{f} extends HumanoidModel but does not use HumanoidModel.createMesh() or ModelUtils.createBlankHumanoidMesh()")
+                if re.search(r'root\.addOrReplaceChild\("head"', content) and 'addOrReplaceChild("hat"' not in content:
+                    errors.append(f"{f} replaces 'head' on root without adding child 'hat' under 'head'!")
+
 # 2. Audit ModelLayerLocations in NarutoRenderEvents
 render_events_path = os.path.join(SRC_JAVA, "com/sekwah/narutomod/client/renderer/NarutoRenderEvents.java")
 if os.path.exists(render_events_path):

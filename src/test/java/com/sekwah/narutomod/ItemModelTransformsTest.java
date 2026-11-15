@@ -119,7 +119,7 @@ public class ItemModelTransformsTest {
             }
         }
 
-        // Ensure no legacy neoforge:separate_transforms remain in models/item
+        // Ensure no legacy neoforge:separate_transforms remain in models/item and every item model has a client item definition
         try (Stream<Path> stream = Files.walk(MODELS_ITEM_DIR, 1)) {
             List<Path> files = stream.filter(p -> p.toString().endsWith(".json")).toList();
             for (Path path : files) {
@@ -130,8 +130,34 @@ public class ItemModelTransformsTest {
                         errors.add(path.getFileName() + ": Still uses removed 'neoforge:separate_transforms' loader!");
                     }
                 }
+                Path clientItemPath = ITEMS_DIR.resolve(path.getFileName());
+                if (!Files.exists(clientItemPath)) {
+                    errors.add(path.getFileName() + ": Missing client item definition at " + clientItemPath);
+                }
             }
         }
+
+        // Ensure all 3D weapon models declare a particle texture
+        Path weaponsDir = MODELS_ITEM_DIR.resolve("weapons");
+        if (Files.isDirectory(weaponsDir)) {
+            try (Stream<Path> stream = Files.walk(weaponsDir, 1)) {
+                List<Path> files = stream.filter(p -> p.toString().endsWith("_3d.json")).toList();
+                for (Path path : files) {
+                    try (Reader reader = Files.newBufferedReader(path)) {
+                        JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
+                        JsonObject textures = json.getAsJsonObject("textures");
+                        if (textures == null || !textures.has("particle")) {
+                            errors.add(path.getFileName() + ": Missing 'textures.particle' reference!");
+                        }
+                    }
+                }
+            }
+        }
+
+        // Ensure conflicting 1.20.1 blocks.json atlas override does not exist
+        Path conflictingAtlas = Paths.get("src/main/resources/assets/minecraft/atlases/blocks.json");
+        Assertions.assertFalse(Files.exists(conflictingAtlas),
+                "Conflicting blocks.json atlas override must be removed for 26.3: " + conflictingAtlas);
 
         Assertions.assertTrue(selectDisplayContextCount >= 8,
                 "Expected at least 8 weapon items to use minecraft:select + minecraft:display_context, but found " + selectDisplayContextCount);

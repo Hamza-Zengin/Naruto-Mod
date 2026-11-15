@@ -44,7 +44,15 @@ def main():
                 continue
 
             model_obj = data.get("model", {})
-            if model_obj.get("type") == "minecraft:select" and model_obj.get("property") == "minecraft:display_context":
+            if model_obj.get("type") == "minecraft:model":
+                ref = model_obj.get("model")
+                if not ref:
+                    errors.append(f"items/{fname}: Missing 'model.model'")
+                else:
+                    ref_path = resolve_model_path(ref)
+                    if ref_path and not os.path.exists(ref_path):
+                        errors.append(f"items/{fname}: referenced model '{ref}' does not exist at {ref_path}")
+            elif model_obj.get("type") == "minecraft:select" and model_obj.get("property") == "minecraft:display_context":
                 select_display_context += 1
 
                 fallback = model_obj.get("fallback", {}).get("model")
@@ -94,6 +102,26 @@ def main():
 
         if data.get("loader") == "neoforge:separate_transforms":
             errors.append(f"models/item/{fname}: Still uses removed 'neoforge:separate_transforms' loader!")
+
+        client_item_path = os.path.join(ITEMS_DIR, fname)
+        if not os.path.exists(client_item_path):
+            errors.append(f"models/item/{fname}: Missing 26.3 client item definition at items/{fname}")
+
+    weapons_dir = os.path.join(MODELS_ITEM_DIR, "weapons")
+    if os.path.isdir(weapons_dir):
+        for fname in sorted(os.listdir(weapons_dir)):
+            if not fname.endswith("_3d.json"):
+                continue
+            fpath = os.path.join(weapons_dir, fname)
+            with open(fpath, "r", encoding="utf-8") as f:
+                wdata = json.load(f)
+            textures = wdata.get("textures", {})
+            if "particle" not in textures or not textures["particle"]:
+                errors.append(f"models/item/weapons/{fname}: Missing 'textures.particle' reference")
+
+    blocks_atlas = os.path.join(BASE_DIR, "src", "main", "resources", "assets", "minecraft", "atlases", "blocks.json")
+    if os.path.exists(blocks_atlas):
+        errors.append(f"Conflicting atlas override still exists: {blocks_atlas}")
 
     if select_display_context < 8:
         errors.append(f"Expected at least 8 client item definitions using minecraft:select + minecraft:display_context, found {select_display_context}")

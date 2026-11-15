@@ -32,6 +32,8 @@ public class AnbuMaskModel extends HumanoidModel<HumanoidRenderState> {
                         .addBox("nose",-1F, -5F, -5F, 2, 2, 1, 50, 5)
                 , PartPose.ZERO);
 
+        partdefinition1.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
+
         partdefinition1.addOrReplaceChild("mouth",
                 CubeListBuilder.create()
                         .texOffs(50, 8)

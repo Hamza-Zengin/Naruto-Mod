@@ -1,7 +1,12 @@
 package com.sekwah.narutomod;
 
-import org.junit.jupiter.api.Test;
+import com.sekwah.narutomod.client.model.entity.SusanooRibcageModel;
+import com.sekwah.narutomod.client.model.item.model.AnbuMaskModel;
+import com.sekwah.narutomod.client.model.item.model.HeadbandModel;
+import com.sekwah.narutomod.client.model.item.model.ShinobiArmorModel;
+import net.minecraft.client.model.geom.ModelPart;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +25,7 @@ public class ModelPartsAuditTest {
 
     private static final Path SRC_MAIN_JAVA = Paths.get("src/main/java");
     private static final Pattern GET_CHILD_PATTERN = Pattern.compile("\\.getChild\\(\"([^\"]+)\"\\)");
+    private static final Pattern ROOT_REPLACE_HEAD_PATTERN = Pattern.compile("root\\.addOrReplaceChild\\(\"head\"");
 
     @Test
     public void testAllGetChildCallsHaveMatchingAddOrReplaceChild() throws IOException {
@@ -41,6 +47,20 @@ public class ModelPartsAuditTest {
                             }
                         }
                     }
+
+                    if (content.contains("extends HumanoidModel")) {
+                        boolean usesHumanoidMesh = content.contains("HumanoidModel.createMesh(")
+                                || content.contains("ModelUtils.createBlankHumanoidMesh()");
+                        if (!usesHumanoidMesh) {
+                            errors.add(path.getFileName()
+                                    + " extends HumanoidModel but does not build on HumanoidModel.createMesh() or ModelUtils.createBlankHumanoidMesh()");
+                        }
+                        if (ROOT_REPLACE_HEAD_PATTERN.matcher(content).find()
+                                && !content.contains("addOrReplaceChild(\"hat\"")) {
+                            errors.add(path.getFileName()
+                                    + " replaces 'head' on root without re-adding 'hat' child under 'head'!");
+                        }
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -50,4 +70,31 @@ public class ModelPartsAuditTest {
         Assertions.assertTrue(errors.isEmpty(),
                 "Found " + errors.size() + " model part inconsistency errors:\n" + String.join("\n", errors));
     }
+
+    @Test
+    public void testHumanoidModelsBakeAndContainHeadHatHierarchy() {
+        assertHumanoidModel(new SusanooRibcageModel(SusanooRibcageModel.createLayer().bakeRoot()),
+                SusanooRibcageModel.createLayer().bakeRoot(), "SusanooRibcageModel");
+        assertHumanoidModel(new AnbuMaskModel(AnbuMaskModel.createLayer(true).bakeRoot()),
+                AnbuMaskModel.createLayer(true).bakeRoot(), "AnbuMaskModel(ears)");
+        assertHumanoidModel(new AnbuMaskModel(AnbuMaskModel.createLayer(false).bakeRoot()),
+                AnbuMaskModel.createLayer(false).bakeRoot(), "AnbuMaskModel(noEars)");
+        assertHumanoidModel(new HeadbandModel(HeadbandModel.createLayer().bakeRoot()),
+                HeadbandModel.createLayer().bakeRoot(), "HeadbandModel");
+        assertHumanoidModel(new ShinobiArmorModel(ShinobiArmorModel.createChuninVestLayer().bakeRoot()),
+                ShinobiArmorModel.createChuninVestLayer().bakeRoot(), "ShinobiArmorModel(chuninVest)");
+        assertHumanoidModel(new ShinobiArmorModel(ShinobiArmorModel.createAnbuArmorLayer().bakeRoot()),
+                ShinobiArmorModel.createAnbuArmorLayer().bakeRoot(), "ShinobiArmorModel(anbuArmor)");
+        assertHumanoidModel(new ShinobiArmorModel(ShinobiArmorModel.createAkatsukiCloakLayer().bakeRoot()),
+                ShinobiArmorModel.createAkatsukiCloakLayer().bakeRoot(), "ShinobiArmorModel(akatsukiCloak)");
+    }
+
+    private static void assertHumanoidModel(Object instance, ModelPart root, String label) {
+        Assertions.assertNotNull(instance, label + " should instantiate cleanly");
+        ModelPart head = root.getChild("head");
+        Assertions.assertNotNull(head, label + " missing 'head' child");
+        ModelPart hat = head.getChild("hat");
+        Assertions.assertNotNull(hat, label + " missing 'hat' child under 'head'");
+    }
 }
+

@@ -24,6 +24,8 @@ public class HeadbandModel extends HumanoidModel<HumanoidRenderState>
                 CubeListBuilder.create()
                 , PartPose.ZERO);
 
+        partdefinition1.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
+
         partdefinition1.addOrReplaceChild("front",
                 CubeListBuilder.create()
                         .mirror(true)
