@@ -48,13 +48,13 @@ jobs:
         working-directory: SekCLib
         run: ./gradlew publishToMavenLocal -PisRelease=true
 
-      - name: Run Model, Language, and Sound Audits
+      - name: Asset & Lang Validation
         run: |
-          python3 scripts/check_model_parts.py
-          python3 scripts/check_lang.py
-          python3 scripts/check_sounds.py
-          python3 scripts/check_item_models.py
-          python3 scripts/check_unused_textures.py
+          set -e
+          for script in scripts/check_*.py; do
+            echo "=== Running $script ==="
+            python3 "$script"
+          done
 
       - name: Run Tests
         run: ./gradlew test
