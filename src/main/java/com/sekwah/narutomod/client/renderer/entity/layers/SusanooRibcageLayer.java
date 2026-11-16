@@ -12,8 +12,9 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import com.sekwah.sekclib.util.ColorUtil;
+import com.sekwah.sekclib.util.RenderMathUtil;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
 
 public class SusanooRibcageLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 
@@ -40,15 +41,15 @@ public class SusanooRibcageLayer extends RenderLayer<AvatarRenderState, PlayerMo
         poseStack.pushPose();
         // Imposing +18% scale to give Susanoo a majestic presence enveloping the entity
         poseStack.translate(0.0D, -0.06D, 0.0D);
-        poseStack.scale(1.18F, 1.18F, 1.18F);
+        RenderMathUtil.scaleUniform(poseStack, 1.18F);
 
-        int tintColor = ARGB.colorFromFloat(0.55F, 1.0F, 0.55F, 0.25F);
+        int tintColor = ColorUtil.argb(0.55F, 1.0F, 0.55F, 0.25F);
         submitNodeCollector.submitModel(
                 this.ribcageModel,
                 state,
                 poseStack,
                 RenderTypes.entityTranslucent(SUSANOO_TEXTURE),
-                15728880,
+                RenderMathUtil.FULL_BRIGHT,
                 OverlayTexture.NO_OVERLAY,
                 tintColor,
                 null,

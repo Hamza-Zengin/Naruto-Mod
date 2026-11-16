@@ -13,8 +13,9 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import com.sekwah.sekclib.util.ColorUtil;
+import com.sekwah.sekclib.util.RenderMathUtil;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, WaterBulletRenderer.WaterBulletRenderState> {
@@ -52,7 +53,7 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
     @Override
     public void submit(WaterBulletRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector,
                        CameraRenderState cameraRenderState) {
-        float fadeOut = state.progress > 0.82F ? (1.0F - ((state.progress - 0.82F) / 0.18F)) : 1.0F;
+        float fadeOut = RenderMathUtil.fadeOut(state.progress, 0.82F);
 
         poseStack.pushPose();
         try {
@@ -69,7 +70,7 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
                         PoseStack localStack = new PoseStack();
                         localStack.last().set(pose);
                         RasenganSphereModel.renderSmoothSphere(
-                                localStack, consumer, 0.45F, 12, 16, 15728880, OverlayTexture.NO_OVERLAY,
+                                localStack, consumer, 0.45F, 12, 16, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
                                 0.08F, 0.50F, 0.95F, sphereAlpha
                         );
                     }
@@ -77,14 +78,14 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
 
             // 2. Surrounding Swirling Water Vortex Rings
             float scale = 0.85F + (state.progress > 0.7F ? (state.progress - 0.7F) * 1.5F : 0.0F);
-            poseStack.scale(-scale, -scale, scale);
-            int vortexColor = ARGB.colorFromFloat(0.80F * fadeOut, 0.20F, 0.65F, 1.0F);
+            RenderMathUtil.scaleEntityModel(poseStack, scale);
+            int vortexColor = ColorUtil.argb(0.80F * fadeOut, 0.20F, 0.65F, 1.0F);
             submitNodeCollector.submitModel(
                     this.waterModel,
                     new VisualState(state.age, state.progress),
                     poseStack,
                     RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_WATER),
-                    15728880,
+                    RenderMathUtil.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY,
                     vortexColor,
                     null,

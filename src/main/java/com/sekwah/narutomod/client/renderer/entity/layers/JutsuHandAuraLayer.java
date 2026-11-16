@@ -14,8 +14,9 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import com.sekwah.sekclib.util.ColorUtil;
+import com.sekwah.sekclib.util.RenderMathUtil;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ARGB;
 
 /**
  * Renders 3D Jutsu Models directly on the player's hand and torso:
@@ -60,7 +61,7 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
             return;
         }
 
-        int fullBright = 15728880;
+        int fullBright = RenderMathUtil.FULL_BRIGHT;
         float ageInTicks = state.ageInTicks;
 
         // 1. Chidori 3D Hand Lightning Blade (floating in front of palm)
@@ -68,7 +69,7 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
             poseStack.pushPose();
             this.getParentModel().rightArm.translateAndRotate(poseStack);
             poseStack.translate(-0.06D, 0.74D, -0.25D);
-            poseStack.scale(0.32F, 0.32F, 0.32F);
+            RenderMathUtil.scaleUniform(poseStack, 0.32F);
             submitNodeCollector.submitModel(
                     this.chidoriHandModel,
                     new VisualState(ageInTicks, 0.0F),
@@ -88,7 +89,7 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
             poseStack.pushPose();
             this.getParentModel().rightArm.translateAndRotate(poseStack);
             poseStack.translate(-0.06D, 0.74D, -0.25D);
-            poseStack.scale(0.28F, 0.28F, 0.28F);
+            RenderMathUtil.scaleUniform(poseStack, 0.28F);
             submitNodeCollector.submitCustomGeometry(
                     poseStack,
                     RenderTypes.entityTranslucent(JutsuVisualEffectRenderer.TEX_RASENGAN),
@@ -103,10 +104,10 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
         if (hasEightGates) {
             poseStack.pushPose();
             poseStack.translate(0.0D, 1.48D, 0.0D);
-            poseStack.scale(0.55F, 0.55F, 0.55F);
+            RenderMathUtil.scaleUniform(poseStack, 0.55F);
             int gatesColor = hasEightGatesDeath
-                    ? ARGB.colorFromFloat(0.85F, 0.95F, 0.10F, 0.15F)
-                    : ARGB.colorFromFloat(0.80F, 0.35F, 0.80F, 1.0F);
+                    ? ColorUtil.argb(0.85F, 0.95F, 0.10F, 0.15F)
+                    : ColorUtil.argb(0.80F, 0.35F, 0.80F, 1.0F);
             submitNodeCollector.submitModel(
                     this.gatesAuraModel,
                     new VisualState(ageInTicks, 0.0F),
@@ -123,13 +124,13 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
 
         // 4. Water Walk circular chakra discs on both foot soles
         if (hasWaterWalk) {
-            int waterColor = ARGB.colorFromFloat(0.75F, 0.10F, 0.55F, 1.0F);
+            int waterColor = ColorUtil.argb(0.75F, 0.10F, 0.55F, 1.0F);
 
             // Left foot sole
             poseStack.pushPose();
             this.getParentModel().leftLeg.translateAndRotate(poseStack);
             poseStack.translate(0.0D, 0.76D, 0.0D);
-            poseStack.scale(0.20F, 0.20F, 0.20F);
+            RenderMathUtil.scaleUniform(poseStack, 0.20F);
             submitNodeCollector.submitModel(
                     this.gatesAuraModel,
                     new VisualState(ageInTicks * 1.5F, 0.0F),
@@ -147,7 +148,7 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
             poseStack.pushPose();
             this.getParentModel().rightLeg.translateAndRotate(poseStack);
             poseStack.translate(0.0D, 0.76D, 0.0D);
-            poseStack.scale(0.20F, 0.20F, 0.20F);
+            RenderMathUtil.scaleUniform(poseStack, 0.20F);
             submitNodeCollector.submitModel(
                     this.gatesAuraModel,
                     new VisualState(-ageInTicks * 1.5F, 0.0F),

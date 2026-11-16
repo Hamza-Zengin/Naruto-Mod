@@ -20,8 +20,9 @@ import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import com.sekwah.sekclib.util.ColorUtil;
+import com.sekwah.sekclib.util.RenderMathUtil;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -107,19 +108,19 @@ public class FirstPersonWorldRenderer {
 
                 float bodyYaw = Mth.rotLerp(partialTicks, player.yBodyRotO, player.yBodyRot);
                 poseStack.rotateDegrees(Axis.YP, 180.0F - bodyYaw);
-                poseStack.scale(-1.0F, -1.0F, 1.0F);
+                RenderMathUtil.scaleEntityModel(poseStack, 1.0F);
                 poseStack.translate(0.0D, -1.501D - 0.06D, 0.0D);
-                poseStack.scale(1.22F, 1.22F, 1.22F);
+                RenderMathUtil.scaleUniform(poseStack, 1.22F);
 
                 HumanoidRenderState susanooState = new HumanoidRenderState();
                 susanooState.isCrouching = player.isCrouching();
-                int color = ARGB.colorFromFloat(0.50F, 1.0F, 0.55F, 0.25F);
+                int color = ColorUtil.argb(0.50F, 1.0F, 0.55F, 0.25F);
                 submitNodeCollector.submitModel(
                         susanooModel,
                         susanooState,
                         poseStack,
                         RenderTypes.entityTranslucent(SUSANOO_TEXTURE),
-                        15728880,
+                        RenderMathUtil.FULL_BRIGHT,
                         OverlayTexture.NO_OVERLAY,
                         color,
                         null,
@@ -135,17 +136,17 @@ public class FirstPersonWorldRenderer {
             poseStack.pushPose();
             try {
                 poseStack.translate(px, py + 0.05D, pz);
-                poseStack.scale(0.65F, 0.65F, 0.65F);
+                RenderMathUtil.scaleUniform(poseStack, 0.65F);
 
                 int color = hasEightGatesDeath
-                        ? ARGB.colorFromFloat(0.85F, 0.95F, 0.10F, 0.15F)
-                        : ARGB.colorFromFloat(0.80F, 0.35F, 0.80F, 1.0F);
+                        ? ColorUtil.argb(0.85F, 0.95F, 0.10F, 0.15F)
+                        : ColorUtil.argb(0.80F, 0.35F, 0.80F, 1.0F);
                 submitNodeCollector.submitModel(
                         gatesAuraModel,
                         new VisualState(player.tickCount + partialTicks, 0.0F),
                         poseStack,
                         RenderTypes.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND),
-                        15728880,
+                        RenderMathUtil.FULL_BRIGHT,
                         OverlayTexture.NO_OVERLAY,
                         color,
                         null,
@@ -161,15 +162,15 @@ public class FirstPersonWorldRenderer {
             poseStack.pushPose();
             try {
                 poseStack.translate(px, py + 0.02D, pz);
-                poseStack.scale(0.35F, 0.35F, 0.35F);
+                RenderMathUtil.scaleUniform(poseStack, 0.35F);
 
-                int color = ARGB.colorFromFloat(0.75F, 0.10F, 0.55F, 1.0F);
+                int color = ColorUtil.argb(0.75F, 0.10F, 0.55F, 1.0F);
                 submitNodeCollector.submitModel(
                         gatesAuraModel,
                         new VisualState((player.tickCount + partialTicks) * 1.5F, 0.0F),
                         poseStack,
                         RenderTypes.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND),
-                        15728880,
+                        RenderMathUtil.FULL_BRIGHT,
                         OverlayTexture.NO_OVERLAY,
                         color,
                         null,
