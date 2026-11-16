@@ -43,8 +43,13 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
     }
 
     @Override
-    public int getCooldown() {
+    public int getDefaultCooldown() {
         return 12 * 20;
+    }
+
+    @Override
+    public float getDefaultChakraCost() {
+        return 22.0f;
     }
 
     @Override
@@ -64,10 +69,7 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
         if (!canActivate(player, ninjaData)) {
             return false;
         }
-        float baseCost = 22.0f;
-        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
-        float cost = baseCost * getChakraCostMultiplier(mastery);
-        return tryConsume(player, ninjaData, cost, 0, 40);
+        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), 40);
     }
 
     public static int getScaledHoldDuration(int mastery) {

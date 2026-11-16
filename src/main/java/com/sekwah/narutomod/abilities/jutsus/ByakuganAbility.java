@@ -55,7 +55,7 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
         }
 
         int mastery = ninjaData.getAbilityMastery(this);
-        float drain = 0.25f * getChakraCostMultiplier(mastery);
+        float drain = getExtraParam("drain_per_tick", 0.25f) * getChakraCostMultiplier(mastery);
 
         if (ninjaData.getChakra() < drain) {
             player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra",

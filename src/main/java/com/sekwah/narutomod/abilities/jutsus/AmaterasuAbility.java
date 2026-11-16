@@ -111,7 +111,8 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
             return false;
         }
 
-        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), 45);
+        int castCooldown = Math.round(getExtraParam("cast_cooldown_ticks", 45.0f));
+        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), castCooldown);
     }
 
     @Override

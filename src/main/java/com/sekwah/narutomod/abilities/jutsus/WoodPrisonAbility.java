@@ -48,7 +48,7 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public int getCooldown() {
+    public int getDefaultCooldown() {
         return 14 * 20;
     }
 

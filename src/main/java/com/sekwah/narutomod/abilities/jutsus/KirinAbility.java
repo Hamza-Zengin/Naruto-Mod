@@ -52,17 +52,27 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public int getCooldown() {
+    public int getDefaultCooldown() {
         return 220; // 11 seconds cooldown
+    }
+
+    @Override
+    public float getDefaultChakraCost() {
+        return 130.0f;
+    }
+
+    @Override
+    public float getDefaultStaminaCost() {
+        return 60.0f;
     }
 
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         boolean isStormy = player.level().isThundering() || player.level().isRaining();
-        float baseChakra = isStormy ? 85.0f : 130.0f; // 35% natural lightning storm discount
+        float stormDiscount = isStormy ? 0.65f : 1.0f; // 35% natural lightning storm discount
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
-        float chakraCost = baseChakra * getChakraCostMultiplier(mastery);
-        float staminaCost = isStormy ? 45.0f : 60.0f;
+        float chakraCost = getChakraCost() * stormDiscount * getChakraCostMultiplier(mastery);
+        float staminaCost = getStaminaCost() * (isStormy ? 0.75f : 1.0f);
 
         return tryConsume(player, ninjaData, chakraCost, staminaCost, 45);
     }

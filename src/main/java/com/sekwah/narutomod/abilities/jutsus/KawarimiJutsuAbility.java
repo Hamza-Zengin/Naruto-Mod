@@ -54,11 +54,6 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
         return NarutoConfig.kawarimiMaxCooldownTicks;
     }
 
-    @Override
-    public int getCooldown() {
-        return getDefaultCooldown();
-    }
-
     public static double getScaledTeleportDistance(int mastery) {
         double t = Mth.clamp(mastery / 100.0, 0.0, 1.0);
         return Mth.lerp(t, NarutoConfig.kawarimiMaxDistance, NarutoConfig.kawarimiMinDistance);

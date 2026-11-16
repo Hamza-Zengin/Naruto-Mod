@@ -108,7 +108,7 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public int getCooldown() {
+    public int getDefaultCooldown() {
         return 6 * 20;
     }
 }

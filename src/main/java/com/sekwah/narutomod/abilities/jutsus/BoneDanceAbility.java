@@ -45,7 +45,7 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public int getCooldown() {
+    public int getDefaultCooldown() {
         return 15 * 20;
     }
 

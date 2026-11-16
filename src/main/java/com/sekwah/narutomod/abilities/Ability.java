@@ -195,7 +195,7 @@ public abstract class Ability {
     public float getChakraCost() {
         Identifier reg = getRegistryName();
         if (reg != null) {
-            JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
+            JutsuDataManager.JutsuStats data = JutsuDataManager.get(reg);
             if (data != null && data.chakraCost() >= 0) {
                 return data.chakraCost();
             }
@@ -206,7 +206,7 @@ public abstract class Ability {
     public float getStaminaCost() {
         Identifier reg = getRegistryName();
         if (reg != null) {
-            JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
+            JutsuDataManager.JutsuStats data = JutsuDataManager.get(reg);
             if (data != null && data.staminaCost() >= 0) {
                 return data.staminaCost();
             }
@@ -217,9 +217,9 @@ public abstract class Ability {
     public float getDamage() {
         Identifier reg = getRegistryName();
         if (reg != null) {
-            JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
-            if (data != null && data.damage() >= 0) {
-                return data.damage();
+            JutsuDataManager.JutsuStats data = JutsuDataManager.get(reg);
+            if (data != null && data.baseDamage() >= 0) {
+                return data.baseDamage();
             }
         }
         return getDefaultDamage();
@@ -240,12 +240,23 @@ public abstract class Ability {
     public int getCooldown() {
         Identifier reg = getRegistryName();
         if (reg != null) {
-            JutsuDataManager.JutsuData data = JutsuDataManager.get(reg);
-            if (data != null && data.cooldown() >= 0) {
-                return data.cooldown();
+            JutsuDataManager.JutsuStats data = JutsuDataManager.get(reg);
+            if (data != null && data.cooldownTicks() >= 0) {
+                return data.cooldownTicks();
             }
         }
         return getDefaultCooldown();
+    }
+
+    public float getExtraParam(String key, float defaultValue) {
+        Identifier reg = getRegistryName();
+        if (reg != null) {
+            JutsuDataManager.JutsuStats data = JutsuDataManager.get(reg);
+            if (data != null) {
+                return data.getExtraParam(key, defaultValue);
+            }
+        }
+        return defaultValue;
     }
 
     public int getCooldown(INinjaData ninjaData) {

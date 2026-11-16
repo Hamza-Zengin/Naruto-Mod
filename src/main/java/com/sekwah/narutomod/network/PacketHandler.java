@@ -9,6 +9,7 @@ import com.sekwah.narutomod.network.c2s.ServerSelectClanPacket;
 import com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket;
 import com.sekwah.narutomod.network.s2c.ClientCameraShakePacket;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
+import com.sekwah.narutomod.network.s2c.ClientJutsuStatsSyncPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -36,6 +37,7 @@ public class PacketHandler {
         // Server to client packets
         registrar.playToClient(ClientJutsuEffectPacket.TYPE, ClientJutsuEffectPacket.STREAM_CODEC);
         registrar.playToClient(ClientCameraShakePacket.TYPE, ClientCameraShakePacket.STREAM_CODEC);
+        registrar.playToClient(ClientJutsuStatsSyncPacket.TYPE, ClientJutsuStatsSyncPacket.STREAM_CODEC);
     }
 
     public static void sendToServer(CustomPacketPayload payload) {

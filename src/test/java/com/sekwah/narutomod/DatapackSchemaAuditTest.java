@@ -212,9 +212,9 @@ public class DatapackSchemaAuditTest {
             Assertions.assertFalse(files.isEmpty());
             for (Path file : files) {
                 JsonElement json = JsonParser.parseString(Files.readString(file));
-                DataResult<JutsuDataManager.JutsuData> result = JutsuDataManager.JutsuData.CODEC.parse(JsonOps.INSTANCE, json);
+                DataResult<JutsuDataManager.JutsuStats> result = JutsuDataManager.JutsuStats.CODEC.parse(JsonOps.INSTANCE, json);
                 Assertions.assertTrue(result.result().isPresent(),
-                        "Failed to decode JutsuData " + file.getFileName() + ": " + result.error().map(DataResult.Error::message).orElse(""));
+                        "Failed to decode JutsuStats " + file.getFileName() + ": " + result.error().map(DataResult.Error::message).orElse(""));
             }
         }
     }

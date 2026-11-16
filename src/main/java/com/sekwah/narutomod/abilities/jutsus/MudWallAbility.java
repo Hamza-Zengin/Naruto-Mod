@@ -78,7 +78,7 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public int getCooldown() {
+    public int getDefaultCooldown() {
         return 12 * 20;
     }
 }
