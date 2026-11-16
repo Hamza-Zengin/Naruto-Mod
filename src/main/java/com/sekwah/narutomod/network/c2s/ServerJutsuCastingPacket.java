@@ -68,13 +68,17 @@ public class ServerJutsuCastingPacket implements CustomPacketPayload {
                     case 3 -> NarutoSounds.SEAL_C.get();
                     default -> null;
                 };
+                var ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+                int sealCount = ninjaData.getActiveSeals().size();
+                float pitch = Math.min(1.4f, 0.9f + (sealCount * 0.08f));
+
                 if(playSound != null) {
                     player.level().playSound(null,
                             player.getX(), player.getY(), player.getZ(),
-                            playSound, SoundSource.PLAYERS, 1.0f, 1.0f);
+                            playSound, SoundSource.PLAYERS, 1.0f, pitch);
                 }
 
-                player.getData(NinjaCapabilityHandler.NINJA_DATA).addSeal((byte) msg.jutsuKey);
+                ninjaData.addSeal((byte) msg.jutsuKey);
             }
         });
     }

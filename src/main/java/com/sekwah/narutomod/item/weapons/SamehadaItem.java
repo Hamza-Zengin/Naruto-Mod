@@ -1,11 +1,16 @@
 package com.sekwah.narutomod.item.weapons;
 
+import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
+import com.sekwah.narutomod.network.s2c.ClientCameraShakePacket;
+import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -17,6 +22,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.function.Consumer;
 
@@ -54,6 +61,17 @@ public class SamehadaItem extends Item {
                 serverLevel.sendParticles(ParticleTypes.SPLASH, target.getX(), target.getY() + 1.0, target.getZ(),
                         10, 0.3, 0.4, 0.3, 0.08, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 serverLevel.playSound(null, target.blockPosition(), SoundEvents.PHANTOM_BITE, SoundSource.PLAYERS, 0.9f, 0.8f);
+            }
+            if (player instanceof ServerPlayer serverPlayer) {
+                PacketDistributor.sendToPlayer(serverPlayer, new ClientCameraShakePacket(0.20f, 3));
+                Vec3 hitPos = target.position().add(0.0, target.getBbHeight() * 0.6, 0.0);
+                PacketDistributor.sendToPlayersTrackingEntityAndSelf(target, new ClientJutsuEffectPacket(
+                        Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "hand_seal_spark"),
+                        hitPos,
+                        player.getLookAngle(),
+                        1.0f,
+                        0x2299FF
+                ));
             }
         }
     }

@@ -2,10 +2,13 @@ package com.sekwah.narutomod.network.c2s;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
+import com.sekwah.narutomod.abilities.ChakraElement;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
+import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
+import com.sekwah.sekclib.util.ColorUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -15,6 +18,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.HashSet;
@@ -91,6 +95,9 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                                         p.getX(), p.getY(), p.getZ(), ability.castingSound(), SoundSource.PLAYERS, 0.5f, 1.0f);
                             }
                             ability.performServer(p, ninjaData);
+                            if (p instanceof ServerPlayer sp) {
+                                sendHandSealSpark(sp, ability);
+                            }
                         }, delay);
                     } else {
                         if (ability.castingSound() != null) {
@@ -98,6 +105,7 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                                     player.getX(), player.getY(), player.getZ(), ability.castingSound(), SoundSource.PLAYERS, 0.5f, 1.0f);
                         }
                         ability.performServer(player, ninjaData);
+                        sendHandSealSpark(player, ability);
                     }
                     ninjaData.addJutsuCast();
                     ninjaData.clearSeals();
@@ -127,5 +135,25 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                 }
             }
         });
+    }
+
+    private static void sendHandSealSpark(ServerPlayer player, Ability ability) {
+        ChakraElement element = ability.getChakraElement();
+        int colorHex = switch (element) {
+            case FIRE -> 0xFF5511;
+            case WATER -> 0x2299FF;
+            case EARTH -> 0xAA7733;
+            case WIND -> 0x66EEAA;
+            case LIGHTNING -> 0x55CCFF;
+            default -> 0x77CCFF;
+        };
+        var handPos = player.getEyePosition().add(player.getLookAngle().scale(0.55)).subtract(0, 0.25, 0);
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new ClientJutsuEffectPacket(
+                Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "hand_seal_spark"),
+                handPos,
+                player.getLookAngle(),
+                1.0f,
+                colorHex
+        ));
     }
 }

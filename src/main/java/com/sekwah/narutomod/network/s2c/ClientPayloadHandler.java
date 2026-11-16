@@ -25,7 +25,13 @@ public class ClientPayloadHandler {
     }
 
     public static void handleCameraShake(final ClientCameraShakePacket msg, final IPayloadContext context) {
-        context.enqueueWork(() -> CameraShakeManager.triggerShake(msg.intensity, msg.durationTicks));
+        context.enqueueWork(() -> {
+            if (msg.hasOrigin) {
+                CameraShakeManager.triggerShakeAt(msg.intensity, msg.durationTicks, msg.origin, msg.maxRadius);
+            } else {
+                CameraShakeManager.triggerShake(msg.intensity, msg.durationTicks);
+            }
+        });
     }
 
     public static void handleJutsuStatsSync(final ClientJutsuStatsSyncPacket msg, final IPayloadContext context) {

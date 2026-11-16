@@ -148,12 +148,28 @@ public class KusanagiSwordItem extends Item {
     @Override
     public void hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         super.hurtEnemy(stack, target, attacker);
-        if (!attacker.level().isClientSide() && attacker.level() instanceof ServerLevel serverLevel && isChakraActive(stack, attacker.level())) {
-            target.hurtServer(serverLevel, attacker.damageSources().magic(), 6.0f);
-            target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 1));
-            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getY() + 1.0, target.getZ(),
-                    15, 0.4, 0.5, 0.4, 0.1, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
-            serverLevel.playSound(null, target.blockPosition(), SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 0.8f, 1.4f);
+        if (!attacker.level().isClientSide() && attacker.level() instanceof ServerLevel serverLevel) {
+            boolean active = isChakraActive(stack, attacker.level());
+            if (active) {
+                target.hurtServer(serverLevel, attacker.damageSources().magic(), 6.0f);
+                target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 1));
+                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getY() + 1.0, target.getZ(),
+                        15, 0.4, 0.5, 0.4, 0.1, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                serverLevel.playSound(null, target.blockPosition(), SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 0.8f, 1.4f);
+            }
+            if (attacker instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(serverPlayer,
+                        new com.sekwah.narutomod.network.s2c.ClientCameraShakePacket(active ? 0.25f : 0.16f, active ? 3 : 2));
+                Vec3 hitPos = target.position().add(0.0, target.getBbHeight() * 0.6, 0.0);
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayersTrackingEntityAndSelf(target,
+                        new com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket(
+                                net.minecraft.resources.Identifier.fromNamespaceAndPath(com.sekwah.narutomod.NarutoMod.MOD_ID, "hand_seal_spark"),
+                                hitPos,
+                                attacker.getLookAngle(),
+                                1.0f,
+                                0x55CCFF
+                        ));
+            }
         }
     }
 

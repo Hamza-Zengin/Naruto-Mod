@@ -1,6 +1,9 @@
 package com.sekwah.narutomod.client.events;
 
 import com.sekwah.narutomod.NarutoMod;
+import com.sekwah.narutomod.config.NarutoConfig;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -18,10 +21,11 @@ public class CameraShakeManager {
     private static int totalTicks = 0;
 
     public static void triggerShake(float newIntensity, int durationTicks) {
-        if (durationTicks <= 0 || newIntensity <= 0.0f) {
+        float scaledIntensity = newIntensity * (float) NarutoConfig.cameraShakeMultiplier;
+        if (durationTicks <= 0 || scaledIntensity <= 0.0f) {
             return;
         }
-        float clampedIntensity = Math.min(newIntensity, 5.0f);
+        float clampedIntensity = Math.min(scaledIntensity, 5.0f);
         if (remainingTicks <= 0 || clampedIntensity >= intensity) {
             intensity = clampedIntensity;
         }
@@ -29,6 +33,23 @@ public class CameraShakeManager {
             remainingTicks = durationTicks;
             totalTicks = durationTicks;
         }
+    }
+
+    public static void triggerShakeAt(float baseIntensity, int durationTicks, Vec3 sourcePos, double maxRadius) {
+        if (maxRadius <= 0.0 || sourcePos == null) {
+            triggerShake(baseIntensity, durationTicks);
+            return;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) {
+            return;
+        }
+        double distance = mc.player.position().distanceTo(sourcePos);
+        if (distance >= maxRadius) {
+            return;
+        }
+        float attenuation = (float) Math.max(0.0, 1.0 - (distance / maxRadius));
+        triggerShake(baseIntensity * attenuation, durationTicks);
     }
 
     @SubscribeEvent

@@ -62,6 +62,15 @@ public class NarutoConfig {
     private static final ModConfigSpec.IntValue CONFIG_CHAKRA_BAR_DESIGN;
     public static int chakraBarDesign = 0;
 
+    private static final ModConfigSpec.BooleanValue CONFIG_AUTO_HIDE_HUD;
+    public static boolean autoHideHud = true;
+
+    private static final ModConfigSpec.IntValue CONFIG_HUD_FADE_DELAY_TICKS;
+    public static int hudFadeDelayTicks = 60;
+
+    private static final ModConfigSpec.DoubleValue CONFIG_CAMERA_SHAKE_MULTIPLIER;
+    public static double cameraShakeMultiplier = 1.0d;
+
     private static final ModConfigSpec.DoubleValue CONFIG_WATER_WALK_SPEED;
     public static float waterWalkSpeed = 1.0f;
 
@@ -207,6 +216,15 @@ public class NarutoConfig {
         CONFIG_CHAKRA_BAR_DESIGN = configBuilder.comment("Design for the chakra bar")
                 .defineInRange("chakraBarDesign", 0, 0, BarDesigns.BarInfo.values().length);
 
+        CONFIG_AUTO_HIDE_HUD = configBuilder.comment("Automatically fade out the Chakra/Stamina HUD when full and out of combat")
+                .define("autoHideHud", true);
+
+        CONFIG_HUD_FADE_DELAY_TICKS = configBuilder.comment("Delay in ticks before the HUD fades out (20 ticks = 1 second)")
+                .defineInRange("hudFadeDelayTicks", 60, 0, 1200);
+
+        CONFIG_CAMERA_SHAKE_MULTIPLIER = configBuilder.comment("Camera shake intensity multiplier (0.0 disables screen shake)")
+                .defineInRange("cameraShakeMultiplier", 1.0d, 0.0d, 2.0d);
+
         configBuilder.pop();
 
         configBuilder.pop();
@@ -227,6 +245,9 @@ public class NarutoConfig {
         paperbombBlockDamage = CONFIG_PAPERBOMB_BLOCK_DAMAGE.get();
         jutsuKeybindHoldThreshold = CONFIG_JUTSU_KEYBIND_HOLD_THRESHOLD.get();
         chakraBarDesign = CONFIG_CHAKRA_BAR_DESIGN.get();
+        autoHideHud = CONFIG_AUTO_HIDE_HUD.get();
+        hudFadeDelayTicks = CONFIG_HUD_FADE_DELAY_TICKS.get();
+        cameraShakeMultiplier = CONFIG_CAMERA_SHAKE_MULTIPLIER.get();
         jutsuCastDelay = CONFIG_JUTSU_CAST_DELAY
                 .get();
         waterWalkSpeed = CONFIG_WATER_WALK_SPEED.get().floatValue();

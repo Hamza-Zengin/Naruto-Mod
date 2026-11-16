@@ -33,6 +33,19 @@ public class BoneSwordItem extends Item {
                 target.hurtServer(serverLevel, player.damageSources().playerAttack(player), 2.5f);
             }
             target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 50, 0));
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(serverPlayer,
+                        new com.sekwah.narutomod.network.s2c.ClientCameraShakePacket(0.18f, 2));
+                net.minecraft.world.phys.Vec3 hitPos = target.position().add(0.0, target.getBbHeight() * 0.6, 0.0);
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayersTrackingEntityAndSelf(target,
+                        new com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket(
+                                net.minecraft.resources.Identifier.fromNamespaceAndPath(com.sekwah.narutomod.NarutoMod.MOD_ID, "hand_seal_spark"),
+                                hitPos,
+                                player.getLookAngle(),
+                                1.0f,
+                                0xE5E7EB
+                        ));
+            }
         }
     }
 

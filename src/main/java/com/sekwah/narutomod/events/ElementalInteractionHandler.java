@@ -7,7 +7,11 @@ import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.MudWallEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity;
+import com.sekwah.narutomod.network.s2c.ClientCameraShakePacket;
+import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -18,6 +22,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -89,6 +94,28 @@ public class ElementalInteractionHandler {
         fireball.setDeltaMovement(fireball.getDeltaMovement().scale(NarutoConfig.windFireSpeedMultiplier));
         fireball.explosionPower *= NarutoConfig.windFireRadiusMultiplier;
         fireball.needsSync = true;
+        if (fireball.level() instanceof ServerLevel serverLevel) {
+            triggerComboShockwave(serverLevel, fireball.position(), 0xFF6622);
+        }
+    }
+
+    private static void triggerComboShockwave(ServerLevel level, Vec3 pos, int colorHex) {
+        final float maxRadius = 16.0f;
+        final double maxRadiusSq = maxRadius * maxRadius;
+        ClientCameraShakePacket shakePacket = new ClientCameraShakePacket(0.75f, 10, pos, maxRadius);
+        ClientJutsuEffectPacket burstPacket = new ClientJutsuEffectPacket(
+                Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "elemental_burst"),
+                pos,
+                new Vec3(0.0, 1.0, 0.0),
+                1.5f,
+                colorHex
+        );
+        for (ServerPlayer player : level.players()) {
+            if (player.position().distanceToSqr(pos) <= maxRadiusSq) {
+                PacketDistributor.sendToPlayer(player, shakePacket);
+                PacketDistributor.sendToPlayer(player, burstPacket);
+            }
+        }
     }
 
     private static boolean isWetOrNearWaterBullet(ServerLevel level, LivingEntity target) {

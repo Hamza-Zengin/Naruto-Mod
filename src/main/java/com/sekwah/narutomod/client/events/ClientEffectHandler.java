@@ -56,6 +56,29 @@ public class ClientEffectHandler {
                 level.addParticle(ParticleTypes.ELECTRIC_SPARK, pos.x, pos.y + 0.25, pos.z, vx, 0.15, vz);
                 level.addParticle(coloredDust, pos.x + vx, pos.y + 0.2, pos.z + vz, 0.0, 0.05, 0.0);
             }
+        } else if ("elemental_burst".equals(path)) {
+            DustParticleOptions burstDust = new DustParticleOptions(ARGB.opaque(msg.colorHex), Math.min(2.2f, scale));
+            for (int i = 0; i < 24; i++) {
+                double angle = (2.0 * Math.PI * i) / 24.0;
+                double vx = Math.cos(angle) * 0.35 * scale;
+                double vz = Math.sin(angle) * 0.35 * scale;
+                level.addParticle(burstDust,
+                        pos.x + vx * 0.4, pos.y + (rand.nextDouble() - 0.5) * 0.4, pos.z + vz * 0.4,
+                        vx * 0.25, 0.08 + rand.nextDouble() * 0.08, vz * 0.25);
+                level.addParticle(ParticleTypes.ELECTRIC_SPARK,
+                        pos.x, pos.y, pos.z,
+                        vx * 0.6, 0.12 + rand.nextDouble() * 0.1, vz * 0.6);
+            }
+        } else if ("hand_seal_spark".equals(path)) {
+            DustParticleOptions sparkDust = new DustParticleOptions(ARGB.opaque(msg.colorHex), 0.65f);
+            for (int i = 0; i < 12; i++) {
+                double ox = (rand.nextDouble() - 0.5) * 0.25 * scale;
+                double oy = (rand.nextDouble() - 0.5) * 0.25 * scale;
+                double oz = (rand.nextDouble() - 0.5) * 0.25 * scale;
+                level.addParticle(sparkDust,
+                        pos.x + ox, pos.y + oy, pos.z + oz,
+                        ox * 0.35, 0.04 + rand.nextDouble() * 0.05, oz * 0.35);
+            }
         } else {
             for (int i = 0; i < 18; i++) {
                 level.addParticle(coloredDust,

@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
 import java.awt.*;
@@ -16,6 +17,9 @@ import java.awt.*;
 public class ChakraAndStaminaGUI {
 
     public static final BarDesigns.BarInfo[] barTypes = BarDesigns.BarInfo.values();
+
+    private static final float MIN_ALPHA = 0.15f;
+    private static final float MAX_ALPHA = 1.0f;
 
     private final Minecraft minecraft;
     private int screenWidth;
@@ -28,6 +32,12 @@ public class ChakraAndStaminaGUI {
 
     private float maxChakra;
     private float maxStamina;
+
+    private float hudAlpha = MAX_ALPHA;
+    private int fadeDelayTimer = 0;
+    private float prevChakra = -1.0f;
+    private float prevStamina = -1.0f;
+    private float prevHealth = -1.0f;
 
     public ChakraAndStaminaGUI(Minecraft mc) {
         this.minecraft = mc;
@@ -62,16 +72,18 @@ public class ChakraAndStaminaGUI {
         int screenMid = this.screenWidth / 2;
 
         float darkenFactor = 0.25f;
+        int alphaByte = Mth.clamp((int) (this.hudAlpha * 255.0f), 0, 255);
+        int underlayColor = ARGB.color(alphaByte, 255, 255, 255);
 
         Color chakraColor = new Color(255,0,0);
         Color staminaColor = new Color(0,255,0);
-        int intStaminaColor = ARGB.opaque(ColorUtil.toMCColor(staminaColor).getValue());
-        int intChakraColor = ARGB.opaque(ColorUtil.toMCColor(chakraColor).getValue());
+        int intStaminaColor = ARGB.color(alphaByte, ColorUtil.toMCColor(staminaColor).getValue());
+        int intChakraColor = ARGB.color(alphaByte, ColorUtil.toMCColor(chakraColor).getValue());
 
-        int intStaminaColorDarker = ARGB.opaque(ColorUtil.toMCColor(new Color((int) (staminaColor.getRed() * darkenFactor),
+        int intStaminaColorDarker = ARGB.color(alphaByte, ColorUtil.toMCColor(new Color((int) (staminaColor.getRed() * darkenFactor),
                 (int) (staminaColor.getGreen() * darkenFactor),
                 (int) (staminaColor.getBlue() * darkenFactor))).getValue());
-        int intChakraColorDarker = ARGB.opaque(ColorUtil.toMCColor(new Color((int) (chakraColor.getRed() * darkenFactor),
+        int intChakraColorDarker = ARGB.color(alphaByte, ColorUtil.toMCColor(new Color((int) (chakraColor.getRed() * darkenFactor),
                 (int) (chakraColor.getGreen() * darkenFactor),
                 (int) (chakraColor.getBlue() * darkenFactor))).getValue());
 
@@ -80,26 +92,26 @@ public class ChakraAndStaminaGUI {
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, barTexture, screenMid - width - offset, this.screenHeight - 22,
                 0, 22,
                 width, 22,
-                width, 44, -1);
+                width, 44, underlayColor);
 
         // Stamina Bar underlay
         int staminaWidth = (int) (barWidth * currentStaminaPercent);
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, barTexture, screenMid + offset, this.screenHeight - 22,
                 0, 22,
                 width, 22,
-                width, 44, -1);
+                width, 44, underlayColor);
 
         // Chakra Bar color
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, barTexture, screenMid - chakraWidth - offset - (width - xOffset - barWidth), this.screenHeight - 22,
                 xOffset + (barWidth - chakraWidth), 0,
                 chakraWidth, 22,
-                width, 44, toArgb(chakraColor));
+                width, 44, toArgb(chakraColor, alphaByte));
 
         // Stamina Bar color
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, barTexture, screenMid + offset + (100 - barWidth - xOffset), this.screenHeight - 22,
                 xOffset, 0,
                 staminaWidth, 22,
-                width, 44, toArgb(staminaColor));
+                width, 44, toArgb(staminaColor, alphaByte));
 
         String chakraText = (int) chakra + "/" + (int) maxChakra;
         this.centeredTextOutlined(guiGraphics,
@@ -137,13 +149,40 @@ public class ChakraAndStaminaGUI {
             stamina = ninjaData.getStamina();
             maxChakra = ninjaData.getMaxChakra();
             maxStamina = ninjaData.getMaxStamina();
+
+            if (!NarutoConfig.autoHideHud) {
+                this.hudAlpha = MAX_ALPHA;
+                this.fadeDelayTimer = 0;
+            } else {
+                boolean chakraChanged = this.prevChakra >= 0 && Math.abs(chakra - this.prevChakra) > 0.001f;
+                boolean staminaChanged = this.prevStamina >= 0 && Math.abs(stamina - this.prevStamina) > 0.001f;
+                boolean tookDamage = player.hurtTime > 0 || (this.prevHealth >= 0 && player.getHealth() < this.prevHealth);
+                boolean hasActiveSeals = ninjaData.getActiveSeals() != null && !ninjaData.getActiveSeals().isEmpty();
+                boolean resourcesNotFull = chakra < maxChakra || stamina < maxStamina;
+
+                if (chakraChanged || staminaChanged || tookDamage || hasActiveSeals || resourcesNotFull) {
+                    this.hudAlpha = MAX_ALPHA;
+                    this.fadeDelayTimer = NarutoConfig.hudFadeDelayTicks;
+                } else if (this.fadeDelayTimer > 0) {
+                    this.fadeDelayTimer--;
+                } else if (this.hudAlpha > MIN_ALPHA) {
+                    this.hudAlpha = Mth.lerp(0.1f, this.hudAlpha, MIN_ALPHA);
+                    if (this.hudAlpha - MIN_ALPHA < 0.005f) {
+                        this.hudAlpha = MIN_ALPHA;
+                    }
+                }
+            }
+
+            this.prevChakra = chakra;
+            this.prevStamina = stamina;
+            this.prevHealth = player.getHealth();
         } else {
             shouldRender = false;
         }
     }
 
-    private static int toArgb(Color color) {
-        return ARGB.color(255, color.getRed(), color.getGreen(), color.getBlue());
+    private static int toArgb(Color color, int alpha) {
+        return ARGB.color(alpha, color.getRed(), color.getGreen(), color.getBlue());
     }
 
     private Font getFont() {
