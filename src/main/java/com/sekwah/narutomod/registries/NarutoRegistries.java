@@ -6,7 +6,7 @@ import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.advancements.NinjaProgressTrigger;
 import com.sekwah.narutomod.clans.Clan;
 import com.sekwah.narutomod.loot.AddNarutoLootModifier;
-import net.minecraft.advancements.CriterionTrigger;
+import net.minecraft.advancements.triggers.CriterionTrigger;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
