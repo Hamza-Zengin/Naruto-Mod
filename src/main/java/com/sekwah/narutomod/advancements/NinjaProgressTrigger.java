@@ -3,12 +3,12 @@ package com.sekwah.narutomod.advancements;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.sekwah.narutomod.registries.NarutoRegistries;
-import net.minecraft.advancements.triggers.ContextAwarePredicate;
 import net.minecraft.advancements.triggers.Criterion;
-import net.minecraft.advancements.triggers.EntityPredicate;
 import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -54,13 +54,13 @@ public class NinjaProgressTrigger extends SimpleCriterionTrigger<NinjaProgressTr
     }
 
     public record Instance(
-            Optional<ContextAwarePredicate> player,
+            Optional<Holder<LootItemCondition>> player,
             Action action,
             Optional<String> target
     ) implements SimpleCriterionTrigger.SimpleInstance {
 
         public static final Codec<Instance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(Instance::player),
+                LootItemCondition.CODEC.optionalFieldOf("player").forGetter(Instance::player),
                 Action.CODEC.fieldOf("action").forGetter(Instance::action),
                 Codec.STRING.optionalFieldOf("target").forGetter(Instance::target)
         ).apply(instance, Instance::new));

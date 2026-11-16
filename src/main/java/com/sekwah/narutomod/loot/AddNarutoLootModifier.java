@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -15,6 +16,7 @@ import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.neoforge.common.loot.LootModifier;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Data-driven Global Loot Modifier for injecting Naruto Mod items and jutsu scrolls
@@ -38,7 +40,7 @@ public class AddNarutoLootModifier extends LootModifier {
     private final int minCount;
     private final int maxCount;
 
-    public AddNarutoLootModifier(LootItemCondition[] conditions, int priority,
+    public AddNarutoLootModifier(Optional<Holder<LootItemCondition>> conditions, int priority,
                                  List<Identifier> targetLootTables, Item item, float chance,
                                  int minCount, int maxCount) {
         super(conditions, priority);
