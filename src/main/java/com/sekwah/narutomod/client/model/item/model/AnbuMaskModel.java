@@ -77,6 +77,13 @@ public class AnbuMaskModel extends HumanoidModel<HumanoidRenderState> {
     @Override
     public void setupAnim(HumanoidRenderState state) {
         super.setupAnim(state);
+        if (state instanceof net.minecraft.client.renderer.entity.state.ArmorStandRenderState armorStandState) {
+            float degToRad = (float) (Math.PI / 180.0);
+            this.head.xRot = armorStandState.headPose.x() * degToRad;
+            this.head.yRot = armorStandState.headPose.y() * degToRad;
+            this.head.zRot = armorStandState.headPose.z() * degToRad;
+            this.head.y = 1.0F;
+        }
         // Scale head slightly to prevent z-fighting with player face geometry
         this.head.xScale = 1.1F;
         this.head.yScale = 1.1F;

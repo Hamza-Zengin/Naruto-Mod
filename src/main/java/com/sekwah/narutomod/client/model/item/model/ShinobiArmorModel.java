@@ -15,8 +15,21 @@ import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
  */
 public class ShinobiArmorModel extends HumanoidModel<HumanoidRenderState> {
 
+    private final ModelPart cloakSkirt;
+
     public ShinobiArmorModel(ModelPart root) {
         super(root);
+        this.cloakSkirt = this.body.hasChild("cloak_skirt") ? this.body.getChild("cloak_skirt") : null;
+    }
+
+    @Override
+    public void setupAnim(HumanoidRenderState state) {
+        super.setupAnim(state);
+        if (this.cloakSkirt != null) {
+            float forwardLegXRot = Math.min(0.0F, Math.min(this.leftLeg.xRot, this.rightLeg.xRot));
+            this.cloakSkirt.xRot = -this.body.xRot + forwardLegXRot * 0.85F - (state.isCrouching ? 0.35F : 0.0F);
+            this.cloakSkirt.z = state.isCrouching ? -0.8F : 0.0F;
+        }
     }
 
     public static LayerDefinition createChuninVestLayer() {
@@ -129,18 +142,22 @@ public class ShinobiArmorModel extends HumanoidModel<HumanoidRenderState> {
         MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
         PartDefinition root = mesh.getRoot();
 
-        root.addOrReplaceChild("body",
+        PartDefinition body = root.addOrReplaceChild("body",
                 CubeListBuilder.create()
                         // 1. Upper Cloak Torso (u=0..28, v=0..17)
                         .texOffs(0, 0)
                         .addBox(-4.5F, 0.0F, -2.5F, 9, 12, 5, new CubeDeformation(0.45F))
-                        // 2. Lower Flowing Pleated Coat Skirt (u=0..32, v=18..33)
-                        .texOffs(0, 18)
-                        .addBox(-5.0F, 11.2F, -3.0F, 10, 9, 6, new CubeDeformation(0.38F))
-                        // 3. Iconic High Stiff Crimson-Lined Akatsuki Collar (u=0..32, v=34..44)
+                        // 3. Iconic High Stiff Crimson-Lined Akatsuki Collar (widened to prevent ±90° head clipping)
                         .texOffs(0, 34)
-                        .addBox(-5.0F, -3.2F, -3.0F, 10, 4, 6, new CubeDeformation(0.20F)),
+                        .addBox(-5.0F, -2.2F, -3.0F, 10, 4, 6, new CubeDeformation(0.65F, 0.0F, 0.65F)),
                 PartPose.ZERO);
+
+        // 2. Lower Flowing Pleated Coat Skirt as animated child part (u=0..32, v=18..33)
+        body.addOrReplaceChild("cloak_skirt",
+                CubeListBuilder.create()
+                        .texOffs(0, 18)
+                        .addBox(-5.0F, 0.0F, -3.0F, 10, 9, 6, new CubeDeformation(0.38F)),
+                PartPose.offset(0.0F, 11.2F, 0.0F));
 
         root.addOrReplaceChild("right_arm",
                 CubeListBuilder.create()

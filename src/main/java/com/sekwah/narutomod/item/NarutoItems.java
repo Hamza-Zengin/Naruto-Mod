@@ -125,7 +125,6 @@ public class NarutoItems {
     public static final DeferredItem<Item> HEADBAND_BLUE = createHeadband("headband_blue");
     public static final DeferredItem<Item> HEADBAND_BLACK = createHeadband("headband_black");
     public static final DeferredItem<Item> HEADBAND_RED = createHeadband("headband_red");
-    public static final DeferredItem<Item> HEADBAND_CUSTARD = createHeadband("headband_custard");
 
     public static final DeferredItem<Item> HEADBAND_LEAF = createHeadband("headband_leaf");
     public static final DeferredItem<Item> HEADBAND_LEAF_SCRATCHED = createHeadband("headband_leaf_scratched");
@@ -156,7 +155,6 @@ public class NarutoItems {
     public static final DeferredItem<Item> HEADBAND_GRASS = createHeadband("headband_grass");
     public static final DeferredItem<Item> HEADBAND_GRASS_SCRATCHED = createHeadband("headband_grass_scratched");
 
-    public static final DeferredItem<Item> HEADBAND_PRIDE = createHeadband("headband_pride");
     public static final DeferredItem<Item> HEADBAND_YOUTUBE = createHeadband("headband_youtube");
     public static final DeferredItem<Item> HEADBAND_LAVA = createHeadband("headband_lava");
 
@@ -216,7 +214,6 @@ public class NarutoItems {
                         output.accept(HEADBAND_BLUE.get());
                         output.accept(HEADBAND_BLACK.get());
                         output.accept(HEADBAND_RED.get());
-                        output.accept(HEADBAND_CUSTARD.get());
                         output.accept(HEADBAND_LEAF.get());
                         output.accept(HEADBAND_LEAF_SCRATCHED.get());
                         output.accept(HEADBAND_LEAF_BLACK.get());
@@ -237,7 +234,6 @@ public class NarutoItems {
                         output.accept(HEADBAND_RAIN_SCRATCHED.get());
                         output.accept(HEADBAND_GRASS.get());
                         output.accept(HEADBAND_GRASS_SCRATCHED.get());
-                        output.accept(HEADBAND_PRIDE.get());
                         output.accept(HEADBAND_YOUTUBE.get());
                         output.accept(HEADBAND_LAVA.get());
                     })

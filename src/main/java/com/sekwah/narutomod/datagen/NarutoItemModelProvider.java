@@ -71,9 +71,7 @@ public class NarutoItemModelProvider extends ModelProvider {
         simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_BLACK.get(), "item/armor/headbands/headband_black_blank");
         simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_BLUE.get(), "item/armor/headbands/headband_blue_blank");
         simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_RED.get(), "item/armor/headbands/headband_red_blank");
-        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_CUSTARD.get(), "item/armor/headbands/headband_custard");
         simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_LAVA.get(), "item/armor/headbands/headband_lava");
-        simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_PRIDE.get(), "item/armor/headbands/headband_rainbow");
         simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_YOUTUBE.get(), "item/armor/headbands/headband_youtube");
 
         // --- Headbands (Villages) ---

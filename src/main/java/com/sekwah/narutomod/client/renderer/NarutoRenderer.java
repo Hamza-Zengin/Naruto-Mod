@@ -48,7 +48,6 @@ public class NarutoRenderer implements ResourceManagerReloadListener {
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_BLUE, "textures/models/armor/headband/headband_blue_blank.png");
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_BLACK, "textures/models/armor/headband/headband_black_blank.png");
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_RED, "textures/models/armor/headband/headband_red_blank.png");
-        setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_CUSTARD, "textures/models/armor/headband/headband_custard.png");
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_LEAF, "textures/models/armor/headband/headband_leafvillage.png");
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_LEAF_SCRATCHED, "textures/models/armor/headband/headband_leafvillage_scratched.png");
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_LEAF_BLACK, "textures/models/armor/headband/headband_leafvillage_black.png");
@@ -69,7 +68,6 @@ public class NarutoRenderer implements ResourceManagerReloadListener {
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_RAIN_SCRATCHED, "textures/models/armor/headband/headband_rainblack_scratched.png");
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_GRASS, "textures/models/armor/headband/headband_grassblack.png");
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_GRASS_SCRATCHED, "textures/models/armor/headband/headband_grassblack_scratched.png");
-        setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_PRIDE, "textures/models/armor/headband/headband_pride.png");
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_YOUTUBE, "textures/models/armor/headband/headband_youtube.png");
         setHeadbandRenderer(modelSet, NarutoItems.HEADBAND_LAVA, "textures/models/armor/headband/headband_lavavillage.png");
 

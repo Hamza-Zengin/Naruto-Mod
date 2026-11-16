@@ -45,10 +45,16 @@ public class SenbonRenderer extends ArrowRenderer<SenbonEntity, ArrowRenderState
             localStack.rotateDegrees(Axis.XP, 90.0F);
             PoseStack.Pose entry = localStack.last();
             Matrix4f matrix4f = entry.pose();
-            vertex(matrix4f, entry, ivertexbuilder, -8, -2, 0, 0.0F, 0.0F, 0, 1, 0, packedLightIn);
-            vertex(matrix4f, entry, ivertexbuilder, 8, -2, 0, 0.5F, 0.0F, 0, 1, 0, packedLightIn);
-            vertex(matrix4f, entry, ivertexbuilder, 8, 2, 0, 0.5F, 0.15625F, 0, 1, 0, packedLightIn);
-            vertex(matrix4f, entry, ivertexbuilder, -8, 2, 0, 0.0F, 0.15625F, 0, 1, 0, packedLightIn);
+            // Slender needle shaft (-8 to 5, half thickness -1 to +1)
+            vertex(matrix4f, entry, ivertexbuilder, -8, -1, 0, 0.0F, 0.0F, 0, 1, 0, packedLightIn);
+            vertex(matrix4f, entry, ivertexbuilder, 5, -1, 0, 0.4F, 0.0F, 0, 1, 0, packedLightIn);
+            vertex(matrix4f, entry, ivertexbuilder, 5, 1, 0, 0.4F, 0.15625F, 0, 1, 0, packedLightIn);
+            vertex(matrix4f, entry, ivertexbuilder, -8, 1, 0, 0.0F, 0.15625F, 0, 1, 0, packedLightIn);
+            // Tapered sharp needle tip (5 to 10)
+            vertex(matrix4f, entry, ivertexbuilder, 5, -1, 0, 0.4F, 0.0F, 0, 1, 0, packedLightIn);
+            vertex(matrix4f, entry, ivertexbuilder, 10, 0, 0, 0.5F, 0.078125F, 0, 1, 0, packedLightIn);
+            vertex(matrix4f, entry, ivertexbuilder, 10, 0, 0, 0.5F, 0.078125F, 0, 1, 0, packedLightIn);
+            vertex(matrix4f, entry, ivertexbuilder, 5, 1, 0, 0.4F, 0.15625F, 0, 1, 0, packedLightIn);
          }
       });
 
