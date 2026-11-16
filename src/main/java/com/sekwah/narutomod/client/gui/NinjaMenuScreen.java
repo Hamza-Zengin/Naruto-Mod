@@ -307,8 +307,6 @@ public class NinjaMenuScreen extends Screen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
-        this.extractBackground(graphics, mouseX, mouseY, partialTicks);
-
         int centerX = this.width / 2;
         int topY = 10;
 
