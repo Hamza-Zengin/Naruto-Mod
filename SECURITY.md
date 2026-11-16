@@ -4,8 +4,7 @@
 
 | Version       | Minecraft | Supported          |
 | ------------- | --------- | ------------------ |
-| 1.20.1-v12.x  | 1.20.1    | :white_check_mark: |
-| < 1.20.1-v12  | <= 1.16.5 | :x:                |
+|   26.3-v0.1   |   26.3    | :white_check_mark: |
 
 ## Reporting a Vulnerability
 
