@@ -1,0 +1,26 @@
+{
+  "parent": "narutomod:shinobi/root",
+  "display": {
+    "icon": {
+      "id": "narutomod:scroll_rasengan"
+    },
+    "title": {
+      "translate": "advancements.narutomod.first_jutsu.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.first_jutsu.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "used_jutsu": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "use_jutsu"
+      }
+    }
+  }
+}

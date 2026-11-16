@@ -4,11 +4,13 @@ import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.ChakraElement;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
+import com.sekwah.narutomod.advancements.NinjaProgressTrigger;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import com.sekwah.narutomod.network.ServerSecurityValidator;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
+import com.sekwah.narutomod.registries.NarutoRegistries;
 import com.sekwah.sekclib.util.ColorUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
@@ -109,6 +111,8 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                     }
                     ninjaData.addJutsuCast();
                     ninjaData.clearSeals();
+                    NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
+                            .trigger(player, NinjaProgressTrigger.Action.USE_JUTSU, msg.abilityId.getPath());
 
                     if (ability instanceof Ability.Cooldown cooldownAbility) {
                         cooldownAbility.registerCooldown(ninjaData, ability.getTranslationKey());
@@ -138,6 +142,8 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                     // Toggle ability on
                     abilityTracker.addAbilityStarted(player, ninjaData, ability);
                     ninjaData.addJutsuCast();
+                    NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
+                            .trigger(player, NinjaProgressTrigger.Action.USE_JUTSU, msg.abilityId.getPath());
                 }
             }
         });

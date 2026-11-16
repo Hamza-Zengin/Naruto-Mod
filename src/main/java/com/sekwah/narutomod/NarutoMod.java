@@ -52,6 +52,7 @@ public class NarutoMod {
         modEventBus.addListener(this::registerCapabilitySync);
         modEventBus.addListener(NarutoRegistries::init);
 
+        NarutoRegistries.register(modEventBus);
         NarutoSounds.register(modEventBus);
         NarutoDataSerialisers.register(modEventBus);
         NarutoDataComponents.register(modEventBus);

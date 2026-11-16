@@ -1,9 +1,11 @@
 package com.sekwah.narutomod.network.c2s;
 
 import com.sekwah.narutomod.NarutoMod;
+import com.sekwah.narutomod.advancements.NinjaProgressTrigger;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.network.ServerSecurityValidator;
+import com.sekwah.narutomod.registries.NarutoRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -61,6 +63,8 @@ public class ServerSelectClanPacket implements CustomPacketPayload {
 
             ninjaData.setClan(msg.clanId);
             ninjaData.setClanLocked(true);
+            NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
+                    .trigger(player, NinjaProgressTrigger.Action.SELECT_CLAN, msg.clanId.getPath());
 
             player.sendSystemMessage(Component.translatable("clan.narutomod.chosen",
                     Component.translatable("clan." + msg.clanId.getNamespace() + "." + msg.clanId.getPath())

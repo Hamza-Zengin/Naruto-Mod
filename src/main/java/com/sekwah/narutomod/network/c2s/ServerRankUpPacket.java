@@ -56,6 +56,8 @@ public class ServerRankUpPacket implements CustomPacketPayload {
             if (ServerSecurityValidator.validateRankUp(player, ninjaData)) {
                 if (ninjaData.rankUp()) {
                     NinjaRank newRank = NinjaRank.fromString(ninjaData.getRank());
+                    com.sekwah.narutomod.registries.NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
+                            .trigger(player, com.sekwah.narutomod.advancements.NinjaProgressTrigger.Action.RANK_UP, newRank.name());
                     player.sendSystemMessage(Component.translatable("naruto.rank.promoted",
                             Component.literal(newRank.getTurkishName() + " (" + newRank.getEnglishName() + ")")
                                     .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD)

@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/rank_genin",
+  "display": {
+    "icon": {
+      "id": "narutomod:chunin_vest"
+    },
+    "title": {
+      "translate": "advancements.narutomod.rank_chunin.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.rank_chunin.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "chunin": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "rank_up",
+        "target": "CHUNIN"
+      }
+    }
+  }
+}

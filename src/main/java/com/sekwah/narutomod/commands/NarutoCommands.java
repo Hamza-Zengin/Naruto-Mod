@@ -323,6 +323,8 @@ public class NarutoCommands {
         for (ServerPlayer player : players) {
             var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
             data.forceSetClan(clanLoc);
+            com.sekwah.narutomod.registries.NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
+                    .trigger(player, com.sekwah.narutomod.advancements.NinjaProgressTrigger.Action.SELECT_CLAN, clanLoc.getPath());
             source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " adlı oyuncunun klanı '" + clanName + "' olarak ayarlandı ve mühürlendi.").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
@@ -369,6 +371,8 @@ public class NarutoCommands {
             data.setEnemiesDefeated(0);
             data.setChakra(data.getMaxChakra());
             data.setStamina(data.getMaxStamina());
+            com.sekwah.narutomod.registries.NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
+                    .trigger(player, com.sekwah.narutomod.advancements.NinjaProgressTrigger.Action.RANK_UP, parsed.name());
             source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " rütbesi '" + parsed.getTurkishName() + "' yapıldı. Çakra/kondisyon yenilendi.").withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();

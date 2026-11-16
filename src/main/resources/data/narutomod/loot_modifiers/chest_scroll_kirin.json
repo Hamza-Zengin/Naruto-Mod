@@ -1,0 +1,15 @@
+{
+  "type": "narutomod:add_naruto_loot",
+  "conditions": [],
+  "target_loot_tables": [
+    "minecraft:chests/simple_dungeon",
+    "minecraft:chests/desert_pyramid",
+    "minecraft:chests/jungle_temple",
+    "minecraft:chests/abandoned_mineshaft",
+    "minecraft:chests/village/village_weaponsmith",
+    "minecraft:chests/nether_bridge",
+    "minecraft:chests/stronghold_corridor"
+  ],
+  "item": "narutomod:scroll_kirin",
+  "chance": 0.03
+}

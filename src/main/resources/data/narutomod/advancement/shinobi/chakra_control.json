@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/first_jutsu",
+  "display": {
+    "icon": {
+      "id": "narutomod:military_rations_pill"
+    },
+    "title": {
+      "translate": "advancements.narutomod.chakra_control.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.chakra_control.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "water_walk": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "use_jutsu",
+        "target": "water_walk"
+      }
+    }
+  }
+}

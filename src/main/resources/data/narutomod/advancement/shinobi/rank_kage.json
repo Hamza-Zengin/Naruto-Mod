@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/rank_chunin",
+  "display": {
+    "icon": {
+      "id": "narutomod:kusanagi_sword"
+    },
+    "title": {
+      "translate": "advancements.narutomod.rank_kage.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.rank_kage.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "kage": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "rank_up",
+        "target": "KAGE"
+      }
+    }
+  }
+}

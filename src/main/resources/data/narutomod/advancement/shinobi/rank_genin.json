@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/select_clan",
+  "display": {
+    "icon": {
+      "id": "narutomod:kunai"
+    },
+    "title": {
+      "translate": "advancements.narutomod.rank_genin.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.rank_genin.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "genin": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "rank_up",
+        "target": "GENIN"
+      }
+    }
+  }
+}

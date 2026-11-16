@@ -7,6 +7,8 @@ import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.sekwah.narutomod.abilities.JutsuDataManager;
+import com.sekwah.narutomod.advancements.NinjaProgressTrigger;
+import com.sekwah.narutomod.loot.AddNarutoLootModifier;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.world.damagesource.DamageType;
@@ -233,6 +235,75 @@ public class DatapackSchemaAuditTest {
             Assertions.assertTrue(layers.has("humanoid") && layers.get("humanoid").isJsonArray()
                             && !layers.getAsJsonArray("humanoid").isEmpty(),
                     file + " must have non-empty 'layers.humanoid' array");
+        }
+    }
+
+    @Test
+    public void testGlobalLootModifiersDecodeCleanly() throws IOException {
+        Path globalFile = Paths.get("src/main/resources/data/neoforge/loot_modifiers/global_loot_modifiers.json");
+        Assertions.assertTrue(Files.isRegularFile(globalFile), "global_loot_modifiers.json must exist!");
+
+        JsonObject globalRoot = JsonParser.parseString(Files.readString(globalFile)).getAsJsonObject();
+        Assertions.assertTrue(globalRoot.has("replace") && globalRoot.get("replace").isJsonPrimitive(),
+                "global_loot_modifiers.json missing 'replace' boolean");
+        Assertions.assertTrue(globalRoot.has("entries") && globalRoot.get("entries").isJsonArray(),
+                "global_loot_modifiers.json missing 'entries' array");
+
+        JsonArray entries = globalRoot.getAsJsonArray("entries");
+        Assertions.assertFalse(entries.isEmpty(), "global_loot_modifiers.json 'entries' must not be empty");
+
+        Path modifiersDir = DATA_DIR.resolve("loot_modifiers");
+        Assertions.assertTrue(Files.isDirectory(modifiersDir), "loot_modifiers directory must exist!");
+
+        for (JsonElement entry : entries) {
+            String id = entry.getAsString();
+            Assertions.assertTrue(id.startsWith("narutomod:"), "Unexpected modifier namespace: " + id);
+            String path = id.substring("narutomod:".length());
+            Path modifierFile = modifiersDir.resolve(path + ".json");
+            Assertions.assertTrue(Files.isRegularFile(modifierFile), "Missing loot modifier JSON: " + modifierFile);
+
+            JsonObject modObj = JsonParser.parseString(Files.readString(modifierFile)).getAsJsonObject();
+            Assertions.assertEquals("narutomod:add_naruto_loot", modObj.get("type").getAsString(),
+                    modifierFile.getFileName() + " must use narutomod:add_naruto_loot");
+            DataResult<AddNarutoLootModifier> result = AddNarutoLootModifier.CODEC.codec().parse(JsonOps.INSTANCE, modObj);
+            Assertions.assertTrue(result.result().isPresent(),
+                    "Failed to decode AddNarutoLootModifier " + modifierFile.getFileName() + ": "
+                            + result.error().map(DataResult.Error::message).orElse(""));
+        }
+    }
+
+    @Test
+    public void testAdvancementsAndTriggersDecodeCleanly() throws IOException {
+        Path advDir = DATA_DIR.resolve("advancement").resolve("shinobi");
+        Assertions.assertTrue(Files.isDirectory(advDir), "advancement/shinobi directory must exist!");
+
+        List<Path> files;
+        try (Stream<Path> walk = Files.walk(advDir)) {
+            files = walk.filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".json")).sorted().toList();
+        }
+        Assertions.assertEquals(8, files.size(), "Expected 8 Shinobi advancement JSONs!");
+
+        for (Path file : files) {
+            JsonObject root = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
+            String fileName = file.getFileName().toString();
+            Assertions.assertTrue(root.has("display") && root.get("display").isJsonObject(),
+                    fileName + " missing 'display'");
+            Assertions.assertTrue(root.has("criteria") && root.get("criteria").isJsonObject(),
+                    fileName + " missing 'criteria'");
+
+            JsonObject criteria = root.getAsJsonObject("criteria");
+            for (String key : criteria.keySet()) {
+                JsonObject crit = criteria.getAsJsonObject(key);
+                if ("narutomod:ninja_progress".equals(crit.get("trigger").getAsString())) {
+                    JsonObject cond = crit.getAsJsonObject("conditions");
+                    Assertions.assertNotNull(cond, fileName + " criterion '" + key + "' missing 'conditions'");
+                    DataResult<NinjaProgressTrigger.Instance> res =
+                            NinjaProgressTrigger.Instance.CODEC.parse(JsonOps.INSTANCE, cond);
+                    Assertions.assertTrue(res.result().isPresent(),
+                            "Failed to decode NinjaProgressTrigger in " + fileName + ": "
+                                    + res.error().map(DataResult.Error::message).orElse(""));
+                }
+            }
         }
     }
 }

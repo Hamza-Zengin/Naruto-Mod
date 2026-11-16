@@ -2,6 +2,7 @@ package com.sekwah.narutomod.events;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.ChakraElement;
+import com.sekwah.narutomod.advancements.NinjaProgressTrigger;
 import com.sekwah.narutomod.config.NarutoConfig;
 import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity;
@@ -9,6 +10,7 @@ import com.sekwah.narutomod.entity.jutsuprojectile.MudWallEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity;
 import com.sekwah.narutomod.network.s2c.ClientCameraShakePacket;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
+import com.sekwah.narutomod.registries.NarutoRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -53,12 +55,20 @@ public class ElementalInteractionHandler {
             if (NarutoConfig.waterLightningSlownessTicks > 0) {
                 target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, NarutoConfig.waterLightningSlownessTicks, 1));
             }
+            if (event.getSource().getEntity() instanceof ServerPlayer attacker) {
+                NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
+                        .trigger(attacker, NinjaProgressTrigger.Action.ELEMENTAL_COMBO, "water_lightning");
+            }
         }
 
         // 2. EARTH + LIGHTNING (Grounding via MudWallEntity)
         Vec3 sourcePos = event.getSource().getSourcePosition();
         if (sourcePos != null && isShieldedByMudWall(serverLevel, sourcePos, target)) {
             amount *= NarutoConfig.earthLightningDamageMultiplier;
+            if (target instanceof ServerPlayer defender) {
+                NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
+                        .trigger(defender, NinjaProgressTrigger.Action.ELEMENTAL_COMBO, "earth_lightning");
+            }
         }
 
         event.setAmount(amount);
@@ -94,6 +104,10 @@ public class ElementalInteractionHandler {
         fireball.setDeltaMovement(fireball.getDeltaMovement().scale(NarutoConfig.windFireSpeedMultiplier));
         fireball.explosionPower *= NarutoConfig.windFireRadiusMultiplier;
         fireball.needsSync = true;
+        if (fireball.getOwner() instanceof ServerPlayer owner) {
+            NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
+                    .trigger(owner, NinjaProgressTrigger.Action.ELEMENTAL_COMBO, "wind_fire");
+        }
         if (fireball.level() instanceof ServerLevel serverLevel) {
             triggerComboShockwave(serverLevel, fireball.position(), 0xFF6622);
         }

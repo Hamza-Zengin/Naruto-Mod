@@ -2,6 +2,8 @@ package com.sekwah.narutomod.client.gui;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
+import com.sekwah.narutomod.abilities.ChakraElement;
+import com.sekwah.narutomod.abilities.JutsuDataManager;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
@@ -364,11 +366,66 @@ public class NinjaMenuScreen extends Screen {
                 if (mouseX >= boxX && mouseX <= boxX + BOX_WIDTH && mouseY >= cardY && mouseY <= cardY + cardH) {
                     Ability ability = allAbilities.get(i);
                     Identifier id = ability.getRegistryName();
+                    JutsuDataManager.JutsuStats syncedStats = id != null ? JutsuDataManager.get(id) : null;
+
                     int mastery = ninjaData.getMastery(id);
                     int tier = Ability.getMasteryTier(mastery);
 
                     List<Component> tooltip = new ArrayList<>();
                     tooltip.add(Component.translatable(ability.getTranslationKey()).copy().withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
+
+                    // 1. Element Type (ChakraElement color & name)
+                    ChakraElement element = ability.getChakraElement();
+                    ChatFormatting elementColor = getElementColor(element);
+                    Component elementName = Component.translatable("naruto.element." + element.getName()).withStyle(elementColor);
+                    tooltip.add(Component.translatable("naruto.gui.ninja_menu.jutsu_detail.element", elementName).withStyle(ChatFormatting.GRAY));
+
+                    // 2. Chakra Cost (from JutsuDataManager with fallback)
+                    float chakraCost = (syncedStats != null && syncedStats.chakraCost() >= 0f)
+                            ? syncedStats.chakraCost()
+                            : ability.getDefaultChakraCost();
+                    tooltip.add(Component.translatable("naruto.gui.ninja_menu.jutsu_detail.chakra_cost",
+                            Component.literal(formatStatNumber(chakraCost)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+
+                    // 3. Cooldown in seconds (from JutsuDataManager cooldown_ticks)
+                    int cooldownTicks = (syncedStats != null && syncedStats.cooldownTicks() >= 0)
+                            ? syncedStats.cooldownTicks()
+                            : ability.getDefaultCooldown();
+                    String cooldownSeconds = String.format(java.util.Locale.ROOT, "%.1fs", cooldownTicks / 20.0f);
+                    tooltip.add(Component.translatable("naruto.gui.ninja_menu.jutsu_detail.cooldown",
+                            Component.literal(cooldownSeconds).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GRAY));
+
+                    // 4. Base Damage (only if > 0)
+                    float baseDamage = (syncedStats != null && syncedStats.baseDamage() >= 0f)
+                            ? syncedStats.baseDamage()
+                            : ability.getDefaultDamage();
+                    if (baseDamage > 0f) {
+                        tooltip.add(Component.translatable("naruto.gui.ninja_menu.jutsu_detail.base_damage",
+                                Component.literal(formatStatNumber(baseDamage)).withStyle(ChatFormatting.RED)).withStyle(ChatFormatting.GRAY));
+                    }
+
+                    // 5. Lock Status & Requirement
+                    boolean unlocked = ninjaData.isAbilityUnlocked(ability);
+                    NinjaRank reqRank = null;
+                    if (syncedStats != null && syncedStats.requiredRank() != null && !syncedStats.requiredRank().isBlank()) {
+                        reqRank = NinjaRank.parseExact(syncedStats.requiredRank());
+                    }
+                    if (reqRank == null) {
+                        reqRank = ability.getRequiredRank();
+                    }
+                    Component reqComp = reqRank != null
+                            ? Component.translatable(reqRank.getTranslationKey())
+                            : Component.literal("-");
+                    if (unlocked) {
+                        tooltip.add(Component.translatable("naruto.gui.ninja_menu.jutsu_detail.status_unlocked", reqComp)
+                                .withStyle(ChatFormatting.GREEN));
+                    } else {
+                        tooltip.add(Component.translatable("naruto.gui.ninja_menu.jutsu_detail.status_locked", reqComp)
+                                .withStyle(ChatFormatting.RED));
+                    }
+
+                    // Mastery breakdown
+                    tooltip.add(Component.empty());
                     tooltip.add(Component.translatable("naruto.gui.ninja_menu.mastery.level", tier, mastery));
 
                     int discountPercent = (int) Math.round((1.0f - Ability.getChakraCostMultiplier(mastery)) * 100);
@@ -968,6 +1025,27 @@ public class NinjaMenuScreen extends Screen {
             return true;
         }
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private static ChatFormatting getElementColor(ChakraElement element) {
+        if (element == null) {
+            return ChatFormatting.GRAY;
+        }
+        return switch (element) {
+            case FIRE -> ChatFormatting.RED;
+            case WIND -> ChatFormatting.GREEN;
+            case LIGHTNING -> ChatFormatting.AQUA;
+            case EARTH -> ChatFormatting.GOLD;
+            case WATER -> ChatFormatting.BLUE;
+            case NONE -> ChatFormatting.GRAY;
+        };
+    }
+
+    private static String formatStatNumber(float value) {
+        if (Math.abs(value - Math.round(value)) < 0.001f) {
+            return Integer.toString(Math.round(value));
+        }
+        return String.format(java.util.Locale.ROOT, "%.1f", value);
     }
 
     @Override

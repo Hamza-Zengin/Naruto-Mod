@@ -1,0 +1,26 @@
+{
+  "parent": "narutomod:shinobi/root",
+  "display": {
+    "icon": {
+      "id": "narutomod:headband_blue"
+    },
+    "title": {
+      "translate": "advancements.narutomod.select_clan.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.select_clan.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "selected_clan": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "select_clan"
+      }
+    }
+  }
+}

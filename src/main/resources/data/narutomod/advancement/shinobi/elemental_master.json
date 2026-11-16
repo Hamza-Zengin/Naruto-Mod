@@ -1,0 +1,26 @@
+{
+  "parent": "narutomod:shinobi/first_jutsu",
+  "display": {
+    "icon": {
+      "id": "narutomod:scroll_kirin"
+    },
+    "title": {
+      "translate": "advancements.narutomod.elemental_master.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.elemental_master.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "elemental_combo": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "elemental_combo"
+      }
+    }
+  }
+}
