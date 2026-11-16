@@ -14,9 +14,10 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import com.sekwah.sekclib.util.ColorUtil;
+import com.sekwah.sekclib.util.RenderMathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 /**
@@ -99,72 +100,63 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
         try {
             poseStack.rotateDegrees(Axis.YP, 180.0F - state.effectYaw);
 
-            float fadeOut = state.progress > 0.82F ? (1.0F - ((state.progress - 0.82F) / 0.18F)) : 1.0F;
-            int fullBright = 15728880; // 0x00F000F0 (Block 15, Sky 15)
-            int solidLight = Math.max(state.lightCoords, 12583104); // Block 12, Sky 12 minimum ambient baseline
+            float fadeOut = RenderMathUtil.fadeOut(state.progress, 0.82F);
+            int fullBright = RenderMathUtil.FULL_BRIGHT;
+            int solidLight = RenderMathUtil.clampMinLight(state.lightCoords, RenderMathUtil.MIN_AMBIENT_LIGHT);
             VisualState visualState = new VisualState(state.age, state.progress);
 
             switch (type) {
                 case JutsuVisualEffectEntity.TYPE_KIRIN_DRAGON -> {
-                    float scale = 1.65F;
-                    poseStack.scale(-scale, -scale, scale);
-                    int color = ARGB.colorFromFloat(0.92F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.65F);
+                    int color = ColorUtil.argb(0.92F * fadeOut, 1.0F, 1.0F, 1.0F);
                     submitNodeCollector.submitModel(this.kirinModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_WOOD_PRISON -> {
-                    float scale = 1.25F;
-                    poseStack.scale(-scale, -scale, scale);
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.25F);
                     submitNodeCollector.submitModel(this.woodModel, visualState, poseStack, renderType, solidLight, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_BONE_FOREST -> {
-                    float scale = 1.2F;
-                    poseStack.scale(-scale, -scale, scale);
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.2F);
                     submitNodeCollector.submitModel(this.boneModel, visualState, poseStack, renderType, solidLight, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_RASENGAN_SPHERE -> {
                     poseStack.translate(0.0D, 1.0D, 0.0D);
-                    float scale = 0.85F + state.progress * 1.35F;
-                    poseStack.scale(-scale, -scale, scale);
+                    RenderMathUtil.scaleEntityModel(poseStack, 0.85F + state.progress * 1.35F);
                     float alpha = 0.88F * fadeOut;
                     submitNodeCollector.submitCustomGeometry(poseStack, renderType, (pose, vc) ->
                             this.rasenganModel.renderProcedural(pose, vc, state.age, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha));
                 }
                 case JutsuVisualEffectEntity.TYPE_CHIDORI_BURST -> {
                     poseStack.translate(0.0D, 1.0D, 0.0D);
-                    float scale = 1.05F + Mth.sin(state.age * 0.8F) * 0.18F;
-                    poseStack.scale(-scale, -scale, scale);
-                    int color = ARGB.colorFromFloat(0.90F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.05F + Mth.sin(state.age * 0.8F) * 0.18F);
+                    int color = ColorUtil.argb(0.90F * fadeOut, 1.0F, 1.0F, 1.0F);
                     submitNodeCollector.submitModel(this.chidoriModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_WATER_VORTEX -> {
                     poseStack.translate(0.0D, 0.9D, 0.0D);
                     float scale = 1.15F + (state.progress > 0.7F ? (state.progress - 0.7F) * 2.2F : 0.0F);
-                    poseStack.scale(-scale, -scale, scale);
-                    int color = ARGB.colorFromFloat(0.86F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    RenderMathUtil.scaleEntityModel(poseStack, scale);
+                    int color = ColorUtil.argb(0.86F * fadeOut, 1.0F, 1.0F, 1.0F);
                     submitNodeCollector.submitModel(this.waterModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_WIND_SHOCKWAVE -> {
                     poseStack.translate(0.0D, 1.0D, 0.0D);
-                    float scale = 0.85F + state.progress * 1.65F;
-                    poseStack.scale(-scale, -scale, scale);
-                    int color = ARGB.colorFromFloat(0.82F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    RenderMathUtil.scaleEntityModel(poseStack, 0.85F + state.progress * 1.65F);
+                    int color = ColorUtil.argb(0.82F * fadeOut, 1.0F, 1.0F, 1.0F);
                     submitNodeCollector.submitModel(this.windModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_AMATERASU_PILLAR -> {
-                    float scale = 1.15F;
-                    poseStack.scale(-scale, -scale, scale);
-                    int color = ARGB.colorFromFloat(0.94F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.15F);
+                    int color = ColorUtil.argb(0.94F * fadeOut, 1.0F, 1.0F, 1.0F);
                     submitNodeCollector.submitModel(this.amaterasuModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_SHADOW_BIND -> {
-                    float scale = 1.1F;
-                    poseStack.scale(-scale, -scale, scale);
-                    int color = ARGB.colorFromFloat(0.92F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.1F);
+                    int color = ColorUtil.argb(0.92F * fadeOut, 1.0F, 1.0F, 1.0F);
                     submitNodeCollector.submitModel(this.shadowModel, visualState, poseStack, renderType, solidLight, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
                 case JutsuVisualEffectEntity.TYPE_EARTH_WALL -> {
-                    float scale = 1.0F;
-                    poseStack.scale(-scale, -scale, scale);
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.0F);
                     submitNodeCollector.submitModel(this.earthModel, visualState, poseStack, renderType, solidLight, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
                 }
             }

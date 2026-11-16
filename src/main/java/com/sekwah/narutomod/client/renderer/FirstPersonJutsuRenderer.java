@@ -15,6 +15,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import com.sekwah.sekclib.util.RenderMathUtil;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -67,7 +68,7 @@ public class FirstPersonJutsuRenderer {
             return;
         }
 
-        int fullBright = 15728880;
+        int fullBright = RenderMathUtil.FULL_BRIGHT;
         float partialTicks = event.getPartialTick();
         float ageInTicks = player.tickCount + partialTicks;
         PoseStack poseStack = event.getPoseStack();
@@ -83,7 +84,7 @@ public class FirstPersonJutsuRenderer {
             try {
                 applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
                 poseStack.translate(arm == HumanoidArm.RIGHT ? -0.08D : 0.08D, 0.24D, -0.28D);
-                poseStack.scale(0.34F, 0.34F, 0.34F);
+                RenderMathUtil.scaleUniform(poseStack, 0.34F);
                 submitNodeCollector.submitModel(
                         chidoriModel,
                         new VisualState(ageInTicks, 0.0F),
@@ -107,7 +108,7 @@ public class FirstPersonJutsuRenderer {
             try {
                 applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
                 poseStack.translate(arm == HumanoidArm.RIGHT ? -0.08D : 0.08D, 0.24D, -0.28D);
-                poseStack.scale(0.30F, 0.30F, 0.30F);
+                RenderMathUtil.scaleUniform(poseStack, 0.30F);
                 submitNodeCollector.submitCustomGeometry(
                         poseStack,
                         RenderTypes.entityTranslucent(JutsuVisualEffectRenderer.TEX_RASENGAN),
