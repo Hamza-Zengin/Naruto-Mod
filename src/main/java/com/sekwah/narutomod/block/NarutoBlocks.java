@@ -40,6 +40,17 @@ public class NarutoBlocks {
 
     public static final DeferredItem<BlockItem> ITEM_BONSAI_TREE = BLOCK_ITEMS.registerSimpleBlockItem(BONSAI_TREE);
 
+    public static final DeferredBlock<Block> AMATERASU_FIRE = BLOCKS.registerBlock("amaterasu_fire",
+            props -> new AmaterasuFireBlock(props
+                    .mapColor(MapColor.COLOR_BLACK)
+                    .replaceable()
+                    .noCollision()
+                    .instabreak()
+                    .lightLevel(state -> 7)
+                    .sound(SoundType.WOOL)
+                    .pushReaction(PushReaction.POPPED)
+                    .noLootTable()));
+
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);
         BLOCK_ITEMS.register(eventBus);

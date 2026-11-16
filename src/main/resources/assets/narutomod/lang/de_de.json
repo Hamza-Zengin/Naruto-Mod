@@ -298,5 +298,6 @@
   "mission.narutomod.objective.kill_enemy": "Ziel: Besiege beliebige feindliche Mobs (%s/%s)",
   "mission.narutomod.objective.kill_rogue": "Ziel: Besiege Abtrünnige Ninjas (%s/%s)",
   "mission.narutomod.objective.cast_jutsu": "Ziel: Wirke Jutsus (%s/%s)",
-  "mission.narutomod.objective.kill_akatsuki": "Ziel: Besiege Akatsuki-Ninjas (%s/%s)"
+  "mission.narutomod.objective.kill_akatsuki": "Ziel: Besiege Akatsuki-Ninjas (%s/%s)",
+  "block.narutomod.amaterasu_fire": "Schwarze Amaterasu-Flammen"
 }

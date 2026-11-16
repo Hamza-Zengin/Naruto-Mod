@@ -298,5 +298,6 @@
   "mission.narutomod.objective.kill_enemy": "目標: 敵対モブを倒す (%s/%s)",
   "mission.narutomod.objective.kill_rogue": "目標: 抜け忍を倒す (%s/%s)",
   "mission.narutomod.objective.cast_jutsu": "目標: 忍術を発動する (%s/%s)",
-  "mission.narutomod.objective.kill_akatsuki": "目標: 暁の忍を倒す (%s/%s)"
+  "mission.narutomod.objective.kill_akatsuki": "目標: 暁の忍を倒す (%s/%s)",
+  "block.narutomod.amaterasu_fire": "天照の黒炎"
 }

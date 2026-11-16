@@ -1,11 +1,18 @@
 package com.sekwah.narutomod.entity.jutsuprojectile;
 
+import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.ChakraElement;
+import com.sekwah.narutomod.config.NarutoConfig;
 import com.sekwah.narutomod.damagesource.NarutoDamageSource;
 import com.sekwah.narutomod.entity.NarutoEntities;
+import com.sekwah.narutomod.network.s2c.ClientCameraShakePacket;
+import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -19,11 +26,17 @@ import net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingPr
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.network.PacketDistributor;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -165,7 +178,14 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
                     serverLevel.playSound(null, this.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 1.4f, 1.6f);
                 }
 
+                if (vt % 4 == 0) {
+                    this.emitClientVortexEffect(serverLevel, 1.35F);
+                }
+
                 if (vt >= 28) {
+                    this.applyErodedCraterTrail(serverLevel, owner);
+                    this.emitClientVortexEffect(serverLevel, 2.2F);
+                    this.sendCameraShakeToNearbyPlayers(serverLevel, 1.55F, 22, 36.0F);
                     serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY(), this.getZ(), 1, 0, 0, 0, 0,
                             net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 2.5f, 1.2f);
@@ -241,10 +261,100 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
             this.entityData.set(DATA_IMPACTED, true);
             this.entityData.set(DATA_VORTEX_TICKS, 0);
             this.setDeltaMovement(Vec3.ZERO);
-            if (!this.level().isClientSide()) {
+            if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
                 this.playSound(SoundEvents.TRIDENT_THUNDER.value(), 2.0f, 1.5f);
+                this.emitClientVortexEffect(serverLevel, 1.6F);
+                this.sendCameraShakeToNearbyPlayers(serverLevel, 0.85F, 12, 32.0F);
             }
         }
+    }
+
+    private void emitClientVortexEffect(ServerLevel serverLevel, float scale) {
+        BlockState surfaceState = resolveSurfaceState(serverLevel, this.blockPosition());
+        int blockStateId = Block.getId(surfaceState);
+        ClientJutsuEffectPacket packet = new ClientJutsuEffectPacket(
+                Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasenshuriken_vortex"),
+                this.position(),
+                new Vec3(0.0D, 1.0D, 0.0D),
+                scale,
+                blockStateId
+        );
+        PacketDistributor.sendToPlayersTrackingEntity(this, packet);
+    }
+
+    private void sendCameraShakeToNearbyPlayers(ServerLevel serverLevel, float intensity, int durationTicks, float maxRadius) {
+        ClientCameraShakePacket shakePacket = new ClientCameraShakePacket(intensity, durationTicks, this.position(), maxRadius);
+        double maxDistSqr = (double) maxRadius * maxRadius;
+        for (ServerPlayer player : serverLevel.players()) {
+            if (player.distanceToSqr(this) <= maxDistSqr) {
+                PacketDistributor.sendToPlayer(player, shakePacket);
+            }
+        }
+    }
+
+    private void applyErodedCraterTrail(ServerLevel serverLevel, @Nullable Entity owner) {
+        if (!NarutoConfig.jutsuWorldDamage || !EventHooks.canEntityGrief(serverLevel, owner)) {
+            return;
+        }
+        BlockPos center = this.blockPosition();
+        int radius = 3;
+        int radiusSqr = radius * radius;
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                if (dx * dx + dz * dz > radiusSqr) {
+                    continue;
+                }
+                for (int dy = 1; dy >= -2; dy--) {
+                    BlockPos pos = center.offset(dx, dy, dz);
+                    BlockState state = serverLevel.getBlockState(pos);
+                    if (!state.isAir() && state.getFluidState().isEmpty()) {
+                        BlockState eroded = getErodedCraterState(state);
+                        if (eroded != null && eroded != state) {
+                            serverLevel.setBlockAndUpdate(pos, eroded);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public static BlockState resolveSurfaceState(ServerLevel level, BlockPos center) {
+        for (int dy = 0; dy >= -3; dy--) {
+            BlockPos check = center.offset(0, dy, 0);
+            BlockState state = level.getBlockState(check);
+            if (!state.isAir() && state.getFluidState().isEmpty()) {
+                return state;
+            }
+        }
+        return Blocks.DIRT.defaultBlockState();
+    }
+
+    /**
+     * Maps natural/structural surface blocks to eroded crater variants without deleting terrain.
+     * Returns null if the block should remain unchanged.
+     */
+    @Nullable
+    public static BlockState getErodedCraterState(BlockState original) {
+        if (original.is(Blocks.GRASS_BLOCK)) {
+            return Blocks.COARSE_DIRT.defaultBlockState();
+        }
+        if (original.is(Blocks.PODZOL) || original.is(Blocks.MYCELIUM)) {
+            return Blocks.DIRT.defaultBlockState();
+        }
+        if (original.is(Blocks.STONE)) {
+            return Blocks.COBBLESTONE.defaultBlockState();
+        }
+        if (original.is(Blocks.DEEPSLATE)) {
+            return Blocks.COBBLED_DEEPSLATE.defaultBlockState();
+        }
+        if (original.is(Blocks.STONE_BRICKS)) {
+            return Blocks.CRACKED_STONE_BRICKS.defaultBlockState();
+        }
+        if (original.is(Blocks.DEEPSLATE_BRICKS)) {
+            return Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState();
+        }
+        return null;
     }
 
     public boolean isImpacted() {

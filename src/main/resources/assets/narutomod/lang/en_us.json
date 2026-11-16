@@ -298,5 +298,6 @@
   "mission.narutomod.objective.kill_enemy": "Objective: Defeat any hostile mob (%s/%s)",
   "mission.narutomod.objective.kill_rogue": "Objective: Defeat Rogue Ninjas (%s/%s)",
   "mission.narutomod.objective.cast_jutsu": "Objective: Cast Jutsus (%s/%s)",
-  "mission.narutomod.objective.kill_akatsuki": "Objective: Defeat Akatsuki Ninjas (%s/%s)"
+  "mission.narutomod.objective.kill_akatsuki": "Objective: Defeat Akatsuki Ninjas (%s/%s)",
+  "block.narutomod.amaterasu_fire": "Amaterasu Black Flames"
 }

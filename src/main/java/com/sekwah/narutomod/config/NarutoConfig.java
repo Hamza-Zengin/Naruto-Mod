@@ -110,6 +110,15 @@ public class NarutoConfig {
     private static final ModConfigSpec.DoubleValue CONFIG_EARTH_LIGHTNING_DMG_MULT;
     public static float earthLightningDamageMultiplier = 0.50f;
 
+    private static final ModConfigSpec.IntValue CONFIG_AMATERASU_DURATION_TICKS;
+    public static int amaterasuDurationTicks = 200;
+
+    private static final ModConfigSpec.BooleanValue CONFIG_JUTSU_WORLD_DAMAGE;
+    public static boolean jutsuWorldDamage = true;
+
+    private static final ModConfigSpec.BooleanValue CONFIG_AMATERASU_PLACE_FIRE;
+    public static boolean amaterasuPlaceFire = true;
+
     static {
         ModConfigSpec.Builder configBuilder = new ModConfigSpec.Builder();
 
@@ -180,6 +189,15 @@ public class NarutoConfig {
 
         CONFIG_EARTH_LIGHTNING_DMG_MULT = configBuilder.comment("Damage multiplier when Lightning hits a target shielded behind MudWallEntity")
                 .defineInRange("earthLightningDamageMultiplier", 0.50d, 0.0d, 1.0d);
+
+        CONFIG_AMATERASU_DURATION_TICKS = configBuilder.comment("Duration in ticks before Amaterasu black flame blocks self-extinguish (20 ticks = 1 second)")
+                .defineInRange("amaterasuDurationTicks", 200, 20, 6000);
+
+        CONFIG_JUTSU_WORLD_DAMAGE = configBuilder.comment("Whether jutsu abilities are allowed to place or break blocks in the world")
+                .define("jutsuWorldDamage", true);
+
+        CONFIG_AMATERASU_PLACE_FIRE = configBuilder.comment("Whether Amaterasu places temporary black flame blocks on the ground")
+                .define("amaterasuPlaceFire", true);
 
         configBuilder.pop();
 
@@ -263,6 +281,9 @@ public class NarutoConfig {
         windFireSpeedMultiplier = CONFIG_WIND_FIRE_SPEED_MULT.get().floatValue();
         windFireRadiusMultiplier = CONFIG_WIND_FIRE_RADIUS_MULT.get().floatValue();
         earthLightningDamageMultiplier = CONFIG_EARTH_LIGHTNING_DMG_MULT.get().floatValue();
+        amaterasuDurationTicks = CONFIG_AMATERASU_DURATION_TICKS.get();
+        jutsuWorldDamage = CONFIG_JUTSU_WORLD_DAMAGE.get();
+        amaterasuPlaceFire = CONFIG_AMATERASU_PLACE_FIRE.get();
     }
 
     @SubscribeEvent

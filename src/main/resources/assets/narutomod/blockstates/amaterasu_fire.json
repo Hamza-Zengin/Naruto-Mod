@@ -1,0 +1,42 @@
+{
+  "multipart": [
+    {
+      "apply": [
+        {
+          "model": "narutomod:block/amaterasu_fire_floor"
+        }
+      ]
+    },
+    {
+      "apply": [
+        {
+          "model": "narutomod:block/amaterasu_fire_side"
+        }
+      ]
+    },
+    {
+      "apply": [
+        {
+          "model": "narutomod:block/amaterasu_fire_side",
+          "y": 90
+        }
+      ]
+    },
+    {
+      "apply": [
+        {
+          "model": "narutomod:block/amaterasu_fire_side",
+          "y": 180
+        }
+      ]
+    },
+    {
+      "apply": [
+        {
+          "model": "narutomod:block/amaterasu_fire_side",
+          "y": 270
+        }
+      ]
+    }
+  ]
+}

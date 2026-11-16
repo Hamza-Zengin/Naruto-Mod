@@ -3,10 +3,14 @@ package com.sekwah.narutomod.client.events;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -78,6 +82,31 @@ public class ClientEffectHandler {
                 level.addParticle(sparkDust,
                         pos.x + ox, pos.y + oy, pos.z + oz,
                         ox * 0.35, 0.04 + rand.nextDouble() * 0.05, oz * 0.35);
+            }
+        } else if ("rasenshuriken_vortex".equals(path)) {
+            BlockState surfaceState = Block.stateById(msg.colorHex);
+            if (surfaceState.isAir()) {
+                surfaceState = Blocks.DIRT.defaultBlockState();
+            }
+            BlockParticleOption dustOption = new BlockParticleOption(ParticleTypes.BLOCK, surfaceState);
+            for (int i = 0; i < 36; i++) {
+                double angle = (2.0 * Math.PI * i) / 18.0 + rand.nextDouble() * 0.35;
+                double radius = (0.6 + (i / 18.0) * 1.4) * scale;
+                double px = pos.x + Math.cos(angle) * radius;
+                double pz = pos.z + Math.sin(angle) * radius;
+                double py = pos.y + 0.1 + rand.nextDouble() * 0.6;
+                double tangentX = -Math.sin(angle) * 0.32 * scale;
+                double tangentZ = Math.cos(angle) * 0.32 * scale;
+                level.addParticle(dustOption, px, py, pz, tangentX, 0.22 + rand.nextDouble() * 0.28, tangentZ);
+                if (i % 2 == 0) {
+                    level.addParticle(ParticleTypes.CLOUD, px, py + 0.3, pz, tangentX * 0.8, 0.14 + rand.nextDouble() * 0.16, tangentZ * 0.8);
+                }
+            }
+            for (int i = 0; i < 6; i++) {
+                double angle = (2.0 * Math.PI * i) / 6.0;
+                level.addParticle(ParticleTypes.SWEEP_ATTACK,
+                        pos.x + Math.cos(angle) * scale, pos.y + 0.5 + rand.nextDouble() * 1.2, pos.z + Math.sin(angle) * scale,
+                        0.0, 0.05, 0.0);
             }
         } else {
             for (int i = 0; i < 18; i++) {

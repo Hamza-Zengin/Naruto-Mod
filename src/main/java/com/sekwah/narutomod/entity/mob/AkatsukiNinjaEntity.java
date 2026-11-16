@@ -2,7 +2,10 @@ package com.sekwah.narutomod.entity.mob;
 
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
-import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
+import com.sekwah.narutomod.entity.ai.NinjaJutsuAttackGoal;
+import com.sekwah.narutomod.entity.ai.NinjaJutsuCooldowns;
+import com.sekwah.narutomod.entity.ai.NinjaJutsuProfile;
+import com.sekwah.narutomod.entity.ai.NinjaJutsuUser;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.core.particles.ParticleTypes;
@@ -33,10 +36,10 @@ import javax.annotation.Nullable;
 
 /**
  * Akatsuki S-Rank Rogue Shinobi (Mini-Boss)
- * Features a dynamic red Boss Bar, casts Katon: Gōkakyū no Jutsu from afar,
+ * Features a dynamic red Boss Bar, tactical Fire/Water jutsu & defensive Kawarimi/MudWall AI,
  * executes Chakra Dash blitzes, wields Kusanagi or Samehada, and grants +5 exam progress on defeat.
  */
-public class AkatsukiNinjaEntity extends Monster {
+public class AkatsukiNinjaEntity extends Monster implements NinjaJutsuUser {
 
     private final ServerBossEvent bossEvent = new ServerBossEvent(
             java.util.UUID.randomUUID(),
@@ -44,12 +47,17 @@ public class AkatsukiNinjaEntity extends Monster {
             BossEvent.BossBarColor.RED,
             BossEvent.BossBarOverlay.NOTCHED_10);
 
-    private int jutsuCooldown = 80;
+    private final NinjaJutsuCooldowns jutsuCooldowns = new NinjaJutsuCooldowns(40);
     private int dashCooldown = 60;
 
     public AkatsukiNinjaEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
         this.xpReward = 75;
+    }
+
+    @Override
+    public NinjaJutsuCooldowns getJutsuCooldowns() {
+        return this.jutsuCooldowns;
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -65,7 +73,8 @@ public class AkatsukiNinjaEntity extends Monster {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.25D, false));
+        this.goalSelector.addGoal(2, new NinjaJutsuAttackGoal<>(this, NinjaJutsuProfile.akatsukiPreset()));
+        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1.25D, false));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 16.0F));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
@@ -102,18 +111,12 @@ public class AkatsukiNinjaEntity extends Monster {
         if (!this.level().isClientSide()) {
             this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
 
-            if (this.jutsuCooldown > 0) this.jutsuCooldown--;
+            this.jutsuCooldowns.tick();
             if (this.dashCooldown > 0) this.dashCooldown--;
 
             LivingEntity target = this.getTarget();
             if (target != null && target.isAlive()) {
                 double distSqr = this.distanceToSqr(target);
-
-                // Cast Katon: Gōkakyū no Jutsu at long-medium range
-                if (distSqr >= 49.0D && distSqr <= 400.0D && this.jutsuCooldown <= 0 && this.hasLineOfSight(target)) {
-                    castFireballJutsu(target);
-                    this.jutsuCooldown = 110 + this.random.nextInt(40);
-                }
 
                 // Execute Chakra Dash blitz at medium range
                 if (distSqr >= 20.0D && distSqr <= 81.0D && this.dashCooldown <= 0 && this.onGround()) {
@@ -121,15 +124,6 @@ public class AkatsukiNinjaEntity extends Monster {
                     this.dashCooldown = 90 + this.random.nextInt(30);
                 }
             }
-        }
-    }
-
-    private void castFireballJutsu(LivingEntity target) {
-        if (this.level() instanceof ServerLevel serverLevel) {
-            serverLevel.playSound(null, this.blockPosition(), NarutoSounds.JUTSU_CAST.get(), SoundSource.HOSTILE, 1.2f, 0.9f);
-            Vec3 dir = target.getEyePosition().subtract(this.getEyePosition()).normalize();
-            FireballJutsuEntity fireball = new FireballJutsuEntity(this, dir.x, dir.y, dir.z);
-            serverLevel.addFreshEntity(fireball);
         }
     }
 

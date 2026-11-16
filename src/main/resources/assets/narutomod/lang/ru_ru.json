@@ -298,5 +298,6 @@
   "mission.narutomod.objective.kill_enemy": "Цель: Победите любых враждебных мобов (%s/%s)",
   "mission.narutomod.objective.kill_rogue": "Цель: Победите ниндзя-отступников (%s/%s)",
   "mission.narutomod.objective.cast_jutsu": "Цель: Используйте дзюцу (%s/%s)",
-  "mission.narutomod.objective.kill_akatsuki": "Цель: Победите ниндзя Акацуки (%s/%s)"
+  "mission.narutomod.objective.kill_akatsuki": "Цель: Победите ниндзя Акацуки (%s/%s)",
+  "block.narutomod.amaterasu_fire": "Чёрное пламя Аматэрасу"
 }

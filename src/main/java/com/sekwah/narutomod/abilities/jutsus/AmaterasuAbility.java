@@ -3,8 +3,10 @@ package com.sekwah.narutomod.abilities.jutsus;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.ChakraElement;
+import com.sekwah.narutomod.block.NarutoBlocks;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
+import com.sekwah.narutomod.config.NarutoConfig;
 import com.sekwah.narutomod.damagesource.NarutoDamageSource;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
@@ -20,11 +22,13 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.List;
 import java.util.Optional;
@@ -222,15 +226,47 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
                     20, 0.3, 0.5, 0.3, 0.03, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
-        // Set Soul Fire at targeted ground blocks
-        BlockPos hitBlockPos = BlockPos.containing(targetPos);
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dz = -1; dz <= 1; dz++) {
-                BlockPos firePos = hitBlockPos.offset(dx, 0, dz);
-                if (serverLevel.isEmptyBlock(firePos.above()) && serverLevel.getBlockState(firePos).isSolidRender()) {
-                    serverLevel.setBlockAndUpdate(firePos.above(), Blocks.SOUL_FIRE.defaultBlockState());
-                } else if (serverLevel.isEmptyBlock(firePos) && serverLevel.getBlockState(firePos.below()).isSolidRender()) {
-                    serverLevel.setBlockAndUpdate(firePos, Blocks.SOUL_FIRE.defaultBlockState());
+        // Place temporary Amaterasu black flames at target feet or hit block surface (if permitted by config & grief rules)
+        if (canPlaceAmaterasuFire(serverLevel, player)) {
+            BlockPos focalGroundPos = resolveFocalBlockPos(serverLevel, directEntity, blockHit, targetPos);
+            placeAmaterasuFirePatch(serverLevel, focalGroundPos, 1);
+        }
+    }
+
+    public static boolean canPlaceAmaterasuFire(ServerLevel serverLevel, Player player) {
+        return NarutoConfig.jutsuWorldDamage
+                && NarutoConfig.amaterasuPlaceFire
+                && EventHooks.canEntityGrief(serverLevel, player);
+    }
+
+    private static BlockPos resolveFocalBlockPos(ServerLevel level, LivingEntity directEntity, HitResult blockHit, Vec3 targetPos) {
+        if (directEntity != null) {
+            BlockPos feetPos = directEntity.blockPosition();
+            for (int dy = 0; dy >= -2; dy--) {
+                BlockPos check = feetPos.offset(0, dy, 0);
+                if (level.getBlockState(check).isAir() && !level.getBlockState(check.below()).isAir()) {
+                    return check;
+                }
+            }
+            return feetPos;
+        }
+        if (blockHit instanceof BlockHitResult bhr && bhr.getType() == HitResult.Type.BLOCK) {
+            return bhr.getBlockPos().relative(bhr.getDirection());
+        }
+        return BlockPos.containing(targetPos);
+    }
+
+    private static void placeAmaterasuFirePatch(ServerLevel level, BlockPos center, int radius) {
+        BlockState amaterasuState = NarutoBlocks.AMATERASU_FIRE.get().defaultBlockState();
+        int clampedRadius = Math.max(1, Math.min(radius, 2));
+        for (int dx = -clampedRadius; dx <= clampedRadius; dx++) {
+            for (int dz = -clampedRadius; dz <= clampedRadius; dz++) {
+                for (int dy = 1; dy >= -1; dy--) {
+                    BlockPos candidate = center.offset(dx, dy, dz);
+                    if (level.getBlockState(candidate).isAir() && amaterasuState.canSurvive(level, candidate)) {
+                        level.setBlockAndUpdate(candidate, amaterasuState);
+                        break;
+                    }
                 }
             }
         }

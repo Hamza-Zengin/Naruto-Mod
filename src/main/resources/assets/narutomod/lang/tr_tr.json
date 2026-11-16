@@ -298,5 +298,6 @@
   "mission.narutomod.objective.kill_enemy": "Hedef: Herhangi bir düşman mob öldür (%s/%s)",
   "mission.narutomod.objective.kill_rogue": "Hedef: Haydut Ninja öldür (%s/%s)",
   "mission.narutomod.objective.cast_jutsu": "Hedef: Jutsu kullan (%s/%s)",
-  "mission.narutomod.objective.kill_akatsuki": "Hedef: Akatsuki Ninjası öldür (%s/%s)"
+  "mission.narutomod.objective.kill_akatsuki": "Hedef: Akatsuki Ninjası öldür (%s/%s)",
+  "block.narutomod.amaterasu_fire": "Amaterasu Kara Alevleri"
 }
