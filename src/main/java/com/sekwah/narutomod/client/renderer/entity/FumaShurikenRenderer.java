@@ -19,7 +19,7 @@ import net.minecraft.world.item.ItemStack;
 public class FumaShurikenRenderer extends EntityRenderer<FumaShurikenEntity, FumaShurikenRenderer.FumaRenderState> {
 
     private final ItemModelResolver itemModelResolver;
-    private final ItemStack fumaStack = new ItemStack(NarutoItems.FUMA_SHURIKEN.get());
+    private ItemStack fumaStack;
 
     public static class FumaRenderState extends EntityRenderState {
         public final ItemStackRenderState item = new ItemStackRenderState();
@@ -44,6 +44,9 @@ public class FumaShurikenRenderer extends EntityRenderer<FumaShurikenEntity, Fum
         state.yRot = entity.getYRot(partialTicks);
         state.xRot = entity.getXRot(partialTicks);
         state.spin = Mth.lerp(partialTicks, entity.getPrevRotateTicks(), entity.getRotateTicks()) * 42.0F;
+        if (this.fumaStack == null) {
+            this.fumaStack = new ItemStack(NarutoItems.FUMA_SHURIKEN.get());
+        }
         this.itemModelResolver.updateForNonLiving(state.item, this.fumaStack, ItemDisplayContext.NONE, entity);
     }
 
