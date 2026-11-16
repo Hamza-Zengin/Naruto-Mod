@@ -36,6 +36,15 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
     public int lifeSpan = 70;
     public float explosionPower = 2;
     private int jutsuPower = 60;
+    private boolean windBoosted = false;
+
+    public boolean isWindBoosted() {
+        return this.windBoosted;
+    }
+
+    public void markWindBoosted() {
+        this.windBoosted = true;
+    }
 
     public static final float INITIAL_SCALE = 0.25f;
     public static final float GROW_SCALE = 1 - INITIAL_SCALE;

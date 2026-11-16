@@ -100,6 +100,9 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
                     living.hurtServer(serverLevel, player.damageSources().playerAttack(player), damage);
                     living.setDeltaMovement(look.scale(2.2 * powerMult).add(0, 0.5 * powerMult, 0));
                     living.needsSync = true;
+                } else if (entity instanceof com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity fireball) {
+                    fireball.setDeltaMovement(look.scale(2.0 * powerMult));
+                    com.sekwah.narutomod.events.ElementalInteractionHandler.boostFireballWithWind(fireball);
                 } else if (entity instanceof Projectile projectile) {
                     projectile.setDeltaMovement(look.scale(2.0 * powerMult));
                 }

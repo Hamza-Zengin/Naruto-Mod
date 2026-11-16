@@ -86,6 +86,21 @@ public class NarutoConfig {
     private static final ModConfigSpec.IntValue CONFIG_KAWARIMI_MAX_CAST;
     public static int kawarimiMaxCastTicks = 15;
 
+    private static final ModConfigSpec.DoubleValue CONFIG_WATER_LIGHTNING_DMG_MULT;
+    public static float waterLightningDamageMultiplier = 1.25f;
+
+    private static final ModConfigSpec.IntValue CONFIG_WATER_LIGHTNING_SLOWNESS_TICKS;
+    public static int waterLightningSlownessTicks = 40;
+
+    private static final ModConfigSpec.DoubleValue CONFIG_WIND_FIRE_SPEED_MULT;
+    public static float windFireSpeedMultiplier = 1.20f;
+
+    private static final ModConfigSpec.DoubleValue CONFIG_WIND_FIRE_RADIUS_MULT;
+    public static float windFireRadiusMultiplier = 1.20f;
+
+    private static final ModConfigSpec.DoubleValue CONFIG_EARTH_LIGHTNING_DMG_MULT;
+    public static float earthLightningDamageMultiplier = 0.50f;
+
     static {
         ModConfigSpec.Builder configBuilder = new ModConfigSpec.Builder();
 
@@ -141,6 +156,21 @@ public class NarutoConfig {
 
         CONFIG_KAWARIMI_MAX_CAST = configBuilder.comment("Kawarimi maximum cast delay in ticks at 0 mastery")
                 .defineInRange("kawarimiMaxCastTicks", 15, 0, 200);
+
+        CONFIG_WATER_LIGHTNING_DMG_MULT = configBuilder.comment("Damage multiplier when Lightning hits a wet or WaterBullet-soaked target")
+                .defineInRange("waterLightningDamageMultiplier", 1.25d, 1.0d, 5.0d);
+
+        CONFIG_WATER_LIGHTNING_SLOWNESS_TICKS = configBuilder.comment("Slowness duration in ticks applied by Water + Lightning conductivity")
+                .defineInRange("waterLightningSlownessTicks", 40, 0, 600);
+
+        CONFIG_WIND_FIRE_SPEED_MULT = configBuilder.comment("Velocity multiplier when FireballJutsuEntity is boosted by Wind")
+                .defineInRange("windFireSpeedMultiplier", 1.20d, 1.0d, 5.0d);
+
+        CONFIG_WIND_FIRE_RADIUS_MULT = configBuilder.comment("Explosion radius multiplier when FireballJutsuEntity is boosted by Wind")
+                .defineInRange("windFireRadiusMultiplier", 1.20d, 1.0d, 5.0d);
+
+        CONFIG_EARTH_LIGHTNING_DMG_MULT = configBuilder.comment("Damage multiplier when Lightning hits a target shielded behind MudWallEntity")
+                .defineInRange("earthLightningDamageMultiplier", 0.50d, 0.0d, 1.0d);
 
         configBuilder.pop();
 
@@ -207,6 +237,11 @@ public class NarutoConfig {
         kawarimiMaxCooldownTicks = CONFIG_KAWARIMI_MAX_COOLDOWN.get();
         kawarimiMinCastTicks = CONFIG_KAWARIMI_MIN_CAST.get();
         kawarimiMaxCastTicks = CONFIG_KAWARIMI_MAX_CAST.get();
+        waterLightningDamageMultiplier = CONFIG_WATER_LIGHTNING_DMG_MULT.get().floatValue();
+        waterLightningSlownessTicks = CONFIG_WATER_LIGHTNING_SLOWNESS_TICKS.get();
+        windFireSpeedMultiplier = CONFIG_WIND_FIRE_SPEED_MULT.get().floatValue();
+        windFireRadiusMultiplier = CONFIG_WIND_FIRE_RADIUS_MULT.get().floatValue();
+        earthLightningDamageMultiplier = CONFIG_EARTH_LIGHTNING_DMG_MULT.get().floatValue();
     }
 
     @SubscribeEvent
