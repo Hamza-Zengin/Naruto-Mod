@@ -54,15 +54,13 @@ Ninja Menüsü (`J` tuşu) üzerinden klanınızı seçin ve shinobi mirasınız
 - **Varlıklar ve Bosslar**: Kaçak Ninjalar (Nukenin) ve Akatsuki S-Rank düşmanları.
 
 ### 🧩 Ekosistem & Mod Uyumluluğu (Modpack Integrations)
-- **Curios API**: 27 köy alın koruyucusu ve 5 ANBU maskesi `head` slotuna, Chūnin yeleği, ANBU zırhı ve Akatsuki pelerini `body` slotuna zırh yuvasını işgal etmeden takılabilir.
-- **Better Combat**: Kunai, Kusanagi Kılıcı, Samehada, Kemik Kılıcı ve Fūma Shuriken akıcı kombo zincirleri ve vuruş animasyonlarıyla tam uyumludur.
+- **Olabildiğince Uyumlu**  
 
 ---
 
 ## 📦 Kütüphane Bağımlılığı (SekCLib)
 
-Mod, yetenek takibi ve veri senkronizasyonu için **SekCLib** (`com.sekwah.sekclib`) `2.0.0` kütüphanesini kullanır (`libs/SekCLib-26.3-2.0.0.jar`).
-
+Mod, yetenek takibi ve veri senkronizasyonu için **SekCLib** kullanılır.
 ---
 
 ## 🌐 Çoklu Dil Desteği (Localization Parity)
@@ -112,5 +110,5 @@ python3 scripts/check_item_models.py
 
 ## 👥 Geliştiriciler & Teşekkür (Authors)
 
-- **Hamza Zengin** — *Lead Developer & Maintainer (1.20.1 Forge & 26.3 NeoForge Port, 18+ Jutsu, Klan Sistemleri, 3D Silahlar & Tam Revizyon)*
-- **Alastair Hawkes (Sekwah41)** — *Orijinal Naruto Mod & SekCLib fikir babası (Eski 1.16 ve öncesi sürümler)*
+- **Hamza Zengin (Shiin)** — *Lead Developer & Maintainer (26.3 NeoForge Port, 18+ Jutsu, Klan Sistemleri, 3D Silahlar & Tam Revizyon)*
+- **Alastair Hawkes (Sekwah41)** — *Orijinal Naruto Mod & SekCLib fikir babası*
