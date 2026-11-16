@@ -5,6 +5,6 @@
   - Email: alastair.hawkes@sekwah.com
   - GitHub: https://github.com/sekwah41
 
-### Lead Developer & Maintainer (1.20.1+)
-- **Hamza Zengin** — *Modernization, 1.20.1 Forge port, Jutsus & Clan expansion, 3D Weapons & Overhaul*
+### Lead Developer & Maintainer (26.3+)
+- **Hamza Zengin** — *Modernization, 26.3 NeoForge port, Jutsus & Clan expansion, 3D Weapons & Overhaul*
   - GitHub: https://github.com/Hamza-Zengin
