@@ -6,6 +6,7 @@ import com.sekwah.narutomod.block.NarutoBlocks;
 import com.sekwah.narutomod.entity.item.PaperBombEntity;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.sounds.NarutoSounds;
+import com.sekwah.narutomod.util.WorldProtectionHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -138,6 +139,9 @@ public class PaperBombBlock extends FaceAttachedHorizontalDirectionalBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit) {
         if (!worldIn.isClientSide()) {
+            if (!WorldProtectionHelper.canModifyBlock(worldIn, pos, player)) {
+                return InteractionResult.FAIL;
+            }
             spawnPaperbomb(state, worldIn, pos, player);
             worldIn.removeBlock(pos, false);
             return InteractionResult.SUCCESS_SERVER;
@@ -147,7 +151,7 @@ public class PaperBombBlock extends FaceAttachedHorizontalDirectionalBlock {
 
     @Override
     protected void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
-        if (!worldIn.isClientSide()) {
+        if (!worldIn.isClientSide() && WorldProtectionHelper.canModifyBlock(worldIn, pos, entityIn)) {
             spawnPaperbomb(state, worldIn, pos, entityIn instanceof LivingEntity ? (LivingEntity) entityIn : null, true);
             worldIn.removeBlock(pos, false);
         }
@@ -165,7 +169,8 @@ public class PaperBombBlock extends FaceAttachedHorizontalDirectionalBlock {
 
     @Override
     public void handlePrecipitation(BlockState blockState, Level level, BlockPos pos, Biome.Precipitation precipitation) {
-        if (precipitation == Biome.Precipitation.RAIN && level instanceof ServerLevel) {
+        if (precipitation == Biome.Precipitation.RAIN && level instanceof ServerLevel
+                && WorldProtectionHelper.canModifyBlock(level, pos, null)) {
             level.destroyBlock(pos, true);
         }
     }

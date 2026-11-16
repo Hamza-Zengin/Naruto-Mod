@@ -299,5 +299,7 @@
   "mission.narutomod.objective.kill_rogue": "Objectif : Vaincre des Ninjas Déserteurs (%s/%s)",
   "mission.narutomod.objective.cast_jutsu": "Objectif : Lancer des Jutsus (%s/%s)",
   "mission.narutomod.objective.kill_akatsuki": "Objectif : Vaincre des Ninjas d'Akatsuki (%s/%s)",
-  "block.narutomod.amaterasu_fire": "Flammes Noires d'Amaterasu"
+  "block.narutomod.amaterasu_fire": "Flammes Noires d'Amaterasu",
+  "gamerule.narutomod.naruto_jutsu_griefing": "Dégâts de Jutsu Naruto",
+  "gamerule.narutomod.naruto_jutsu_griefing.description": "Détermine si les jutsus et explosifs ninja de Naruto Mod peuvent casser, brûler ou modifier des blocs."
 }

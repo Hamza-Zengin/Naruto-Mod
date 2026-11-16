@@ -9,6 +9,7 @@ import com.sekwah.narutomod.capabilities.NinjaRank;
 import com.sekwah.narutomod.config.NarutoConfig;
 import com.sekwah.narutomod.damagesource.NarutoDamageSource;
 import com.sekwah.narutomod.sounds.NarutoSounds;
+import com.sekwah.narutomod.util.WorldProtectionHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -28,7 +29,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.List;
 import java.util.Optional;
@@ -226,17 +226,16 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
                     20, 0.3, 0.5, 0.3, 0.03, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
-        // Place temporary Amaterasu black flames at target feet or hit block surface (if permitted by config & grief rules)
+        // Place temporary Amaterasu black flames at target feet or hit block surface (if permitted by config & protection rules)
         if (canPlaceAmaterasuFire(serverLevel, player)) {
             BlockPos focalGroundPos = resolveFocalBlockPos(serverLevel, directEntity, blockHit, targetPos);
-            placeAmaterasuFirePatch(serverLevel, focalGroundPos, 1);
+            placeAmaterasuFirePatch(serverLevel, focalGroundPos, 1, player);
         }
     }
 
     public static boolean canPlaceAmaterasuFire(ServerLevel serverLevel, Player player) {
         return NarutoConfig.jutsuWorldDamage
-                && NarutoConfig.amaterasuPlaceFire
-                && EventHooks.canEntityGrief(serverLevel, player);
+                && NarutoConfig.amaterasuPlaceFire;
     }
 
     private static BlockPos resolveFocalBlockPos(ServerLevel level, LivingEntity directEntity, HitResult blockHit, Vec3 targetPos) {
@@ -256,14 +255,16 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         return BlockPos.containing(targetPos);
     }
 
-    private static void placeAmaterasuFirePatch(ServerLevel level, BlockPos center, int radius) {
+    private static void placeAmaterasuFirePatch(ServerLevel level, BlockPos center, int radius, Player player) {
         BlockState amaterasuState = NarutoBlocks.AMATERASU_FIRE.get().defaultBlockState();
         int clampedRadius = Math.max(1, Math.min(radius, 2));
         for (int dx = -clampedRadius; dx <= clampedRadius; dx++) {
             for (int dz = -clampedRadius; dz <= clampedRadius; dz++) {
                 for (int dy = 1; dy >= -1; dy--) {
                     BlockPos candidate = center.offset(dx, dy, dz);
-                    if (level.getBlockState(candidate).isAir() && amaterasuState.canSurvive(level, candidate)) {
+                    if (level.getBlockState(candidate).isAir()
+                            && amaterasuState.canSurvive(level, candidate)
+                            && WorldProtectionHelper.canModifyBlock(level, candidate, player)) {
                         level.setBlockAndUpdate(candidate, amaterasuState);
                         break;
                     }

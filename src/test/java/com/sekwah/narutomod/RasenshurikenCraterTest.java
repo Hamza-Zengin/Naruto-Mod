@@ -41,8 +41,8 @@ public class RasenshurikenCraterTest {
         assertTrue(entitySrc.contains("Block.getId("), "RasenshurikenEntity must encode surface block via Block.getId");
         assertTrue(entitySrc.contains("ClientJutsuEffectPacket"), "RasenshurikenEntity must emit lightweight S2C vortex packet");
         assertTrue(entitySrc.contains("ClientCameraShakePacket"), "RasenshurikenEntity must trigger distance-attenuated camera shake");
-        assertTrue(entitySrc.contains("NarutoConfig.jutsuWorldDamage") && entitySrc.contains("canEntityGrief"),
-                "RasenshurikenEntity must check world damage & mobGriefing rules before altering surface blocks");
+        assertTrue(entitySrc.contains("WorldProtectionHelper.canModifyBlock("),
+                "RasenshurikenEntity must check WorldProtectionHelper.canModifyBlock before altering surface blocks");
 
         String clientSrc = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/client/events/ClientEffectHandler.java"));
         assertTrue(clientSrc.contains("\"rasenshuriken_vortex\"") && clientSrc.contains("Block.stateById"),

@@ -3,6 +3,7 @@ package com.sekwah.narutomod.entity.jutsuprojectile;
 import com.sekwah.narutomod.abilities.ChakraElement;
 import com.sekwah.narutomod.damagesource.NarutoDamageSource;
 import com.sekwah.narutomod.entity.NarutoEntities;
+import com.sekwah.narutomod.util.WorldProtectionHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -274,18 +275,17 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                 }
             });
 
-            boolean flag = net.neoforged.neoforge.event.EventHooks.canEntityGrief(serverLevel, this.getOwner());
-
-            if(flag) {
-                int fireSpread = 2;
-                BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
-                for (int x = (int) this.getX() - fireSpread; x < (int) this.getX() + fireSpread - 1; x++) {
-                    for (int y = (int) this.getY() - fireSpread + 1; y < (int) this.getY() + fireSpread; y++) {
-                        for (int z = (int) this.getZ() - fireSpread + 1; z < (int) this.getZ() + fireSpread; z++) {
-                            blockPos.set(x, y, z);
-                            if (this.random.nextInt(2) == 0 && this.level().getBlockState(blockPos).isAir()) {
-                                this.level().setBlockAndUpdate(blockPos.immutable(), BaseFireBlock.getState(this.level(), blockPos));
-                            }
+            int fireSpread = 2;
+            BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
+            Entity fireOwner = this.getOwner();
+            for (int x = (int) this.getX() - fireSpread; x < (int) this.getX() + fireSpread - 1; x++) {
+                for (int y = (int) this.getY() - fireSpread + 1; y < (int) this.getY() + fireSpread; y++) {
+                    for (int z = (int) this.getZ() - fireSpread + 1; z < (int) this.getZ() + fireSpread; z++) {
+                        blockPos.set(x, y, z);
+                        if (this.random.nextInt(2) == 0
+                                && this.level().getBlockState(blockPos).isAir()
+                                && WorldProtectionHelper.canModifyBlock(serverLevel, blockPos, fireOwner)) {
+                            this.level().setBlockAndUpdate(blockPos.immutable(), BaseFireBlock.getState(this.level(), blockPos));
                         }
                     }
                 }

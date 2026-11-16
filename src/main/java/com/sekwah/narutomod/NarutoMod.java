@@ -13,6 +13,7 @@ import com.sekwah.narutomod.commands.NarutoCommands;
 import com.sekwah.narutomod.config.NarutoConfig;
 import com.sekwah.narutomod.entity.NarutoDataSerialisers;
 import com.sekwah.narutomod.entity.NarutoEntities;
+import com.sekwah.narutomod.gamerules.NarutoGameRules;
 import com.sekwah.narutomod.item.NarutoDataComponents;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.network.PacketHandler;
@@ -59,6 +60,7 @@ public class NarutoMod {
         NarutoEntities.register(modEventBus);
         NarutoAbilities.register(modEventBus);
         NarutoClans.register(modEventBus);
+        NarutoGameRules.register(modEventBus);
         NinjaCapabilityHandler.register(modEventBus);
 
         NeoForge.EVENT_BUS.addListener(NarutoMod::onServerStarting);

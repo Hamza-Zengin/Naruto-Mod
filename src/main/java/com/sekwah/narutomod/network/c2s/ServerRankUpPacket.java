@@ -4,6 +4,7 @@ import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
+import com.sekwah.narutomod.network.ServerSecurityValidator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -46,10 +47,13 @@ public class ServerRankUpPacket implements CustomPacketPayload {
     public static void handle(final ServerRankUpPacket msg, final IPayloadContext context) {
         context.enqueueWork(() -> {
             if (!(context.player() instanceof ServerPlayer player)) return;
+            if (!ServerSecurityValidator.validateBasePacket(player, "ServerRankUpPacket")) {
+                return;
+            }
 
             NinjaData ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
             NinjaRank currentRank = NinjaRank.fromString(ninjaData.getRank());
-            if (currentRank.canRankUp(ninjaData)) {
+            if (ServerSecurityValidator.validateRankUp(player, ninjaData)) {
                 if (ninjaData.rankUp()) {
                     NinjaRank newRank = NinjaRank.fromString(ninjaData.getRank());
                     player.sendSystemMessage(Component.translatable("naruto.rank.promoted",

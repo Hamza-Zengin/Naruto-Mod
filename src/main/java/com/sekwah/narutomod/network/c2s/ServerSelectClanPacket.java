@@ -3,7 +3,7 @@ package com.sekwah.narutomod.network.c2s;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.capabilities.NinjaData;
-import com.sekwah.narutomod.clans.NarutoClans;
+import com.sekwah.narutomod.network.ServerSecurityValidator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -50,17 +50,12 @@ public class ServerSelectClanPacket implements CustomPacketPayload {
     public static void handle(final ServerSelectClanPacket msg, final IPayloadContext context) {
         context.enqueueWork(() -> {
             if (!(context.player() instanceof ServerPlayer player)) return;
-
-            NinjaData ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
-            if (ninjaData.isClanLocked()) {
-                player.sendSystemMessage(Component.translatable("clan.narutomod.already_locked")
-                        .withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+            if (!ServerSecurityValidator.validateBasePacket(player, "ServerSelectClanPacket")) {
                 return;
             }
 
-            // Validate clan exists
-            if (NarutoClans.getClan(msg.clanId) == null) {
-                player.sendSystemMessage(Component.translatable("clan.narutomod.invalid").withStyle(ChatFormatting.RED));
+            NinjaData ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            if (!ServerSecurityValidator.validateClanSelection(player, ninjaData, msg.clanId)) {
                 return;
             }
 

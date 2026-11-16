@@ -2,6 +2,7 @@ package com.sekwah.narutomod.network.c2s;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
+import com.sekwah.narutomod.network.ServerSecurityValidator;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -51,35 +52,42 @@ public class ServerJutsuCastingPacket implements CustomPacketPayload {
 
     public static void handle(final ServerJutsuCastingPacket msg, final IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer player) {
-                long now = System.currentTimeMillis();
-                Long last = LAST_SEAL_TIME.get(player.getUUID());
-                if (last != null && (now - last) < 60) {
-                    return; // Rate limit: drop packet spam to prevent audio flooding
-                }
-                LAST_SEAL_TIME.put(player.getUUID(), now);
-                if (LAST_SEAL_TIME.size() > 500) {
-                    LAST_SEAL_TIME.entrySet().removeIf(e -> (now - e.getValue()) > 60000);
-                }
-
-                SoundEvent playSound = switch (msg.jutsuKey) {
-                    case 1 -> NarutoSounds.SEAL_A.get();
-                    case 2 -> NarutoSounds.SEAL_B.get();
-                    case 3 -> NarutoSounds.SEAL_C.get();
-                    default -> null;
-                };
-                var ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
-                int sealCount = ninjaData.getActiveSeals().size();
-                float pitch = Math.min(1.4f, 0.9f + (sealCount * 0.08f));
-
-                if(playSound != null) {
-                    player.level().playSound(null,
-                            player.getX(), player.getY(), player.getZ(),
-                            playSound, SoundSource.PLAYERS, 1.0f, pitch);
-                }
-
-                ninjaData.addSeal((byte) msg.jutsuKey);
+            if (!(context.player() instanceof ServerPlayer player)) return;
+            if (!ServerSecurityValidator.validateBasePacket(player, "ServerJutsuCastingPacket")) {
+                return;
             }
+            if (msg.jutsuKey < 1 || msg.jutsuKey > 3) {
+                NarutoMod.LOGGER.warn("Player {} sent invalid hand seal key {}", player.getScoreboardName(), msg.jutsuKey);
+                return;
+            }
+
+            long now = System.currentTimeMillis();
+            Long last = LAST_SEAL_TIME.get(player.getUUID());
+            if (last != null && (now - last) < 60) {
+                return; // Rate limit: drop packet spam to prevent audio flooding
+            }
+            LAST_SEAL_TIME.put(player.getUUID(), now);
+            if (LAST_SEAL_TIME.size() > 500) {
+                LAST_SEAL_TIME.entrySet().removeIf(e -> (now - e.getValue()) > 60000);
+            }
+
+            SoundEvent playSound = switch (msg.jutsuKey) {
+                case 1 -> NarutoSounds.SEAL_A.get();
+                case 2 -> NarutoSounds.SEAL_B.get();
+                case 3 -> NarutoSounds.SEAL_C.get();
+                default -> null;
+            };
+            var ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            int sealCount = ninjaData.getActiveSeals().size();
+            float pitch = Math.min(1.4f, 0.9f + (sealCount * 0.08f));
+
+            if (playSound != null) {
+                player.level().playSound(null,
+                        player.getX(), player.getY(), player.getZ(),
+                        playSound, SoundSource.PLAYERS, 1.0f, pitch);
+            }
+
+            ninjaData.addSeal((byte) msg.jutsuKey);
         });
     }
 }

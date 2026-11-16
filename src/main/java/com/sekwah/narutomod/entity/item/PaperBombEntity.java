@@ -4,6 +4,7 @@ import com.sekwah.narutomod.block.NarutoBlocks;
 import com.sekwah.narutomod.config.NarutoConfig;
 import com.sekwah.narutomod.entity.NarutoDataSerialisers;
 import com.sekwah.narutomod.entity.NarutoEntities;
+import com.sekwah.narutomod.util.WorldProtectionHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -219,8 +220,10 @@ public class PaperBombEntity extends Entity {
     }
 
     protected void explode() {
+        Level.ExplosionInteraction interaction = WorldProtectionHelper.getExplosionInteraction(
+                this.level(), this.blockPosition(), this.owner, NarutoConfig.paperbombBlockDamage);
         this.level().explode(this, this.getX(), this.getY(0.0625D), this.getZ(),
                 NarutoConfig.paperbombExplosionRadius,
-                NarutoConfig.paperbombBlockDamage ? Level.ExplosionInteraction.BLOCK : Level.ExplosionInteraction.NONE);
+                interaction);
     }
 }

@@ -299,5 +299,7 @@
   "mission.narutomod.objective.kill_rogue": "Цель: Победите ниндзя-отступников (%s/%s)",
   "mission.narutomod.objective.cast_jutsu": "Цель: Используйте дзюцу (%s/%s)",
   "mission.narutomod.objective.kill_akatsuki": "Цель: Победите ниндзя Акацуки (%s/%s)",
-  "block.narutomod.amaterasu_fire": "Чёрное пламя Аматэрасу"
+  "block.narutomod.amaterasu_fire": "Чёрное пламя Аматэрасу",
+  "gamerule.narutomod.naruto_jutsu_griefing": "Разрушение блоков дзюцу Наруто",
+  "gamerule.narutomod.naruto_jutsu_griefing.description": "Определяет, могут ли дзюцу и ниндзя-взрывчатка из Naruto Mod ломать, поджигать или изменять блоки."
 }

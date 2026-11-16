@@ -299,5 +299,7 @@
   "mission.narutomod.objective.kill_rogue": "Objective: Defeat Rogue Ninjas (%s/%s)",
   "mission.narutomod.objective.cast_jutsu": "Objective: Cast Jutsus (%s/%s)",
   "mission.narutomod.objective.kill_akatsuki": "Objective: Defeat Akatsuki Ninjas (%s/%s)",
-  "block.narutomod.amaterasu_fire": "Amaterasu Black Flames"
+  "block.narutomod.amaterasu_fire": "Amaterasu Black Flames",
+  "gamerule.narutomod.naruto_jutsu_griefing": "Naruto Jutsu Griefing",
+  "gamerule.narutomod.naruto_jutsu_griefing.description": "Controls whether Naruto Mod jutsus and ninja explosives can break, burn, or modify blocks."
 }

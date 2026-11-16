@@ -7,6 +7,7 @@ import com.sekwah.narutomod.abilities.jutsus.ChidoriAbility;
 import com.sekwah.narutomod.abilities.jutsus.RasenganAbility;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.capabilities.NinjaData;
+import com.sekwah.narutomod.network.ServerSecurityValidator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -61,9 +62,21 @@ public class ServerTriggerHandJutsuPacket implements CustomPacketPayload {
     public static void handle(final ServerTriggerHandJutsuPacket msg, final IPayloadContext context) {
         context.enqueueWork(() -> {
             if (!(context.player() instanceof ServerPlayer player)) return;
+            if (!ServerSecurityValidator.validateBasePacket(player, "ServerTriggerHandJutsuPacket")) {
+                return;
+            }
             NinjaData ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
             String activeJutsu = ninjaData.getActiveHandJutsu();
             if (ninjaData.getActiveHandJutsuTicks() <= 0 || activeJutsu.isEmpty()) {
+                return;
+            }
+
+            Ability struckAbility = "rasengan".equalsIgnoreCase(activeJutsu)
+                    ? NarutoAbilities.RASENGAN.get()
+                    : "chidori".equalsIgnoreCase(activeJutsu)
+                    ? NarutoAbilities.CHIDORI.get()
+                    : null;
+            if (struckAbility == null || !ServerSecurityValidator.isAbilityUnlocked(ninjaData, struckAbility)) {
                 return;
             }
 
@@ -78,13 +91,7 @@ public class ServerTriggerHandJutsuPacket implements CustomPacketPayload {
                 }
             }
 
-            Ability struckAbility = "rasengan".equalsIgnoreCase(activeJutsu)
-                    ? NarutoAbilities.RASENGAN.get()
-                    : "chidori".equalsIgnoreCase(activeJutsu)
-                    ? NarutoAbilities.CHIDORI.get()
-                    : null;
-
-            if (struckAbility != null && struckAbility.matchesExpectedSeals(ninjaData.getActiveSeals())) {
+            if (struckAbility.matchesExpectedSeals(ninjaData.getActiveSeals())) {
                 float discountChakra = struckAbility.getChakraCost() * 0.25f;
                 if (discountChakra > 0) {
                     ninjaData.addChakra(discountChakra);

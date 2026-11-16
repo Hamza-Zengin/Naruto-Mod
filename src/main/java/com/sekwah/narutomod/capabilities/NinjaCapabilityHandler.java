@@ -100,6 +100,13 @@ public class NinjaCapabilityHandler {
     }
 
     @SubscribeEvent
+    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            com.sekwah.narutomod.network.ServerSecurityValidator.clearPlayer(serverPlayer.getUUID());
+        }
+    }
+
+    @SubscribeEvent
     public static void onLivingDeath(LivingDeathEvent event) {
         if (event.getEntity() instanceof Player player) {
             NinjaData ninjaData = player.getData(NINJA_DATA);

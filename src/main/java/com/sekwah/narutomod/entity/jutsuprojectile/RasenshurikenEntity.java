@@ -7,6 +7,7 @@ import com.sekwah.narutomod.damagesource.NarutoDamageSource;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.network.s2c.ClientCameraShakePacket;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
+import com.sekwah.narutomod.util.WorldProtectionHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -33,7 +34,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
@@ -293,9 +293,6 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
     }
 
     private void applyErodedCraterTrail(ServerLevel serverLevel, @Nullable Entity owner) {
-        if (!NarutoConfig.jutsuWorldDamage || !EventHooks.canEntityGrief(serverLevel, owner)) {
-            return;
-        }
         BlockPos center = this.blockPosition();
         int radius = 3;
         int radiusSqr = radius * radius;
@@ -309,7 +306,7 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
                     BlockState state = serverLevel.getBlockState(pos);
                     if (!state.isAir() && state.getFluidState().isEmpty()) {
                         BlockState eroded = getErodedCraterState(state);
-                        if (eroded != null && eroded != state) {
+                        if (eroded != null && eroded != state && WorldProtectionHelper.canModifyBlock(serverLevel, pos, owner)) {
                             serverLevel.setBlockAndUpdate(pos, eroded);
                         }
                         break;

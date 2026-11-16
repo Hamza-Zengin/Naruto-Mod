@@ -299,5 +299,7 @@
   "mission.narutomod.objective.kill_rogue": "Objetivo: Derrote Ninjas Renegados (%s/%s)",
   "mission.narutomod.objective.cast_jutsu": "Objetivo: Lance Jutsus (%s/%s)",
   "mission.narutomod.objective.kill_akatsuki": "Objetivo: Derrote Ninjas da Akatsuki (%s/%s)",
-  "block.narutomod.amaterasu_fire": "Chamas Negras de Amaterasu"
+  "block.narutomod.amaterasu_fire": "Chamas Negras de Amaterasu",
+  "gamerule.narutomod.naruto_jutsu_griefing": "Dano de Jutsu Naruto",
+  "gamerule.narutomod.naruto_jutsu_griefing.description": "Controla se jutsus e explosivos ninja do Naruto Mod podem quebrar, queimar ou modificar blocos."
 }

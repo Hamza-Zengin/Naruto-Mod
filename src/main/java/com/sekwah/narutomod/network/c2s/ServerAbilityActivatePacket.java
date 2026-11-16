@@ -7,6 +7,7 @@ import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
+import com.sekwah.narutomod.network.ServerSecurityValidator;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
 import com.sekwah.sekclib.util.ColorUtil;
 import net.minecraft.ChatFormatting;
@@ -57,28 +58,24 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
     public static void handle(final ServerAbilityActivatePacket msg, final IPayloadContext context) {
         context.enqueueWork(() -> {
             if (!(context.player() instanceof ServerPlayer player)) return;
+            if (!ServerSecurityValidator.validateBasePacket(player, "ServerAbilityActivatePacket")) {
+                return;
+            }
             NinjaData ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
 
             Ability ability = NarutoAbilities.getAbility(msg.abilityId);
             if (ability == null) return;
 
-            // Silently ignore if player does not have the ability unlocked (no chat spam)
-            if (!ninjaData.isAbilityUnlocked(ability)) {
-                return;
-            }
-
             if (ability.activationType() == Ability.ActivationType.INSTANT) {
+                if (!ServerSecurityValidator.validateAbilityActivation(player, ninjaData, ability, true)) {
+                    return;
+                }
                 if (!ability.canActivate(player, ninjaData)) {
                     return;
                 }
 
-                boolean canTriggerJutsu = true;
-                if (ability instanceof Ability.Cooldown cooldownAbility) {
-                    canTriggerJutsu = !cooldownAbility.checkCooldown(player, ninjaData, ability.getTranslationKey());
-                }
-
                 boolean comboMatched = ability.matchesExpectedSeals(ninjaData.getActiveSeals());
-                if (canTriggerJutsu && ability.handleCost(player, ninjaData)) {
+                if (ability.handleCost(player, ninjaData)) {
                     if (ability.logInChat()) {
                         player.sendSystemMessage(Component.translatable("jutsu.cast", Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
                         if (comboMatched) {
@@ -90,6 +87,9 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                                 SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.4f, 1.2f);
                         ninjaData.scheduleDelayedTickEvent(p -> {
+                            if (p instanceof ServerPlayer sp && !ServerSecurityValidator.validatePlayerState(sp)) {
+                                return;
+                            }
                             if (ability.castingSound() != null) {
                                 p.level().playSound(null,
                                         p.getX(), p.getY(), p.getZ(), ability.castingSound(), SoundSource.PLAYERS, 0.5f, 1.0f);
@@ -118,6 +118,9 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                 ToggleAbilityData abilityTracker = ninjaData.getToggleAbilityData();
                 HashSet<Identifier> abilities = abilityTracker.getAbilitiesHashSet();
                 if (abilities.contains(ability.getRegistryName())) {
+                    if (!ServerSecurityValidator.validateAbilityActivation(player, ninjaData, ability, false)) {
+                        return;
+                    }
                     if (NarutoAbilities.EIGHT_GATES_DEATH.getId().equals(ability.getRegistryName())) {
                         player.sendSystemMessage(Component.translatable("jutsu.eight_gates_death.cannot_close")
                                 .withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
@@ -126,6 +129,9 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                     // Toggle ability off
                     abilityTracker.removeAbilityEnded(player, ninjaData, ability);
                 } else {
+                    if (!ServerSecurityValidator.validateAbilityActivation(player, ninjaData, ability, true)) {
+                        return;
+                    }
                     if (!ability.canActivate(player, ninjaData)) {
                         return;
                     }

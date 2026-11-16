@@ -299,5 +299,7 @@
   "mission.narutomod.objective.kill_rogue": "Hedef: Haydut Ninja öldür (%s/%s)",
   "mission.narutomod.objective.cast_jutsu": "Hedef: Jutsu kullan (%s/%s)",
   "mission.narutomod.objective.kill_akatsuki": "Hedef: Akatsuki Ninjası öldür (%s/%s)",
-  "block.narutomod.amaterasu_fire": "Amaterasu Kara Alevleri"
+  "block.narutomod.amaterasu_fire": "Amaterasu Kara Alevleri",
+  "gamerule.narutomod.naruto_jutsu_griefing": "Naruto Jutsu Blok Hasarı",
+  "gamerule.narutomod.naruto_jutsu_griefing.description": "Naruto Mod jutsularının ve ninja patlayıcılarının blokları kırıp yakabileceğini veya değiştirebileceğini belirler."
 }
