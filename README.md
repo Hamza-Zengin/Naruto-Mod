@@ -6,6 +6,8 @@
 [![Java 25](https://img.shields.io/badge/Java-25-red.svg?style=for-the-badge&logo=openjdk&logoColor=white)](https://github.com/Hamza-Zengin/Naruto-Mod)
 [![License: All rights reserved](https://img.shields.io/badge/License-All_Rights_Reserved-red.svg?style=for-the-badge)](LICENSE)
 
+![Naruto-Mod Banner](banner.jpg)
+
 Kapsamlı bir **Minecraft 26.3 NeoForge** modu. Naruto shinobi evrenini Minecraft dünyasına taşıyarak; 18'den fazla imza jutsu, 7 ninja klanı ve kan bağı, 3D animasyonlu ninja silahları, taktiksel zırhlar, chakra sistemi, akıcı hareket mekanikleri ve özgün ses/efektler sunar.
 
 ---
