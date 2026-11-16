@@ -1,13 +1,12 @@
-# Naruto-Mod (Minecraft 1.20.1 Forge)
+# Naruto-Mod (Minecraft 26.3 NeoForge)
 
 [![Build and Release](https://github.com/Hamza-Zengin/Naruto-Mod/actions/workflows/gradle.yml/badge.svg)](https://github.com/Hamza-Zengin/Naruto-Mod/actions/workflows/gradle.yml)
-[![Minecraft 1.20.1](https://img.shields.io/badge/Minecraft-1.20.1%20Forge-orange.svg?style=for-the-badge&logo=curseforge&logoColor=white)](https://github.com/Hamza-Zengin/Naruto-Mod)
-[![Java 17](https://img.shields.io/badge/Java-17-blue.svg?style=for-the-badge&logo=openjdk&logoColor=white)](https://github.com/Hamza-Zengin/Naruto-Mod)
-[![Curios API](https://img.shields.io/badge/Curios_API-Compatible-purple.svg?style=for-the-badge)](https://github.com/Hamza-Zengin/Naruto-Mod)
-[![Better Combat](https://img.shields.io/badge/Better_Combat-Compatible-red.svg?style=for-the-badge)](https://github.com/Hamza-Zengin/Naruto-Mod)
+[![Minecraft 26.3](https://img.shields.io/badge/Minecraft-26.3%20NeoForge-orange.svg?style=for-the-badge&logo=curseforge&logoColor=white)](https://github.com/Hamza-Zengin/Naruto-Mod)
+[![Version](https://img.shields.io/badge/Version-26.3--v12.2-blue.svg?style=for-the-badge)](https://github.com/Hamza-Zengin/Naruto-Mod/releases)
+[![Java 25](https://img.shields.io/badge/Java-25-red.svg?style=for-the-badge&logo=openjdk&logoColor=white)](https://github.com/Hamza-Zengin/Naruto-Mod)
 [![License: All rights reserved](https://img.shields.io/badge/License-All_Rights_Reserved-red.svg?style=for-the-badge)](LICENSE)
 
-Kapsamlı bir **Minecraft 1.20.1 Forge** modu. Naruto shinobi evrenini Minecraft dünyasına taşıyarak; 18'den fazla imza jutsu, 7 ninja klanı ve kan bağı, 3D animasyonlu ninja silahları, taktiksel zırhlar, chakra sistemi, akıcı hareket mekanikleri ve özgün ses/efektler sunar.
+Kapsamlı bir **Minecraft 26.3 NeoForge** modu. Naruto shinobi evrenini Minecraft dünyasına taşıyarak; 18'den fazla imza jutsu, 7 ninja klanı ve kan bağı, 3D animasyonlu ninja silahları, taktiksel zırhlar, chakra sistemi, akıcı hareket mekanikleri ve özgün ses/efektler sunar.
 
 ---
 
@@ -60,7 +59,7 @@ Ninja Menüsü (`J` tuşu) üzerinden klanınızı seçin ve shinobi mirasınız
 
 ## 📦 Kütüphane Bağımlılığı (SekCLib)
 
-Mod, yetenek takibi ve veri senkronizasyonu için **SekCLib** (`com.sekwah.sekclib`) kütüphanesini kullanır. Forge 1.20.1 için deobfuscate edilmiş sürüm [`libs/SekCLib-1.20.1-1.1.0-deobf.jar`](libs/SekCLib-1.20.1-1.1.0-deobf.jar) içerisinde hazır bulunmaktadır.
+Mod, yetenek takibi ve veri senkronizasyonu için **SekCLib** (`com.sekwah.sekclib`) `2.0.0` kütüphanesini kullanır (`libs/SekCLib-26.3-2.0.0.jar`).
 
 ---
 
@@ -86,7 +85,7 @@ python3 scripts/check_lang.py
 ## 🛠️ Projeyi Derleme & Geliştirme (Building)
 
 ### Gereksinimler
-- **JDK 17** (örn. Eclipse Temurin veya Azul Zulu)
+- **JDK 25** (örn. Eclipse Temurin veya Azul Zulu)
 - Python 3.8+ (model, ses ve dil denetim betikleri için)
 
 ### Komutlar
@@ -111,5 +110,5 @@ python3 scripts/check_item_models.py
 
 ## 👥 Geliştiriciler & Teşekkür (Authors)
 
-- **Hamza Zengin** — *Lead Developer & Maintainer (1.20.1 Forge Port, 18+ Jutsu, Klan Sistemleri, 3D Silahlar & Tam Revizyon)*
+- **Hamza Zengin** — *Lead Developer & Maintainer (1.20.1 Forge & 26.3 NeoForge Port, 18+ Jutsu, Klan Sistemleri, 3D Silahlar & Tam Revizyon)*
 - **Alastair Hawkes (Sekwah41)** — *Orijinal Naruto Mod & SekCLib fikir babası (Eski 1.16 ve öncesi sürümler)*
