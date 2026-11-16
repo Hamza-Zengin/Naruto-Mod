@@ -47,10 +47,12 @@ public class NinjaDataLogicTest {
         assertEquals(NinjaRank.ACADEMY_STUDENT, NinjaRank.fromString(ninjaData.getRank()));
         assertFalse(ninjaData.isClanLocked());
         assertEquals("shinobi", ninjaData.getClan().getPath());
-        assertEquals(1000.0f, ninjaData.getMaxChakra(), 0.01f, "Initial maxChakra should be 1000");
-        assertEquals(800.0f, ninjaData.getMaxStamina(), 0.01f, "Initial maxStamina should be 800");
-        assertEquals(1000.0f, ninjaData.getChakra(), 0.01f, "Initial chakra should be 1000");
-        assertEquals(800.0f, ninjaData.getStamina(), 0.01f, "Initial stamina should be 800");
+        assertEquals(100.0f, ninjaData.getMaxChakra(), 0.01f, "Initial maxChakra should be 100");
+        assertEquals(100.0f, ninjaData.getMaxStamina(), 0.01f, "Initial maxStamina should be 100");
+        assertEquals(100.0f, ninjaData.getChakra(), 0.01f, "Initial chakra should be 100");
+        assertEquals(100.0f, ninjaData.getStamina(), 0.01f, "Initial stamina should be 100");
+        assertEquals(0.0f, ninjaData.getChakraExp(), 0.01f, "Initial chakraExp should be 0");
+        assertEquals(0.0f, ninjaData.getStaminaExp(), 0.01f, "Initial staminaExp should be 0");
         assertEquals("", ninjaData.getUnlockedJutsusString());
     }
 

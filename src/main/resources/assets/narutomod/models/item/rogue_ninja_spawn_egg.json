@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/egg"
+    "layer0": "narutomod:item/rogue_ninja_spawn_egg"
   }
 }

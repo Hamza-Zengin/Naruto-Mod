@@ -23,6 +23,12 @@ public class NarutoConfig {
 
     public static final ModConfigSpec MOD_CONFIG;
 
+    private static final ModConfigSpec.DoubleValue CONFIG_STARTING_CHAKRA;
+    public static float startingChakra = 100.0f;
+
+    private static final ModConfigSpec.DoubleValue CONFIG_STARTING_STAMINA;
+    public static float startingStamina = 100.0f;
+
     private static final ModConfigSpec.DoubleValue CONFIG_MAX_CHAKRA;
     public static float maxChakra = 1000.0f;
 
@@ -91,6 +97,12 @@ public class NarutoConfig {
         configBuilder.comment("Player settings").push(CATEGORY_PLAYER);
 
         configBuilder.comment("Stuff such as regen rates and maximum (will likely change with updates, e.g. stats system)").push(ENERGY_BARS);
+
+        CONFIG_STARTING_CHAKRA = configBuilder.comment("Starting Base Chakra")
+                .defineInRange("startingChakra", 100F, 1d, Integer.MAX_VALUE);
+
+        CONFIG_STARTING_STAMINA = configBuilder.comment("Starting Base Stamina")
+                .defineInRange("startingStamina", 100F, 1d, Integer.MAX_VALUE);
 
         CONFIG_MAX_CHAKRA = configBuilder.comment("Max Chakra")
                 .defineInRange("maxChakra", 1000F, 0d, Integer.MAX_VALUE);
@@ -173,6 +185,8 @@ public class NarutoConfig {
     }
 
     public static void loadVariables() {
+        startingChakra = CONFIG_STARTING_CHAKRA.get().floatValue();
+        startingStamina = CONFIG_STARTING_STAMINA.get().floatValue();
         maxChakra = CONFIG_MAX_CHAKRA.get().floatValue();
         maxStamina = CONFIG_MAX_STAMINA.get().floatValue();
         chakraRegenRate = CONFIG_CHAKRA_REGEN_RATE.get().floatValue();

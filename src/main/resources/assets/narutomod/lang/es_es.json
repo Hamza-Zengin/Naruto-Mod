@@ -296,5 +296,9 @@
   "mission.narutomod.a_rank_akatsuki_recon.title": "A-Rank: Akatsuki Recon",
   "mission.narutomod.a_rank_akatsuki_recon.desc": "Intercept and defeat Akatsuki operatives spotted in high-risk territories.",
   "mission.narutomod.s_rank_akatsuki_bounty.title": "S-Rank: Akatsuki Bounty",
-  "mission.narutomod.s_rank_akatsuki_bounty.desc": "Hunt down elite Akatsuki members to neutralize a major threat to the shinobi world."
+  "mission.narutomod.s_rank_akatsuki_bounty.desc": "Hunt down elite Akatsuki members to neutralize a major threat to the shinobi world.",
+  "mission.narutomod.objective.kill_enemy": "Objetivo: Derrota a cualquier mob hostil (%s/%s)",
+  "mission.narutomod.objective.kill_rogue": "Objetivo: Derrota a Ninjas Renegados (%s/%s)",
+  "mission.narutomod.objective.cast_jutsu": "Objetivo: Lanza Jutsus (%s/%s)",
+  "mission.narutomod.objective.kill_akatsuki": "Objetivo: Derrota a Ninjas de Akatsuki (%s/%s)"
 }

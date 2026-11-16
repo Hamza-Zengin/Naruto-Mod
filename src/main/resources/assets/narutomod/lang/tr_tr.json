@@ -296,5 +296,9 @@
   "mission.narutomod.a_rank_akatsuki_recon.title": "A-Rütbe: Akatsuki Keşfi",
   "mission.narutomod.a_rank_akatsuki_recon.desc": "Yüksek riskli bölgelerde görülen Akatsuki ajanlarını durdur ve yen.",
   "mission.narutomod.s_rank_akatsuki_bounty.title": "S-Rütbe: Akatsuki Ödül Avı",
-  "mission.narutomod.s_rank_akatsuki_bounty.desc": "Shinobi dünyasına yönelik büyük tehdidi bitirmek için elit Akatsuki üyelerini avla."
+  "mission.narutomod.s_rank_akatsuki_bounty.desc": "Shinobi dünyasına yönelik büyük tehdidi bitirmek için elit Akatsuki üyelerini avla.",
+  "mission.narutomod.objective.kill_enemy": "Hedef: Herhangi bir düşman mob öldür (%s/%s)",
+  "mission.narutomod.objective.kill_rogue": "Hedef: Haydut Ninja öldür (%s/%s)",
+  "mission.narutomod.objective.cast_jutsu": "Hedef: Jutsu kullan (%s/%s)",
+  "mission.narutomod.objective.kill_akatsuki": "Hedef: Akatsuki Ninjası öldür (%s/%s)"
 }

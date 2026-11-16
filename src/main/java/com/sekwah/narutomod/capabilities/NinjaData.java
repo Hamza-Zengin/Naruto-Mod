@@ -116,8 +116,8 @@ public class NinjaData implements INinjaData {
 
     public NinjaData(boolean isServer) {
         if (isServer) {
-            this.maxChakra = NarutoConfig.maxChakra > 0 ? NarutoConfig.maxChakra : 1000.0f;
-            this.maxStamina = NarutoConfig.maxStamina > 0 ? NarutoConfig.maxStamina : 800.0f;
+            this.maxChakra = NarutoConfig.startingChakra > 0 ? NarutoConfig.startingChakra : 100.0f;
+            this.maxStamina = NarutoConfig.startingStamina > 0 ? NarutoConfig.startingStamina : 100.0f;
             this.chakra = this.getMaxChakra();
             this.stamina = this.getMaxStamina();
             this.clan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shinobi");

@@ -35,6 +35,9 @@ public class NinjaMenuScreen extends Screen {
     private static final int CLANS_PER_PAGE = 4;
     private int jutsuPage = 0;
     private static final int JUTSUS_PER_PAGE = 4;
+    private int missionScrollOffset = 0;
+    private int missionMaxScroll = 0;
+    private final List<Button> missionAcceptButtons = new ArrayList<>();
 
     private static final int BOX_WIDTH = 340;
     private static final int BOX_HEIGHT = 195;
@@ -253,6 +256,7 @@ public class NinjaMenuScreen extends Screen {
     }
 
     private void initMissionsTab(int centerX, int boxY) {
+        this.missionAcceptButtons.clear();
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         INinjaData ninjaData = mc.player.getData(NinjaCapabilityHandler.NINJA_DATA);
@@ -261,8 +265,10 @@ public class NinjaMenuScreen extends Screen {
         int boxX = centerX - BOX_WIDTH / 2;
 
         if (active != null) {
+            this.missionScrollOffset = 0;
+            this.missionMaxScroll = 0;
             boolean completed = active.isCompleted(ninjaData);
-            int btnY = boxY + 125;
+            int btnY = boxY + 126;
             if (completed) {
                 this.addRenderableWidget(Button.builder(
                         Component.translatable("naruto.gui.ninja_menu.mission.claim"),
@@ -286,11 +292,7 @@ public class NinjaMenuScreen extends Screen {
             NinjaRank playerRank = NinjaRank.fromString(ninjaData.getRank());
             com.sekwah.narutomod.capabilities.NinjaMission[] missions =
                     com.sekwah.narutomod.capabilities.NinjaMission.values();
-            int startY = boxY + 36;
-            int rowH = 30;
-            for (int i = 0; i < missions.length; i++) {
-                com.sekwah.narutomod.capabilities.NinjaMission m = missions[i];
-                int rowY = startY + i * rowH;
+            for (com.sekwah.narutomod.capabilities.NinjaMission m : missions) {
                 Button acceptBtn = Button.builder(
                         Component.translatable("naruto.gui.ninja_menu.mission.accept"),
                         b -> {
@@ -298,8 +300,9 @@ public class NinjaMenuScreen extends Screen {
                                     com.sekwah.narutomod.network.c2s.ServerMissionActionPacket.Action.ACCEPT_MISSION,
                                     m.getId()));
                             this.onClose();
-                        }).bounds(boxX + BOX_WIDTH - 88, rowY + 3, 80, 20).build();
+                        }).bounds(boxX + BOX_WIDTH - 92, boxY + 32, 80, 20).build();
                 acceptBtn.active = m.canAccept(playerRank);
+                this.missionAcceptButtons.add(acceptBtn);
                 this.addRenderableWidget(acceptBtn);
             }
         }
@@ -476,20 +479,20 @@ public class NinjaMenuScreen extends Screen {
         // Chakra EXP (Left)
         float chakraExp = ninjaData.getChakraExp();
         float cNeededExp = baseChakra < 150.0f ? (30.0f + (baseChakra - 100.0f) * 0.50f) : (55.0f + (baseChakra - 150.0f) * 1.10f);
-        String cExpVal = baseChakra >= 500.0f ? "§aMAKS (500)" : String.format("§f%.0f / %.0f", chakraExp, cNeededExp);
+        String cExpVal = baseChakra >= 1000.0f ? "§aMAKS (1000)" : String.format("§f%.0f / %.0f", chakraExp, cNeededExp);
         graphics.text(this.font, "§dÇakra Eğitimi", x, y, 0xFFFFFFFF);
         graphics.text(this.font, cExpVal, x + halfW - this.font.width(cExpVal), y, 0xFFFFFFFF);
 
         // Stamina EXP (Right)
         float staminaExp = ninjaData.getStaminaExp();
         float sNeededExp = 50.0f + (baseStamina - 100.0f) * 1.10f;
-        String sExpVal = baseStamina >= 400.0f ? "§aMAKS (400)" : String.format("§f%.0f / %.0f", staminaExp, sNeededExp);
+        String sExpVal = baseStamina >= 800.0f ? "§aMAKS (800)" : String.format("§f%.0f / %.0f", staminaExp, sNeededExp);
         graphics.text(this.font, "§2Kondisyon Eğitimi", rightColX, y, 0xFFFFFFFF);
         graphics.text(this.font, sExpVal, rightColX + halfW - this.font.width(sExpVal), y, 0xFFFFFFFF);
         y += 10;
 
-        renderBar(graphics, x, y, halfW, 5, baseChakra >= 500f ? 1f : (cNeededExp > 0 ? chakraExp / cNeededExp : 0f), 0xFFAA22EE, 0xFF330044);
-        renderBar(graphics, rightColX, y, halfW, 5, baseStamina >= 400f ? 1f : (sNeededExp > 0 ? staminaExp / sNeededExp : 0f), 0xFF22AA66, 0xFF003318);
+        renderBar(graphics, x, y, halfW, 5, baseChakra >= 1000f ? 1f : (cNeededExp > 0 ? chakraExp / cNeededExp : 0f), 0xFFAA22EE, 0xFF330044);
+        renderBar(graphics, rightColX, y, halfW, 5, baseStamina >= 800f ? 1f : (sNeededExp > 0 ? staminaExp / sNeededExp : 0f), 0xFF22AA66, 0xFF003318);
         y += 11;
 
         // Exam & Progression Card
@@ -835,19 +838,20 @@ public class NinjaMenuScreen extends Screen {
                 com.sekwah.narutomod.capabilities.NinjaMission.fromId(ninjaData.getActiveMissionId());
 
         if (active != null) {
-            int cardY = boxY + 34;
+            int cardY = boxY + 30;
+            int cardH = 128;
             boolean completed = active.isCompleted(ninjaData);
             int borderCol = completed ? 0xFF33AA33 : 0xFFCC9922;
-            graphics.fill(boxX + 10, cardY, boxX + BOX_WIDTH - 10, cardY + 106, 0xCC181824);
-            graphics.outline(boxX + 10, cardY, BOX_WIDTH - 20, 106, borderCol);
+            graphics.fill(boxX + 10, cardY, boxX + BOX_WIDTH - 10, cardY + cardH, 0xCC181824);
+            graphics.outline(boxX + 10, cardY, BOX_WIDTH - 20, cardH, borderCol);
 
             String title = "§6§l[" + active.getRankLabel() + "] §f"
                     + active.getTitleComponent().getString();
             graphics.text(this.font, title, boxX + 20, cardY + 8, 0xFFFFFFFF);
 
-            java.util.List<net.minecraft.util.FormattedCharSequence> descLines =
+            List<FormattedCharSequence> descLines =
                     this.font.split(active.getDescriptionComponent(), BOX_WIDTH - 40);
-            int descY = cardY + 22;
+            int descY = cardY + 21;
             for (int l = 0; l < Math.min(2, descLines.size()); l++) {
                 graphics.text(this.font, descLines.get(l), boxX + 20, descY + l * 10, 0xFFBBBBCC);
             }
@@ -855,39 +859,115 @@ public class NinjaMenuScreen extends Screen {
             int progress = active.getProgress(ninjaData);
             int target = active.getTargetCount();
             float ratio = target > 0 ? (float) progress / target : 1.0f;
-            String progText = (completed ? "§a✔ Tamamlandı: " : "§eİlerleme: ") + progress + " / " + target
-                    + "   §bÖdül: +" + active.getRewardXp() + " XP";
-            graphics.text(this.font, progText, boxX + 20, cardY + 52, 0xFFDDDDDD);
 
-            renderBar(graphics, boxX + 20, cardY + 68, BOX_WIDTH - 40, 10, ratio,
+            Component objectiveText = active.getObjectiveComponent(progress).copy()
+                    .withStyle(completed ? ChatFormatting.GREEN : ChatFormatting.YELLOW);
+            graphics.text(this.font, objectiveText, boxX + 20, cardY + 46, 0xFFFFFFFF);
+
+            String progText = (completed ? "§a✔ Tamamlandı: " : "§7İlerleme: ") + progress + " / " + target
+                    + "   §bÖdül: +" + active.getRewardXp() + " XP";
+            graphics.text(this.font, progText, boxX + 20, cardY + 60, 0xFFDDDDDD);
+
+            renderBar(graphics, boxX + 20, cardY + 75, BOX_WIDTH - 40, 10, ratio,
                     completed ? 0xFF33CC33 : 0xFF3399FF, 0xFF222233);
         } else {
             com.sekwah.narutomod.capabilities.NinjaMission[] missions =
                     com.sekwah.narutomod.capabilities.NinjaMission.values();
-            int startY = boxY + 32;
-            int rowH = 34;
+
+            int viewX = boxX + 6;
+            int viewY = boxY + 28;
+            int viewW = BOX_WIDTH - 12;
+            int viewH = BOX_HEIGHT - 36;
+            int cardW = viewW - 8;
+            int textMaxW = cardW - 96;
+            int cardGap = 4;
+
+            int[] cardHeights = new int[missions.length];
+            List<List<FormattedCharSequence>> wrappedDescs = new ArrayList<>(missions.length);
+            List<List<FormattedCharSequence>> wrappedObjs = new ArrayList<>(missions.length);
+            int totalContentH = 0;
+
             for (int i = 0; i < missions.length; i++) {
                 com.sekwah.narutomod.capabilities.NinjaMission m = missions[i];
-                int rowY = startY + i * rowH;
+                List<FormattedCharSequence> descLines = this.font.split(m.getDescriptionComponent(), textMaxW);
+                List<FormattedCharSequence> objLines = this.font.split(m.getObjectiveComponent(0), textMaxW);
+                wrappedDescs.add(descLines);
+                wrappedObjs.add(objLines);
+                int h = 6 + 11 + descLines.size() * 10 + objLines.size() * 10 + 11 + 5;
+                cardHeights[i] = h;
+                totalContentH += h + (i < missions.length - 1 ? cardGap : 0);
+            }
+
+            this.missionMaxScroll = Math.max(0, totalContentH - viewH);
+            this.missionScrollOffset = Math.max(0, Math.min(this.missionScrollOffset, this.missionMaxScroll));
+
+            graphics.enableScissor(viewX, viewY, viewX + viewW, viewY + viewH);
+
+            int cursorY = viewY - this.missionScrollOffset;
+            for (int i = 0; i < missions.length; i++) {
+                com.sekwah.narutomod.capabilities.NinjaMission m = missions[i];
+                int cardH = cardHeights[i];
+                int rowY = cursorY;
                 boolean eligible = m.canAccept(rank);
-                graphics.fill(boxX + 8, rowY, boxX + BOX_WIDTH - 96, rowY + 31, 0xCC181822);
-                graphics.outline(boxX + 8, rowY, BOX_WIDTH - 104, 31, eligible ? 0xFF447744 : 0xFF553333);
 
-                String mName = (eligible ? "§6[" + m.getRankLabel() + "] §f" : "§8[" + m.getRankLabel() + "] ")
-                        + m.getTitleComponent().getString();
-                graphics.text(this.font, mName, boxX + 14, rowY + 3, 0xFFFFFFFF);
+                if (rowY + cardH >= viewY && rowY <= viewY + viewH) {
+                    graphics.fill(viewX + 2, rowY, viewX + 2 + cardW, rowY + cardH, 0xCC181822);
+                    graphics.outline(viewX + 2, rowY, cardW, cardH, eligible ? 0xFF447744 : 0xFF553333);
 
-                java.util.List<net.minecraft.util.FormattedCharSequence> descLines =
-                        this.font.split(m.getDescriptionComponent(), BOX_WIDTH - 116);
-                if (!descLines.isEmpty()) {
-                    graphics.text(this.font, descLines.get(0), boxX + 14, rowY + 13, 0xFF9999AA);
+                    int lineY = rowY + 5;
+                    String mName = (eligible ? "§6[" + m.getRankLabel() + "] §f" : "§8[" + m.getRankLabel() + "] ")
+                            + m.getTitleComponent().getString();
+                    graphics.text(this.font, mName, viewX + 8, lineY, 0xFFFFFFFF);
+                    lineY += 11;
+
+                    for (FormattedCharSequence line : wrappedDescs.get(i)) {
+                        graphics.text(this.font, line, viewX + 8, lineY, 0xFF9999AA);
+                        lineY += 10;
+                    }
+
+                    for (FormattedCharSequence line : wrappedObjs.get(i)) {
+                        graphics.text(this.font, line, viewX + 8, lineY, eligible ? 0xFFEEDD77 : 0xFF888899);
+                        lineY += 10;
+                    }
+
+                    String mMeta = "§bÖdül: +" + m.getRewardXp() + " XP"
+                            + (eligible ? "" : "  §c(Gerekli: " + m.getRequiredRank().getEnglishName() + ")");
+                    graphics.text(this.font, mMeta, viewX + 8, lineY + 1, 0xFFAAAAAA);
                 }
 
-                String mMeta = "§7Hedef: " + m.getTargetCount() + " | Ödül: +" + m.getRewardXp() + " XP"
-                        + (eligible ? "" : " §c(" + m.getRequiredRank().getEnglishName() + ")");
-                graphics.text(this.font, mMeta, boxX + 14, rowY + 22, 0xFFAAAAAA);
+                if (i < this.missionAcceptButtons.size()) {
+                    Button acceptBtn = this.missionAcceptButtons.get(i);
+                    int btnY = rowY + (cardH - 20) / 2;
+                    acceptBtn.setX(viewX + cardW - 84);
+                    acceptBtn.setY(btnY);
+                    boolean inViewport = btnY >= viewY && (btnY + 20) <= (viewY + viewH);
+                    acceptBtn.visible = inViewport;
+                    acceptBtn.active = eligible && inViewport;
+                }
+
+                cursorY += cardH + cardGap;
+            }
+
+            graphics.disableScissor();
+
+            if (this.missionMaxScroll > 0) {
+                int barX = viewX + viewW - 4;
+                graphics.fill(barX, viewY, barX + 3, viewY + viewH, 0x55333344);
+                int thumbH = Math.max(18, (int) ((float) viewH * viewH / totalContentH));
+                int thumbY = viewY + (int) ((float) this.missionScrollOffset / this.missionMaxScroll * (viewH - thumbH));
+                graphics.fill(barX, thumbY, barX + 3, thumbY + thumbH, 0xFFCC9922);
             }
         }
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (this.activeTab == 3 && this.missionMaxScroll > 0) {
+            this.missionScrollOffset = Math.max(0, Math.min(this.missionMaxScroll,
+                    this.missionScrollOffset - (int) Math.round(scrollY * 18.0)));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     @Override

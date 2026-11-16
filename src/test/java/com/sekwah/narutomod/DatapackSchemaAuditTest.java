@@ -218,4 +218,21 @@ public class DatapackSchemaAuditTest {
             }
         }
     }
+
+    @Test
+    public void testEquipmentAssetsExistForAllArmorMaterials() throws IOException {
+        Path equipmentDir = Path.of("src/main/resources/assets/narutomod/equipment");
+        Assertions.assertTrue(Files.isDirectory(equipmentDir), "assets/narutomod/equipment directory must exist!");
+        for (String assetName : List.of("anbu", "headband", "chunin", "akatsuki")) {
+            Path file = equipmentDir.resolve(assetName + ".json");
+            Assertions.assertTrue(Files.isRegularFile(file), "Missing equipment asset JSON: " + file);
+            JsonObject root = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
+            Assertions.assertTrue(root.has("layers") && root.get("layers").isJsonObject(),
+                    file + " missing 'layers' object");
+            JsonObject layers = root.getAsJsonObject("layers");
+            Assertions.assertTrue(layers.has("humanoid") && layers.get("humanoid").isJsonArray()
+                            && !layers.getAsJsonArray("humanoid").isEmpty(),
+                    file + " must have non-empty 'layers.humanoid' array");
+        }
+    }
 }
