@@ -63,6 +63,7 @@ public class NarutoMod {
         NarutoClans.register(modEventBus);
         NarutoGameRules.register(modEventBus);
         NinjaCapabilityHandler.register(modEventBus);
+        com.sekwah.narutomod.gametest.NarutoModGameTests.register(modEventBus);
 
         NeoForge.EVENT_BUS.addListener(NarutoMod::onServerStarting);
 
