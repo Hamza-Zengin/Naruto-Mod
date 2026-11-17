@@ -1132,6 +1132,12 @@ public class NinjaData implements INinjaData {
 
     // --- Package-private raw accessors used by NinjaDataNbtCodec (bypass clamping/side effects) ---
 
+    void setRawRank(String rank) { this.rank = rank; }
+
+    void setRawChakra(float value) { this.chakra = value; }
+
+    void setRawStamina(float value) { this.stamina = value; }
+
     float getRawMaxChakra() { return this.maxChakra; }
 
     void setRawMaxChakra(float value) { this.maxChakra = value; }

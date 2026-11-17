@@ -84,8 +84,8 @@ final class NinjaDataNbtCodec {
     static void load(NinjaData data, CompoundTag compoundTag) {
         if (compoundTag == null) return;
         data.setShimonPenaltyActive(compoundTag.getBooleanOr("shimonPenaltyActive", false));
-        data.setChakra(compoundTag.getFloatOr(CHAKRA_TAG, 0.0f));
-        data.setStamina(compoundTag.getFloatOr(STAMINA_TAG, 0.0f));
+        data.setRawChakra(compoundTag.getFloatOr(CHAKRA_TAG, 0.0f));
+        data.setRawStamina(compoundTag.getFloatOr(STAMINA_TAG, 0.0f));
         if (compoundTag.contains(MAX_CHAKRA_TAG)) {
             data.setRawMaxChakra(compoundTag.getFloatOr(MAX_CHAKRA_TAG, data.getRawMaxChakra()));
         }
@@ -102,9 +102,9 @@ final class NinjaDataNbtCodec {
             data.setClanLocked(compoundTag.getBooleanOr(CLAN_LOCKED_TAG, false));
         }
         if (compoundTag.contains(RANK_TAG)) {
-            data.setRank(compoundTag.getStringOr(RANK_TAG, "ACADEMY_STUDENT"));
+            data.setRawRank(compoundTag.getStringOr(RANK_TAG, "ACADEMY_STUDENT"));
         } else {
-            data.setRank("ACADEMY_STUDENT");
+            data.setRawRank("ACADEMY_STUDENT");
         }
         if (compoundTag.contains(CHAKRA_EXP_TAG)) {
             data.setChakraExp(compoundTag.getFloatOr(CHAKRA_EXP_TAG, 0.0f));
