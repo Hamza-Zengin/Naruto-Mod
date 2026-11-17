@@ -111,6 +111,10 @@ public class ShadowCloneEntity extends PathfinderMob {
             SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_HACHIMON_GATE =
             SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<String> DATA_ACTIVE_HAND_JUTSU =
+            SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.STRING);
+
+    private int activeHandJutsuTicks = 0;
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
@@ -123,6 +127,7 @@ public class ShadowCloneEntity extends PathfinderMob {
         builder.define(DATA_ACTIVE_ABILITIES, "");
         builder.define(DATA_SHARINGAN_STAGE, 0);
         builder.define(DATA_HACHIMON_GATE, 0);
+        builder.define(DATA_ACTIVE_HAND_JUTSU, "");
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -260,6 +265,11 @@ public class ShadowCloneEntity extends PathfinderMob {
         output.putInt("MaxLifespan", this.getMaxLifespan());
         output.putBoolean("IsSlim", this.isSlim());
         output.putInt("CommandMode", this.getCommandMode());
+        output.putString("ActiveAbilities", this.entityData.get(DATA_ACTIVE_ABILITIES));
+        output.putInt("SharinganStage", this.getSharinganStage());
+        output.putInt("HachimonGate", this.getHachimonGate());
+        output.putString("ActiveHandJutsu", this.getActiveHandJutsu());
+        output.putInt("ActiveHandJutsuTicks", this.activeHandJutsuTicks);
     }
 
     @Override
@@ -274,20 +284,128 @@ public class ShadowCloneEntity extends PathfinderMob {
         this.entityData.set(DATA_MAX_LIFESPAN, input.getIntOr("MaxLifespan", 600));
         this.entityData.set(DATA_IS_SLIM, input.getBooleanOr("IsSlim", false));
         this.setCommandMode(input.getIntOr("CommandMode", MODE_FOLLOW));
+        this.entityData.set(DATA_ACTIVE_ABILITIES, input.getStringOr("ActiveAbilities", ""));
+        this.entityData.set(DATA_SHARINGAN_STAGE, input.getIntOr("SharinganStage", 0));
+        this.entityData.set(DATA_HACHIMON_GATE, input.getIntOr("HachimonGate", 0));
+        this.entityData.set(DATA_ACTIVE_HAND_JUTSU, input.getStringOr("ActiveHandJutsu", ""));
+        this.activeHandJutsuTicks = input.getIntOr("ActiveHandJutsuTicks", 0);
+        if (this.hasActiveAbility("water_walk")) {
+            this.setPathfindingMalus(net.minecraft.world.level.pathfinder.PathType.WATER, 0.0F);
+        }
+    }
+
+    @Override
+    public boolean canStandOnFluid(net.minecraft.world.level.material.FluidState fluidState) {
+        if (this.hasActiveAbility("water_walk")
+                && (fluidState.is(net.minecraft.world.level.material.Fluids.WATER)
+                || fluidState.is(net.minecraft.world.level.material.Fluids.FLOWING_WATER))) {
+            return true;
+        }
+        return super.canStandOnFluid(fluidState);
+    }
+
+    private boolean isWaterBlock(net.minecraft.core.BlockPos pos) {
+        net.minecraft.world.level.material.FluidState fluidState = this.level().getFluidState(pos);
+        return fluidState.is(net.minecraft.world.level.material.Fluids.WATER)
+                || fluidState.is(net.minecraft.world.level.material.Fluids.FLOWING_WATER);
+    }
+
+    private void updateWaterWalkMovement() {
+        int blockX = (int) Math.floor(this.getX());
+        int blockZ = (int) Math.floor(this.getZ());
+        net.minecraft.core.BlockPos.MutableBlockPos mutablePos = new net.minecraft.core.BlockPos.MutableBlockPos();
+
+        boolean steadyCheck = isWaterBlock(mutablePos.set(blockX, (int) Math.round(this.getY() - 0.56f), blockZ));
+        boolean pushUpFast = isWaterBlock(mutablePos.set(blockX, (int) Math.round(this.getY()), blockZ));
+        boolean pushUpNormal = isWaterBlock(mutablePos.set(blockX, (int) Math.round(this.getY() - 0.47f), blockZ));
+
+        if (!steadyCheck && !pushUpFast && !pushUpNormal) {
+            return;
+        }
+
+        net.minecraft.world.phys.Vec3 vec = this.getDeltaMovement();
+        double resultingYSpeed = vec.y();
+        if (pushUpFast) {
+            resultingYSpeed = Math.min(0.6D, resultingYSpeed + 0.2D);
+        } else if (pushUpNormal) {
+            resultingYSpeed = Math.min(0.2D, resultingYSpeed + 0.1D);
+        } else if (steadyCheck && resultingYSpeed < 0.0D) {
+            resultingYSpeed = 0.0D;
+            this.resetFallDistance();
+            this.setOnGround(true);
+        }
+        this.setDeltaMovement(vec.x(), resultingYSpeed, vec.z());
     }
 
     @Override
     public void tick() {
         super.tick();
+        if (this.hasActiveAbility("water_walk")) {
+            this.updateWaterWalkMovement();
+        }
         if (!this.level().isClientSide()) {
             if (this.cloneJutsuCooldown > 0) {
                 this.cloneJutsuCooldown--;
+            }
+            if (this.activeHandJutsuTicks > 0) {
+                this.activeHandJutsuTicks--;
+                if (this.activeHandJutsuTicks == 0) {
+                    this.entityData.set(DATA_ACTIVE_HAND_JUTSU, "");
+                }
+            }
+            if (this.tickCount % 20 == 0 && this.level() instanceof ServerLevel serverLevel) {
+                applyPeriodicAbilityEffects(serverLevel);
             }
             this.lifeTicks--;
             if (this.lifeTicks <= 0) {
                 this.poof();
             }
         }
+    }
+
+    private void applyPeriodicAbilityEffects(ServerLevel serverLevel) {
+        if (this.hasActiveAbility("byakugan")) {
+            net.minecraft.world.phys.AABB field = this.getBoundingBox().inflate(24.0D);
+            java.util.List<LivingEntity> nearby = serverLevel.getEntitiesOfClass(LivingEntity.class, field,
+                    e -> e != this && e.isAlive() && !areAllies(this, e));
+            for (LivingEntity entity : nearby) {
+                entity.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                        net.minecraft.world.effect.MobEffects.GLOWING, 30, 0, false, false, false));
+            }
+        }
+        int sharinganStage = this.getSharinganStage();
+        if (this.hasActiveAbility("sharingan") && sharinganStage > 0) {
+            double radius = 6.0D + Math.max(0, sharinganStage - 1) * 2.0D;
+            int slowAmp = sharinganStage >= 3 ? 1 : 0;
+            boolean applyWeakness = sharinganStage == 2 || sharinganStage >= 4;
+            net.minecraft.world.phys.AABB field = this.getBoundingBox().inflate(radius);
+            java.util.List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, field,
+                    e -> e != this && e.isAlive() && !areAllies(this, e));
+            for (LivingEntity enemy : enemies) {
+                enemy.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                        net.minecraft.world.effect.MobEffects.SLOWNESS, 40, slowAmp, false, false));
+                if (applyWeakness) {
+                    enemy.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                            net.minecraft.world.effect.MobEffects.WEAKNESS, 40, 0, false, false));
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean doHurtTarget(ServerLevel serverLevel, net.minecraft.world.entity.Entity target) {
+        boolean hit = super.doHurtTarget(serverLevel, target);
+        if (hit && this.hasActiveAbility("byakugan") && target instanceof LivingEntity livingTarget && !areAllies(this, livingTarget)) {
+            livingTarget.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.WEAKNESS, 60, 0, false, false));
+            livingTarget.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.SLOWNESS, 40, 0, false, false));
+            if (livingTarget instanceof Player targetPlayer) {
+                targetPlayer.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA)
+                        .lockChakraRegen(com.sekwah.narutomod.abilities.jutsus.ByakuganAbility.CHAKRA_LOCK_TICKS);
+            }
+        }
+        return hit;
     }
 
     @Nullable
@@ -327,33 +445,78 @@ public class ShadowCloneEntity extends PathfinderMob {
 
     public void copyActiveAbilitiesFrom(Player owner, com.sekwah.narutomod.capabilities.INinjaData ninjaData) {
         if (ninjaData == null) return;
-        java.util.Set<Identifier> toggles = ninjaData.getToggleAbilityData().getAbilitiesHashSet();
-        String joined = toggles.stream()
-                .map(Identifier::toString)
-                .collect(java.util.stream.Collectors.joining(","));
-        this.entityData.set(DATA_ACTIVE_ABILITIES, joined);
-
-        if (ninjaData.isSharinganActive()) {
-            this.entityData.set(DATA_SHARINGAN_STAGE,
-                    com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(ninjaData).ordinal() + 1);
-            this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-                    net.minecraft.world.effect.MobEffects.SPEED, 1200, 0, false, false));
+        java.util.Set<String> activeIds = new java.util.LinkedHashSet<>();
+        com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData toggleData = ninjaData.getToggleAbilityData();
+        if (toggleData != null) {
+            for (Identifier id : toggleData.getAbilitiesSnapshot()) {
+                if (id != null) {
+                    activeIds.add(id.toString());
+                }
+            }
         }
+        if (ninjaData.isSharinganActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":sharingan");
+        if (ninjaData.isByakuganActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":byakugan");
+        if (ninjaData.isEightGatesActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":eight_gates");
+        if (ninjaData.isEighthGateActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":eight_gates_death");
+        if (ninjaData.isWaterWalkActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":water_walk");
+
+        this.entityData.set(DATA_ACTIVE_ABILITIES, String.join(",", activeIds));
+
+        if (ninjaData.getActiveHandJutsuTicks() > 0 && ninjaData.getActiveHandJutsu() != null && !ninjaData.getActiveHandJutsu().isEmpty()) {
+            this.setActiveHandJutsu(ninjaData.getActiveHandJutsu(), ninjaData.getActiveHandJutsuTicks());
+        } else {
+            this.setActiveHandJutsu("", 0);
+        }
+
+        int lifespan = Math.max(1200, this.getMaxLifespan());
+
+        if (hasActiveAbility("water_walk")) {
+            this.setPathfindingMalus(net.minecraft.world.level.pathfinder.PathType.WATER, 0.0F);
+        }
+
+        if (hasActiveAbility("sharingan")) {
+            int stage = com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(ninjaData).ordinal() + 1;
+            this.entityData.set(DATA_SHARINGAN_STAGE, stage);
+            int speedAmp = stage >= 3 ? 1 : 0;
+            this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.SPEED, lifespan, speedAmp, false, false));
+            if (stage >= 3) {
+                this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                        net.minecraft.world.effect.MobEffects.STRENGTH, lifespan, 0, false, false));
+            }
+            if (stage >= 4) {
+                this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                        net.minecraft.world.effect.MobEffects.RESISTANCE, lifespan, 0, false, false));
+            }
+        } else {
+            this.entityData.set(DATA_SHARINGAN_STAGE, 0);
+        }
+
         if (hasActiveAbility("susanoo_ribcage")) {
             this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-                    net.minecraft.world.effect.MobEffects.RESISTANCE, 1200, 1, false, false));
+                    net.minecraft.world.effect.MobEffects.RESISTANCE, lifespan, 1, false, false));
         }
-        if (hasActiveAbility("eight_gates")) {
+
+        if (hasActiveAbility("eight_gates_death")) {
+            this.entityData.set(DATA_HACHIMON_GATE, 8);
+            this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.STRENGTH, lifespan, 3, false, false));
+            this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.SPEED, lifespan, 3, false, false));
+        } else if (hasActiveAbility("eight_gates")) {
             int gate = com.sekwah.narutomod.abilities.jutsus.EightGatesAbility.getStage(ninjaData).ordinal() + 1;
             this.entityData.set(DATA_HACHIMON_GATE, gate);
             this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-                    net.minecraft.world.effect.MobEffects.STRENGTH, 1200, Math.min(2, gate / 3), false, false));
+                    net.minecraft.world.effect.MobEffects.STRENGTH, lifespan, Math.min(2, gate / 3), false, false));
             this.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-                    net.minecraft.world.effect.MobEffects.SPEED, 1200, Math.min(2, gate / 3), false, false));
+                    net.minecraft.world.effect.MobEffects.SPEED, lifespan, Math.min(2, gate / 3), false, false));
+        } else {
+            this.entityData.set(DATA_HACHIMON_GATE, 0);
         }
     }
 
     public boolean hasActiveAbility(String abilityPath) {
+        if (abilityPath == null || abilityPath.isEmpty()) return false;
         String data = this.entityData.get(DATA_ACTIVE_ABILITIES);
         if (data == null || data.isEmpty()) return false;
         for (String token : data.split(",")) {
@@ -370,6 +533,16 @@ public class ShadowCloneEntity extends PathfinderMob {
 
     public int getHachimonGate() {
         return this.entityData.get(DATA_HACHIMON_GATE);
+    }
+
+    public String getActiveHandJutsu() {
+        String val = this.entityData.get(DATA_ACTIVE_HAND_JUTSU);
+        return val != null ? val : "";
+    }
+
+    public void setActiveHandJutsu(String jutsu, int ticks) {
+        this.entityData.set(DATA_ACTIVE_HAND_JUTSU, jutsu != null ? jutsu : "");
+        this.activeHandJutsuTicks = Math.max(0, ticks);
     }
 
     @Override

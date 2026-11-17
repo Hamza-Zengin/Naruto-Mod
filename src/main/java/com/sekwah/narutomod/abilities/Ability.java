@@ -101,23 +101,6 @@ public abstract class Ability {
         return -1;
     }
 
-    /**
-     * Hand seals required / expected for this jutsu combination.
-     * By default, derives expected seals from digits of defaultCombo() (e.g. 121 -> [1, 2, 1]).
-     */
-    public byte[] getExpectedSeals() {
-        long combo = defaultCombo();
-        if (combo <= 0) {
-            return new byte[0];
-        }
-        String s = Long.toString(combo);
-        byte[] seals = new byte[s.length()];
-        for (int i = 0; i < s.length(); i++) {
-            seals[i] = (byte) Character.digit(s.charAt(i), 10);
-        }
-        return seals;
-    }
-
     public static int getComboKeyLength(Ability a) {
         if (a == null || a.defaultCombo() <= 0) return 0;
         return Long.toString(a.defaultCombo()).length();
@@ -136,55 +119,6 @@ public abstract class Ability {
                     .thenComparingDouble(a -> a.getDefaultChakraCost() + a.getDefaultStaminaCost())
                     .thenComparingInt(a -> a.getRequiredRank() != null ? a.getRequiredRank().getLevel() : 0)
                     .thenComparing(a -> a.getRegistryName() != null ? a.getRegistryName().toString() : "");
-
-    /**
-     * Checks if the entered seal list matches the ability's expected seal sequence or defaultCombo digits.
-     */
-    public boolean matchesExpectedSeals(java.util.List<Byte> activeSeals) {
-        if (activeSeals == null || activeSeals.isEmpty()) {
-            return false;
-        }
-        byte[] expected = getExpectedSeals();
-        if (matchesSequence(activeSeals, expected)) {
-            return true;
-        }
-        long combo = defaultCombo();
-        if (combo > 0) {
-            String s = Long.toString(combo);
-            byte[] comboBytes = new byte[s.length()];
-            for (int i = 0; i < s.length(); i++) {
-                comboBytes[i] = (byte) Character.digit(s.charAt(i), 10);
-            }
-            if (matchesSequence(activeSeals, comboBytes)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean matchesSequence(java.util.List<Byte> activeSeals, byte[] expected) {
-        if (expected == null || expected.length == 0 || activeSeals.size() < expected.length) {
-            return false;
-        }
-        int offset = activeSeals.size() - expected.length;
-        for (int i = 0; i < expected.length; i++) {
-            if (activeSeals.get(offset + i) != expected[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Calculates the effective chakra cost with a 25% discount if the entered seals match.
-     */
-    public float getEffectiveChakraCost(INinjaData ninjaData) {
-        float cost = getChakraCost();
-        if (ninjaData != null && matchesExpectedSeals(ninjaData.getActiveSeals())) {
-            return cost * 0.75f;
-        }
-        return cost;
-    }
 
     public abstract ActivationType activationType();
 
@@ -329,7 +263,7 @@ public abstract class Ability {
     }
 
     public float getScaledChakraCost(INinjaData ninjaData) {
-        float baseCost = getEffectiveChakraCost(ninjaData);
+        float baseCost = getChakraCost();
         if (ninjaData == null) return baseCost;
         Identifier reg = getRegistryName();
         int mastery = reg != null ? ninjaData.getMastery(reg) : 0;

@@ -27,43 +27,56 @@ public class RasenshurikenModel extends Model<RasenshurikenModel.SpinState> {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
 
-        // Central Rasengan Chakra Sphere
+        // Central Chamfered Multi-Angle Rasengan Chakra Core
         PartDefinition core = root.addOrReplaceChild("core",
                 CubeListBuilder.create()
-                        .texOffs(0, 0)
-                        .addBox(-4.0F, -4.0F, -4.0F, 8, 8, 8)
-                        .texOffs(32, 0)
-                        .addBox(-5.0F, -3.0F, -3.0F, 10, 6, 6)
-                        .texOffs(0, 16)
-                        .addBox(-3.0F, -5.0F, -3.0F, 6, 10, 6),
+                        .texOffs(0, 0).addBox(-3.5F, -3.5F, -3.5F, 7, 7, 7),
                 PartPose.ZERO);
+        core.addOrReplaceChild("core_rot_y",
+                CubeListBuilder.create().texOffs(32, 0).addBox(-3.5F, -2.5F, -3.5F, 7, 5, 7),
+                PartPose.rotation(0.0F, 0.7854F, 0.0F));
+        core.addOrReplaceChild("core_rot_x",
+                CubeListBuilder.create().texOffs(0, 16).addBox(-2.5F, -3.5F, -3.5F, 5, 7, 7),
+                PartPose.rotation(0.7854F, 0.0F, 0.0F));
+        core.addOrReplaceChild("core_rot_diag",
+                CubeListBuilder.create().texOffs(32, 0).addBox(-3.2F, -3.2F, -3.2F, 6.4F, 6.4F, 6.4F),
+                PartPose.rotation(0.5236F, 0.7854F, 0.5236F));
 
-        // 4 Outer Wind-Chakra Shuriken Blades + Inner Ring
-        PartDefinition blades = root.addOrReplaceChild("blades",
-                CubeListBuilder.create()
-                        .texOffs(0, 32)
-                        .addBox(-6.0F, -1.0F, -6.0F, 12, 2, 12)
-                        // North Blade (+Z)
-                        .texOffs(0, 46)
-                        .addBox(-3.0F, -0.5F, 5.0F, 6, 1, 11)
-                        .texOffs(34, 46)
-                        .addBox(-1.5F, -0.5F, 16.0F, 3, 1, 5)
-                        // South Blade (-Z)
-                        .texOffs(0, 46)
-                        .addBox(-3.0F, -0.5F, -16.0F, 6, 1, 11)
-                        .texOffs(34, 46)
-                        .addBox(-1.5F, -0.5F, -21.0F, 3, 1, 5)
-                        // East Blade (+X)
-                        .texOffs(24, 16)
-                        .addBox(5.0F, -0.5F, -3.0F, 11, 1, 6)
-                        .texOffs(24, 24)
-                        .addBox(16.0F, -0.5F, -1.5F, 5, 1, 3)
-                        // West Blade (-X)
-                        .texOffs(24, 16)
-                        .addBox(-16.0F, -0.5F, -3.0F, 11, 1, 6)
-                        .texOffs(24, 24)
-                        .addBox(-21.0F, -0.5F, -1.5F, 5, 1, 3),
-                PartPose.ZERO);
+        // 4 Swept Curved Wind-Chakra Shuriken Blades + 12-Segment Circular Ring
+        PartDefinition blades = root.addOrReplaceChild("blades", CubeListBuilder.create(), PartPose.ZERO);
+
+        int ringSegments = 12;
+        for (int i = 0; i < ringSegments; i++) {
+            float angle = (float) (i * Math.PI * 2.0 / ringSegments);
+            float radius = 5.6F;
+            float rx = (float) Math.cos(angle) * radius;
+            float rz = (float) Math.sin(angle) * radius;
+            blades.addOrReplaceChild("ring_seg_" + i,
+                    CubeListBuilder.create()
+                            .texOffs(0, 32).addBox(-1.6F, -0.7F, -0.9F, 3.2F, 1.4F, 1.8F),
+                    PartPose.offsetAndRotation(rx, 0.0F, rz, 0.0F, -angle + (float) (Math.PI / 2.0), 0.0F));
+        }
+
+        // 4 Smoothly Curved, Tapered Shuriken Blades (4 articulated segments per blade)
+        for (int b = 0; b < 4; b++) {
+            float yaw = (float) (b * Math.PI / 2.0);
+            PartDefinition bladeRoot = blades.addOrReplaceChild("blade_" + b,
+                    CubeListBuilder.create()
+                            .texOffs(0, 46).addBox(-2.8F, -0.5F, 5.0F, 5.6F, 1.0F, 4.5F),
+                    PartPose.rotation(0.0F, yaw, 0.08F));
+            PartDefinition seg1 = bladeRoot.addOrReplaceChild("bseg_1_" + b,
+                    CubeListBuilder.create()
+                            .texOffs(0, 46).addBox(-2.4F, -0.45F, 0.0F, 4.8F, 0.9F, 4.5F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, 9.2F, 0.0F, 0.16F, 0.0F));
+            PartDefinition seg2 = seg1.addOrReplaceChild("bseg_2_" + b,
+                    CubeListBuilder.create()
+                            .texOffs(24, 16).addBox(-1.8F, -0.4F, 0.0F, 3.6F, 0.8F, 4.2F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, 4.2F, 0.0F, 0.20F, 0.0F));
+            seg2.addOrReplaceChild("bseg_3_" + b,
+                    CubeListBuilder.create()
+                            .texOffs(34, 46).addBox(-0.9F, -0.35F, 0.0F, 1.8F, 0.7F, 4.0F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, 3.9F, 0.0F, 0.24F, 0.0F));
+        }
 
         return LayerDefinition.create(mesh, 64, 64);
     }

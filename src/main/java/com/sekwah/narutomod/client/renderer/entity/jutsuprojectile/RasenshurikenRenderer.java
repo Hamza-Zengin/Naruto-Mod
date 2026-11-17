@@ -2,9 +2,11 @@ package com.sekwah.narutomod.client.renderer.entity.jutsuprojectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.sekwah.narutomod.NarutoMod;
+import com.sekwah.narutomod.client.model.jutsu.RasenganSphereModel;
 import com.sekwah.narutomod.client.model.jutsu.RasenshurikenModel;
 import com.sekwah.narutomod.client.renderer.NarutoRenderEvents;
 import com.sekwah.narutomod.entity.jutsuprojectile.RasenshurikenEntity;
+import com.sekwah.sekclib.util.RenderMathUtil;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -54,6 +56,16 @@ public class RasenshurikenRenderer extends EntityRenderer<RasenshurikenEntity, R
         poseStack.pushPose();
         poseStack.translate(0.0D, 0.35D, 0.0D);
         poseStack.scale(state.scale, state.scale, state.scale);
+
+        // Smooth procedural glowing Rasengan sphere core at the shuriken center
+        submitNodeCollector.submitCustomGeometry(poseStack, RENDER_TYPE, (pose, consumer) -> {
+            PoseStack local = new PoseStack();
+            local.last().set(pose);
+            RasenganSphereModel.renderSmoothSphere(
+                    local, consumer, 0.28F, 18, 28, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                    0.75F, 0.96F, 1.0F, 0.80F
+            );
+        });
 
         int color = ARGB.colorFromFloat(0.88F, 1.0F, 1.0F, 1.0F);
         submitNodeCollector.submitModel(

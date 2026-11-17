@@ -29,42 +29,64 @@ public class FireballJutsuModel extends Model<EntityRenderState> {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
 
-        // 1. Incandescent White-Yellow Inner Core
-        root.addOrReplaceChild("inner_core",
+        // 1. Multi-angle Chamfered Incandescent Inner Core
+        PartDefinition innerCore = root.addOrReplaceChild("inner_core",
                 CubeListBuilder.create()
-                        .texOffs(0, 0)
-                        .addBox(-5.0F, -5.0F, -5.0F, 10, 10, 10)
-                        .texOffs(40, 0)
-                        .addBox(-6.0F, -4.0F, -4.0F, 12, 8, 8)
-                        .texOffs(80, 0)
-                        .addBox(-4.0F, -6.0F, -4.0F, 8, 12, 8),
+                        .texOffs(0, 0).addBox(-4.5F, -4.5F, -4.5F, 9, 9, 9),
                 PartPose.ZERO);
+        innerCore.addOrReplaceChild("inner_rot_y",
+                CubeListBuilder.create().texOffs(40, 0).addBox(-4.5F, -3.5F, -4.5F, 9, 7, 9),
+                PartPose.rotation(0.0F, 0.7854F, 0.0F));
+        innerCore.addOrReplaceChild("inner_rot_x",
+                CubeListBuilder.create().texOffs(80, 0).addBox(-3.5F, -4.5F, -4.5F, 7, 9, 9),
+                PartPose.rotation(0.7854F, 0.0F, 0.0F));
+        innerCore.addOrReplaceChild("inner_rot_z",
+                CubeListBuilder.create().texOffs(40, 0).addBox(-4.5F, -4.5F, -3.5F, 9, 9, 7),
+                PartPose.rotation(0.0F, 0.0F, 0.7854F));
 
-        // 2. Roiling Orange-Crimson Outer Fireball Sphere
-        root.addOrReplaceChild("outer_sphere",
+        // 2. Multi-angled Geodesic-Style Roiling Outer Fireball Sphere
+        PartDefinition outerSphere = root.addOrReplaceChild("outer_sphere",
                 CubeListBuilder.create()
-                        .texOffs(0, 20)
-                        .addBox(-8.0F, -8.0F, -8.0F, 16, 16, 16)
-                        .texOffs(64, 20)
-                        .addBox(-9.5F, -6.5F, -6.5F, 19, 13, 13)
-                        .texOffs(0, 52)
-                        .addBox(-6.5F, -9.5F, -6.5F, 13, 19, 13)
-                        .texOffs(52, 52)
-                        .addBox(-6.5F, -6.5F, -9.5F, 13, 13, 19),
+                        .texOffs(0, 20).addBox(-7.5F, -7.5F, -7.5F, 15, 15, 15),
                 PartPose.ZERO);
+        outerSphere.addOrReplaceChild("outer_rot_y",
+                CubeListBuilder.create().texOffs(64, 20).addBox(-7.5F, -6.0F, -7.5F, 15, 12, 15),
+                PartPose.rotation(0.0F, 0.7854F, 0.0F));
+        outerSphere.addOrReplaceChild("outer_rot_x",
+                CubeListBuilder.create().texOffs(0, 52).addBox(-6.0F, -7.5F, -7.5F, 12, 15, 15),
+                PartPose.rotation(0.7854F, 0.0F, 0.0F));
+        outerSphere.addOrReplaceChild("outer_rot_z",
+                CubeListBuilder.create().texOffs(52, 52).addBox(-7.5F, -7.5F, -6.0F, 15, 15, 12),
+                PartPose.rotation(0.0F, 0.0F, 0.7854F));
+        outerSphere.addOrReplaceChild("outer_diag_a",
+                CubeListBuilder.create().texOffs(64, 20).addBox(-7.0F, -7.0F, -7.0F, 14, 14, 14),
+                PartPose.rotation(0.5236F, 0.7854F, 0.5236F));
+        outerSphere.addOrReplaceChild("outer_diag_b",
+                CubeListBuilder.create().texOffs(0, 52).addBox(-7.0F, -7.0F, -7.0F, 14, 14, 14),
+                PartPose.rotation(-0.5236F, -0.7854F, 0.5236F));
 
-        // 3. Swirling 3D Flame Corona & Solar Flare Fins
-        root.addOrReplaceChild("flame_corona",
-                CubeListBuilder.create()
-                        .texOffs(0, 84)
-                        .addBox(-11.0F, -2.0F, -11.0F, 22, 4, 22)
-                        .texOffs(0, 110)
-                        .addBox(-2.0F, -11.0F, -11.0F, 4, 22, 22)
-                        .texOffs(66, 84)
-                        .addBox(-11.0F, -11.0F, -2.0F, 22, 22, 4),
-                PartPose.ZERO);
+        // 3. Three Intersecting 12-Segment Circular Solar-Flare Corona Rings
+        PartDefinition corona = root.addOrReplaceChild("flame_corona", CubeListBuilder.create(), PartPose.ZERO);
+        addCircularCoronaRing(corona, "eq", 10.5F, 0.0F, 0.0F);
+        addCircularCoronaRing(corona, "orb_a", 10.2F, 0.65F, 0.35F);
+        addCircularCoronaRing(corona, "orb_b", 10.8F, -0.65F, -0.35F);
 
         return LayerDefinition.create(mesh, 128, 128);
+    }
+
+    private static void addCircularCoronaRing(PartDefinition parent, String prefix, float radius, float tiltX, float tiltZ) {
+        PartDefinition ring = parent.addOrReplaceChild("ring_" + prefix, CubeListBuilder.create(),
+                PartPose.rotation(tiltX, 0.0F, tiltZ));
+        int segments = 12;
+        for (int i = 0; i < segments; i++) {
+            float angle = (float) (i * Math.PI * 2.0 / segments);
+            float px = (float) Math.cos(angle) * radius;
+            float pz = (float) Math.sin(angle) * radius;
+            ring.addOrReplaceChild(prefix + "_seg_" + i,
+                    CubeListBuilder.create()
+                            .texOffs(0, 84).addBox(-2.8F, -0.9F, -1.2F, 5.6F, 1.8F, 2.4F),
+                    PartPose.offsetAndRotation(px, 0.0F, pz, 0.22F, -angle + (float) (Math.PI / 2.0), 0.14F));
+        }
     }
 
     @Override

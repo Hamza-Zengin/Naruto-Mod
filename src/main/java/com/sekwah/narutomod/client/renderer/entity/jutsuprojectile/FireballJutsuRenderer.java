@@ -2,8 +2,10 @@ package com.sekwah.narutomod.client.renderer.entity.jutsuprojectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.sekwah.narutomod.client.model.jutsu.FireballJutsuModel;
+import com.sekwah.narutomod.client.model.jutsu.RasenganSphereModel;
 import com.sekwah.narutomod.client.renderer.NarutoRenderEvents;
 import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
+import com.sekwah.sekclib.util.RenderMathUtil;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -59,6 +61,17 @@ public class FireballJutsuRenderer extends EntityRenderer<FireballJutsuEntity, F
       poseStack.pushPose();
       poseStack.translate(0.0F, state.boundingBoxHeight / 2.0F, 0.0F);
       poseStack.scale(state.scale, state.scale, state.scale);
+
+      // Smooth spherical inner fire glow for silhouette continuity
+      submitNodeCollector.submitCustomGeometry(poseStack, RENDER_TYPE, (pose, consumer) -> {
+         PoseStack local = new PoseStack();
+         local.last().set(pose);
+         RasenganSphereModel.renderSmoothSphere(
+                 local, consumer, 0.42F, 18, 26, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                 1.0F, 0.72F, 0.25F, state.alpha * 0.55F
+         );
+      });
+
       int color = ARGB.colorFromFloat(state.alpha, 1.0F, 1.0F, 1.0F);
       submitNodeCollector.submitModel(
               this.model,

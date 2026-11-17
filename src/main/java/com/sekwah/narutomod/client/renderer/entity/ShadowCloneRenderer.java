@@ -3,6 +3,7 @@ package com.sekwah.narutomod.client.renderer.entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
 import com.sekwah.narutomod.client.renderer.NarutoRenderEvents;
+import com.sekwah.narutomod.client.renderer.entity.layers.JutsuHandAuraLayer;
 import com.sekwah.narutomod.client.renderer.entity.layers.SharinganEyesLayer;
 import com.sekwah.narutomod.client.renderer.entity.layers.SusanooRibcageLayer;
 import com.sekwah.narutomod.entity.ShadowCloneEntity;
@@ -29,7 +30,7 @@ import java.util.UUID;
 
 /**
  * Renders Shadow Clones with the owner player's custom skin, Steve (wide) or Alex (slim) model,
- * and equipped armor, held items, Sharingan/Byakugan eyes, and Susanoo ribcage.
+ * and equipped armor, held items, Sharingan/Byakugan eyes, Susanoo ribcage, and hand/aura effects.
  */
 public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, AvatarRenderState, PlayerModel> {
 
@@ -48,6 +49,7 @@ public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, 
         ));
         this.addLayer(new SharinganEyesLayer(this));
         this.addLayer(new SusanooRibcageLayer(this, context.getModelSet()));
+        this.addLayer(new JutsuHandAuraLayer(this, context.getModelSet()));
     }
 
     @Override
@@ -57,6 +59,9 @@ public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, 
 
     @Override
     public void extractRenderState(ShadowCloneEntity entity, AvatarRenderState state, float partialTick) {
+        if (entity == null || state == null) {
+            return;
+        }
         super.extractRenderState(entity, state, partialTick);
         state.skin = resolveSkin(entity);
 
@@ -64,41 +69,66 @@ public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, 
         boolean byakugan = entity.hasActiveAbility("byakugan");
         Identifier eyeTexture = null;
         if (sharingan) {
-            int stageIdx = Math.max(0, Math.min(3, entity.getSharinganStage() - 1));
-            eyeTexture = SharinganAbility.SharinganStage.values()[stageIdx].getTexture();
+            SharinganAbility.SharinganStage[] stages = SharinganAbility.SharinganStage.values();
+            int stageIdx = Math.max(0, Math.min(stages.length - 1, entity.getSharinganStage() - 1));
+            eyeTexture = stages[stageIdx].getTexture();
         }
         boolean susanoo = entity.hasActiveAbility("susanoo_ribcage");
+        String activeHandJutsu = entity.getActiveHandJutsu();
+        boolean hasEightGatesDeath = entity.hasActiveAbility("eight_gates_death") || entity.getHachimonGate() >= 8;
+        boolean hasEightGates = entity.hasActiveAbility("eight_gates") || hasEightGatesDeath || entity.getHachimonGate() > 0;
+        boolean hasWaterWalk = entity.hasActiveAbility("water_walk");
 
         state.setRenderData(
                 NarutoRenderEvents.NINJA_RENDER_DATA_KEY,
-                new NarutoRenderEvents.NinjaRenderStateData(susanoo, sharingan, eyeTexture, byakugan, "", false, false, false)
+                new NarutoRenderEvents.NinjaRenderStateData(
+                        susanoo,
+                        sharingan,
+                        eyeTexture,
+                        byakugan,
+                        activeHandJutsu != null ? activeHandJutsu : "",
+                        hasEightGates,
+                        hasEightGatesDeath,
+                        hasWaterWalk
+                )
         );
     }
 
     private PlayerSkin resolveSkin(ShadowCloneEntity entity) {
+        if (entity == null) {
+            return DefaultPlayerSkin.getDefaultSkin();
+        }
         UUID ownerUUID = entity.getOwnerUUID();
         if (ownerUUID != null) {
-            Player p = entity.level().getPlayerByUUID(ownerUUID);
-            if (p instanceof ClientAvatarEntity avatar) {
-                return avatar.getSkin();
+            if (entity.level() != null) {
+                Player p = entity.level().getPlayerByUUID(ownerUUID);
+                if (p instanceof ClientAvatarEntity avatar && avatar.getSkin() != null) {
+                    return avatar.getSkin();
+                }
             }
-            if (Minecraft.getInstance().getConnection() != null) {
-                PlayerInfo info = Minecraft.getInstance().getConnection().getPlayerInfo(ownerUUID);
-                if (info != null) {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc != null && mc.getConnection() != null) {
+                PlayerInfo info = mc.getConnection().getPlayerInfo(ownerUUID);
+                if (info != null && info.getSkin() != null) {
                     return info.getSkin();
                 }
             }
             PlayerSkin defaultSkin = DefaultPlayerSkin.get(ownerUUID);
-            if (entity.isSlim() && defaultSkin.model() != PlayerModelType.SLIM) {
+            if (defaultSkin != null && entity.isSlim() && defaultSkin.model() != PlayerModelType.SLIM) {
                 return new PlayerSkin(defaultSkin.body(), defaultSkin.cape(), defaultSkin.elytra(), PlayerModelType.SLIM, defaultSkin.secure());
             }
-            return defaultSkin;
+            if (defaultSkin != null) {
+                return defaultSkin;
+            }
         }
         return DefaultPlayerSkin.getDefaultSkin();
     }
 
     @Override
     public void submit(AvatarRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
+        if (state == null) {
+            return;
+        }
         boolean isSlim = state.skin != null && state.skin.model() == PlayerModelType.SLIM;
         this.model = isSlim ? this.slimModel : this.defaultModel;
         super.submit(state, poseStack, submitNodeCollector, cameraRenderState);
@@ -106,7 +136,10 @@ public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, 
 
     @Override
     public Identifier getTextureLocation(AvatarRenderState state) {
-        PlayerSkin skin = state.skin != null ? state.skin : DefaultPlayerSkin.getDefaultSkin();
+        PlayerSkin skin = (state != null && state.skin != null) ? state.skin : DefaultPlayerSkin.getDefaultSkin();
+        if (skin == null || skin.body() == null || skin.body().texturePath() == null) {
+            return DefaultPlayerSkin.getDefaultSkin().body().texturePath();
+        }
         return skin.body().texturePath();
     }
 }

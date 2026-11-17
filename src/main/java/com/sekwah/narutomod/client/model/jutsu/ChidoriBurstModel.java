@@ -28,10 +28,20 @@ public class ChidoriBurstModel extends Model<JutsuVisualModels.VisualState> {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
 
-        root.addOrReplaceChild("core",
+        // Multi-angle Chamfered Plasma Orb Core (eliminates sharp cube corners)
+        PartDefinition core = root.addOrReplaceChild("core",
                 CubeListBuilder.create()
-                        .texOffs(0, 0).addBox(-2.5F, -2.5F, -2.5F, 5, 5, 5),
+                        .texOffs(0, 0).addBox(-2.0F, -2.0F, -2.0F, 4, 4, 4),
                 PartPose.ZERO);
+        core.addOrReplaceChild("core_rot_y",
+                CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -1.6F, -2.0F, 4, 3.2F, 4),
+                PartPose.rotation(0.0F, 0.7854F, 0.0F));
+        core.addOrReplaceChild("core_rot_x",
+                CubeListBuilder.create().texOffs(0, 0).addBox(-1.6F, -2.0F, -2.0F, 3.2F, 4, 4),
+                PartPose.rotation(0.7854F, 0.0F, 0.0F));
+        core.addOrReplaceChild("core_rot_diag",
+                CubeListBuilder.create().texOffs(0, 0).addBox(-1.9F, -1.9F, -1.9F, 3.8F, 3.8F, 3.8F),
+                PartPose.rotation(0.5236F, 0.7854F, 0.5236F));
 
         for (int i = 0; i < 14; i++) {
             float baseRx = (i * 0.85F);
@@ -42,17 +52,23 @@ public class ChidoriBurstModel extends Model<JutsuVisualModels.VisualState> {
                     PartPose.rotation(baseRx, baseRy, baseRz));
 
             PartDefinition seg0 = arc.addOrReplaceChild("seg_0",
-                    CubeListBuilder.create().texOffs(0, 16).addBox(-0.4F, -0.4F, 0.0F, 0.8F, 0.8F, 3.5F),
-                    PartPose.offsetAndRotation(0.0F, 0.0F, 1.5F, 0.25F, 0.30F, 0.0F));
+                    CubeListBuilder.create().texOffs(0, 16).addBox(-0.32F, -0.32F, 0.0F, 0.64F, 0.64F, 2.8F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, 1.3F, 0.22F, 0.28F, 0.0F));
             PartDefinition seg1 = seg0.addOrReplaceChild("seg_1",
-                    CubeListBuilder.create().texOffs(0, 16).addBox(-0.35F, -0.35F, 0.0F, 0.7F, 0.7F, 3.5F),
-                    PartPose.offsetAndRotation(0.0F, 0.0F, 3.3F, -0.45F, -0.55F, 0.15F));
+                    CubeListBuilder.create().texOffs(0, 16).addBox(-0.28F, -0.28F, 0.0F, 0.56F, 0.56F, 2.8F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, 2.6F, -0.38F, -0.45F, 0.14F));
+            seg1.addOrReplaceChild("fork_0",
+                    CubeListBuilder.create().texOffs(0, 16).addBox(-0.18F, -0.18F, 0.0F, 0.36F, 0.36F, 2.0F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, 1.4F, 0.55F, 0.50F, 0.0F));
             PartDefinition seg2 = seg1.addOrReplaceChild("seg_2",
-                    CubeListBuilder.create().texOffs(0, 16).addBox(-0.3F, -0.3F, 0.0F, 0.6F, 0.6F, 3.2F),
-                    PartPose.offsetAndRotation(0.0F, 0.0F, 3.3F, 0.50F, 0.45F, -0.20F));
-            seg2.addOrReplaceChild("seg_3",
-                    CubeListBuilder.create().texOffs(0, 16).addBox(-0.2F, -0.2F, 0.0F, 0.4F, 0.4F, 2.8F),
-                    PartPose.offsetAndRotation(0.0F, 0.0F, 3.0F, -0.35F, -0.40F, 0.10F));
+                    CubeListBuilder.create().texOffs(0, 16).addBox(-0.24F, -0.24F, 0.0F, 0.48F, 0.48F, 2.6F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, 2.6F, 0.42F, 0.38F, -0.18F));
+            PartDefinition seg3 = seg2.addOrReplaceChild("seg_3",
+                    CubeListBuilder.create().texOffs(0, 16).addBox(-0.18F, -0.18F, 0.0F, 0.36F, 0.36F, 2.4F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, 2.4F, -0.32F, -0.34F, 0.12F));
+            seg3.addOrReplaceChild("seg_4",
+                    CubeListBuilder.create().texOffs(0, 16).addBox(-0.12F, -0.12F, 0.0F, 0.24F, 0.24F, 1.8F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, 2.2F, 0.26F, 0.30F, -0.10F));
         }
 
         return LayerDefinition.create(mesh, 64, 64);

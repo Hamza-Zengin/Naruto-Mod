@@ -216,6 +216,7 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
             decoy.setOwner(player);
             decoy.setMaxLifespan(40); // 2 seconds decoy
             decoy.setDecoyMode(true);
+            decoy.copyActiveAbilitiesFrom(player, ninjaData);
             serverLevel.addFreshEntity(decoy);
 
             // Redirect nearby hostile mobs targeting the player onto the decoy

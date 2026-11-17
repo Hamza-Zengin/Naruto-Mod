@@ -26,16 +26,6 @@ public class FireballJutsuAbility extends Ability implements Ability.Cooldown {
         return 121;
     }
 
-    /**
-     * Canon hand seals: Yılan (Snake - 6) - Koyun (Ram - 8) - Maymun (Monkey - 9) - Domuz (Boar - 12) - At (Horse - 7) - Kaplan (Tiger - 3)
-     */
-    public static final byte[] FIREBALL_CANON_SEALS = new byte[]{6, 8, 9, 12, 7, 3};
-
-    @Override
-    public byte[] getExpectedSeals() {
-        return FIREBALL_CANON_SEALS;
-    }
-
     @Override
     public float getDefaultChakraCost() {
         return 30.0f;

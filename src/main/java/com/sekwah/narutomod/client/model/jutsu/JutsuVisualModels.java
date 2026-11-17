@@ -38,60 +38,91 @@ public class JutsuVisualModels {
             MeshDefinition mesh = new MeshDefinition();
             PartDefinition root = mesh.getRoot();
 
-            // Roaring 3D Lightning Dragon Head
+            // Roaring 3D Sculpted Lightning Dragon Head
             PartDefinition head = root.addOrReplaceChild("dragon_head",
                     CubeListBuilder.create()
-                            // Main Dragon Cranium
-                            .texOffs(0, 0).addBox(-6.0F, -6.0F, -10.0F, 12, 9, 12)
-                            // Upper Snout & Fangs
-                            .texOffs(0, 21).addBox(-4.5F, -3.0F, -20.0F, 9, 5, 10)
-                            .texOffs(38, 21).addBox(-4.0F, 2.0F, -19.0F, 2, 3, 2)
-                            .texOffs(38, 21).addBox(2.0F, 2.0F, -19.0F, 2, 3, 2),
+                            .texOffs(0, 0).addBox(-5.2F, -5.2F, -10.0F, 10.4F, 7.8F, 11.5F)
+                            .texOffs(0, 21).addBox(-3.8F, -2.8F, -18.5F, 7.6F, 4.4F, 9.0F)
+                            .texOffs(0, 21).addBox(-2.8F, -2.0F, -21.5F, 5.6F, 3.5F, 3.5F)
+                            .texOffs(38, 21).addBox(-3.2F, 1.4F, -19.0F, 1.6F, 2.6F, 1.6F)
+                            .texOffs(38, 21).addBox(1.6F, 1.4F, -19.0F, 1.6F, 2.6F, 1.6F),
                     PartPose.offset(0.0F, -18.0F, 0.0F));
 
-            // Roaring Lower Jaw
-            head.addOrReplaceChild("lower_jaw",
+            head.addOrReplaceChild("cranium_bevel",
+                    CubeListBuilder.create().texOffs(0, 0).addBox(-4.4F, -5.6F, -8.5F, 8.8F, 2.0F, 9.5F),
+                    PartPose.rotation(-0.18F, 0.0F, 0.0F));
+            head.addOrReplaceChild("brow_left",
+                    CubeListBuilder.create().texOffs(0, 21).addBox(-1.2F, -1.2F, -6.0F, 2.4F, 2.0F, 7.0F),
+                    PartPose.offsetAndRotation(4.6F, -4.2F, -4.5F, -0.15F, 0.25F, -0.35F));
+            head.addOrReplaceChild("brow_right",
+                    CubeListBuilder.create().texOffs(0, 21).addBox(-1.2F, -1.2F, -6.0F, 2.4F, 2.0F, 7.0F),
+                    PartPose.offsetAndRotation(-4.6F, -4.2F, -4.5F, -0.15F, -0.25F, 0.35F));
+
+            // Tapered Roaring Lower Jaw
+            PartDefinition jaw = head.addOrReplaceChild("lower_jaw",
                     CubeListBuilder.create()
-                            .texOffs(0, 36).addBox(-4.0F, 0.0F, -10.0F, 8, 3, 10),
+                            .texOffs(0, 36).addBox(-3.6F, 0.0F, -7.5F, 7.2F, 2.6F, 8.0F),
                     PartPose.offsetAndRotation(0.0F, 2.0F, -9.0F, 0.48F, 0.0F, 0.0F));
+            jaw.addOrReplaceChild("jaw_tip",
+                    CubeListBuilder.create().texOffs(0, 36).addBox(-2.4F, 0.0F, -4.5F, 4.8F, 2.0F, 5.0F),
+                    PartPose.offsetAndRotation(0.0F, 0.2F, -7.0F, -0.10F, 0.0F, 0.0F));
 
-            // Forked Swept-Back Lightning Horns
-            head.addOrReplaceChild("horn_left",
-                    CubeListBuilder.create()
-                            .texOffs(36, 0).addBox(-1.5F, -2.0F, 0.0F, 3, 3, 16)
-                            .texOffs(36, 0).addBox(-1.0F, 0.5F, 8.0F, 2, 2, 10),
-                    PartPose.offsetAndRotation(4.5F, -5.0F, -2.0F, 0.45F, 0.32F, 0.0F));
-            head.addOrReplaceChild("horn_right",
-                    CubeListBuilder.create()
-                            .texOffs(36, 0).addBox(-1.5F, -2.0F, 0.0F, 3, 3, 16)
-                            .texOffs(36, 0).addBox(-1.0F, 0.5F, 8.0F, 2, 2, 10),
-                    PartPose.offsetAndRotation(-4.5F, -5.0F, -2.0F, 0.45F, -0.32F, 0.0F));
+            // Articulated 3-Segment Swept-Back Curved Lightning Horns
+            addKirinHorn(head, "horn_left", 4.4F, 1.0F);
+            addKirinHorn(head, "horn_right", -4.4F, -1.0F);
 
-            // Serpentine Coiled Lightning Body Segments ascending to the heavens
+            // 10 Tapered, Octagonally Beveled Serpentine Lightning Body Segments
             PartDefinition body = root.addOrReplaceChild("dragon_body", CubeListBuilder.create(), PartPose.ZERO);
-            for (int i = 0; i < 6; i++) {
-                float segY = -28.0F - (i * 15.0F);
-                float offsetX = Mth.sin(i * 1.1F) * 5.0F;
-                float offsetZ = Mth.cos(i * 1.1F) * 5.0F;
-                body.addOrReplaceChild("seg_" + i,
+            for (int i = 0; i < 10; i++) {
+                float segY = -24.0F - (i * 9.0F);
+                float spiralRadius = 4.6F + Mth.sin(i * 0.45F) * 1.4F;
+                float offsetX = Mth.sin(i * 0.72F) * spiralRadius;
+                float offsetZ = Mth.cos(i * 0.72F) * spiralRadius;
+                float width = Math.max(4.4F, 8.8F - i * 0.42F);
+                float halfW = width * 0.5F;
+                PartDefinition seg = body.addOrReplaceChild("seg_" + i,
                         CubeListBuilder.create()
-                                .texOffs(0, 49).addBox(-4.5F, -8.0F, -4.5F, 9, 16, 9)
-                                // Dorsal Lightning Fin
-                                .texOffs(38, 36).addBox(-1.0F, -7.0F, 4.5F, 2, 14, 5),
-                        PartPose.offsetAndRotation(offsetX, segY, offsetZ, 0.18F, i * 0.55F, 0.12F));
+                                .texOffs(0, 49).addBox(-halfW, -5.5F, -halfW, width, 11.0F, width)
+                                .texOffs(38, 36).addBox(-0.8F, -5.0F, halfW, 1.6F, 10.0F, 4.2F),
+                        PartPose.offsetAndRotation(offsetX, segY, offsetZ, 0.14F, i * 0.38F, 0.10F));
+                seg.addOrReplaceChild("seg_bevel_" + i,
+                        CubeListBuilder.create().texOffs(0, 49).addBox(-halfW * 0.92F, -5.3F, -halfW * 0.92F, width * 0.92F, 10.6F, width * 0.92F),
+                        PartPose.rotation(0.0F, 0.7854F, 0.0F));
             }
 
-            // Ground Impact Lightning Shockwave Rings
-            root.addOrReplaceChild("shock_ring_inner",
-                    CubeListBuilder.create()
-                            .texOffs(0, 74).addBox(-14.0F, -3.0F, -14.0F, 28, 3, 28),
-                    PartPose.ZERO);
-            root.addOrReplaceChild("shock_ring_outer",
-                    CubeListBuilder.create()
-                            .texOffs(0, 74).addBox(-22.0F, -2.0F, -22.0F, 44, 2, 44),
-                    PartPose.ZERO);
+            // 16-Segment Circular Ground Impact Shockwave Rings
+            PartDefinition innerRing = root.addOrReplaceChild("shock_ring_inner", CubeListBuilder.create(), PartPose.ZERO);
+            addCircularKirinRing(innerRing, "in", 13.5F, 5.6F, 2.2F, 2.8F, 0.18F);
+
+            PartDefinition outerRing = root.addOrReplaceChild("shock_ring_outer", CubeListBuilder.create(), PartPose.ZERO);
+            addCircularKirinRing(outerRing, "out", 21.0F, 8.6F, 1.6F, 3.0F, -0.14F);
 
             return LayerDefinition.create(mesh, 128, 128);
+        }
+
+        private static void addKirinHorn(PartDefinition head, String name, float offsetX, float dirSign) {
+            PartDefinition h0 = head.addOrReplaceChild(name,
+                    CubeListBuilder.create().texOffs(36, 0).addBox(-1.3F, -1.4F, 0.0F, 2.6F, 2.6F, 7.0F),
+                    PartPose.offsetAndRotation(offsetX, -4.8F, -2.0F, 0.36F, dirSign * 0.28F, 0.0F));
+            PartDefinition h1 = h0.addOrReplaceChild(name + "_mid",
+                    CubeListBuilder.create().texOffs(36, 0).addBox(-1.0F, -1.1F, 0.0F, 2.0F, 2.2F, 6.5F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, 6.6F, 0.18F, dirSign * -0.12F, 0.0F));
+            h1.addOrReplaceChild(name + "_tip",
+                    CubeListBuilder.create().texOffs(36, 0).addBox(-0.65F, -0.75F, 0.0F, 1.3F, 1.5F, 6.0F),
+                    PartPose.offsetAndRotation(0.0F, 0.0F, 6.2F, 0.22F, dirSign * -0.15F, 0.0F));
+        }
+
+        private static void addCircularKirinRing(PartDefinition parent, String prefix, float radius,
+                                                 float segLen, float segHeight, float segThick, float tiltX) {
+            int segments = 16;
+            for (int i = 0; i < segments; i++) {
+                float angle = (float) (i * Math.PI * 2.0 / segments);
+                float px = Mth.cos(angle) * radius;
+                float pz = Mth.sin(angle) * radius;
+                parent.addOrReplaceChild(prefix + "_ring_" + i,
+                        CubeListBuilder.create().texOffs(0, 74).addBox(-segLen * 0.5F, -segHeight, -segThick * 0.5F, segLen, segHeight, segThick),
+                        PartPose.offsetAndRotation(px, 0.0F, pz, tiltX, -angle + (float) (Math.PI / 2.0), 0.0F));
+            }
         }
 
         @Override
@@ -136,34 +167,60 @@ public class JutsuVisualModels {
                 float px = Mth.cos(angle) * radius;
                 float pz = Mth.sin(angle) * radius;
 
+                // Lower gnarled octagonal trunk + splayed root buttresses
                 PartDefinition pillar = pillars.addOrReplaceChild("pillar_" + i,
                         CubeListBuilder.create()
-                                // Lower gnarled trunk
-                                .texOffs(0, 0).addBox(-2.5F, -18.0F, -2.5F, 5, 18, 5),
+                                .texOffs(0, 0).addBox(-2.2F, -18.0F, -2.2F, 4.4F, 18.0F, 4.4F),
                         PartPose.offsetAndRotation(px, 0.0F, pz, 0.0F, -angle + (float) (Math.PI / 2.0), 0.0F));
+                pillar.addOrReplaceChild("pillar_oct_" + i,
+                        CubeListBuilder.create().texOffs(0, 0).addBox(-2.1F, -17.6F, -2.1F, 4.2F, 17.6F, 4.2F),
+                        PartPose.rotation(0.0F, 0.7854F, 0.0F));
+                pillar.addOrReplaceChild("root_flare_l_" + i,
+                        CubeListBuilder.create().texOffs(0, 0).addBox(-1.2F, -7.0F, -1.2F, 2.4F, 8.0F, 2.4F),
+                        PartPose.offsetAndRotation(1.6F, 0.0F, 0.8F, 0.35F, 0.4F, -0.35F));
+                pillar.addOrReplaceChild("root_flare_r_" + i,
+                        CubeListBuilder.create().texOffs(0, 0).addBox(-1.2F, -7.0F, -1.2F, 2.4F, 8.0F, 2.4F),
+                        PartPose.offsetAndRotation(-1.6F, 0.0F, 0.8F, 0.35F, -0.4F, 0.35F));
 
-                // Middle trunk curving inward toward target center
+                // Middle octagonal trunk curving smoothly inward toward center
                 PartDefinition mid = pillar.addOrReplaceChild("mid_" + i,
                         CubeListBuilder.create()
-                                .texOffs(20, 0).addBox(-2.0F, -16.0F, -2.0F, 4, 16, 4),
+                                .texOffs(20, 0).addBox(-1.75F, -16.0F, -1.75F, 3.5F, 16.0F, 3.5F),
                         PartPose.offsetAndRotation(0.0F, -17.0F, 0.0F, 0.35F, 0.0F, 0.0F));
+                mid.addOrReplaceChild("mid_oct_" + i,
+                        CubeListBuilder.create().texOffs(20, 0).addBox(-1.65F, -15.6F, -1.65F, 3.3F, 15.6F, 3.3F),
+                        PartPose.rotation(0.0F, 0.7854F, 0.0F));
 
-                // Upper canopy arch interlocking overhead + emerald leaf cluster
-                mid.addOrReplaceChild("top_" + i,
+                // Upper canopy arch interlocking overhead + multi-angled chamfered emerald foliage
+                PartDefinition top = mid.addOrReplaceChild("top_" + i,
                         CubeListBuilder.create()
-                                .texOffs(36, 0).addBox(-1.5F, -14.0F, -1.5F, 3, 14, 3)
-                                .texOffs(0, 38).addBox(-4.5F, -12.0F, -4.5F, 9, 6, 9),
+                                .texOffs(36, 0).addBox(-1.3F, -14.0F, -1.3F, 2.6F, 14.0F, 2.6F)
+                                .texOffs(0, 38).addBox(-4.0F, -12.0F, -4.0F, 8.0F, 5.5F, 8.0F),
                         PartPose.offsetAndRotation(0.0F, -15.0F, 0.0F, 0.55F, 0.0F, 0.0F));
+                top.addOrReplaceChild("canopy_rot_" + i,
+                        CubeListBuilder.create().texOffs(0, 38).addBox(-3.8F, -11.5F, -3.8F, 7.6F, 5.0F, 7.6F),
+                        PartPose.rotation(0.25F, 0.7854F, 0.18F));
             }
 
-            // Horizontal constricting root-vine bands
-            root.addOrReplaceChild("vine_rings",
-                    CubeListBuilder.create()
-                            .texOffs(0, 23).addBox(-18.0F, -12.0F, -18.0F, 36, 3, 36)
-                            .texOffs(0, 23).addBox(-15.0F, -24.0F, -15.0F, 30, 3, 30),
-                    PartPose.ZERO);
+            // Two 12-Segment Circular Constricting Root-Vine Rings
+            PartDefinition vineRings = root.addOrReplaceChild("vine_rings", CubeListBuilder.create(), PartPose.ZERO);
+            addCircularVineRing(vineRings, "low", 18.5F, -11.0F, 0.08F);
+            addCircularVineRing(vineRings, "high", 15.0F, -23.0F, -0.08F);
 
             return LayerDefinition.create(mesh, 128, 64);
+        }
+
+        private static void addCircularVineRing(PartDefinition parent, String prefix, float radius, float y, float tilt) {
+            int segments = 12;
+            float segWidth = (radius * 2.0F * 3.14159F / segments) + 0.8F;
+            for (int i = 0; i < segments; i++) {
+                float angle = (float) (i * Math.PI * 2.0 / segments);
+                float vx = Mth.cos(angle) * radius;
+                float vz = Mth.sin(angle) * radius;
+                parent.addOrReplaceChild(prefix + "_vine_" + i,
+                        CubeListBuilder.create().texOffs(0, 23).addBox(-segWidth * 0.5F, -1.3F, -1.1F, segWidth, 2.6F, 2.2F),
+                        PartPose.offsetAndRotation(vx, y, vz, tilt, -angle + (float) (Math.PI / 2.0), 0.05F));
+            }
         }
 
         @Override
@@ -218,17 +275,25 @@ public class JutsuVisualModels {
                 float sx = Mth.cos(angle) * radius;
                 float sz = Mth.sin(angle) * radius;
 
-                parent.addOrReplaceChild(prefix + "_spike_" + i,
+                // Smooth octagonal-tapered bone spire
+                PartDefinition spike = parent.addOrReplaceChild(prefix + "_spike_" + i,
                         CubeListBuilder.create()
-                                // Thick calcified base shaft
-                                .texOffs(0, 0).addBox(-2.5F, -14.0F, -2.5F, 5, 16, 5)
-                                // Mid bone spire
-                                .texOffs(20, 0).addBox(-1.8F, -28.0F, -1.8F, 4, 15, 4)
-                                // Razor-sharp osteoblast tip
-                                .texOffs(36, 0).addBox(-1.0F, -40.0F, -1.0F, 2, 13, 2)
-                                // Protruding lateral bone barbs
-                                .texOffs(0, 22).addBox(-4.5F, -20.0F, -1.0F, 9, 3, 2),
+                                .texOffs(0, 0).addBox(-2.2F, -14.0F, -2.2F, 4.4F, 16.0F, 4.4F)
+                                .texOffs(20, 0).addBox(-1.6F, -27.5F, -1.6F, 3.2F, 14.5F, 3.2F)
+                                .texOffs(36, 0).addBox(-0.9F, -40.0F, -0.9F, 1.8F, 13.0F, 1.8F),
                         PartPose.offsetAndRotation(sx, 2.0F, sz, -tilt, -angle - (float) (Math.PI / 2.0), 0.0F));
+                spike.addOrReplaceChild(prefix + "_oct_" + i,
+                        CubeListBuilder.create()
+                                .texOffs(0, 0).addBox(-2.1F, -13.6F, -2.1F, 4.2F, 15.5F, 4.2F)
+                                .texOffs(20, 0).addBox(-1.5F, -27.0F, -1.5F, 3.0F, 14.0F, 3.0F)
+                                .texOffs(36, 0).addBox(-0.85F, -39.5F, -0.85F, 1.7F, 12.5F, 1.7F),
+                        PartPose.rotation(0.0F, 0.7854F, 0.0F));
+                spike.addOrReplaceChild(prefix + "_barb_l_" + i,
+                        CubeListBuilder.create().texOffs(0, 22).addBox(-3.6F, -1.0F, -0.8F, 4.2F, 2.0F, 1.6F),
+                        PartPose.offsetAndRotation(-1.0F, -19.0F, 0.0F, 0.0F, 0.0F, 0.42F));
+                spike.addOrReplaceChild(prefix + "_barb_r_" + i,
+                        CubeListBuilder.create().texOffs(0, 22).addBox(-0.6F, -1.0F, -0.8F, 4.2F, 2.0F, 1.6F),
+                        PartPose.offsetAndRotation(1.0F, -19.0F, 0.0F, 0.0F, 0.0F, -0.42F));
             }
         }
 
@@ -288,29 +353,49 @@ public class JutsuVisualModels {
             MeshDefinition mesh = new MeshDefinition();
             PartDefinition root = mesh.getRoot();
 
-            root.addOrReplaceChild("hydro_core",
+            // Chamfered & Tapered Hydro Torpedo Core
+            PartDefinition core = root.addOrReplaceChild("hydro_core",
                     CubeListBuilder.create()
-                            // Snout & Torpedo Head
-                            .texOffs(0, 0).addBox(-3.5F, -3.5F, -20.0F, 7, 7, 10)
-                            // Main Water Body
-                            .texOffs(0, 17).addBox(-5.5F, -5.5F, -10.0F, 11, 11, 18)
-                            // Dorsal Water Crest Fin
-                            .texOffs(34, 0).addBox(-1.0F, -11.0F, -6.0F, 2, 6, 10),
+                            .texOffs(0, 0).addBox(-2.2F, -2.2F, -22.0F, 4.4F, 4.4F, 5.0F)
+                            .texOffs(0, 0).addBox(-3.3F, -3.3F, -17.0F, 6.6F, 6.6F, 8.0F)
+                            .texOffs(0, 17).addBox(-4.8F, -4.8F, -9.0F, 9.6F, 9.6F, 16.0F)
+                            .texOffs(34, 0).addBox(-0.8F, -10.5F, -6.0F, 1.6F, 6.0F, 9.0F),
                     PartPose.ZERO);
+            core.addOrReplaceChild("hydro_core_rot",
+                    CubeListBuilder.create()
+                            .texOffs(0, 0).addBox(-3.2F, -3.2F, -16.5F, 6.4F, 6.4F, 7.5F)
+                            .texOffs(0, 17).addBox(-4.6F, -4.6F, -8.5F, 9.2F, 9.2F, 15.0F),
+                    PartPose.rotation(0.0F, 0.0F, 0.7854F));
 
-            root.addOrReplaceChild("vortex_fins",
-                    CubeListBuilder.create()
-                            .texOffs(0, 46).addBox(-12.0F, -1.5F, -8.0F, 24, 3, 14)
-                            .texOffs(0, 46).addBox(-1.5F, -12.0F, -8.0F, 3, 24, 14),
-                    PartPose.ZERO);
+            // 6 Pitched Helical Hydro-Vortex Turbine Fins
+            PartDefinition fins = root.addOrReplaceChild("vortex_fins", CubeListBuilder.create(), PartPose.ZERO);
+            for (int i = 0; i < 6; i++) {
+                float finAngle = (float) (i * Math.PI * 2.0 / 6.0);
+                fins.addOrReplaceChild("fin_" + i,
+                        CubeListBuilder.create()
+                                .texOffs(0, 46).addBox(2.8F, -0.7F, -7.0F, 8.5F, 1.4F, 11.0F),
+                        PartPose.rotation(0.26F, 0.0F, finAngle));
+            }
 
-            root.addOrReplaceChild("wake_rings",
-                    CubeListBuilder.create()
-                            .texOffs(0, 46).addBox(-9.0F, -9.0F, 4.0F, 18, 18, 3)
-                            .texOffs(0, 46).addBox(-12.0F, -12.0F, 11.0F, 24, 24, 3),
-                    PartPose.ZERO);
+            // Two 12-Segment Circular Hydro Wake Rings around travel axis (Z)
+            PartDefinition wakeRings = root.addOrReplaceChild("wake_rings", CubeListBuilder.create(), PartPose.ZERO);
+            addCircularZRing(wakeRings, "wake_a", 8.5F, 4.0F, 1.8F, 2.6F, 12, 0.14F, 0, 46);
+            addCircularZRing(wakeRings, "wake_b", 11.8F, 11.0F, 1.8F, 2.8F, 12, -0.14F, 0, 46);
 
             return LayerDefinition.create(mesh, 64, 64);
+        }
+
+        private static void addCircularZRing(PartDefinition parent, String prefix, float radius, float zPos,
+                                             float thick, float depth, int segments, float tiltPitch, int u, int v) {
+            float segLen = (radius * 2.0F * 3.14159F / segments) + 0.7F;
+            for (int i = 0; i < segments; i++) {
+                float angle = (float) (i * Math.PI * 2.0 / segments);
+                float px = Mth.cos(angle) * radius;
+                float py = Mth.sin(angle) * radius;
+                parent.addOrReplaceChild(prefix + "_seg_" + i,
+                        CubeListBuilder.create().texOffs(u, v).addBox(-segLen * 0.5F, -thick * 0.5F, -depth * 0.5F, segLen, thick, depth),
+                        PartPose.offsetAndRotation(px, py, zPos, tiltPitch, 0.0F, angle + (float) (Math.PI / 2.0)));
+            }
         }
 
         @Override
@@ -344,22 +429,30 @@ public class JutsuVisualModels {
             MeshDefinition mesh = new MeshDefinition();
             PartDefinition root = mesh.getRoot();
 
-            root.addOrReplaceChild("ring_front",
-                    CubeListBuilder.create()
-                            .texOffs(0, 0).addBox(-14.0F, -14.0F, -12.0F, 28, 28, 3),
-                    PartPose.ZERO);
+            // 16-Segment Circular Aerodynamic Wind-Blade Torus Rings
+            PartDefinition front = root.addOrReplaceChild("ring_front", CubeListBuilder.create(), PartPose.ZERO);
+            addWindRing(front, "wf", 13.5F, -12.0F, 2.4F, 2.8F, 16, 0.16F, 0, 0);
 
-            root.addOrReplaceChild("ring_mid",
-                    CubeListBuilder.create()
-                            .texOffs(0, 31).addBox(-10.0F, -10.0F, -2.0F, 20, 20, 4),
-                    PartPose.ZERO);
+            PartDefinition mid = root.addOrReplaceChild("ring_mid", CubeListBuilder.create(), PartPose.ZERO);
+            addWindRing(mid, "wm", 9.6F, -2.0F, 2.2F, 3.2F, 16, -0.16F, 0, 31);
 
-            root.addOrReplaceChild("ring_back",
-                    CubeListBuilder.create()
-                            .texOffs(0, 31).addBox(-6.0F, -6.0F, 8.0F, 12, 12, 4),
-                    PartPose.ZERO);
+            PartDefinition back = root.addOrReplaceChild("ring_back", CubeListBuilder.create(), PartPose.ZERO);
+            addWindRing(back, "wb", 5.8F, 8.0F, 2.0F, 3.2F, 12, 0.14F, 0, 31);
 
             return LayerDefinition.create(mesh, 64, 64);
+        }
+
+        private static void addWindRing(PartDefinition parent, String prefix, float radius, float zPos,
+                                        float radialThick, float depth, int segments, float tiltPitch, int u, int v) {
+            float segLen = (radius * 2.0F * 3.14159F / segments) + 0.6F;
+            for (int i = 0; i < segments; i++) {
+                float angle = (float) (i * Math.PI * 2.0 / segments);
+                float px = Mth.cos(angle) * radius;
+                float py = Mth.sin(angle) * radius;
+                parent.addOrReplaceChild(prefix + "_seg_" + i,
+                        CubeListBuilder.create().texOffs(u, v).addBox(-segLen * 0.5F, -radialThick * 0.5F, -depth * 0.5F, segLen, radialThick, depth),
+                        PartPose.offsetAndRotation(px, py, zPos, tiltPitch, 0.0F, angle + (float) (Math.PI / 2.0)));
+            }
         }
 
         @Override
@@ -392,21 +485,38 @@ public class JutsuVisualModels {
             MeshDefinition mesh = new MeshDefinition();
             PartDefinition root = mesh.getRoot();
 
-            root.addOrReplaceChild("inner_pillars",
+            // Multi-angle Tapered Inner Black Flame Core
+            PartDefinition inner = root.addOrReplaceChild("inner_pillars",
                     CubeListBuilder.create()
-                            .texOffs(0, 0).addBox(-3.0F, -22.0F, -3.0F, 6, 22, 6)
-                            .texOffs(24, 0).addBox(-2.0F, -26.0F, -2.0F, 4, 26, 4),
+                            .texOffs(0, 0).addBox(-2.8F, -14.0F, -2.8F, 5.6F, 14.0F, 5.6F)
+                            .texOffs(24, 0).addBox(-1.8F, -25.0F, -1.8F, 3.6F, 12.0F, 3.6F),
                     PartPose.ZERO);
+            inner.addOrReplaceChild("inner_rot_a",
+                    CubeListBuilder.create()
+                            .texOffs(0, 0).addBox(-2.6F, -15.0F, -2.6F, 5.2F, 15.0F, 5.2F)
+                            .texOffs(24, 0).addBox(-1.5F, -27.0F, -1.5F, 3.0F, 13.0F, 3.0F),
+                    PartPose.rotation(0.06F, 0.7854F, -0.06F));
+            inner.addOrReplaceChild("inner_rot_b",
+                    CubeListBuilder.create().texOffs(24, 0).addBox(-1.2F, -29.0F, -1.2F, 2.4F, 16.0F, 2.4F),
+                    PartPose.rotation(-0.08F, 0.5236F, 0.08F));
 
+            // 8 Spiraling 3-Segment Tapered Outer Flame Tongues
             PartDefinition outer = root.addOrReplaceChild("outer_pillars", CubeListBuilder.create(), PartPose.ZERO);
-            for (int i = 0; i < 5; i++) {
-                float angle = (float) (i * Math.PI * 2.0 / 5.0);
-                float rx = Mth.cos(angle) * 8.0F;
-                float rz = Mth.sin(angle) * 8.0F;
-                outer.addOrReplaceChild("flame_" + i,
+            for (int i = 0; i < 8; i++) {
+                float angle = (float) (i * Math.PI * 2.0 / 8.0);
+                float radius = (i % 2 == 0) ? 7.8F : 6.4F;
+                float rx = Mth.cos(angle) * radius;
+                float rz = Mth.sin(angle) * radius;
+                PartDefinition f0 = outer.addOrReplaceChild("flame_" + i,
                         CubeListBuilder.create()
-                                .texOffs(0, 36).addBox(-2.5F, -20.0F, -1.0F, 5, 20, 2),
-                        PartPose.offsetAndRotation(rx, 0.0F, rz, 0.15F, -angle + (float) (Math.PI / 2.0), 0.10F));
+                                .texOffs(0, 36).addBox(-2.0F, -8.5F, -0.9F, 4.0F, 8.5F, 1.8F),
+                        PartPose.offsetAndRotation(rx, 0.0F, rz, 0.16F, -angle + (float) (Math.PI / 2.0), 0.14F));
+                PartDefinition f1 = f0.addOrReplaceChild("flame_mid_" + i,
+                        CubeListBuilder.create().texOffs(0, 36).addBox(-1.4F, -7.5F, -0.7F, 2.8F, 7.5F, 1.4F),
+                        PartPose.offsetAndRotation(0.0F, -8.0F, 0.0F, 0.14F, 0.18F, 0.12F));
+                f1.addOrReplaceChild("flame_tip_" + i,
+                        CubeListBuilder.create().texOffs(0, 36).addBox(-0.8F, -6.5F, -0.5F, 1.6F, 6.5F, 1.0F),
+                        PartPose.offsetAndRotation(0.0F, -7.0F, 0.0F, -0.18F, 0.20F, 0.14F));
             }
 
             return LayerDefinition.create(mesh, 64, 64);
@@ -440,22 +550,41 @@ public class JutsuVisualModels {
             MeshDefinition mesh = new MeshDefinition();
             PartDefinition root = mesh.getRoot();
 
-            // Ground Shadow Pool & Ribbon
-            root.addOrReplaceChild("shadow_pool",
+            // Rounded Multi-Rotated Shadow Pool Disc & Tapered Segmented Shadow Ribbon
+            PartDefinition pool = root.addOrReplaceChild("shadow_pool",
                     CubeListBuilder.create()
-                            .texOffs(0, 0).addBox(-12.0F, -0.8F, -12.0F, 24, 1, 24)
-                            .texOffs(0, 25).addBox(-2.5F, -0.6F, 0.0F, 5, 1, 36),
+                            .texOffs(0, 0).addBox(-9.0F, -0.8F, -9.0F, 18, 1, 18)
+                            .texOffs(0, 25).addBox(-2.2F, -0.6F, 0.0F, 4.4F, 1.0F, 12.0F),
                     PartPose.ZERO);
+            pool.addOrReplaceChild("pool_rot_a",
+                    CubeListBuilder.create().texOffs(0, 0).addBox(-9.0F, -0.78F, -9.0F, 18, 1, 18),
+                    PartPose.rotation(0.0F, 0.5236F, 0.0F));
+            pool.addOrReplaceChild("pool_rot_b",
+                    CubeListBuilder.create().texOffs(0, 0).addBox(-9.0F, -0.76F, -9.0F, 18, 1, 18),
+                    PartPose.rotation(0.0F, 1.0472F, 0.0F));
+            pool.addOrReplaceChild("ribbon_mid",
+                    CubeListBuilder.create().texOffs(0, 25).addBox(-1.8F, -0.6F, 11.5F, 3.6F, 1.0F, 12.0F),
+                    PartPose.rotation(0.0F, 0.08F, 0.0F));
+            pool.addOrReplaceChild("ribbon_tip",
+                    CubeListBuilder.create().texOffs(0, 25).addBox(-1.3F, -0.6F, 22.5F, 2.6F, 1.0F, 12.5F),
+                    PartPose.rotation(0.0F, -0.06F, 0.0F));
 
+            // 6 Articulated 3-Joint Curving Shadow Claws
             PartDefinition claws = root.addOrReplaceChild("claws", CubeListBuilder.create(), PartPose.ZERO);
             for (int i = 0; i < 6; i++) {
                 float angle = (float) (i * Math.PI * 2.0 / 6.0);
                 float cx = Mth.cos(angle) * 9.0F;
                 float cz = Mth.sin(angle) * 9.0F;
-                claws.addOrReplaceChild("claw_" + i,
+                PartDefinition clawBase = claws.addOrReplaceChild("claw_" + i,
                         CubeListBuilder.create()
-                                .texOffs(0, 28).addBox(-1.5F, -22.0F, -1.5F, 3, 22, 3),
-                        PartPose.offsetAndRotation(cx, 0.0F, cz, 0.25F, -angle + (float) (Math.PI / 2.0), 0.0F));
+                                .texOffs(0, 28).addBox(-1.3F, -8.5F, -1.3F, 2.6F, 8.5F, 2.6F),
+                        PartPose.offsetAndRotation(cx, 0.0F, cz, 0.14F, -angle + (float) (Math.PI / 2.0), 0.0F));
+                PartDefinition clawMid = clawBase.addOrReplaceChild("claw_mid_" + i,
+                        CubeListBuilder.create().texOffs(0, 28).addBox(-1.0F, -8.0F, -1.0F, 2.0F, 8.0F, 2.0F),
+                        PartPose.offsetAndRotation(0.0F, -8.0F, 0.0F, 0.28F, 0.0F, 0.0F));
+                clawMid.addOrReplaceChild("claw_tip_" + i,
+                        CubeListBuilder.create().texOffs(0, 28).addBox(-0.65F, -7.0F, -0.65F, 1.3F, 7.0F, 1.3F),
+                        PartPose.offsetAndRotation(0.0F, -7.6F, 0.0F, 0.34F, 0.0F, 0.0F));
             }
 
             return LayerDefinition.create(mesh, 128, 64);
@@ -489,11 +618,44 @@ public class JutsuVisualModels {
             MeshDefinition mesh = new MeshDefinition();
             PartDefinition root = mesh.getRoot();
 
-            // Solid 3-block wide, 3-block tall, 12-pixel thick stone bulwark
-            root.addOrReplaceChild("wall_body",
+            // Sculpted 3-block wide stone bulwark with chamfered battlements, side columns, and stone buttresses
+            PartDefinition wall = root.addOrReplaceChild("wall_body",
                     CubeListBuilder.create()
-                            .texOffs(0, 0).addBox(-24.0F, -48.0F, -6.0F, 48, 48, 12),
+                            .texOffs(0, 0).addBox(-22.0F, -45.0F, -5.5F, 44, 45, 11)
+                            // Stepped stone plinth & top cornice ledge
+                            .texOffs(0, 0).addBox(-24.0F, -6.0F, -7.0F, 48, 6, 14)
+                            .texOffs(0, 0).addBox(-23.0F, -46.5F, -6.5F, 46, 3, 13),
                     PartPose.ZERO);
+
+            // Beveled octagonal flanking stone pillars
+            wall.addOrReplaceChild("pillar_left",
+                    CubeListBuilder.create().texOffs(0, 0).addBox(-3.5F, -48.0F, -6.5F, 7, 48, 13),
+                    PartPose.offsetAndRotation(-21.5F, 0.0F, 0.0F, 0.0F, 0.22F, 0.0F));
+            wall.addOrReplaceChild("pillar_right",
+                    CubeListBuilder.create().texOffs(0, 0).addBox(-3.5F, -48.0F, -6.5F, 7, 48, 13),
+                    PartPose.offsetAndRotation(21.5F, 0.0F, 0.0F, 0.0F, -0.22F, 0.0F));
+
+            // Angled Front & Back Stone Buttress Ribs
+            for (int i = -1; i <= 1; i++) {
+                float bx = i * 11.5F;
+                wall.addOrReplaceChild("buttress_f_" + (i + 1),
+                        CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -40.0F, -3.0F, 6, 40, 6),
+                        PartPose.offsetAndRotation(bx, 0.0F, -5.5F, -0.09F, 0.0F, 0.0F));
+                wall.addOrReplaceChild("buttress_b_" + (i + 1),
+                        CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -40.0F, -3.0F, 6, 40, 6),
+                        PartPose.offsetAndRotation(bx, 0.0F, 5.5F, 0.09F, 0.0F, 0.0F));
+            }
+
+            // Sculpted Chamfered Top Battlement Merlons
+            for (int i = 0; i < 4; i++) {
+                float mx = -15.0F + i * 10.0F;
+                PartDefinition merlon = wall.addOrReplaceChild("merlon_" + i,
+                        CubeListBuilder.create().texOffs(0, 0).addBox(-3.5F, -5.0F, -5.0F, 7, 5, 10),
+                        PartPose.offset(mx, -46.5F, 0.0F));
+                merlon.addOrReplaceChild("merlon_cap_" + i,
+                        CubeListBuilder.create().texOffs(0, 0).addBox(-2.6F, -2.0F, -4.0F, 5.2F, 2.0F, 8.0F),
+                        PartPose.offset(0.0F, -5.0F, 0.0F));
+            }
 
             return LayerDefinition.create(mesh, 128, 64);
         }

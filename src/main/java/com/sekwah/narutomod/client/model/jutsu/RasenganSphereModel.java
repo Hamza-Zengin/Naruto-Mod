@@ -25,9 +25,32 @@ public class RasenganSphereModel extends Model<JutsuVisualModels.VisualState> {
     public static LayerDefinition createLayer() {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
-        root.addOrReplaceChild("core", CubeListBuilder.create(), PartPose.ZERO);
-        root.addOrReplaceChild("inner_shell", CubeListBuilder.create(), PartPose.ZERO);
-        root.addOrReplaceChild("outer_shell", CubeListBuilder.create(), PartPose.ZERO);
+        PartDefinition core = root.addOrReplaceChild("core",
+                CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -3.0F, -3.0F, 6, 6, 6),
+                PartPose.ZERO);
+        core.addOrReplaceChild("core_rot_y",
+                CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -3.0F, -3.0F, 6, 6, 6),
+                PartPose.rotation(0.0F, 0.7854F, 0.0F));
+        core.addOrReplaceChild("core_rot_x",
+                CubeListBuilder.create().texOffs(0, 0).addBox(-3.0F, -3.0F, -3.0F, 6, 6, 6),
+                PartPose.rotation(0.7854F, 0.0F, 0.7854F));
+
+        PartDefinition innerShell = root.addOrReplaceChild("inner_shell",
+                CubeListBuilder.create().texOffs(0, 16).addBox(-4.5F, -4.5F, -4.5F, 9, 9, 9),
+                PartPose.ZERO);
+        innerShell.addOrReplaceChild("inner_rot_a",
+                CubeListBuilder.create().texOffs(0, 16).addBox(-4.5F, -4.5F, -4.5F, 9, 9, 9),
+                PartPose.rotation(0.5236F, 0.7854F, 0.0F));
+        innerShell.addOrReplaceChild("inner_rot_b",
+                CubeListBuilder.create().texOffs(0, 16).addBox(-4.5F, -4.5F, -4.5F, 9, 9, 9),
+                PartPose.rotation(-0.5236F, 0.0F, 0.7854F));
+
+        PartDefinition outerShell = root.addOrReplaceChild("outer_shell",
+                CubeListBuilder.create().texOffs(0, 34).addBox(-5.5F, -5.5F, -5.5F, 11, 11, 11),
+                PartPose.ZERO);
+        outerShell.addOrReplaceChild("outer_rot_a",
+                CubeListBuilder.create().texOffs(0, 34).addBox(-5.5F, -5.5F, -5.5F, 11, 11, 11),
+                PartPose.rotation(0.7854F, 0.5236F, 0.5236F));
         return LayerDefinition.create(mesh, 64, 64);
     }
 
@@ -60,24 +83,36 @@ public class RasenganSphereModel extends Model<JutsuVisualModels.VisualState> {
 
     public void renderProcedural(PoseStack poseStack, VertexConsumer buffer, float age, int light, int overlay,
                                  float r, float g, float b, float a) {
+        // Dense incandescent core sphere
         poseStack.pushPose();
-        poseStack.rotateDegrees(com.mojang.math.Axis.YP, age * 25.0F);
-        renderSmoothSphere(poseStack, buffer, 0.36F, 16, 24, light, overlay,
-                0.80F * r, 0.96F * g, 1.0F * b, 0.95F * a);
+        poseStack.rotateDegrees(com.mojang.math.Axis.YP, age * 26.0F);
+        renderSmoothSphere(poseStack, buffer, 0.34F, 24, 36, light, overlay,
+                0.85F * r, 0.97F * g, 1.0F * b, 0.95F * a);
         poseStack.popPose();
 
+        // Mid counter-rotating tilted swirl shell
         poseStack.pushPose();
         poseStack.rotateDegrees(com.mojang.math.Axis.ZP, 35.0F);
-        poseStack.rotateDegrees(com.mojang.math.Axis.YP, -age * 18.0F);
-        renderSmoothSphere(poseStack, buffer, 0.48F, 16, 24, light, overlay,
-                0.20F * r, 0.68F * g, 1.0F * b, 0.55F * a);
+        poseStack.rotateDegrees(com.mojang.math.Axis.YP, -age * 19.0F);
+        renderSmoothSphere(poseStack, buffer, 0.45F, 24, 36, light, overlay,
+                0.24F * r, 0.72F * g, 1.0F * b, 0.58F * a);
         poseStack.popPose();
 
+        // Outer cross-tilted chakra shell
         poseStack.pushPose();
         poseStack.rotateDegrees(com.mojang.math.Axis.XP, -35.0F);
-        poseStack.rotateDegrees(com.mojang.math.Axis.YP, age * 12.0F);
-        renderSmoothSphere(poseStack, buffer, 0.58F, 16, 24, light, overlay,
-                0.45F * r, 0.85F * g, 1.0F * b, 0.25F * a);
+        poseStack.rotateDegrees(com.mojang.math.Axis.YP, age * 14.0F);
+        renderSmoothSphere(poseStack, buffer, 0.54F, 24, 36, light, overlay,
+                0.42F * r, 0.85F * g, 1.0F * b, 0.30F * a);
+        poseStack.popPose();
+
+        // 4th wispy outer corona shell for spherical silhouette continuity
+        poseStack.pushPose();
+        poseStack.rotateDegrees(com.mojang.math.Axis.ZP, -42.0F);
+        poseStack.rotateDegrees(com.mojang.math.Axis.XP, 28.0F);
+        poseStack.rotateDegrees(com.mojang.math.Axis.YP, -age * 10.0F);
+        renderSmoothSphere(poseStack, buffer, 0.62F, 20, 32, light, overlay,
+                0.55F * r, 0.90F * g, 1.0F * b, 0.16F * a);
         poseStack.popPose();
     }
 

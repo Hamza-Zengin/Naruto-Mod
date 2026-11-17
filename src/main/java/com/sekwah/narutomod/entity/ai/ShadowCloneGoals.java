@@ -259,11 +259,13 @@ public final class ShadowCloneGoals {
                 target.hurtServer(serverLevel, this.clone.damageSources().mobAttack(this.clone), 8.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
                 target.setDeltaMovement(dir.scale(1.6).add(0, 0.35, 0));
             } else if ("rasengan".equals(path)) {
+                this.clone.setActiveHandJutsu("rasengan", 25);
                 serverLevel.sendParticles(ParticleTypes.END_ROD, target.getX(), target.getY() + 1.0, target.getZ(), 20, 0.3, 0.3, 0.3, 0.15,
                         ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 target.hurtServer(serverLevel, this.clone.damageSources().mobAttack(this.clone), 14.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
                 serverLevel.playSound(null, target.blockPosition(), NarutoSounds.RASENGAN.get(), SoundSource.PLAYERS, 0.9F, 1.0F);
             } else if ("chidori".equals(path)) {
+                this.clone.setActiveHandJutsu("chidori", 25);
                 serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, target.getX(), target.getY() + 1.0, target.getZ(), 24, 0.4, 0.4, 0.4, 0.2,
                         ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 target.hurtServer(serverLevel, this.clone.damageSources().mobAttack(this.clone), 14.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);

@@ -30,7 +30,7 @@ public class SusanooRibcageLayer extends RenderLayer<AvatarRenderState, PlayerMo
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight,
                        AvatarRenderState state, float yRot, float xRot) {
-        if (state.isInvisible) {
+        if (state == null || state.isInvisible || poseStack == null || submitNodeCollector == null || this.ribcageModel == null) {
             return;
         }
         NarutoRenderEvents.NinjaRenderStateData data = state.getRenderData(NarutoRenderEvents.NINJA_RENDER_DATA_KEY);

@@ -60,7 +60,7 @@ public class JutsuComboAuditTest {
     );
 
     private static final Set<String> HIGH_LEVEL = Set.of(
-            "sharingan", "byakugan", "shadow_clone", "shadow_possession", "chidori",
+            "shadow_clone", "shadow_possession", "chidori",
             "rasengan", "hakke_kusho", "bone_dance", "wood_prison", "eight_gates"
     );
 

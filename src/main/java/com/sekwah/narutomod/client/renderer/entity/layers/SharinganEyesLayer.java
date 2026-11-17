@@ -30,7 +30,7 @@ public class SharinganEyesLayer extends RenderLayer<AvatarRenderState, PlayerMod
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight,
                        AvatarRenderState state, float yRot, float xRot) {
-        if (state.isInvisible) {
+        if (state == null || state.isInvisible || poseStack == null || submitNodeCollector == null) {
             return;
         }
         NarutoRenderEvents.NinjaRenderStateData data = state.getRenderData(NarutoRenderEvents.NINJA_RENDER_DATA_KEY);
@@ -45,8 +45,12 @@ public class SharinganEyesLayer extends RenderLayer<AvatarRenderState, PlayerMod
     }
 
     private void renderIrisQuads(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, Identifier texture) {
+        PlayerModel parentModel = this.getParentModel();
+        if (parentModel == null || parentModel.head == null || texture == null) {
+            return;
+        }
         poseStack.pushPose();
-        this.getParentModel().head.translateAndRotate(poseStack);
+        parentModel.head.translateAndRotate(poseStack);
 
         submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture), (pose, consumer) -> {
             Matrix4f matrix = pose.pose();

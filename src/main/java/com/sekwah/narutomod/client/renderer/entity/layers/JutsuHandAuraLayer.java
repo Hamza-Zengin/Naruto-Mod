@@ -40,7 +40,8 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight,
                        AvatarRenderState state, float yRot, float xRot) {
-        if (state.isInvisible) {
+        PlayerModel parentModel = this.getParentModel();
+        if (state == null || state.isInvisible || poseStack == null || submitNodeCollector == null || parentModel == null) {
             return;
         }
         NarutoRenderEvents.NinjaRenderStateData data = state.getRenderData(NarutoRenderEvents.NINJA_RENDER_DATA_KEY);

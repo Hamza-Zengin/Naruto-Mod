@@ -61,7 +61,7 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
             poseStack.rotateDegrees(Axis.XP, state.xRot);
             poseStack.translate(0.0D, 0.25D, 0.0D);
 
-            // 1. 3D Fluid Water Core Sphere (r = 0.45F)
+            // 1. High-resolution Dual-Layer 3D Fluid Water Core Sphere
             float sphereAlpha = 0.90F * fadeOut;
             submitNodeCollector.submitCustomGeometry(
                     poseStack,
@@ -70,8 +70,12 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
                         PoseStack localStack = new PoseStack();
                         localStack.last().set(pose);
                         RasenganSphereModel.renderSmoothSphere(
-                                localStack, consumer, 0.45F, 12, 16, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
-                                0.08F, 0.50F, 0.95F, sphereAlpha
+                                localStack, consumer, 0.42F, 20, 28, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                                0.10F, 0.54F, 0.98F, sphereAlpha
+                        );
+                        RasenganSphereModel.renderSmoothSphere(
+                                localStack, consumer, 0.52F, 18, 24, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                                0.35F, 0.78F, 1.0F, sphereAlpha * 0.42F
                         );
                     }
             );
