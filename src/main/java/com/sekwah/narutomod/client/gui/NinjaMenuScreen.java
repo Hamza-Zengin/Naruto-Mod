@@ -376,7 +376,7 @@ public class NinjaMenuScreen extends Screen {
 
                     // 1. Element Type (ChakraElement color & name)
                     ChakraElement element = ability.getChakraElement();
-                    ChatFormatting elementColor = getElementColor(element);
+                    ChatFormatting elementColor = NinjaMenuRenderUtils.getElementColor(element);
                     Component elementName = Component.translatable("naruto.element." + element.getName()).withStyle(elementColor);
                     tooltip.add(Component.translatable("naruto.gui.ninja_menu.jutsu_detail.element", elementName).withStyle(ChatFormatting.GRAY));
 
@@ -385,7 +385,7 @@ public class NinjaMenuScreen extends Screen {
                             ? syncedStats.chakraCost()
                             : ability.getDefaultChakraCost();
                     tooltip.add(Component.translatable("naruto.gui.ninja_menu.jutsu_detail.chakra_cost",
-                            Component.literal(formatStatNumber(chakraCost)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+                            Component.literal(NinjaMenuRenderUtils.formatStatNumber(chakraCost)).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
 
                     // 3. Cooldown in seconds (from JutsuDataManager cooldown_ticks)
                     int cooldownTicks = (syncedStats != null && syncedStats.cooldownTicks() >= 0)
@@ -401,7 +401,7 @@ public class NinjaMenuScreen extends Screen {
                             : ability.getDefaultDamage();
                     if (baseDamage > 0f) {
                         tooltip.add(Component.translatable("naruto.gui.ninja_menu.jutsu_detail.base_damage",
-                                Component.literal(formatStatNumber(baseDamage)).withStyle(ChatFormatting.RED)).withStyle(ChatFormatting.GRAY));
+                                Component.literal(NinjaMenuRenderUtils.formatStatNumber(baseDamage)).withStyle(ChatFormatting.RED)).withStyle(ChatFormatting.GRAY));
                     }
 
                     // 5. Lock Status & Requirement

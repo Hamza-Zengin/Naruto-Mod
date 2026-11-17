@@ -5,7 +5,7 @@ import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import com.sekwah.narutomod.config.NarutoConfig;
-import com.sekwah.sekclib.capabilitysync.capabilitysync.annotation.Sync;
+import com.sekwah.sekclib.capabilitysync.annotation.Sync;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -1129,4 +1129,30 @@ public class NinjaData implements INinjaData {
         abandonMission();
         return true;
     }
+
+    // --- Package-private raw accessors used by NinjaDataNbtCodec (bypass clamping/side effects) ---
+
+    void setRawRank(String rank) { this.rank = rank; }
+
+    void setRawChakra(float value) { this.chakra = value; }
+
+    void setRawStamina(float value) { this.stamina = value; }
+
+    float getRawMaxChakra() { return this.maxChakra; }
+
+    void setRawMaxChakra(float value) { this.maxChakra = value; }
+
+    float getRawMaxStamina() { return this.maxStamina; }
+
+    void setRawMaxStamina(float value) { this.maxStamina = value; }
+
+    void setRawClan(Identifier clan) { this.clan = clan; }
+
+    List<Byte> getMutableActiveSeals() { return this.activeSeals; }
+
+    void setRawSealTimeout(int value) { this.sealTimeout = value; }
+
+    void setRawMissionProgress(int value) { this.missionProgress = value; }
+
+    void setRawChakraRegenCooldown(int value) { this.chakraRegenInfo.cooldown = value; }
 }
