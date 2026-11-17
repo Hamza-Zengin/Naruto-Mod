@@ -73,10 +73,18 @@ python3 scripts/check_sounds.py
 python3 scripts/check_item_models.py
 python3 scripts/check_unused_textures.py
 
-# Testler ve üretim JAR derlemesi (build/libs/ altında oluşur):
+# Testler, GameTest sunucusu ve üretim JAR derlemesi (build/libs/ altında oluşur):
 ./gradlew test
+./gradlew runGameTestServer
 ./gradlew clean build
 ```
+
+---
+
+## 📜 Lisans & Atıflar
+
+- **Naruto-Mod:** [`All Rights Reserved`](LICENSE) — Orijinal mod temelleri **Alastair Hawkes (Sekwah41)**'e, Minecraft 26.3+ NeoForge portu, yeniden yazılan sistemler ve yeni içerikler **Hamza Zengin**'e aittir. Ayrıntılar için [`LICENSE`](LICENSE) ve [`AUTHOR.MD`](AUTHOR.MD) dosyalarına bakın.
+- **SekCLib (Bağımlılık):** [`SekCLib`](https://github.com/Hamza-Zengin/SekCLib) ayrı bir kütüphane olarak **MIT Lisansı** ile lisanslanmıştır; MIT lisansı yalnızca SekCLib için geçerlidir ve Naruto-Mod'a uygulanmaz.
 
 ---
 

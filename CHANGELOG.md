@@ -6,7 +6,12 @@ Bu dosya `Naruto-Mod` projesinin sürüm geçmişini ve öne çıkan değişikli
 
 ### Mimari & Altyapı
 - **NeoForge 26.3 Tam Geçişi:** `DataComponents` tabanlı eşya/parşömen verileri, `StreamCodec` ağ paket altyapısı ve modern item/equipment model sistemiyle tam uyum.
-- **SekCLib 0.1.0 Entegrasyonu:** Yetenek senkronizasyonu ve paket birleştirme (batching) desteği.
+- **SekCLib 0.1.0 Entegrasyonu (Breaking Change Uyumu):**
+  - SekCLib `capabilitysync` paket yapısı düzleştirildi (`com.sekwah.sekclib.network.capabilitysync.*` → `com.sekwah.sekclib.capabilitysync.*`).
+  - Spectator (izleyici) modundaki oyuncular için otomatik tam capability senkronizasyonu desteği eklendi.
+  - `ColorUtil` ve `RenderMathUtil` ortak render yardımcıları SekCLib üzerinden kullanılmaya başlandı.
+- **`NinjaData` Modülerleştirme:** `INinjaData` arayüzü ve `@Sync` alanları korunarak çakra/stamina hesaplamaları (`ChakraStaminaLogic`), rütbe ilerlemesi (`RankProgression`) ve görev mantığı (`MissionLogic`) bağımsız yardımcı sınıflara ayrıldı.
+- **Otomatik Test & GameTest Altyapısı:** JUnit birim testlerine ek olarak `runGameTestServer` (`NarutoModGameTests`) ile `ServerSecurityValidator`, jutsu çakra/cooldown akışı, görev döngüsü ve C2S paket codec'leri gerçek NeoForge sunucu ortamında doğrulanır hale getirildi.
 
 ### Oynanış & Sistemler
 - **Veri Odaklı (Data-Driven) Jutsu Dengeleme:** `data/narutomod/jutsus/` altındaki JSON tanımlarıyla çakra maliyeti, bekleme süresi, temel hasar ve rütbe gereksinimlerini özelleştirme; sunucudan istemciye otomatik senkronizasyon (`JutsuDataManager`).
