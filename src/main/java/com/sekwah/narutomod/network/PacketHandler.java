@@ -46,19 +46,34 @@ public class PacketHandler {
 
     // These are for handling from server side to players.
     public static void sendToPlayer(CustomPacketPayload payload, ServerPlayer player) {
+        if (player == null || player.connection == null || !player.connection.hasChannel(payload)) {
+            return;
+        }
         PacketDistributor.sendToPlayer(player, payload);
     }
 
     public static void sendToTrackingAndSelf(CustomPacketPayload msg, Entity target) {
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(target, msg);
+        try {
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(target, msg);
+        } catch (UnsupportedOperationException ignored) {
+            // Mock test players in GameTestServer lack registered client payload channels.
+        }
     }
 
     public static void sentToTrackingAndSelf(CustomPacketPayload obj, ServerPlayer player) {
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, obj);
+        try {
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, obj);
+        } catch (UnsupportedOperationException ignored) {
+            // Mock test players in GameTestServer lack registered client payload channels.
+        }
     }
 
     public static void sentToTracking(CustomPacketPayload obj, Entity entity) {
-        PacketDistributor.sendToPlayersTrackingEntity(entity, obj);
+        try {
+            PacketDistributor.sendToPlayersTrackingEntity(entity, obj);
+        } catch (UnsupportedOperationException ignored) {
+            // Mock test players in GameTestServer lack registered client payload channels.
+        }
     }
 
 }
