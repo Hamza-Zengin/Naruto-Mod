@@ -29,6 +29,14 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 repositories {
     mavenLocal()
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/Hamza-Zengin/SekCLib")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
     mavenCentral()
 }
 
@@ -76,7 +84,7 @@ neoForge {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    // SekCLib 2.0.0 via mavenLocal() (no other external mod dependencies)
+    // SekCLib 0.1.0 via mavenLocal() / GitHub Packages (no other external mod dependencies)
     implementation "com.sekwah:SekCLib:${project.sekclib_version}"
 
     // Unit testing

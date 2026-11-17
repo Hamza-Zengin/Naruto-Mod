@@ -6,7 +6,7 @@ Bu dosya `Naruto-Mod` projesinin sürüm geçmişini ve öne çıkan değişikli
 
 ### Mimari & Altyapı
 - **NeoForge 26.3 Tam Geçişi:** `DataComponents` tabanlı eşya/parşömen verileri, `StreamCodec` ağ paket altyapısı ve modern item/equipment model sistemiyle tam uyum.
-- **SekCLib 2.0.0 Entegrasyonu:** Yetenek senkronizasyonu ve paket birleştirme (batching) desteği.
+- **SekCLib 0.1.0 Entegrasyonu:** Yetenek senkronizasyonu ve paket birleştirme (batching) desteği.
 
 ### Oynanış & Sistemler
 - **Veri Odaklı (Data-Driven) Jutsu Dengeleme:** `data/narutomod/jutsus/` altındaki JSON tanımlarıyla çakra maliyeti, bekleme süresi, temel hasar ve rütbe gereksinimlerini özelleştirme; sunucudan istemciye otomatik senkronizasyon (`JutsuDataManager`).

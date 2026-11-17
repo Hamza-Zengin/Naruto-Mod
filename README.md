@@ -16,7 +16,7 @@
 
 - **Minecraft:** `26.3`
 - **Mod Yükleyici:** `NeoForge 26.3.0.83+`
-- **Zorunlu Kütüphane:** [`SekCLib 2.0.0+`](https://github.com/Hamza-Zengin/SekCLib)
+- **Zorunlu Kütüphane:** [`SekCLib 0.1.0+`](https://github.com/Hamza-Zengin/SekCLib)
 - **Java:** `JDK 25`
 
 ---
