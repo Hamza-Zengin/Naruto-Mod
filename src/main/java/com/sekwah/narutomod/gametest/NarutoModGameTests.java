@@ -83,6 +83,7 @@ public class NarutoModGameTests {
         );
     }
 
+    @SuppressWarnings("removal")
     private static void testSecurityAndRateLimit(GameTestHelper helper) {
         ServerSecurityValidator.resetRateLimits();
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
@@ -117,6 +118,7 @@ public class NarutoModGameTests {
         helper.succeed();
     }
 
+    @SuppressWarnings("removal")
     private static void testJutsuChakraAndCooldown(GameTestHelper helper) {
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
         NinjaData ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
@@ -145,6 +147,7 @@ public class NarutoModGameTests {
         helper.succeed();
     }
 
+    @SuppressWarnings("removal")
     private static void testMissionAndPacketCodecs(GameTestHelper helper) {
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
         NinjaData ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
@@ -154,7 +157,7 @@ public class NarutoModGameTests {
         helper.assertValueEqual(ninjaData.getActiveMissionId(), NinjaMission.D_RANK_PATROL.getId(), "active mission id");
 
         for (int i = 0; i < NinjaMission.D_RANK_PATROL.getTargetCount(); i++) {
-            ninjaData.incrementMissionProgress(NinjaMission.TargetType.KILL_ENEMY, 1);
+            ninjaData.incrementMissionProgress(1);
         }
         helper.assertTrue(ninjaData.claimMissionReward(), "Completed mission reward should be claimable");
         helper.assertValueEqual(ninjaData.getCompletedMissionsCount(), 1, "completed missions count");
