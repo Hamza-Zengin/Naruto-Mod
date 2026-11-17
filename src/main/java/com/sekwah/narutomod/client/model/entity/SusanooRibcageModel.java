@@ -6,14 +6,38 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 3D Skeletal Chakra Ribcage of Susanoo enveloping the shinobi.
  * Engineered with 100% mathematical left/right symmetry and balanced front-to-back chest depth.
  */
 public class SusanooRibcageModel extends HumanoidModel<HumanoidRenderState> {
 
+    private static final String[] FIRST_PERSON_HIDDEN_PART_NAMES = {
+            "rib_1_farch_l", "rib_1_farch_r", "rib_1_fcurve_l", "rib_1_fcurve_r",
+            "rib_2_farch_l", "rib_2_farch_r", "rib_2_fcurve_l", "rib_2_fcurve_r",
+            "rib_3_farch_l", "rib_3_farch_r"
+    };
+
+    private final List<ModelPart> firstPersonHiddenParts;
+
     public SusanooRibcageModel(ModelPart root) {
         super(root);
+        List<ModelPart> hiddenParts = new ArrayList<>();
+        for (String partName : FIRST_PERSON_HIDDEN_PART_NAMES) {
+            if (this.body.hasChild(partName)) {
+                hiddenParts.add(this.body.getChild(partName));
+            }
+        }
+        this.firstPersonHiddenParts = hiddenParts;
+    }
+
+    public void setFirstPersonView(boolean firstPerson) {
+        for (ModelPart part : this.firstPersonHiddenParts) {
+            part.visible = !firstPerson;
+        }
     }
 
     public static LayerDefinition createLayer() {
@@ -133,7 +157,7 @@ public class SusanooRibcageModel extends HumanoidModel<HumanoidRenderState> {
                 .addBox(-1.8F, -halfT, -halfT, 3.6F, thickness, thickness, CubeDeformation.NONE),
                 PartPose.offsetAndRotation(-(outerX - 2.9F), y + halfT, -6.1F, 0.0F, 0.56F, -0.04F));
 
-        // 4. Front Chest Arch + Tapered Sternum Tip
+        // 4. Front Chest Arch (open sternum framing)
         bodyPart.addOrReplaceChild(prefix + "_farch_l", CubeListBuilder.create()
                 .texOffs(16, texY)
                 .addBox(-2.2F, -halfT, -halfT, 4.4F, thickness, thickness, CubeDeformation.NONE),
@@ -142,15 +166,6 @@ public class SusanooRibcageModel extends HumanoidModel<HumanoidRenderState> {
                 .texOffs(16, texY)
                 .addBox(-2.2F, -halfT, -halfT, 4.4F, thickness, thickness, CubeDeformation.NONE),
                 PartPose.offsetAndRotation(-5.2F, y + halfT, -frontZ, 0.0F, 0.22F, 0.0F));
-
-        bodyPart.addOrReplaceChild(prefix + "_ftip_l", CubeListBuilder.create()
-                .texOffs(16, texY)
-                .addBox(-1.1F, -halfT * 0.85F, -halfT * 0.85F, 2.2F, thickness * 0.85F, thickness * 0.85F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(2.6F, y + halfT, -(frontZ + 0.35F), 0.0F, -0.08F, 0.0F));
-        bodyPart.addOrReplaceChild(prefix + "_ftip_r", CubeListBuilder.create()
-                .texOffs(16, texY)
-                .addBox(-1.1F, -halfT * 0.85F, -halfT * 0.85F, 2.2F, thickness * 0.85F, thickness * 0.85F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(-2.6F, y + halfT, -(frontZ + 0.35F), 0.0F, 0.08F, 0.0F));
 
         // 5. Back-Lateral Curve A (gentle backward sweep)
         bodyPart.addOrReplaceChild(prefix + "_bcurve_a_l", CubeListBuilder.create()

@@ -65,6 +65,16 @@ public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, 
         super.extractRenderState(entity, state, partialTick);
         state.skin = resolveSkin(entity);
 
+        state.setRenderData(
+                NarutoRenderEvents.NINJA_RENDER_DATA_KEY,
+                createNinjaRenderStateData(entity)
+        );
+    }
+
+    public static NarutoRenderEvents.NinjaRenderStateData createNinjaRenderStateData(ShadowCloneEntity entity) {
+        if (entity == null) {
+            return new NarutoRenderEvents.NinjaRenderStateData(false, false, null, false, "", false, false, false);
+        }
         boolean sharingan = entity.hasActiveAbility("sharingan") || entity.getSharinganStage() > 0;
         boolean byakugan = entity.hasActiveAbility("byakugan");
         Identifier eyeTexture = null;
@@ -79,18 +89,15 @@ public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, 
         boolean hasEightGates = entity.hasActiveAbility("eight_gates") || hasEightGatesDeath || entity.getHachimonGate() > 0;
         boolean hasWaterWalk = entity.hasActiveAbility("water_walk");
 
-        state.setRenderData(
-                NarutoRenderEvents.NINJA_RENDER_DATA_KEY,
-                new NarutoRenderEvents.NinjaRenderStateData(
-                        susanoo,
-                        sharingan,
-                        eyeTexture,
-                        byakugan,
-                        activeHandJutsu != null ? activeHandJutsu : "",
-                        hasEightGates,
-                        hasEightGatesDeath,
-                        hasWaterWalk
-                )
+        return new NarutoRenderEvents.NinjaRenderStateData(
+                susanoo,
+                sharingan,
+                eyeTexture,
+                byakugan,
+                activeHandJutsu != null ? activeHandJutsu : "",
+                hasEightGates,
+                hasEightGatesDeath,
+                hasWaterWalk
         );
     }
 

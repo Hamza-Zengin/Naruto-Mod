@@ -353,6 +353,9 @@ public class ShadowCloneEntity extends PathfinderMob {
                     this.entityData.set(DATA_ACTIVE_HAND_JUTSU, "");
                 }
             }
+            if (this.tickCount % 10 == 0) {
+                this.syncActiveAbilitiesFromOwner();
+            }
             if (this.tickCount % 20 == 0 && this.level() instanceof ServerLevel serverLevel) {
                 applyPeriodicAbilityEffects(serverLevel);
             }
@@ -443,8 +446,7 @@ public class ShadowCloneEntity extends PathfinderMob {
         return result;
     }
 
-    public void copyActiveAbilitiesFrom(Player owner, com.sekwah.narutomod.capabilities.INinjaData ninjaData) {
-        if (ninjaData == null) return;
+    private static java.util.Set<String> collectActiveAbilityIds(com.sekwah.narutomod.capabilities.INinjaData ninjaData) {
         java.util.Set<String> activeIds = new java.util.LinkedHashSet<>();
         com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData toggleData = ninjaData.getToggleAbilityData();
         if (toggleData != null) {
@@ -459,6 +461,42 @@ public class ShadowCloneEntity extends PathfinderMob {
         if (ninjaData.isEightGatesActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":eight_gates");
         if (ninjaData.isEighthGateActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":eight_gates_death");
         if (ninjaData.isWaterWalkActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":water_walk");
+        return activeIds;
+    }
+
+    private void syncActiveAbilitiesFromOwner() {
+        Player owner = this.getOwner();
+        if (owner == null) return;
+        com.sekwah.narutomod.capabilities.INinjaData ninjaData = owner.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA);
+        if (ninjaData == null) return;
+        java.util.Set<String> activeIds = collectActiveAbilityIds(ninjaData);
+        String joined = String.join(",", activeIds);
+        if (!joined.equals(this.entityData.get(DATA_ACTIVE_ABILITIES))) {
+            this.entityData.set(DATA_ACTIVE_ABILITIES, joined);
+            if (hasActiveAbility("water_walk")) {
+                this.setPathfindingMalus(net.minecraft.world.level.pathfinder.PathType.WATER, 0.0F);
+            }
+        }
+        int desiredSharinganStage = hasActiveAbility("sharingan")
+                ? com.sekwah.narutomod.abilities.jutsus.SharinganAbility.getStage(ninjaData).ordinal() + 1
+                : 0;
+        if (desiredSharinganStage != this.getSharinganStage()) {
+            this.entityData.set(DATA_SHARINGAN_STAGE, desiredSharinganStage);
+        }
+        int desiredGate = 0;
+        if (hasActiveAbility("eight_gates_death")) {
+            desiredGate = 8;
+        } else if (hasActiveAbility("eight_gates")) {
+            desiredGate = com.sekwah.narutomod.abilities.jutsus.EightGatesAbility.getStage(ninjaData).ordinal() + 1;
+        }
+        if (desiredGate != this.getHachimonGate()) {
+            this.entityData.set(DATA_HACHIMON_GATE, desiredGate);
+        }
+    }
+
+    public void copyActiveAbilitiesFrom(Player owner, com.sekwah.narutomod.capabilities.INinjaData ninjaData) {
+        if (ninjaData == null) return;
+        java.util.Set<String> activeIds = collectActiveAbilityIds(ninjaData);
 
         this.entityData.set(DATA_ACTIVE_ABILITIES, String.join(",", activeIds));
 

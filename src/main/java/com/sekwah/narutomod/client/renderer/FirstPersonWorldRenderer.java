@@ -114,6 +114,7 @@ public class FirstPersonWorldRenderer {
 
                 HumanoidRenderState susanooState = new HumanoidRenderState();
                 susanooState.isCrouching = player.isCrouching();
+                susanooModel.setFirstPersonView(true);
                 int color = ColorUtil.argb(0.50F, 1.0F, 0.55F, 0.25F);
                 submitNodeCollector.submitModel(
                         susanooModel,

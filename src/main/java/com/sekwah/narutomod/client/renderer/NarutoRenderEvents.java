@@ -224,6 +224,9 @@ public class NarutoRenderEvents {
                 }
             }
         });
+        event.registerEntityModifier(ShadowCloneRenderer.class, (entity, state) -> {
+            state.setRenderData(NINJA_RENDER_DATA_KEY, ShadowCloneRenderer.createNinjaRenderStateData(entity));
+        });
     }
 
     @SubscribeEvent

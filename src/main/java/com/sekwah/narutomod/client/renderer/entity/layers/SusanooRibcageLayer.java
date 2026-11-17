@@ -43,6 +43,7 @@ public class SusanooRibcageLayer extends RenderLayer<AvatarRenderState, PlayerMo
         poseStack.translate(0.0D, -0.06D, 0.0D);
         RenderMathUtil.scaleUniform(poseStack, 1.18F);
 
+        this.ribcageModel.setFirstPersonView(false);
         int tintColor = ColorUtil.argb(0.55F, 1.0F, 0.55F, 0.25F);
         submitNodeCollector.submitModel(
                 this.ribcageModel,
