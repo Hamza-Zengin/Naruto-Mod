@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 public enum NinjaRank {
-    ACADEMY_STUDENT(0, "Academy Student", "Akademi Öğrencisi", 0.0f, 0.0f),
+    ACADEMY_STUDENT(0, "Academy Student", "Akademi \u00d6\u011frencisi", 0.0f, 0.0f),
     GENIN(1, "Genin", "Genin", 25.0f, 20.0f),
-    CHUNIN(2, "Chunin", "Chūnin", 60.0f, 45.0f),
-    JONIN(3, "Jonin", "Jōnin", 110.0f, 80.0f),
+    CHUNIN(2, "Chunin", "Ch\u016bnin", 60.0f, 45.0f),
+    JONIN(3, "Jonin", "J\u014dnin", 110.0f, 80.0f),
     ANBU(4, "Anbu", "Anbu", 160.0f, 110.0f),
     KAGE(5, "Kage", "Kage", 250.0f, 160.0f);
 

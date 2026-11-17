@@ -16,6 +16,7 @@ public class NarutoDataGenerators {
         event.getDefaultPackGenerator().createReloadableRegistryObjects(
                 new RegistrySetBuilder().add(RecipeProvider.asBootstrap(RecipeGen::new))
         );
+        event.createProvider(NarutoGlobalLootModifierProvider::new);
     }
 
     @SubscribeEvent

@@ -327,6 +327,42 @@ public class NinjaDataLogicTest {
     }
 
     @Test
+    @DisplayName("Verify Ability expected seals, dynamic discount percentage, and 25% chakra cost discount")
+    public void testHandSealComboCostDiscount() {
+        com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility fireball = new com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility();
+        fireball.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball"));
+
+        assertArrayEquals(new byte[]{6, 8, 9, 12, 7, 3}, fireball.getExpectedSeals());
+
+        java.util.List<Byte> canonSeals = java.util.List.of((byte) 6, (byte) 8, (byte) 9, (byte) 12, (byte) 7, (byte) 3);
+        assertTrue(fireball.matchesExpectedSeals(canonSeals));
+
+        java.util.List<Byte> comboSeals = java.util.List.of((byte) 1, (byte) 2, (byte) 1);
+        assertTrue(fireball.matchesExpectedSeals(comboSeals));
+
+        java.util.List<Byte> wrongSeals = java.util.List.of((byte) 2, (byte) 3, (byte) 2);
+        assertFalse(fireball.matchesExpectedSeals(wrongSeals));
+
+        float baseCost = fireball.getDefaultChakraCost();
+        assertEquals(baseCost * 0.75f,
+                com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket.calculateEffectiveChakraCost(fireball, baseCost, canonSeals),
+                0.01f);
+        assertEquals(baseCost,
+                com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket.calculateEffectiveChakraCost(fireball, baseCost, wrongSeals),
+                0.01f);
+
+        ninjaData.clearSeals();
+        assertEquals(0, fireball.getPerfectComboDiscountPercent(ninjaData));
+        assertEquals(baseCost, fireball.getEffectiveChakraCost(ninjaData), 0.01f);
+
+        for (byte b : comboSeals) {
+            ninjaData.addSeal(b);
+        }
+        assertEquals(25, fireball.getPerfectComboDiscountPercent(ninjaData));
+        assertEquals(baseCost * 0.75f, fireball.getEffectiveChakraCost(ninjaData), 0.01f);
+    }
+
+    @Test
     @DisplayName("Verify getToggleAbilityData is null-safe and self-healing")
     public void testToggleAbilityDataNullSafety() {
         assertNotNull(ninjaData.getToggleAbilityData(), "Initial ToggleAbilityData should not be null");

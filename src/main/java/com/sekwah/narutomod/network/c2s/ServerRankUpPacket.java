@@ -59,7 +59,7 @@ public class ServerRankUpPacket implements CustomPacketPayload {
                     com.sekwah.narutomod.registries.NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
                             .trigger(player, com.sekwah.narutomod.advancements.NinjaProgressTrigger.Action.RANK_UP, newRank.name());
                     player.sendSystemMessage(Component.translatable("naruto.rank.promoted",
-                            Component.literal(newRank.getTurkishName() + " (" + newRank.getEnglishName() + ")")
+                            Component.translatable(newRank.getTranslationKey())
                                     .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD)
                     ).withStyle(ChatFormatting.GREEN));
 

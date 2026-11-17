@@ -26,6 +26,16 @@ public class FireballJutsuAbility extends Ability implements Ability.Cooldown {
         return 121;
     }
 
+    /**
+     * Canon hand seals: Snake (6) - Ram (8) - Monkey (9) - Boar (12) - Horse (7) - Tiger (3)
+     */
+    public static final byte[] FIREBALL_CANON_SEALS = new byte[]{6, 8, 9, 12, 7, 3};
+
+    @Override
+    public byte[] getExpectedSeals() {
+        return FIREBALL_CANON_SEALS;
+    }
+
     @Override
     public float getDefaultChakraCost() {
         return 30.0f;

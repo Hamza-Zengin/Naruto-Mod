@@ -84,6 +84,31 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
         return new WaterChecks(steadyCheck, pushUpFast, pushUpNormal);
     }
 
+    public static boolean hasActiveWaterWalk(Player player) {
+        if (player == null || player.isSpectator() || player.isShiftKeyDown()) {
+            return false;
+        }
+        try {
+            INinjaData data = player.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA);
+            return data != null && data.getToggleAbilityData() != null
+                    && data.getToggleAbilityData().hasToggleAbility(
+                    com.sekwah.narutomod.abilities.NarutoAbilities.WATER_WALK.getId());
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    public static boolean isStandingOnWaterSurface(Player player) {
+        if (player == null) return false;
+        Level level = player.level();
+        int blockX = (int) Math.floor(player.getX());
+        int blockZ = (int) Math.floor(player.getZ());
+        int blockY = (int) Math.floor(player.getY() - 0.1D);
+        BlockPos pos = new BlockPos(blockX, blockY, blockZ);
+        FluidState fluidState = level.getFluidState(pos);
+        return fluidState.is(Fluids.WATER) || fluidState.is(Fluids.FLOWING_WATER);
+    }
+
     private void updatePlayerMovement(Player player, INinjaData ninjaData) {
         WaterChecks checks = this.checkSteadyNormalFastPush(player);
 
@@ -100,10 +125,12 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
             if (resultingYSpeed > 0.2D) {
                 resultingYSpeed = 0.2D;
             }
-        } else if (checks.steadyCheck && resultingYSpeed < 0.0D) {
+        } else if (checks.steadyCheck && resultingYSpeed <= 0.0D) {
             resultingYSpeed = 0.0D;
             player.resetFallDistance();
             player.setOnGround(true);
+            player.verticalCollision = true;
+            player.verticalCollisionBelow = true;
             if(player.isFallFlying()) {
                 player.stopFallFlying();
             }

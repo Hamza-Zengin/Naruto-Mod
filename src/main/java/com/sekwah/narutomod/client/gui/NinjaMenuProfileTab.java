@@ -156,15 +156,15 @@ final class NinjaMenuProfileTab {
             int rogueKills = ninjaData.getRogueNinjasDefeated();
             int masteredCount = NinjaRank.countMasteredJutsus(ninjaData, 50);
 
-            graphics.text(font, "§e★ Chūnin Sınavı (Genin ➔ Chūnin)", x + 6, examBoxY + 5, 0xFFFFAA00);
-            String cText = (baseChakra >= needC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int) Math.min(baseChakra, needC) + "/" + needC;
+            graphics.text(font, "§e★ Ch\u016bnin S\u0131nav\u0131 (Genin ➔ Ch\u016bnin)", x + 6, examBoxY + 5, 0xFFFFAA00);
+            String cText = (baseChakra >= needC ? "§a✔ " : "§c✖ ") + "\u00c7akra: " + (int) Math.min(baseChakra, needC) + "/" + needC;
             String sText = (baseStamina >= needS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int) Math.min(baseStamina, needS) + "/" + needS;
-            String rText = (rogueKills >= 10 ? "§a✔ " : "§c✖ ") + "Kaçak Ninja: " + Math.min(rogueKills, 10) + "/10";
+            String rText = (rogueKills >= 10 ? "§a✔ " : "§c✖ ") + "Ka\u00e7ak Ninja: " + Math.min(rogueKills, 10) + "/10";
             String mText = (masteredCount >= 3 ? "§a✔ " : "§c✖ ") + "Usta Jutsu: " + Math.min(masteredCount, 3) + "/3";
             graphics.text(font, cText + "   " + sText, x + 6, examBoxY + 18, 0xFFFFFFFF);
             graphics.text(font, rText + "   " + mText, x + 6, examBoxY + 30, 0xFFFFFFFF);
-            String hint = ready ? "§a✔ Chūnin terfisi hazır! Aşağıdaki butona tıklayın."
-                    : "§7Kaçak ninjaları avlayın ve en az 3 jutsuda 50+ ustalığa ulaşın.";
+            String hint = ready ? "§a✔ Ch\u016bnin terfisi haz\u0131r! A\u015fa\u011f\u0131daki butona t\u0131klay\u0131n."
+                    : "§7Ka\u00e7ak ninjalar\u0131 avlay\u0131n ve en az 3 jutsuda 50+ ustal\u0131\u011fa ula\u015f\u0131n.";
             graphics.text(font, hint, x + 6, examBoxY + 43, 0xFFAAAAAA);
         } else if (rank == NinjaRank.CHUNIN) {
             int needC = (int) rank.getRequiredChakraToAdvance();
@@ -172,15 +172,15 @@ final class NinjaMenuProfileTab {
             int akatsukiKills = ninjaData.getAkatsukiNinjasDefeated();
             boolean reqAdv = NinjaRank.hasMasteredAdvancedJutsu(ninjaData, 50);
 
-            graphics.text(font, "§e★ Jōnin Değerlendirmesi (Chūnin ➔ Jōnin)", x + 6, examBoxY + 5, 0xFFFFAA00);
-            String cText = (baseChakra >= needC ? "§a✔ " : "§c✖ ") + "Çakra: " + (int) Math.min(baseChakra, needC) + "/" + needC;
+            graphics.text(font, "§e★ J\u014dnin De\u011ferlendirmesi (Ch\u016bnin ➔ J\u014dnin)", x + 6, examBoxY + 5, 0xFFFFAA00);
+            String cText = (baseChakra >= needC ? "§a✔ " : "§c✖ ") + "\u00c7akra: " + (int) Math.min(baseChakra, needC) + "/" + needC;
             String sText = (baseStamina >= needS ? "§a✔ " : "§c✖ ") + "Kondisyon: " + (int) Math.min(baseStamina, needS) + "/" + needS;
             String aText = (akatsukiKills >= 1 ? "§a✔ " : "§c✖ ") + "Akatsuki: " + Math.min(akatsukiKills, 1) + "/1";
-            String advText = (reqAdv ? "§a✔ " : "§c✖ ") + "İleri Jutsu: " + (reqAdv ? "Hazır" : "Gerekiyor");
+            String advText = (reqAdv ? "§a✔ " : "§c✖ ") + "\u0130leri Jutsu: " + (reqAdv ? "Haz\u0131r" : "Gerekiyor");
             graphics.text(font, cText + "   " + sText, x + 6, examBoxY + 18, 0xFFFFFFFF);
             graphics.text(font, aText + "   " + advText, x + 6, examBoxY + 30, 0xFFFFFFFF);
-            String hint = ready ? "§a✔ Jōnin ataması hazır! Aşağıdan rütbeye terfi edin."
-                    : "§7Akatsuki üyesini yenin ve ileri seviye bir teknikte (Rasengan/Chidori) ustalaşın.";
+            String hint = ready ? "§a✔ J\u014dnin atamas\u0131 haz\u0131r! A\u015fa\u011f\u0131dan r\u00fctbeye terfi edin."
+                    : "§7Akatsuki \u00fcyesini yenin ve ileri seviye bir teknikte (Rasengan/Chidori) ustala\u015f\u0131n.";
             graphics.text(font, hint, x + 6, examBoxY + 43, 0xFFAAAAAA);
         } else {
             int needC = (int) rank.getRequiredChakraToAdvance();
@@ -189,8 +189,8 @@ final class NinjaMenuProfileTab {
             int needJ = rank.getRequiredJutsusToAdvance();
             int unlocked = ninjaData.getUnlockedAbilities().size();
             String title = rank == NinjaRank.JONIN
-                    ? "§e★ ANBU Özel Kuvvet Sınavı (Jōnin ➔ ANBU)"
-                    : "§e★ Kage Seçim Adaylığı (ANBU ➔ Kage)";
+                    ? "§e★ ANBU \u00d6zel Kuvvet S\u0131nav\u0131 (J\u014dnin ➔ ANBU)"
+                    : "§e★ Kage Se\u00e7im Adayl\u0131\u011f\u0131 (ANBU ➔ Kage)";
             String readyHint = rank == NinjaRank.JONIN
                     ? "§a✔ Özel kuvvetler daveti onaylandı! Aşağıdan terfi edin."
                     : "§a✔ Köy Meclisi sizi Kage ilan etti! Liderliği devralın.";

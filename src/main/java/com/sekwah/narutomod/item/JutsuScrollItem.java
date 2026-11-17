@@ -121,7 +121,7 @@ public class JutsuScrollItem extends Item {
             NinjaRank playerRank = NinjaRank.fromString(ninjaData.getRank());
             if (playerRank.getLevel() < ability.getRequiredRank().getLevel()) {
                 player.sendSystemMessage(Component.translatable("jutsu.scroll.fail_rank",
-                        Component.literal(ability.getRequiredRank().getTurkishName() + " (" + ability.getRequiredRank().getEnglishName() + ")")
+                        Component.translatable(ability.getRequiredRank().getTranslationKey())
                                 .withStyle(ChatFormatting.GOLD)
                 ).withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
                 level.playSound(null, player.blockPosition(), SoundEvents.VILLAGER_NO, SoundSource.PLAYERS, 1.0f, 1.0f);
@@ -180,7 +180,7 @@ public class JutsuScrollItem extends Item {
                 tooltip.accept(Component.translatable("jutsu.scroll.contains",
                         Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.GOLD)).withStyle(ChatFormatting.GRAY));
                 tooltip.accept(Component.translatable("jutsu.scroll.requires_rank",
-                        Component.literal(ability.getRequiredRank().getTurkishName() + " (" + ability.getRequiredRank().getEnglishName() + ")").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.DARK_GRAY));
+                        Component.translatable(ability.getRequiredRank().getTranslationKey()).withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.DARK_GRAY));
                 if (!ability.getPrerequisites().isEmpty()) {
                     List<Identifier> prereqs = ability.getPrerequisites();
                     StringBuilder prereqNames = new StringBuilder();

@@ -91,18 +91,18 @@ final class NinjaMenuJutsuTab {
         }
         if (id != null) {
             String path = id.getPath();
-            if (path.equals("amaterasu") || path.equals("susanoo_ribcage")) return "§c[Uchiha Parşömeni - Jōnin]";
-            if (path.equals("eight_gates_death")) return "§4[Nihai Yasak Parşömen - Jōnin]";
-            if (path.equals("eight_gates")) return "§4[Yasak Parşömen - Jōnin]";
-            if (path.equals("rasenshuriken")) return "§b[S-Seviye Parşömen - Jōnin]";
-            if (path.equals("sharingan")) return "§c[Uchiha Klanı - Genin]";
-            if (path.equals("byakugan")) return "§f[Hyūga Klanı - Genin]";
-            if (path.equals("wood_prison")) return "§2[Senju Klanı - Genin]";
-            if (path.equals("bone_dance")) return "§f[Kaguya Klanı - Genin]";
-            if (path.equals("shadow_possession")) return "§8[Nara Klanı - Genin / Parşömen]";
+            if (path.equals("amaterasu") || path.equals("susanoo_ribcage")) return "§c[Uchiha Par\u015f\u00f6meni - J\u014dnin]";
+            if (path.equals("eight_gates_death")) return "§4[Nihai Yasak Par\u015f\u00f6men - J\u014dnin]";
+            if (path.equals("eight_gates")) return "§4[Yasak Par\u015f\u00f6men - J\u014dnin]";
+            if (path.equals("rasenshuriken")) return "§b[S-Seviye Par\u015f\u00f6men - J\u014dnin]";
+            if (path.equals("sharingan")) return "§c[Uchiha Klan\u0131 - Genin]";
+            if (path.equals("byakugan")) return "§f[Hy\u016bga Klan\u0131 - Genin]";
+            if (path.equals("wood_prison")) return "§2[Senju Klan\u0131 - Genin]";
+            if (path.equals("bone_dance")) return "§f[Kaguya Klan\u0131 - Genin]";
+            if (path.equals("shadow_possession")) return "§8[Nara Klan\u0131 - Genin / Par\u015f\u00f6men]";
         }
-        if (NinjaData.isScrollRequiredJutsu(id)) return "§6[Parşömen Gerekir]";
+        if (NinjaData.isScrollRequiredJutsu(id)) return "§6[Par\u015f\u00f6men Gerekir]";
         if (ability.getRequiredRank() == NinjaRank.ACADEMY_STUDENT) return "§7[Temel Yetenek]";
-        return "§a[Rütbe: " + ability.getRequiredRank().getTurkishName() + "]";
+        return "§a[R\u00fctbe: " + Component.translatable(ability.getRequiredRank().getTranslationKey()).getString() + "]";
     }
 }

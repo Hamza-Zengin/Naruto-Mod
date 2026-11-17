@@ -1,6 +1,9 @@
 {
   "type": "narutomod:add_naruto_loot",
-  "conditions": [],
+  "chance": 0.25,
+  "item": "narutomod:kunai",
+  "max_count": 12,
+  "min_count": 4,
   "target_loot_tables": [
     "minecraft:chests/simple_dungeon",
     "minecraft:chests/desert_pyramid",
@@ -9,9 +12,5 @@
     "minecraft:chests/village/village_weaponsmith",
     "minecraft:chests/nether_bridge",
     "minecraft:chests/stronghold_corridor"
-  ],
-  "item": "narutomod:kunai",
-  "chance": 0.25,
-  "min_count": 4,
-  "max_count": 12
+  ]
 }

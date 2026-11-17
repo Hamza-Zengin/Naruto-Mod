@@ -76,11 +76,17 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                     return;
                 }
 
+                int discountPercent = ability.getPerfectComboDiscountPercent(ninjaData);
                 if (ability.handleCost(player, ninjaData)) {
                     if (ability.logInChat()) {
                         player.sendSystemMessage(Component.translatable("jutsu.cast", Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
+                        if (discountPercent > 0) {
+                            player.sendSystemMessage(Component.translatable("jutsu.combo.perfect",
+                                    Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW),
+                                    discountPercent).withStyle(ChatFormatting.GOLD));
+                        }
                     }
-                    int delay = ability.requiresSealActivationDelay() ? ability.getActivationDelayTicks(ninjaData) : 0;
+                    int delay = (ability.requiresSealActivationDelay() && discountPercent > 0) ? ability.getActivationDelayTicks(ninjaData) : 0;
                     if (delay > 0) {
                         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                                 SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.4f, 1.2f);

@@ -240,31 +240,29 @@ public class DatapackSchemaAuditTest {
 
     @Test
     public void testGlobalLootModifiersDecodeCleanly() throws IOException {
-        Path globalFile = Paths.get("src/main/resources/data/neoforge/loot_modifiers/global_loot_modifiers.json");
-        Assertions.assertTrue(Files.isRegularFile(globalFile), "global_loot_modifiers.json must exist!");
-
-        JsonObject globalRoot = JsonParser.parseString(Files.readString(globalFile)).getAsJsonObject();
-        Assertions.assertTrue(globalRoot.has("replace") && globalRoot.get("replace").isJsonPrimitive(),
-                "global_loot_modifiers.json missing 'replace' boolean");
-        Assertions.assertTrue(globalRoot.has("entries") && globalRoot.get("entries").isJsonArray(),
-                "global_loot_modifiers.json missing 'entries' array");
-
-        JsonArray entries = globalRoot.getAsJsonArray("entries");
-        Assertions.assertFalse(entries.isEmpty(), "global_loot_modifiers.json 'entries' must not be empty");
+        Path legacyGlobalFile = Paths.get("src/main/resources/data/neoforge/loot_modifiers/global_loot_modifiers.json");
+        Assertions.assertFalse(Files.exists(legacyGlobalFile),
+                "Legacy global_loot_modifiers.json must not exist in NeoForge 26.3 (causes LootModifierManager parse error)");
 
         Path modifiersDir = DATA_DIR.resolve("loot_modifiers");
         Assertions.assertTrue(Files.isDirectory(modifiersDir), "loot_modifiers directory must exist!");
 
-        for (JsonElement entry : entries) {
-            String id = entry.getAsString();
-            Assertions.assertTrue(id.startsWith("narutomod:"), "Unexpected modifier namespace: " + id);
-            String path = id.substring("narutomod:".length());
-            Path modifierFile = modifiersDir.resolve(path + ".json");
-            Assertions.assertTrue(Files.isRegularFile(modifierFile), "Missing loot modifier JSON: " + modifierFile);
+        List<Path> modifierFiles;
+        try (Stream<Path> walk = Files.list(modifiersDir)) {
+            modifierFiles = walk.filter(Files::isRegularFile)
+                    .filter(p -> p.toString().endsWith(".json"))
+                    .sorted()
+                    .toList();
+        }
+        Assertions.assertEquals(13, modifierFiles.size(), "Expected 13 Global Loot Modifier JSON files!");
 
+        for (Path modifierFile : modifierFiles) {
             JsonObject modObj = JsonParser.parseString(Files.readString(modifierFile)).getAsJsonObject();
+            Assertions.assertTrue(modObj.has("type"), modifierFile.getFileName() + " missing 'type'");
             Assertions.assertEquals("narutomod:add_naruto_loot", modObj.get("type").getAsString(),
                     modifierFile.getFileName() + " must use narutomod:add_naruto_loot");
+            Assertions.assertFalse(modObj.has("conditions"),
+                    modifierFile.getFileName() + " should not use legacy 'conditions' array in NeoForge 26.3");
             DataResult<AddNarutoLootModifier> result = AddNarutoLootModifier.CODEC.codec().parse(JsonOps.INSTANCE, modObj);
             Assertions.assertTrue(result.result().isPresent(),
                     "Failed to decode AddNarutoLootModifier " + modifierFile.getFileName() + ": "

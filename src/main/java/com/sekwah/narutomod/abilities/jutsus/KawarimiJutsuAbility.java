@@ -140,12 +140,13 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
         );
         if (found == null) return null;
 
-        // Align directly onto the solid surface below found (found itself is open, check if below(1) is solid or drop up to 2 blocks)
-        int surfaceY = found.getY();
+        // Align directly onto the solid surface collision top below found
+        double surfaceY = found.getY();
         for (int dy = 1; dy <= 3; dy++) {
             BlockPos below = found.below(dy);
-            if (!level.getBlockState(below).getCollisionShape(level, below).isEmpty()) {
-                surfaceY = below.getY() + 1;
+            var shape = level.getBlockState(below).getCollisionShape(level, below);
+            if (!shape.isEmpty()) {
+                surfaceY = below.getY() + shape.max(net.minecraft.core.Direction.Axis.Y);
                 break;
             }
         }
@@ -179,7 +180,7 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
-        if (!(player.level() instanceof ServerLevel serverLevel)) return;
+        if (player.level().isClientSide() || !(player.level() instanceof ServerLevel serverLevel)) return;
 
         int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
         double distance = getScaledTeleportDistance(mastery);
@@ -228,8 +229,12 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
             }
         }
 
-        // Silent teleport with zero particles and zero sound
+        // Silent server-authoritative teleport with synchronized velocity & ground collision state
+        player.setDeltaMovement(Vec3.ZERO);
         player.teleportTo(safePos.x, safePos.y, safePos.z);
+        player.setOnGround(true);
+        player.verticalCollision = true;
+        player.verticalCollisionBelow = true;
         player.resetFallDistance();
     }
 }

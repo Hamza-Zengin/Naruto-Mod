@@ -1,6 +1,8 @@
 {
   "type": "narutomod:add_naruto_loot",
-  "conditions": [],
+  "chance": 0.14,
+  "item": "narutomod:chakra_metal",
+  "max_count": 4,
   "target_loot_tables": [
     "minecraft:chests/simple_dungeon",
     "minecraft:chests/desert_pyramid",
@@ -9,9 +11,5 @@
     "minecraft:chests/village/village_weaponsmith",
     "minecraft:chests/nether_bridge",
     "minecraft:chests/stronghold_corridor"
-  ],
-  "item": "narutomod:chakra_metal",
-  "chance": 0.14,
-  "min_count": 1,
-  "max_count": 4
+  ]
 }

@@ -38,6 +38,11 @@ public class NarutoBlockStateProvider extends ModelProvider {
     }
 
     @Override
+    public String getName() {
+        return "Block State Definitions - " + NarutoMod.MOD_ID;
+    }
+
+    @Override
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
         // Bonsai Tree
         Identifier bonsaiModel = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/bonsai_tree");

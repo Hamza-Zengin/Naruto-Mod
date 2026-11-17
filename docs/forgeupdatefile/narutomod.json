@@ -1,14 +1,14 @@
 {
     "homepage": "https://github.com/Hamza-Zengin/Naruto-Mod",
     "26.3": {
-      "26.3-v12.2": "Release V12.2: NeoForge 26.3 port with 3D weapon client item models, Susanoo ribcage hierarchy fix, and updated mixins"
+      "0.1.0": "Release 0.1.0: NeoForge 26.3 port with SekCLib 0.1.0 integration, data-driven jutsus & GLMs, 3D weapon client item models, and GameTests"
     },
     "1.20.1": {
       "1.20.1-v12.2": "Release V12.2: Fix 8 Gates horizontal rings, weapon 2D icons, 3D models & grip angles, and 32x32 single-iris Sharingan/Byakugan overlays"
     },
     "promos": {
-      "26.3-latest": "26.3-v12.2",
-      "26.3-recommended": "26.3-v12.2",
+      "26.3-latest": "0.1.0",
+      "26.3-recommended": "0.1.0",
       "1.20.1-latest": "1.20.1-v12.2",
       "1.20.1-recommended": "1.20.1-v12.2"
     }

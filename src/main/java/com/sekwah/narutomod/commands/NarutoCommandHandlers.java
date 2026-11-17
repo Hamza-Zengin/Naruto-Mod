@@ -151,7 +151,10 @@ final class NarutoCommandHandlers {
         for (ServerPlayer player : players) {
             var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
             NinjaRank rank = NinjaRank.fromString(data.getRank());
-            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " Rütbesi: " + rank.getTurkishName() + " (" + rank.getEnglishName() + ")").withStyle(ChatFormatting.LIGHT_PURPLE), false);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " Rütbesi: ")
+                    .append(Component.translatable(rank.getTranslationKey()))
+                    .append(" (" + rank.getEnglishName() + ")")
+                    .withStyle(ChatFormatting.LIGHT_PURPLE), false);
         }
         return players.size();
     }
@@ -172,7 +175,10 @@ final class NarutoCommandHandlers {
             data.setStamina(data.getMaxStamina());
             NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
                     .trigger(player, NinjaProgressTrigger.Action.RANK_UP, parsed.name());
-            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " rütbesi '" + parsed.getTurkishName() + "' yapıldı. Çakra/kondisyon yenilendi.").withStyle(ChatFormatting.GREEN), true);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " rütbesi '")
+                    .append(Component.translatable(parsed.getTranslationKey()))
+                    .append("' yapıldı. Çakra/kondisyon yenilendi.")
+                    .withStyle(ChatFormatting.GREEN), true);
         }
         return players.size();
     }
@@ -180,7 +186,10 @@ final class NarutoCommandHandlers {
     static int listRanks(CommandSourceStack source) {
         source.sendSuccess(() -> Component.literal("=== Mevcut Shinobi Rütbeleri ===").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.BOLD), false);
         for (NinjaRank rank : NinjaRank.values()) {
-            source.sendSuccess(() -> Component.literal(" - " + rank.name().toLowerCase() + " (" + rank.getTurkishName() + ") §7[+" + (int) rank.getChakraBonus() + " Çakra, +" + (int) rank.getStaminaBonus() + " Kondisyon]").withStyle(ChatFormatting.AQUA), false);
+            source.sendSuccess(() -> Component.literal(" - " + rank.name().toLowerCase() + " (")
+                    .append(Component.translatable(rank.getTranslationKey()))
+                    .append(") §7[+" + (int) rank.getChakraBonus() + " Çakra, +" + (int) rank.getStaminaBonus() + " Kondisyon]")
+                    .withStyle(ChatFormatting.AQUA), false);
         }
         return 1;
     }
@@ -222,7 +231,10 @@ final class NarutoCommandHandlers {
             String path = entry.getId().getPath();
             boolean isScroll = NinjaData.isScrollRequiredJutsu(entry.getId());
             String tag = isScroll ? " §e[Parşömen]" : "";
-            source.sendSuccess(() -> Component.literal(" - " + path + tag + " §7(Gerekli: " + a.getRequiredRank().getDisplayName() + ")").withStyle(ChatFormatting.WHITE), false);
+            source.sendSuccess(() -> Component.literal(" - " + path + tag + " §7(Gerekli: ")
+                    .append(Component.translatable(a.getRequiredRank().getTranslationKey()))
+                    .append(")")
+                    .withStyle(ChatFormatting.WHITE), false);
         }
         return 1;
     }
@@ -288,7 +300,10 @@ final class NarutoCommandHandlers {
             float sExpNeeded = 50.0f + (data.getBaseMaxStamina() - 100.0f) * 1.10f;
 
             source.sendSuccess(() -> Component.literal("=== SHINOBI STATS: " + player.getScoreboardName() + " ===").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD), false);
-            source.sendSuccess(() -> Component.literal("• Rütbe: §f" + rank.getTurkishName() + " (" + rank.getEnglishName() + ")").withStyle(ChatFormatting.AQUA), false);
+            source.sendSuccess(() -> Component.literal("• Rütbe: §f")
+                    .append(Component.translatable(rank.getTranslationKey()))
+                    .append(" (" + rank.getEnglishName() + ")")
+                    .withStyle(ChatFormatting.AQUA), false);
             source.sendSuccess(() -> Component.literal("• Klan: §f" + clan + " " + clanLock).withStyle(ChatFormatting.YELLOW), false);
             source.sendSuccess(() -> Component.literal("• Çakra: §f" + (int) data.getChakra() + " / " + (int) data.getMaxChakra() + " §7(Taban: " + (int) data.getBaseMaxChakra() + ", Rütbe Bonusu: +" + (int) rank.getChakraBonus() + ")").withStyle(ChatFormatting.BLUE), false);
             source.sendSuccess(() -> Component.literal("• Kondisyon: §f" + (int) data.getStamina() + " / " + (int) data.getMaxStamina() + " §7(Taban: " + (int) data.getBaseMaxStamina() + ", Rütbe Bonusu: +" + (int) rank.getStaminaBonus() + ")").withStyle(ChatFormatting.GREEN), false);

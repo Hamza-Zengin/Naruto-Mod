@@ -4,7 +4,10 @@
   "compatibilityLevel": "JAVA_21",
   "package": "com.sekwah.narutomod.mixin",
   "mixins": [
-    "common.TripWireBlockMixin"
+    "common.TripWireBlockMixin",
+    "common.LivingEntityWaterWalkMixin",
+    "common.LiquidBlockWalkMixin",
+    "common.ServerGamePacketListenerImplMixin"
   ],
   "client": [
   ],

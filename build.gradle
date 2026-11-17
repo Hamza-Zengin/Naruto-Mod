@@ -68,6 +68,11 @@ neoForge {
             programArguments.addAll '--mod', project.modid, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
 
+        serverData {
+            serverData()
+            programArguments.addAll '--mod', project.modid, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             logLevel = org.slf4j.event.Level.DEBUG
@@ -104,7 +109,12 @@ tasks.named('test', Test).configure {
     }
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 tasks.named('processResources', ProcessResources).configure {
+    filteringCharset = 'UTF-8'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     def replaceProperties = [
             minecraft_version      : project.property('minecraft_version'),

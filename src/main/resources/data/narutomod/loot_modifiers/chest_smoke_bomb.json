@@ -1,6 +1,9 @@
 {
   "type": "narutomod:add_naruto_loot",
-  "conditions": [],
+  "chance": 0.2,
+  "item": "narutomod:smoke_bomb",
+  "max_count": 6,
+  "min_count": 2,
   "target_loot_tables": [
     "minecraft:chests/simple_dungeon",
     "minecraft:chests/desert_pyramid",
@@ -9,9 +12,5 @@
     "minecraft:chests/village/village_weaponsmith",
     "minecraft:chests/nether_bridge",
     "minecraft:chests/stronghold_corridor"
-  ],
-  "item": "narutomod:smoke_bomb",
-  "chance": 0.2,
-  "min_count": 2,
-  "max_count": 6
+  ]
 }
