@@ -1,5 +1,9 @@
 package com.sekwah.narutomod.entity;
 
+import com.sekwah.narutomod.entity.ai.ShadowCloneGoals.CloneFollowOwnerGoal;
+import com.sekwah.narutomod.entity.ai.ShadowCloneGoals.CloneJutsuAttackGoal;
+import com.sekwah.narutomod.entity.ai.ShadowCloneGoals.CloneOwnerHurtByTargetGoal;
+import com.sekwah.narutomod.entity.ai.ShadowCloneGoals.CloneOwnerHurtTargetGoal;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleTypes;
@@ -87,6 +91,18 @@ public class ShadowCloneEntity extends PathfinderMob {
 
     public void setFastJutsuCooldown(boolean fast) {
         this.fastJutsuCooldown = fast;
+    }
+
+    public boolean isFastJutsuCooldown() {
+        return this.fastJutsuCooldown;
+    }
+
+    public int getCloneJutsuCooldown() {
+        return this.cloneJutsuCooldown;
+    }
+
+    public void setCloneJutsuCooldown(int ticks) {
+        this.cloneJutsuCooldown = ticks;
     }
 
     private static final EntityDataAccessor<String> DATA_ACTIVE_ABILITIES =

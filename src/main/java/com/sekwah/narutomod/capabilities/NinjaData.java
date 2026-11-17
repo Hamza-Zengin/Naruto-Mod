@@ -1129,4 +1129,24 @@ public class NinjaData implements INinjaData {
         abandonMission();
         return true;
     }
+
+    // --- Package-private raw accessors used by NinjaDataNbtCodec (bypass clamping/side effects) ---
+
+    float getRawMaxChakra() { return this.maxChakra; }
+
+    void setRawMaxChakra(float value) { this.maxChakra = value; }
+
+    float getRawMaxStamina() { return this.maxStamina; }
+
+    void setRawMaxStamina(float value) { this.maxStamina = value; }
+
+    void setRawClan(Identifier clan) { this.clan = clan; }
+
+    List<Byte> getMutableActiveSeals() { return this.activeSeals; }
+
+    void setRawSealTimeout(int value) { this.sealTimeout = value; }
+
+    void setRawMissionProgress(int value) { this.missionProgress = value; }
+
+    void setRawChakraRegenCooldown(int value) { this.chakraRegenInfo.cooldown = value; }
 }
