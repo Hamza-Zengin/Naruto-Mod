@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Hamza-Zengin/SekCLib
-          ref: 1f851a1abbf26467a0a82d3b3f23ebd43e6e4e70
+          ref: 134e6896064fb14db766987a3fc101972d843e5c
           path: SekCLib
 
       - name: Cache Gradle packages

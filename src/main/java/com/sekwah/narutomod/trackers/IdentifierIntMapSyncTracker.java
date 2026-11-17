@@ -1,7 +1,7 @@
 package com.sekwah.narutomod.trackers;
 
-import com.sekwah.sekclib.capabilitysync.capabilitysync.tracker.SyncTrackerClone;
-import com.sekwah.sekclib.capabilitysync.capabilitysync.tracker.SyncTrackerSerializer;
+import com.sekwah.sekclib.capabilitysync.tracker.SyncTrackerClone;
+import com.sekwah.sekclib.capabilitysync.tracker.SyncTrackerSerializer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.Identifier;
 
