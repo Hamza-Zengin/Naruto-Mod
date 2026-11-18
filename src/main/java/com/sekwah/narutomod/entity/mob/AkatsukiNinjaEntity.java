@@ -171,10 +171,19 @@ public class AkatsukiNinjaEntity extends Monster implements NinjaJutsuUser {
         this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.FUMA_SHURIKEN.get(), 1 + this.random.nextInt(2)));
 
         float roll = this.random.nextFloat();
-        if (roll < 0.35f) {
+        if (roll < 0.22f) {
             this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.SCROLL_RASENSHURIKEN.get(), 1));
-        } else if (roll < 0.65f) {
+        } else if (roll < 0.44f) {
             this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.SCROLL_KIRIN.get(), 1));
+        } else if (roll < 0.59f) {
+            this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.SCROLL_WATER_DRAGON.get(), 1));
+        } else if (roll < 0.74f) {
+            this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.SCROLL_STONE_SPIKES.get(), 1));
+        } else if (roll < 0.92f) {
+            this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.BLANK_JUTSU_SCROLL.get(), 1));
+        }
+        if (this.random.nextFloat() < 0.12f) {
+            this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.WARRING_STATES_ARMOR.get(), 1));
         }
     }
 }

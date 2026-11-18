@@ -56,6 +56,14 @@ public class ServerRankUpPacket implements CustomPacketPayload {
             if (ServerSecurityValidator.validateRankUp(player, ninjaData)) {
                 if (ninjaData.rankUp()) {
                     NinjaRank newRank = NinjaRank.fromString(ninjaData.getRank());
+                    if (newRank == NinjaRank.KAGE) {
+                        net.minecraft.world.item.ItemStack kageHat = new net.minecraft.world.item.ItemStack(
+                                com.sekwah.narutomod.item.NarutoItems.KAGE_HAT.get());
+                        if (!player.getInventory().add(kageHat)
+                                && player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                            player.spawnAtLocation(serverLevel, kageHat);
+                        }
+                    }
                     com.sekwah.narutomod.registries.NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
                             .trigger(player, com.sekwah.narutomod.advancements.NinjaProgressTrigger.Action.RANK_UP, newRank.name());
                     player.sendSystemMessage(Component.translatable("naruto.rank.promoted",

@@ -86,7 +86,8 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                                     discountPercent).withStyle(ChatFormatting.GOLD));
                         }
                     }
-                    int delay = (ability.requiresSealActivationDelay() && discountPercent > 0) ? ability.getActivationDelayTicks(ninjaData) : 0;
+                    int rawDelay = (ability.requiresSealActivationDelay() && discountPercent > 0) ? ability.getActivationDelayTicks(ninjaData) : 0;
+                    int delay = Ability.applyArmorDelayReduction(player, rawDelay);
                     if (delay > 0) {
                         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                                 SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.4f, 1.2f);

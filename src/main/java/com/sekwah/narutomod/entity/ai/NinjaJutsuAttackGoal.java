@@ -2,8 +2,10 @@ package com.sekwah.narutomod.entity.ai;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.jutsus.KawarimiJutsuAbility;
+import com.sekwah.narutomod.entity.jutsuprojectile.EarthBulletEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.MudWallEntity;
+import com.sekwah.narutomod.entity.jutsuprojectile.VacuumSphereEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity;
 import com.sekwah.narutomod.network.PacketHandler;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
@@ -95,12 +97,18 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
         if (hasLineOfSight
                 && distanceToTarget >= profile.getMinRangedDistance()
                 && distanceToTarget <= profile.getMaxRangedDistance()) {
-            List<NinjaJutsuType> rangedCandidates = new ArrayList<>(2);
+            List<NinjaJutsuType> rangedCandidates = new ArrayList<>(4);
             if (profile.isEnabled(NinjaJutsuType.FIREBALL) && cooldowns.isReady(NinjaJutsuType.FIREBALL)) {
                 rangedCandidates.add(NinjaJutsuType.FIREBALL);
             }
             if (profile.isEnabled(NinjaJutsuType.WATER_BULLET) && cooldowns.isReady(NinjaJutsuType.WATER_BULLET)) {
                 rangedCandidates.add(NinjaJutsuType.WATER_BULLET);
+            }
+            if (profile.isEnabled(NinjaJutsuType.EARTH_BULLET) && cooldowns.isReady(NinjaJutsuType.EARTH_BULLET)) {
+                rangedCandidates.add(NinjaJutsuType.EARTH_BULLET);
+            }
+            if (profile.isEnabled(NinjaJutsuType.VACUUM_SPHERES) && cooldowns.isReady(NinjaJutsuType.VACUUM_SPHERES)) {
+                rangedCandidates.add(NinjaJutsuType.VACUUM_SPHERES);
             }
             if (!rangedCandidates.isEmpty()) {
                 int idx = Math.floorMod(randomChoiceIndex, rangedCandidates.size());
@@ -261,6 +269,54 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
             int cd = this.profile.getWaterBulletCooldownTicks()
                     + (this.profile.getWaterBulletCooldownJitter() > 0 ? this.mob.getRandom().nextInt(this.profile.getWaterBulletCooldownJitter()) : 0);
             this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.WATER_BULLET, cd, this.profile.getGlobalCooldownTicks());
+        } else if (type == NinjaJutsuType.EARTH_BULLET) {
+            serverLevel.playSound(null, this.mob.blockPosition(), NarutoSounds.JUTSU_CAST.get(), SoundSource.HOSTILE, 1.0F, 0.9F);
+            serverLevel.playSound(null, this.mob.blockPosition(), NarutoSounds.MUD_WALL_RISE.get(), SoundSource.HOSTILE, 1.1F, 1.0F);
+            EarthBulletEntity bullet = new EarthBulletEntity(serverLevel, this.mob);
+            Vec3 spawnPos = this.mob.getEyePosition().add(dir.scale(1.25D));
+            bullet.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+            bullet.setYRot(this.mob.getYRot());
+            bullet.setXRot(this.mob.getXRot());
+            bullet.setDamage(this.profile.getEarthBulletDamage());
+            bullet.setMaxLife(this.profile.getEarthBulletMaxLife());
+            bullet.setDeltaMovement(dir.scale(this.profile.getEarthBulletSpeed()));
+            serverLevel.addFreshEntity(bullet);
+
+            BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
+            serverLevel.sendParticles(rockParticle, spawnPos.x, spawnPos.y, spawnPos.z,
+                    14, 0.3D, 0.3D, 0.3D, 0.08D,
+                    ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+
+            int cd = this.profile.getEarthBulletCooldownTicks()
+                    + (this.profile.getEarthBulletCooldownJitter() > 0 ? this.mob.getRandom().nextInt(this.profile.getEarthBulletCooldownJitter()) : 0);
+            this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.EARTH_BULLET, cd, this.profile.getGlobalCooldownTicks());
+        } else if (type == NinjaJutsuType.VACUUM_SPHERES) {
+            serverLevel.playSound(null, this.mob.blockPosition(), NarutoSounds.JUTSU_CAST.get(), SoundSource.HOSTILE, 1.0F, 1.2F);
+            serverLevel.playSound(null, this.mob.blockPosition(), SoundEvents.PHANTOM_FLAP, SoundSource.HOSTILE, 1.1F, 1.35F);
+            Vec3 spawnPos = this.mob.getEyePosition().add(dir.scale(1.1D));
+            Vec3 right = new Vec3(-dir.z, 0.0D, dir.x);
+            if (right.lengthSqr() > 1.0E-5D) {
+                right = right.normalize();
+            }
+            for (int i = -1; i <= 1; i++) {
+                Vec3 shotDir = dir.add(right.scale(i * 0.06D)).normalize();
+                VacuumSphereEntity sphere = new VacuumSphereEntity(serverLevel, this.mob);
+                sphere.setPos(spawnPos.x + right.x * (i * 0.25D), spawnPos.y, spawnPos.z + right.z * (i * 0.25D));
+                sphere.setYRot(this.mob.getYRot());
+                sphere.setXRot(this.mob.getXRot());
+                sphere.setDamage(this.profile.getVacuumSpheresDamage());
+                sphere.setMaxLife(this.profile.getVacuumSpheresMaxLife());
+                sphere.setDeltaMovement(shotDir.scale(this.profile.getVacuumSpheresSpeed()));
+                serverLevel.addFreshEntity(sphere);
+            }
+
+            serverLevel.sendParticles(ParticleTypes.CLOUD, spawnPos.x, spawnPos.y, spawnPos.z,
+                    12, 0.25D, 0.25D, 0.25D, 0.08D,
+                    ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+
+            int cd = this.profile.getVacuumSpheresCooldownTicks()
+                    + (this.profile.getVacuumSpheresCooldownJitter() > 0 ? this.mob.getRandom().nextInt(this.profile.getVacuumSpheresCooldownJitter()) : 0);
+            this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.VACUUM_SPHERES, cd, this.profile.getGlobalCooldownTicks());
         }
     }
 

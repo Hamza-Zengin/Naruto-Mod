@@ -101,6 +101,9 @@ public class NinjaData implements INinjaData {
     @Sync(minTicks = 1, syncGlobally = true)
     private int activeJutsusFlag = 0;
 
+    @Sync
+    private boolean kageHatEquipped = false;
+
     public static final int DEFAULT_SEAL_TIMEOUT = 60;
     public static final int MAX_ACTIVE_SEALS = 12;
 
@@ -127,6 +130,7 @@ public class NinjaData implements INinjaData {
             this.chakraExp = 0;
             this.staminaExp = 0;
             this.activeJutsusFlag = 0;
+            this.kageHatEquipped = false;
         }
         this.toggleAbilityData = new ToggleAbilityData();
     }
@@ -143,7 +147,21 @@ public class NinjaData implements INinjaData {
 
     @Override
     public float getMaxChakra() {
-        return ChakraStaminaLogic.computeMaxChakra(this.maxChakra, this.rank, this.clan);
+        return ChakraStaminaLogic.computeMaxChakra(this.maxChakra, this.rank, this.clan, this.kageHatEquipped);
+    }
+
+    @Override
+    public boolean isKageHatEquipped() {
+        return this.kageHatEquipped;
+    }
+
+    @Override
+    public void setKageHatEquipped(boolean equipped) {
+        this.kageHatEquipped = equipped;
+        float maxC = this.getMaxChakra();
+        if (this.chakra > maxC) {
+            this.chakra = maxC;
+        }
     }
 
     @Override
@@ -615,6 +633,12 @@ public class NinjaData implements INinjaData {
         // Zero-allocation cooldown tick execution: remove directly without allocating keySet copy
         if (!this.cooldownTickEvents.isEmpty()) {
             this.cooldownTickEvents.values().removeIf(CooldownTickEvent::tickAndCheckComplete);
+        }
+
+        boolean wearingKageHat = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).getItem()
+                == com.sekwah.narutomod.item.NarutoItems.KAGE_HAT.get();
+        if (this.kageHatEquipped != wearingKageHat) {
+            this.setKageHatEquipped(wearingKageHat);
         }
 
         ChakraStaminaLogic.tickRegen(this, player, this.staminaRegenInfo, this.chakraRegenInfo);

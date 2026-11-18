@@ -37,6 +37,8 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
             SynchedEntityData.defineId(WaterBulletEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_DAMAGE =
             SynchedEntityData.defineId(WaterBulletEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Boolean> DATA_IS_DRAGON =
+            SynchedEntityData.defineId(WaterBulletEntity.class, EntityDataSerializers.BOOLEAN);
 
     private int jutsuPower = 50;
 
@@ -93,6 +95,7 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
         super.defineSynchedData(builder);
         builder.define(DATA_MAX_LIFE, 40);
         builder.define(DATA_DAMAGE, 12.0F);
+        builder.define(DATA_IS_DRAGON, false);
     }
 
     @Override
@@ -126,6 +129,17 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
         this.entityData.set(DATA_DAMAGE, damage);
     }
 
+    public boolean isDragon() {
+        return this.entityData.get(DATA_IS_DRAGON);
+    }
+
+    public void setDragon(boolean dragon) {
+        this.entityData.set(DATA_IS_DRAGON, dragon);
+        if (dragon) {
+            this.jutsuPower = 90;
+        }
+    }
+
     @Override
     protected double getDefaultGravity() {
         return this.isNoGravity() ? 0.0D : 0.02D;
@@ -136,7 +150,8 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
         super.tick();
 
         if (this.level().isClientSide()) {
-            for (int i = 0; i < 3; i++) {
+            int particleCount = this.isDragon() ? 5 : 3;
+            for (int i = 0; i < particleCount; i++) {
                 this.level().addParticle(ParticleTypes.SPLASH,
                         this.getX() + (this.random.nextDouble() - 0.5D) * 0.6D,
                         this.getY() + 0.3D + (this.random.nextDouble() - 0.5D) * 0.6D,
@@ -149,17 +164,21 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
                         0.0D, -0.02D, 0.0D);
             }
         } else if (this.level() instanceof ServerLevel serverLevel) {
+            if (this.isDragon() && this.tickCount > 2) {
+                this.steerTowardNearestTarget(serverLevel);
+            }
+
             serverLevel.sendParticles(ParticleTypes.SPLASH,
                     this.getX(), this.getY() + 0.4D, this.getZ(),
-                    8, 0.35D, 0.35D, 0.35D, 0.08D,
+                    this.isDragon() ? 14 : 8, 0.35D, 0.35D, 0.35D, 0.08D,
                     net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
-            serverLevel.sendParticles(ParticleTypes.DRIPPING_WATER,
+            serverLevel.sendParticles(this.isDragon() ? ParticleTypes.BUBBLE : ParticleTypes.DRIPPING_WATER,
                     this.getX(), this.getY() + 0.4D, this.getZ(),
-                    4, 0.25D, 0.25D, 0.25D, 0.04D,
+                    this.isDragon() ? 8 : 4, 0.25D, 0.25D, 0.25D, 0.04D,
                     net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
             if (!this.level().isClientSide() && this.isAlive()) {
-                AABB clashBox = this.getBoundingBox().inflate(0.35D);
+                AABB clashBox = this.getBoundingBox().inflate(this.isDragon() ? 0.65D : 0.35D);
                 List<Entity> others = this.level().getEntities(this, clashBox,
                         e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
                 for (Entity e : others) {
@@ -175,6 +194,38 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
             if (this.tickCount >= this.getMaxLife()) {
                 this.discard();
             }
+        }
+    }
+
+    private void steerTowardNearestTarget(ServerLevel serverLevel) {
+        Vec3 motion = this.getDeltaMovement();
+        double speed = motion.length();
+        if (speed < 1.0E-4D) {
+            return;
+        }
+        Vec3 forward = motion.scale(1.0D / speed);
+        AABB searchBox = this.getBoundingBox().inflate(12.0D);
+        List<LivingEntity> candidates = serverLevel.getEntitiesOfClass(LivingEntity.class, searchBox,
+                e -> e.isAlive() && this.canHitEntity(e));
+        LivingEntity bestTarget = null;
+        double bestDistSq = Double.MAX_VALUE;
+        for (LivingEntity candidate : candidates) {
+            Vec3 toTarget = candidate.getEyePosition().subtract(this.position());
+            double distSq = toTarget.lengthSqr();
+            if (distSq < 1.0E-4D || distSq > 196.0D) {
+                continue;
+            }
+            Vec3 dir = toTarget.normalize();
+            if (forward.dot(dir) > 0.35D && distSq < bestDistSq) {
+                bestDistSq = distSq;
+                bestTarget = candidate;
+            }
+        }
+        if (bestTarget != null) {
+            Vec3 desiredDir = bestTarget.getEyePosition().subtract(this.position()).normalize();
+            Vec3 newDir = forward.scale(0.84D).add(desiredDir.scale(0.16D)).normalize();
+            this.setDeltaMovement(newDir.scale(speed));
+            this.needsSync = true;
         }
     }
 
@@ -197,7 +248,10 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
 
             hitEntity.clearFire();
             if (hitEntity instanceof LivingEntity livingTarget) {
-                Vec3 push = this.getDeltaMovement().normalize().scale(1.4D).add(0.0D, 0.35D, 0.0D);
+                double pushScale = this.isDragon() ? 1.85D : 1.4D;
+                Vec3 motion = this.getDeltaMovement();
+                Vec3 dir = motion.lengthSqr() > 1.0E-4D ? motion.normalize() : new Vec3(0, 0, 1);
+                Vec3 push = dir.scale(pushScale).add(0.0D, this.isDragon() ? 0.45D : 0.35D, 0.0D);
                 livingTarget.setDeltaMovement(push);
                 livingTarget.needsSync = true;
             }
@@ -216,11 +270,11 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
             serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_SPLASH, SoundSource.PLAYERS, 1.5F, 1.0F);
             serverLevel.sendParticles(ParticleTypes.SPLASH,
                     this.getX(), this.getY() + 0.5D, this.getZ(),
-                    25, 0.5D, 0.5D, 0.5D, 0.15D,
+                    this.isDragon() ? 45 : 25, 0.5D, 0.5D, 0.5D, 0.15D,
                     net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             serverLevel.sendParticles(ParticleTypes.BUBBLE,
                     this.getX(), this.getY() + 0.5D, this.getZ(),
-                    12, 0.4D, 0.4D, 0.4D, 0.1D,
+                    this.isDragon() ? 24 : 12, 0.4D, 0.4D, 0.4D, 0.1D,
                     net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             this.discard();
         }
@@ -231,6 +285,7 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
         super.addAdditionalSaveData(output);
         output.putInt("MaxLife", this.getMaxLife());
         output.putFloat("Damage", this.getDamage());
+        output.putBoolean("IsDragon", this.isDragon());
     }
 
     @Override
@@ -238,5 +293,6 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
         super.readAdditionalSaveData(input);
         this.setMaxLife(input.getIntOr("MaxLife", 40));
         this.setDamage(input.getFloatOr("Damage", 12.0F));
+        this.setDragon(input.getBooleanOr("IsDragon", false));
     }
 }

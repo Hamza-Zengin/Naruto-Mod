@@ -28,6 +28,15 @@ public class NarutoRenderer implements ResourceManagerReloadListener {
         ((NarutoArmorItem) NarutoItems.AKATSUKI_CLOAK.get())
                 .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.AKATSUKI_CLOAK_LAYER)))
                 .setArmorTexture("textures/models/armor/akatsuki_cloak.png");
+        ((NarutoArmorItem) NarutoItems.JONIN_VEST.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.JONIN_VEST_LAYER)))
+                .setArmorTexture("textures/models/armor/jonin_vest.png");
+        ((NarutoArmorItem) NarutoItems.WARRING_STATES_ARMOR.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.WARRING_STATES_ARMOR_LAYER)))
+                .setArmorTexture("textures/models/armor/warring_states_armor.png");
+        ((NarutoArmorItem) NarutoItems.KAGE_HAT.get())
+                .setArmorModel(new com.sekwah.narutomod.client.model.item.model.KageHatModel(modelSet.bakeLayer(NarutoRenderEvents.KAGE_HAT_LAYER)))
+                .setArmorTexture("textures/models/armor/kage_hat.png");
 
         ((NarutoArmorItem) NarutoItems.RED_ANBU_MASK.get())
                 .setArmorModel(new AnbuMaskModel(modelSet.bakeLayer(NarutoRenderEvents.ANBU_MASK_LAYER)))

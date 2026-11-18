@@ -113,6 +113,26 @@ public class ElementalInteractionHandler {
         }
     }
 
+    /**
+     * Applies Fire + Earth Molten synergy to an EarthBulletEntity passing near a FireballJutsuEntity.
+     */
+    public static void igniteEarthWithFire(
+            com.sekwah.narutomod.entity.jutsuprojectile.EarthBulletEntity earthBullet,
+            FireballJutsuEntity fireball) {
+        if (earthBullet == null || fireball == null || earthBullet.isMolten()) {
+            return;
+        }
+        earthBullet.setMolten(true);
+        earthBullet.setDamage(earthBullet.getDamage() * 1.35F);
+        if (earthBullet.getOwner() instanceof ServerPlayer owner) {
+            NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
+                    .trigger(owner, NinjaProgressTrigger.Action.ELEMENTAL_COMBO, "fire_earth");
+        }
+        if (earthBullet.level() instanceof ServerLevel serverLevel) {
+            triggerComboShockwave(serverLevel, earthBullet.position(), 0xFF4500);
+        }
+    }
+
     private static void triggerComboShockwave(ServerLevel level, Vec3 pos, int colorHex) {
         final float maxRadius = 16.0f;
         final double maxRadiusSq = maxRadius * maxRadius;

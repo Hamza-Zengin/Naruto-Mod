@@ -53,11 +53,15 @@ public class NinjaJutsuAttackGoalTest {
         NinjaJutsuProfile akatsuki = NinjaJutsuProfile.akatsukiPreset();
         NinjaJutsuCooldowns cooldowns = new NinjaJutsuCooldowns();
 
-        // Within 10-24 blocks with LoS -> selects FIREBALL or WATER_BULLET
+        // Within 10-24 blocks with LoS -> cycles FIREBALL, WATER_BULLET, EARTH_BULLET, VACUUM_SPHERES
         NinjaJutsuType first = NinjaJutsuAttackGoal.selectTacticalAction(akatsuki, cooldowns, 15.0D, true, 1.0F, 0);
         NinjaJutsuType second = NinjaJutsuAttackGoal.selectTacticalAction(akatsuki, cooldowns, 15.0D, true, 1.0F, 1);
+        NinjaJutsuType third = NinjaJutsuAttackGoal.selectTacticalAction(akatsuki, cooldowns, 15.0D, true, 1.0F, 2);
+        NinjaJutsuType fourth = NinjaJutsuAttackGoal.selectTacticalAction(akatsuki, cooldowns, 15.0D, true, 1.0F, 3);
         assertEquals(NinjaJutsuType.FIREBALL, first);
         assertEquals(NinjaJutsuType.WATER_BULLET, second);
+        assertEquals(NinjaJutsuType.EARTH_BULLET, third);
+        assertEquals(NinjaJutsuType.VACUUM_SPHERES, fourth);
 
         // No Line of Sight -> null
         assertNull(NinjaJutsuAttackGoal.selectTacticalAction(akatsuki, cooldowns, 15.0D, false, 1.0F, 0));

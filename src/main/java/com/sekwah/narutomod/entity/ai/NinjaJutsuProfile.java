@@ -25,6 +25,20 @@ public final class NinjaJutsuProfile {
     private final int waterBulletMaxLife;
     private final double waterBulletSpeed;
 
+    private final boolean earthBulletEnabled;
+    private final int earthBulletCooldownTicks;
+    private final int earthBulletCooldownJitter;
+    private final float earthBulletDamage;
+    private final int earthBulletMaxLife;
+    private final double earthBulletSpeed;
+
+    private final boolean vacuumSpheresEnabled;
+    private final int vacuumSpheresCooldownTicks;
+    private final int vacuumSpheresCooldownJitter;
+    private final float vacuumSpheresDamage;
+    private final int vacuumSpheresMaxLife;
+    private final double vacuumSpheresSpeed;
+
     private final boolean kawarimiEnabled;
     private final int kawarimiCooldownTicks;
     private final double kawarimiDistance;
@@ -52,6 +66,18 @@ public final class NinjaJutsuProfile {
         this.waterBulletDamage = builder.waterBulletDamage;
         this.waterBulletMaxLife = builder.waterBulletMaxLife;
         this.waterBulletSpeed = builder.waterBulletSpeed;
+        this.earthBulletEnabled = builder.earthBulletEnabled;
+        this.earthBulletCooldownTicks = builder.earthBulletCooldownTicks;
+        this.earthBulletCooldownJitter = builder.earthBulletCooldownJitter;
+        this.earthBulletDamage = builder.earthBulletDamage;
+        this.earthBulletMaxLife = builder.earthBulletMaxLife;
+        this.earthBulletSpeed = builder.earthBulletSpeed;
+        this.vacuumSpheresEnabled = builder.vacuumSpheresEnabled;
+        this.vacuumSpheresCooldownTicks = builder.vacuumSpheresCooldownTicks;
+        this.vacuumSpheresCooldownJitter = builder.vacuumSpheresCooldownJitter;
+        this.vacuumSpheresDamage = builder.vacuumSpheresDamage;
+        this.vacuumSpheresMaxLife = builder.vacuumSpheresMaxLife;
+        this.vacuumSpheresSpeed = builder.vacuumSpheresSpeed;
         this.kawarimiEnabled = builder.kawarimiEnabled;
         this.kawarimiCooldownTicks = builder.kawarimiCooldownTicks;
         this.kawarimiDistance = builder.kawarimiDistance;
@@ -64,8 +90,8 @@ public final class NinjaJutsuProfile {
     }
 
     /**
-     * Aggressive S-Rank Akatsuki preset: short cooldowns, dual elemental projectiles (Fireball & Water Bullet),
-     * and both Kawarimi evasion and Mud Wall defense at critical health.
+     * Aggressive S-Rank Akatsuki preset: short cooldowns, multi-element projectiles (Fireball, Water Bullet,
+     * Earth Dragon Bullet & Vacuum Spheres), and both Kawarimi evasion and Mud Wall defense at critical health.
      */
     public static NinjaJutsuProfile akatsukiPreset() {
         return new Builder()
@@ -76,6 +102,8 @@ public final class NinjaJutsuProfile {
                 .handSealWindupTicks(8)
                 .fireball(true, 65, 25)
                 .waterBullet(true, 65, 25, 12.0F, 32, 1.25D)
+                .earthBullet(true, 75, 25, 13.0F, 40, 1.15D)
+                .vacuumSpheres(true, 75, 25, 6.0F, 30, 1.55D)
                 .kawarimi(true, 140, 5.5D, 60, 1)
                 .mudWall(true, 160, 120, 45.0F)
                 .build();
@@ -94,6 +122,8 @@ public final class NinjaJutsuProfile {
                 .handSealWindupTicks(14)
                 .fireball(false, 120, 30)
                 .waterBullet(true, 115, 35, 8.0F, 30, 1.15D)
+                .earthBullet(false, 130, 35, 9.0F, 35, 1.05D)
+                .vacuumSpheres(false, 130, 35, 4.5F, 28, 1.40D)
                 .kawarimi(true, 200, 4.5D, 80, 0)
                 .mudWall(false, 200, 100, 35.0F)
                 .build();
@@ -117,6 +147,20 @@ public final class NinjaJutsuProfile {
     public int getWaterBulletMaxLife() { return this.waterBulletMaxLife; }
     public double getWaterBulletSpeed() { return this.waterBulletSpeed; }
 
+    public boolean isEarthBulletEnabled() { return this.earthBulletEnabled; }
+    public int getEarthBulletCooldownTicks() { return this.earthBulletCooldownTicks; }
+    public int getEarthBulletCooldownJitter() { return this.earthBulletCooldownJitter; }
+    public float getEarthBulletDamage() { return this.earthBulletDamage; }
+    public int getEarthBulletMaxLife() { return this.earthBulletMaxLife; }
+    public double getEarthBulletSpeed() { return this.earthBulletSpeed; }
+
+    public boolean isVacuumSpheresEnabled() { return this.vacuumSpheresEnabled; }
+    public int getVacuumSpheresCooldownTicks() { return this.vacuumSpheresCooldownTicks; }
+    public int getVacuumSpheresCooldownJitter() { return this.vacuumSpheresCooldownJitter; }
+    public float getVacuumSpheresDamage() { return this.vacuumSpheresDamage; }
+    public int getVacuumSpheresMaxLife() { return this.vacuumSpheresMaxLife; }
+    public double getVacuumSpheresSpeed() { return this.vacuumSpheresSpeed; }
+
     public boolean isKawarimiEnabled() { return this.kawarimiEnabled; }
     public int getKawarimiCooldownTicks() { return this.kawarimiCooldownTicks; }
     public double getKawarimiDistance() { return this.kawarimiDistance; }
@@ -132,6 +176,8 @@ public final class NinjaJutsuProfile {
         return switch (type) {
             case FIREBALL -> this.fireballEnabled;
             case WATER_BULLET -> this.waterBulletEnabled;
+            case EARTH_BULLET -> this.earthBulletEnabled;
+            case VACUUM_SPHERES -> this.vacuumSpheresEnabled;
             case KAWARIMI -> this.kawarimiEnabled;
             case MUD_WALL -> this.mudWallEnabled;
         };
@@ -155,6 +201,20 @@ public final class NinjaJutsuProfile {
         private float waterBulletDamage = 10.0F;
         private int waterBulletMaxLife = 30;
         private double waterBulletSpeed = 1.15D;
+
+        private boolean earthBulletEnabled = false;
+        private int earthBulletCooldownTicks = 110;
+        private int earthBulletCooldownJitter = 30;
+        private float earthBulletDamage = 11.0F;
+        private int earthBulletMaxLife = 40;
+        private double earthBulletSpeed = 1.10D;
+
+        private boolean vacuumSpheresEnabled = false;
+        private int vacuumSpheresCooldownTicks = 110;
+        private int vacuumSpheresCooldownJitter = 30;
+        private float vacuumSpheresDamage = 5.5F;
+        private int vacuumSpheresMaxLife = 30;
+        private double vacuumSpheresSpeed = 1.45D;
 
         private boolean kawarimiEnabled = true;
         private int kawarimiCooldownTicks = 180;
@@ -207,6 +267,26 @@ public final class NinjaJutsuProfile {
             this.waterBulletDamage = damage;
             this.waterBulletMaxLife = maxLife;
             this.waterBulletSpeed = speed;
+            return this;
+        }
+
+        public Builder earthBullet(boolean enabled, int cooldownTicks, int jitter, float damage, int maxLife, double speed) {
+            this.earthBulletEnabled = enabled;
+            this.earthBulletCooldownTicks = cooldownTicks;
+            this.earthBulletCooldownJitter = jitter;
+            this.earthBulletDamage = damage;
+            this.earthBulletMaxLife = maxLife;
+            this.earthBulletSpeed = speed;
+            return this;
+        }
+
+        public Builder vacuumSpheres(boolean enabled, int cooldownTicks, int jitter, float damage, int maxLife, double speed) {
+            this.vacuumSpheresEnabled = enabled;
+            this.vacuumSpheresCooldownTicks = cooldownTicks;
+            this.vacuumSpheresCooldownJitter = jitter;
+            this.vacuumSpheresDamage = damage;
+            this.vacuumSpheresMaxLife = maxLife;
+            this.vacuumSpheresSpeed = speed;
             return this;
         }
 

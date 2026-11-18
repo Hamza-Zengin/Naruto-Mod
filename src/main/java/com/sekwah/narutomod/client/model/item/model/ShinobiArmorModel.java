@@ -175,5 +175,94 @@ public class ShinobiArmorModel extends HumanoidModel<HumanoidRenderState> {
 
         return LayerDefinition.create(mesh, 64, 64);
     }
+
+    public static LayerDefinition createJoninVestLayer() {
+        MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
+        PartDefinition root = mesh.getRoot();
+
+        root.addOrReplaceChild("body",
+                CubeListBuilder.create()
+                        // High-rank dark olive Jōnin tactical flak vest torso (u=0..24, v=0..16)
+                        .texOffs(0, 0)
+                        .addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4, new CubeDeformation(0.45F))
+                        // Reinforced padded protective collar (u=0..28, v=18..26)
+                        .texOffs(0, 18)
+                        .addBox(-4.5F, -2.5F, -2.5F, 9, 3, 5, new CubeDeformation(0.15F))
+                        // Dual tactical chest scroll holsters + extra waist kunai pouch
+                        .texOffs(0, 28)
+                        .addBox(-3.8F, 2.0F, -3.2F, 3, 4, 1, new CubeDeformation(0.08F))
+                        .texOffs(10, 28)
+                        .addBox(0.8F, 2.0F, -3.2F, 3, 4, 1, new CubeDeformation(0.08F))
+                        .texOffs(20, 28)
+                        .addBox(-3.7F, 7.0F, -3.0F, 3, 3, 1, CubeDeformation.NONE)
+                        .texOffs(30, 28)
+                        .addBox(0.7F, 7.0F, -3.0F, 3, 3, 1, CubeDeformation.NONE),
+                PartPose.ZERO);
+
+        root.addOrReplaceChild("right_arm",
+                CubeListBuilder.create()
+                        // Dark shinobi undersleeve + reinforced forearm guard (u=0..16, v=36..52)
+                        .texOffs(0, 36)
+                        .addBox(-3.0F, -2.0F, -2.0F, 4, 10, 4, new CubeDeformation(0.24F))
+                        // Flared Jōnin shoulder armor cap (u=32..50, v=0..10)
+                        .texOffs(32, 0)
+                        .addBox(-3.4F, -2.3F, -2.5F, 4, 5, 5, new CubeDeformation(0.36F)),
+                PartPose.offset(-5.0F, 2.0F, 0.0F));
+
+        root.addOrReplaceChild("left_arm",
+                CubeListBuilder.create()
+                        .texOffs(18, 36)
+                        .addBox(-1.0F, -2.0F, -2.0F, 4, 10, 4, new CubeDeformation(0.24F))
+                        .texOffs(32, 12)
+                        .addBox(-0.6F, -2.3F, -2.5F, 4, 5, 5, new CubeDeformation(0.36F)),
+                PartPose.offset(5.0F, 2.0F, 0.0F));
+
+        return LayerDefinition.create(mesh, 64, 64);
+    }
+
+    public static LayerDefinition createWarringStatesArmorLayer() {
+        MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
+        PartDefinition root = mesh.getRoot();
+
+        PartDefinition body = root.addOrReplaceChild("body",
+                CubeListBuilder.create()
+                        // Chainmail/dark robe underlayer (u=0..24, v=0..16)
+                        .texOffs(0, 0)
+                        .addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4, new CubeDeformation(0.32F))
+                        // Layered Sengoku crimson lamellar cuirass (u=0..28, v=18..31)
+                        .texOffs(0, 18)
+                        .addBox(-4.3F, 0.4F, -2.6F, 8.6F, 8.0F, 5.2F, new CubeDeformation(0.28F))
+                        // Neck throat guard (Nodowa) (u=30..48, v=0..5)
+                        .texOffs(30, 0)
+                        .addBox(-3.5F, -1.8F, -2.6F, 7, 2, 5, new CubeDeformation(0.14F)),
+                PartPose.ZERO);
+
+        // Kusazuri waist lamellar tassets animated against legs
+        body.addOrReplaceChild("cloak_skirt",
+                CubeListBuilder.create()
+                        .texOffs(0, 33)
+                        .addBox(-4.6F, 0.0F, -2.7F, 9.2F, 5.5F, 5.4F, new CubeDeformation(0.22F)),
+                PartPose.offset(0.0F, 8.8F, 0.0F));
+
+        root.addOrReplaceChild("right_arm",
+                CubeListBuilder.create()
+                        // Armored kote bracer sleeve (u=0..16, v=45..59)
+                        .texOffs(0, 45)
+                        .addBox(-3.0F, -2.0F, -2.0F, 4, 10, 4, new CubeDeformation(0.24F))
+                        // Iconic Sengoku layered Sode shoulder pauldron (u=32..52, v=8..20)
+                        .texOffs(32, 8)
+                        .addBox(-4.2F, -2.5F, -2.8F, 4, 6, 5.6F, new CubeDeformation(0.28F)),
+                PartPose.offset(-5.0F, 2.0F, 0.0F));
+
+        root.addOrReplaceChild("left_arm",
+                CubeListBuilder.create()
+                        .texOffs(18, 45)
+                        .addBox(-1.0F, -2.0F, -2.0F, 4, 10, 4, new CubeDeformation(0.24F))
+                        .texOffs(32, 22)
+                        .addBox(0.2F, -2.5F, -2.8F, 4, 6, 5.6F, new CubeDeformation(0.28F)),
+                PartPose.offset(5.0F, 2.0F, 0.0F));
+
+        return LayerDefinition.create(mesh, 64, 64);
+    }
 }
 

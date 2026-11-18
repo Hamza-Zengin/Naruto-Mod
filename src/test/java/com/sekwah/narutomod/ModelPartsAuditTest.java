@@ -3,6 +3,7 @@ package com.sekwah.narutomod;
 import com.sekwah.narutomod.client.model.entity.SusanooRibcageModel;
 import com.sekwah.narutomod.client.model.item.model.AnbuMaskModel;
 import com.sekwah.narutomod.client.model.item.model.HeadbandModel;
+import com.sekwah.narutomod.client.model.item.model.KageHatModel;
 import com.sekwah.narutomod.client.model.item.model.ShinobiArmorModel;
 import net.minecraft.client.model.geom.ModelPart;
 import org.junit.jupiter.api.Assertions;
@@ -81,12 +82,18 @@ public class ModelPartsAuditTest {
                 AnbuMaskModel.createLayer(false).bakeRoot(), "AnbuMaskModel(noEars)");
         assertHumanoidModel(new HeadbandModel(HeadbandModel.createLayer().bakeRoot()),
                 HeadbandModel.createLayer().bakeRoot(), "HeadbandModel");
+        assertHumanoidModel(new KageHatModel(KageHatModel.createLayer().bakeRoot()),
+                KageHatModel.createLayer().bakeRoot(), "KageHatModel");
         assertHumanoidModel(new ShinobiArmorModel(ShinobiArmorModel.createChuninVestLayer().bakeRoot()),
                 ShinobiArmorModel.createChuninVestLayer().bakeRoot(), "ShinobiArmorModel(chuninVest)");
+        assertHumanoidModel(new ShinobiArmorModel(ShinobiArmorModel.createJoninVestLayer().bakeRoot()),
+                ShinobiArmorModel.createJoninVestLayer().bakeRoot(), "ShinobiArmorModel(joninVest)");
         assertHumanoidModel(new ShinobiArmorModel(ShinobiArmorModel.createAnbuArmorLayer().bakeRoot()),
                 ShinobiArmorModel.createAnbuArmorLayer().bakeRoot(), "ShinobiArmorModel(anbuArmor)");
         assertHumanoidModel(new ShinobiArmorModel(ShinobiArmorModel.createAkatsukiCloakLayer().bakeRoot()),
                 ShinobiArmorModel.createAkatsukiCloakLayer().bakeRoot(), "ShinobiArmorModel(akatsukiCloak)");
+        assertHumanoidModel(new ShinobiArmorModel(ShinobiArmorModel.createWarringStatesArmorLayer().bakeRoot()),
+                ShinobiArmorModel.createWarringStatesArmorLayer().bakeRoot(), "ShinobiArmorModel(warringStatesArmor)");
     }
 
     private static void assertHumanoidModel(Object instance, ModelPart root, String label) {

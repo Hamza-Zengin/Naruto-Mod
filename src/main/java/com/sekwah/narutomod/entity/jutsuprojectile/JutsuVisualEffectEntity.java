@@ -1,12 +1,17 @@
 package com.sekwah.narutomod.entity.jutsuprojectile;
 
 import com.sekwah.narutomod.entity.NarutoEntities;
+import com.sekwah.narutomod.entity.ShadowCloneEntity;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -42,6 +47,7 @@ public class JutsuVisualEffectEntity extends Entity {
     public static final int TYPE_AMATERASU_PILLAR = 7;
     public static final int TYPE_SHADOW_BIND = 8;
     public static final int TYPE_EARTH_WALL = 9;
+    public static final int TYPE_STONE_SPIKES = 10;
 
     private static final EntityDataAccessor<Integer> DATA_VISUAL_TYPE =
             SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.INT);
@@ -50,6 +56,8 @@ public class JutsuVisualEffectEntity extends Entity {
     private static final EntityDataAccessor<Integer> DATA_TARGET_ID =
             SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_YAW =
+            SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> DATA_DAMAGE =
             SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Optional<net.minecraft.world.entity.EntityReference<LivingEntity>>> DATA_CASTER_UUID =
             SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
@@ -79,6 +87,7 @@ public class JutsuVisualEffectEntity extends Entity {
         builder.define(DATA_MAX_LIFE, 40);
         builder.define(DATA_TARGET_ID, -1);
         builder.define(DATA_YAW, 0.0F);
+        builder.define(DATA_DAMAGE, 22.0F);
         builder.define(DATA_CASTER_UUID, Optional.empty());
     }
 
@@ -214,6 +223,36 @@ public class JutsuVisualEffectEntity extends Entity {
                                 NarutoSounds.RASENGAN_LOOP.get(), SoundSource.PLAYERS, 0.8f, 1.0f);
                     }
                 }
+
+                // --- DOTON: DORYŪSŌ (Targeted Earth Stone Spikes Eruption) ---
+                case TYPE_STONE_SPIKES -> {
+                    if (this.tickCount == 2) {
+                        serverLevel.playSound(null, this.blockPosition(), NarutoSounds.MUD_WALL_RISE.get(), SoundSource.PLAYERS, 1.5F, 0.85F);
+                        serverLevel.playSound(null, this.blockPosition(), SoundEvents.STONE_BREAK, SoundSource.PLAYERS, 1.8F, 0.7F);
+                        BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.POINTED_DRIPSTONE.defaultBlockState());
+                        serverLevel.sendParticles(rockParticle,
+                                this.getX(), this.getY() + 0.6D, this.getZ(),
+                                36, 1.6D, 0.8D, 1.6D, 0.16D,
+                                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                    }
+                    if (this.tickCount == 3 || this.tickCount == 12) {
+                        float baseDmg = Math.max(4.0F, this.getEffectDamage());
+                        float hitDmg = this.tickCount == 3 ? baseDmg * 0.70F : baseDmg * 0.35F;
+                        AABB spikeBox = this.getBoundingBox().inflate(3.0D, 2.2D, 3.0D);
+                        List<LivingEntity> victims = serverLevel.getEntitiesOfClass(LivingEntity.class, spikeBox,
+                                e -> e.isAlive() && (caster == null || (!e.equals(caster) && !ShadowCloneEntity.areAllies(caster, e))));
+                        for (LivingEntity v : victims) {
+                            v.hurtServer(serverLevel, caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().generic(), hitDmg);
+                            if (this.tickCount == 3) {
+                                v.setDeltaMovement(v.getDeltaMovement().x * 0.5D, 0.68D, v.getDeltaMovement().z * 0.5D);
+                                v.needsSync = true;
+                                v.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 80, 2));
+                            } else {
+                                v.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 1));
+                            }
+                        }
+                    }
+                }
             }
 
             // Expiration
@@ -258,6 +297,14 @@ public class JutsuVisualEffectEntity extends Entity {
         this.entityData.set(DATA_YAW, yaw);
     }
 
+    public float getEffectDamage() {
+        return this.entityData.get(DATA_DAMAGE);
+    }
+
+    public void setEffectDamage(float damage) {
+        this.entityData.set(DATA_DAMAGE, damage);
+    }
+
     @Override
     public boolean shouldRenderAtSqrDistance(double distance) {
         return distance < 16384.0D;
@@ -273,6 +320,7 @@ public class JutsuVisualEffectEntity extends Entity {
         this.setVisualType(input.getIntOr("VisualType", TYPE_KIRIN_DRAGON));
         this.setMaxLife(input.getIntOr("MaxLife", 40));
         this.setEffectYaw(input.getFloatOr("EffectYaw", 0.0F));
+        this.setEffectDamage(input.getFloatOr("EffectDamage", 22.0F));
         input.read("CasterUUID", UUIDUtil.CODEC).ifPresent(this::setCasterUUID);
     }
 
@@ -281,6 +329,7 @@ public class JutsuVisualEffectEntity extends Entity {
         output.putInt("VisualType", this.getVisualType());
         output.putInt("MaxLife", this.getMaxLife());
         output.putFloat("EffectYaw", this.getEffectYaw());
+        output.putFloat("EffectDamage", this.getEffectDamage());
         this.getCasterUUID().ifPresent(uuid -> output.store("CasterUUID", UUIDUtil.CODEC, uuid));
     }
 }

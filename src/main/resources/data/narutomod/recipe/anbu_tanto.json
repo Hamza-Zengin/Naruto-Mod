@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  C",
+    " S ",
+    "L  "
+  ],
+  "key": {
+    "C": "narutomod:chakra_metal",
+    "S": "minecraft:iron_sword",
+    "L": "minecraft:leather"
+  },
+  "result": {
+    "id": "narutomod:anbu_tanto",
+    "count": 1
+  }
+}

@@ -59,6 +59,26 @@
         },
         {
           "type": "minecraft:item",
+          "weight": 3,
+          "name": "narutomod:warring_states_armor"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "narutomod:scroll_stone_spikes"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "narutomod:scroll_water_dragon"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 6,
+          "name": "narutomod:blank_jutsu_scroll"
+        },
+        {
+          "type": "minecraft:item",
           "weight": 10,
           "name": "minecraft:gold_ingot",
           "modifier": {

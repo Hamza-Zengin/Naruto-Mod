@@ -90,6 +90,34 @@ public class ServerMissionActionPacket implements CustomPacketPayload {
                 case CLAIM_REWARD -> {
                     NinjaMission active = NinjaMission.fromId(ninjaData.getActiveMissionId());
                     if (active != null && ninjaData.claimMissionReward()) {
+                        switch (active) {
+                            case B_RANK_JUTSU_DRILL -> giveOrDrop(player,
+                                    new net.minecraft.world.item.ItemStack(com.sekwah.narutomod.item.NarutoItems.BLANK_JUTSU_SCROLL.get()));
+                            case A_RANK_AKATSUKI_RECON -> {
+                                giveOrDrop(player,
+                                        new net.minecraft.world.item.ItemStack(com.sekwah.narutomod.item.NarutoItems.BLANK_JUTSU_SCROLL.get()));
+                                if (player.getRandom().nextFloat() < 0.45f) {
+                                    var scroll = player.getRandom().nextBoolean()
+                                            ? com.sekwah.narutomod.item.NarutoItems.SCROLL_STONE_SPIKES.get()
+                                            : com.sekwah.narutomod.item.NarutoItems.SCROLL_WATER_DRAGON.get();
+                                    giveOrDrop(player, new net.minecraft.world.item.ItemStack(scroll));
+                                }
+                            }
+                            case S_RANK_AKATSUKI_BOUNTY -> {
+                                giveOrDrop(player,
+                                        new net.minecraft.world.item.ItemStack(com.sekwah.narutomod.item.NarutoItems.BLANK_JUTSU_SCROLL.get()));
+                                if (player.getRandom().nextFloat() < 0.35f) {
+                                    giveOrDrop(player,
+                                            new net.minecraft.world.item.ItemStack(com.sekwah.narutomod.item.NarutoItems.WARRING_STATES_ARMOR.get()));
+                                } else {
+                                    var scroll = player.getRandom().nextBoolean()
+                                            ? com.sekwah.narutomod.item.NarutoItems.SCROLL_WATER_DRAGON.get()
+                                            : com.sekwah.narutomod.item.NarutoItems.SCROLL_STONE_SPIKES.get();
+                                    giveOrDrop(player, new net.minecraft.world.item.ItemStack(scroll));
+                                }
+                            }
+                            default -> {}
+                        }
                         ninjaData.updateServerData(player);
                         player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP,
                                 SoundSource.PLAYERS, 1.0f, 1.2f);
@@ -108,5 +136,12 @@ public class ServerMissionActionPacket implements CustomPacketPayload {
                 }
             }
         });
+    }
+
+    private static void giveOrDrop(ServerPlayer player, net.minecraft.world.item.ItemStack stack) {
+        if (!stack.isEmpty() && !player.getInventory().add(stack)
+                && player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            player.spawnAtLocation(serverLevel, stack);
+        }
     }
 }

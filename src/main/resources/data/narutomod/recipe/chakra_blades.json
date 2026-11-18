@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C C",
+    "I I",
+    "D D"
+  ],
+  "key": {
+    "C": "narutomod:chakra_metal",
+    "I": "minecraft:iron_ingot",
+    "D": "minecraft:diamond"
+  },
+  "result": {
+    "id": "narutomod:chakra_blades",
+    "count": 1
+  }
+}

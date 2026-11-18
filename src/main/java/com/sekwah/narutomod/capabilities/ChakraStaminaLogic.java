@@ -31,11 +31,20 @@ public final class ChakraStaminaLogic {
 
     private ChakraStaminaLogic() {}
 
+    public static final float KAGE_HAT_CHAKRA_BONUS = 60.0f;
+
     public static float computeMaxChakra(float baseMaxChakra, String rank, Identifier clan) {
+        return computeMaxChakra(baseMaxChakra, rank, clan, false);
+    }
+
+    public static float computeMaxChakra(float baseMaxChakra, String rank, Identifier clan, boolean hasKageHat) {
         NinjaRank currentRank = NinjaRank.fromString(rank);
         float total = baseMaxChakra + currentRank.getChakraBonus();
         if (clan != null && "uzumaki".equals(clan.getPath())) {
             total *= 1.25f;
+        }
+        if (hasKageHat) {
+            total += KAGE_HAT_CHAKRA_BONUS;
         }
         return total;
     }
@@ -121,6 +130,8 @@ public final class ChakraStaminaLogic {
             }
             if (chestItem == NarutoItems.CHUNIN_VEST.get()) {
                 staminaRegen *= 1.25f;
+            } else if (chestItem == NarutoItems.JONIN_VEST.get()) {
+                staminaRegen *= 1.25f;
             } else if (chestItem == NarutoItems.ANBU_ARMOR.get()) {
                 staminaRegen *= 1.15f;
             }
@@ -136,6 +147,8 @@ public final class ChakraStaminaLogic {
             }
             if (chestItem == NarutoItems.AKATSUKI_CLOAK.get()) {
                 chakraRegen *= 1.35f;
+            } else if (chestItem == NarutoItems.JONIN_VEST.get()) {
+                chakraRegen *= 1.20f;
             } else if (chestItem == NarutoItems.ANBU_ARMOR.get()) {
                 chakraRegen *= 1.15f;
             }

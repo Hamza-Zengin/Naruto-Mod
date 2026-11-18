@@ -3,10 +3,12 @@ package com.sekwah.narutomod;
 import com.sekwah.narutomod.abilities.ChakraElement;
 import com.sekwah.narutomod.abilities.jutsus.*;
 import com.sekwah.narutomod.abilities.utility.WaterWalkAbility;
+import com.sekwah.narutomod.entity.jutsuprojectile.EarthBulletEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.JutsuProjectile;
 import com.sekwah.narutomod.entity.jutsuprojectile.MudWallEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.RasenshurikenEntity;
+import com.sekwah.narutomod.entity.jutsuprojectile.VacuumSphereEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,10 +72,14 @@ public class JutsuClashLogicTest {
         assertEquals(ChakraElement.FIRE, new AmaterasuAbility().getChakraElement());
         assertEquals(ChakraElement.WIND, new RasenshurikenAbility().getChakraElement());
         assertEquals(ChakraElement.WIND, new WindBreakerAbility().getChakraElement());
+        assertEquals(ChakraElement.WIND, new VacuumSpheresAbility().getChakraElement());
         assertEquals(ChakraElement.LIGHTNING, new ChidoriAbility().getChakraElement());
         assertEquals(ChakraElement.LIGHTNING, new KirinAbility().getChakraElement());
         assertEquals(ChakraElement.EARTH, new MudWallAbility().getChakraElement());
+        assertEquals(ChakraElement.EARTH, new EarthDragonBulletAbility().getChakraElement());
+        assertEquals(ChakraElement.EARTH, new StoneSpikesAbility().getChakraElement());
         assertEquals(ChakraElement.WATER, new WaterBulletAbility().getChakraElement());
+        assertEquals(ChakraElement.WATER, new WaterDragonAbility().getChakraElement());
         assertEquals(ChakraElement.WATER, new WaterWalkAbility().getChakraElement());
     }
 
@@ -84,6 +90,8 @@ public class JutsuClashLogicTest {
         assertTrue(JutsuProjectile.class.isAssignableFrom(RasenshurikenEntity.class));
         assertTrue(JutsuProjectile.class.isAssignableFrom(WaterBulletEntity.class));
         assertTrue(JutsuProjectile.class.isAssignableFrom(MudWallEntity.class));
+        assertTrue(JutsuProjectile.class.isAssignableFrom(EarthBulletEntity.class));
+        assertTrue(JutsuProjectile.class.isAssignableFrom(VacuumSphereEntity.class));
     }
 
     /**

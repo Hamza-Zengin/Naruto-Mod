@@ -1,0 +1,83 @@
+{
+  "credit": "NarutoMod Asuma Chakra Blades (Hien) 3D Model",
+  "textures": {
+    "texture": "narutomod:item/weapons/chakra_blades_3d",
+    "particle": "narutomod:item/weapons/chakra_blades"
+  },
+  "elements": [
+    {
+      "name": "knuckle_grip",
+      "from": [7.3, 4.0, 7.0],
+      "to": [8.7, 10.5, 9.0],
+      "faces": {
+        "north": {"uv": [8, 0, 12, 8], "texture": "#texture"},
+        "south": {"uv": [8, 0, 12, 8], "texture": "#texture"},
+        "east": {"uv": [8, 0, 12, 8], "texture": "#texture"},
+        "west": {"uv": [8, 0, 12, 8], "texture": "#texture"},
+        "up": {"uv": [8, 0, 12, 8], "texture": "#texture"},
+        "down": {"uv": [8, 0, 12, 8], "texture": "#texture"}
+      }
+    },
+    {
+      "name": "knuckle_guard_front",
+      "from": [7.4, 4.2, 5.4],
+      "to": [8.6, 10.2, 7.0],
+      "faces": {
+        "north": {"uv": [12, 0, 16, 8], "texture": "#texture"},
+        "south": {"uv": [12, 0, 16, 8], "texture": "#texture"},
+        "east": {"uv": [12, 0, 16, 8], "texture": "#texture"},
+        "west": {"uv": [12, 0, 16, 8], "texture": "#texture"},
+        "up": {"uv": [12, 0, 16, 8], "texture": "#texture"},
+        "down": {"uv": [12, 0, 16, 8], "texture": "#texture"}
+      }
+    },
+    {
+      "name": "blade_spine",
+      "from": [7.65, 9.5, 4.4],
+      "to": [8.35, 19.5, 6.2],
+      "faces": {
+        "north": {"uv": [0, 0, 4, 16], "texture": "#texture"},
+        "south": {"uv": [0, 0, 4, 16], "texture": "#texture"},
+        "east": {"uv": [0, 0, 4, 16], "texture": "#texture"},
+        "west": {"uv": [0, 0, 4, 16], "texture": "#texture"},
+        "up": {"uv": [0, 0, 4, 16], "texture": "#texture"},
+        "down": {"uv": [0, 0, 4, 16], "texture": "#texture"}
+      }
+    },
+    {
+      "name": "blade_edge_spur",
+      "from": [7.72, 10.5, 2.8],
+      "to": [8.28, 17.5, 4.4],
+      "faces": {
+        "north": {"uv": [4, 0, 8, 12], "texture": "#texture"},
+        "south": {"uv": [4, 0, 8, 12], "texture": "#texture"},
+        "east": {"uv": [4, 0, 8, 12], "texture": "#texture"},
+        "west": {"uv": [4, 0, 8, 12], "texture": "#texture"},
+        "up": {"uv": [4, 0, 8, 12], "texture": "#texture"},
+        "down": {"uv": [4, 0, 8, 12], "texture": "#texture"}
+      }
+    },
+    {
+      "name": "blade_tip",
+      "from": [7.76, 19.5, 4.8],
+      "to": [8.24, 22.0, 5.9],
+      "faces": {
+        "north": {"uv": [0, 0, 4, 6], "texture": "#texture"},
+        "south": {"uv": [0, 0, 4, 6], "texture": "#texture"},
+        "east": {"uv": [0, 0, 4, 6], "texture": "#texture"},
+        "west": {"uv": [0, 0, 4, 6], "texture": "#texture"},
+        "up": {"uv": [0, 0, 4, 6], "texture": "#texture"},
+        "down": {"uv": [0, 0, 4, 6], "texture": "#texture"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {"rotation": [0, -90, 15], "translation": [0, 2.0, 1.0], "scale": [0.8, 0.8, 0.8]},
+    "thirdperson_lefthand": {"rotation": [0, 90, -15], "translation": [0, 2.0, 1.0], "scale": [0.8, 0.8, 0.8]},
+    "firstperson_righthand": {"rotation": [0, -90, -25], "translation": [1.13, 3.0, 1.13], "scale": [0.68, 0.68, 0.68]},
+    "firstperson_lefthand": {"rotation": [0, 90, 25], "translation": [1.13, 3.0, 1.13], "scale": [0.68, 0.68, 0.68]},
+    "ground": {"rotation": [0, 0, 45], "translation": [0, 3, 0], "scale": [0.5, 0.5, 0.5]},
+    "gui": {"rotation": [0, 0, -45], "translation": [0, -2, 0], "scale": [0.75, 0.75, 0.75]},
+    "fixed": {"rotation": [0, 180, -45], "translation": [0, -2, 0], "scale": [0.75, 0.75, 0.75]}
+  }
+}

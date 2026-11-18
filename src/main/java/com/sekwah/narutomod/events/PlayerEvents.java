@@ -63,7 +63,49 @@ public class PlayerEvents {
                     }
                 }
             }
+
+            // Kage Hat passive aura: empower nearby owned Shadow Clones and tamed Ninken wolves
+            if (player.tickCount % 20 == 0
+                    && player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).getItem()
+                    == com.sekwah.narutomod.item.NarutoItems.KAGE_HAT.get()) {
+                AABB auraBox = player.getBoundingBox().inflate(16.0D);
+                for (com.sekwah.narutomod.entity.ShadowCloneEntity clone : serverLevel.getEntitiesOfClass(
+                        com.sekwah.narutomod.entity.ShadowCloneEntity.class, auraBox,
+                        c -> c.isAlive() && player.getUUID().equals(c.getOwnerUUID()))) {
+                    clone.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.STRENGTH, 60, 0, true, false));
+                    clone.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SPEED, 60, 0, true, false));
+                }
+                for (net.minecraft.world.entity.animal.wolf.Wolf wolf : serverLevel.getEntitiesOfClass(
+                        net.minecraft.world.entity.animal.wolf.Wolf.class, auraBox,
+                        w -> w.isAlive() && w.isTame() && w.isOwnedBy(player))) {
+                    wolf.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.STRENGTH, 60, 0, true, false));
+                    wolf.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SPEED, 60, 0, true, false));
+                }
+            }
         }
+    }
+
+    public static float applyWarringStatesReduction(float amount, boolean wearingWarringStatesArmor, boolean isJutsuOrExplosion) {
+        return (wearingWarringStatesArmor && isJutsuOrExplosion) ? amount * 0.85F : amount;
+    }
+
+    public static boolean isWarringStatesReducedDamage(net.minecraft.world.damagesource.DamageSource source) {
+        if (source == null) {
+            return false;
+        }
+        if (source.is(net.minecraft.tags.DamageTypeTags.IS_EXPLOSION)
+                || source.is(net.minecraft.tags.DamageTypeTags.WITCH_RESISTANT_TO)
+                || source.is(net.minecraft.tags.DamageTypeTags.IS_FIRE)
+                || source.is(net.minecraft.tags.DamageTypeTags.IS_LIGHTNING)) {
+            return true;
+        }
+        if (source.getDirectEntity() instanceof com.sekwah.narutomod.entity.jutsuprojectile.JutsuProjectile) {
+            return true;
+        }
+        String ns = source.typeHolder().unwrapKey()
+                .map(k -> k.identifier().getNamespace())
+                .orElse("");
+        return NarutoMod.MOD_ID.equals(ns);
     }
 
     @SubscribeEvent
@@ -73,16 +115,28 @@ public class PlayerEvents {
             return;
         }
         // Kaguya Clan Osteoblast Bone Density Passives (+20% melee damage dealt, -15% physical damage taken)
+        // ANBU Tanto Backstab / Stealth (+50% direct melee damage when striking from behind, crouching, invisible, or in smoke)
         if (event.getSource().getEntity() instanceof Player attacker) {
             var ninjaData = attacker.getData(NinjaCapabilityHandler.NINJA_DATA);
             if (ninjaData.getClan() != null && ninjaData.getClan().getPath().equals("kaguya")) {
                 event.setAmount(event.getAmount() * 1.20F);
+            }
+            if (event.getSource().getDirectEntity() == attacker
+                    && attacker.getMainHandItem().getItem() instanceof com.sekwah.narutomod.item.weapons.AnbuTantoItem
+                    && event.getEntity() instanceof net.minecraft.world.entity.LivingEntity livingTarget
+                    && com.sekwah.narutomod.item.weapons.AnbuTantoItem.isStealthBackstab(attacker, livingTarget)) {
+                event.setAmount(event.getAmount() * com.sekwah.narutomod.item.weapons.AnbuTantoItem.BACKSTAB_MULTIPLIER);
             }
         }
         if (event.getEntity() instanceof Player defender) {
             var ninjaData = defender.getData(NinjaCapabilityHandler.NINJA_DATA);
             if (ninjaData.getClan() != null && ninjaData.getClan().getPath().equals("kaguya")) {
                 event.setAmount(event.getAmount() * 0.85F);
+            }
+            boolean wearingWarringStates = defender.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).getItem()
+                    == com.sekwah.narutomod.item.NarutoItems.WARRING_STATES_ARMOR.get();
+            if (wearingWarringStates && isWarringStatesReducedDamage(event.getSource())) {
+                event.setAmount(applyWarringStatesReduction(event.getAmount(), true, true));
             }
         }
     }

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C C",
+    "IVI",
+    "LIL"
+  ],
+  "key": {
+    "V": "narutomod:chunin_vest",
+    "C": "narutomod:chakra_metal",
+    "I": "minecraft:iron_ingot",
+    "L": "minecraft:leather"
+  },
+  "result": {
+    "id": "narutomod:jonin_vest",
+    "count": 1
+  }
+}

@@ -43,6 +43,10 @@ public class NarutoAbilities {
     public static final DeferredHolder<Ability, WaterBulletAbility> WATER_BULLET = ABILITY.register("water_bullet", WaterBulletAbility::new);
     public static final DeferredHolder<Ability, WindBreakerAbility> WIND_BREAKER = ABILITY.register("wind_breaker", WindBreakerAbility::new);
     public static final DeferredHolder<Ability, MudWallAbility> MUD_WALL = ABILITY.register("mud_wall", MudWallAbility::new);
+    public static final DeferredHolder<Ability, EarthDragonBulletAbility> EARTH_DRAGON_BULLET = ABILITY.register("earth_dragon_bullet", EarthDragonBulletAbility::new);
+    public static final DeferredHolder<Ability, VacuumSpheresAbility> VACUUM_SPHERES = ABILITY.register("vacuum_spheres", VacuumSpheresAbility::new);
+    public static final DeferredHolder<Ability, StoneSpikesAbility> STONE_SPIKES = ABILITY.register("stone_spikes", StoneSpikesAbility::new);
+    public static final DeferredHolder<Ability, WaterDragonAbility> WATER_DRAGON = ABILITY.register("water_dragon", WaterDragonAbility::new);
 
     // Dōjutsu
     public static final DeferredHolder<Ability, SharinganAbility> SHARINGAN = ABILITY.register("sharingan", SharinganAbility::new);

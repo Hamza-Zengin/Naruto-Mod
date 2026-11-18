@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "KPS",
+    "PCP",
+    "LPL"
+  ],
+  "key": {
+    "K": "narutomod:kunai",
+    "S": "narutomod:shuriken",
+    "P": "minecraft:paper",
+    "C": "narutomod:chakra_metal",
+    "L": "minecraft:leather"
+  },
+  "result": {
+    "id": "narutomod:sealed_ammo_scroll",
+    "count": 1
+  }
+}

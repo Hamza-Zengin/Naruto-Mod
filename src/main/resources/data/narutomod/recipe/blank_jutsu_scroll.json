@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GPG",
+    "PCP",
+    "LIL"
+  ],
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "P": "minecraft:paper",
+    "C": "narutomod:chakra_metal",
+    "L": "minecraft:leather",
+    "I": "minecraft:ink_sac"
+  },
+  "result": {
+    "id": "narutomod:blank_jutsu_scroll",
+    "count": 1
+  }
+}

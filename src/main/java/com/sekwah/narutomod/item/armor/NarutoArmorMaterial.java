@@ -85,6 +85,57 @@ public final class NarutoArmorMaterial {
             assetKey("akatsuki")
     );
 
+    public static final ArmorMaterial JONIN_MAT = new ArmorMaterial(
+            40,
+            Map.of(
+                    ArmorType.BOOTS, 3,
+                    ArmorType.LEGGINGS, 6,
+                    ArmorType.CHESTPLATE, 8,
+                    ArmorType.HELMET, 3,
+                    ArmorType.BODY, 8
+            ),
+            14,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            2.5F,
+            0.05F,
+            ItemTags.REPAIRS_IRON_ARMOR,
+            assetKey("jonin")
+    );
+
+    public static final ArmorMaterial WARRING_STATES_MAT = new ArmorMaterial(
+            44,
+            Map.of(
+                    ArmorType.BOOTS, 3,
+                    ArmorType.LEGGINGS, 6,
+                    ArmorType.CHESTPLATE, 8,
+                    ArmorType.HELMET, 3,
+                    ArmorType.BODY, 9
+            ),
+            15,
+            SoundEvents.ARMOR_EQUIP_NETHERITE,
+            3.5F,
+            0.15F,
+            ItemTags.REPAIRS_NETHERITE_ARMOR,
+            assetKey("warring_states")
+    );
+
+    public static final ArmorMaterial KAGE_MAT = new ArmorMaterial(
+            40,
+            Map.of(
+                    ArmorType.BOOTS, 3,
+                    ArmorType.LEGGINGS, 6,
+                    ArmorType.CHESTPLATE, 7,
+                    ArmorType.HELMET, 4,
+                    ArmorType.BODY, 7
+            ),
+            18,
+            SoundEvents.ARMOR_EQUIP_GOLD,
+            2.5F,
+            0.10F,
+            ItemTags.REPAIRS_GOLD_ARMOR,
+            assetKey("kage")
+    );
+
     private static ResourceKey<EquipmentAsset> assetKey(String name) {
         return ResourceKey.create(EquipmentAssets.ROOT_ID, Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, name));
     }

@@ -36,6 +36,7 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
     public static final Identifier TEX_AMATERASU = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/amaterasu_flame.png");
     public static final Identifier TEX_SHADOW = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/shadow_bind.png");
     public static final Identifier TEX_EARTH = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/earth_wall.png");
+    public static final Identifier TEX_STONE_SPIKES = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/stone_spikes.png");
 
     private final KirinDragonModel kirinModel;
     private final WoodPrisonModel woodModel;
@@ -47,6 +48,7 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
     private final AmaterasuFlameModel amaterasuModel;
     private final ShadowBindModel shadowModel;
     private final EarthWallModel earthModel;
+    private final StoneSpikesModel stoneSpikesModel;
 
     public static class VisualEffectRenderState extends EntityRenderState {
         public int visualType;
@@ -67,6 +69,7 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
         this.amaterasuModel = new AmaterasuFlameModel(ctx.bakeLayer(NarutoRenderEvents.AMATERASU_FLAME_LAYER));
         this.shadowModel = new ShadowBindModel(ctx.bakeLayer(NarutoRenderEvents.SHADOW_BIND_LAYER));
         this.earthModel = new EarthWallModel(ctx.bakeLayer(NarutoRenderEvents.EARTH_WALL_LAYER));
+        this.stoneSpikesModel = new StoneSpikesModel(ctx.bakeLayer(NarutoRenderEvents.STONE_SPIKES_LAYER));
     }
 
     @Override
@@ -91,6 +94,7 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
         int type = state.visualType;
         Identifier tex = getTextureLocation(type);
         RenderType renderType = (type == JutsuVisualEffectEntity.TYPE_EARTH_WALL
+                || type == JutsuVisualEffectEntity.TYPE_STONE_SPIKES
                 || type == JutsuVisualEffectEntity.TYPE_BONE_FOREST
                 || type == JutsuVisualEffectEntity.TYPE_WOOD_PRISON)
                 ? RenderTypes.entityCutout(tex)
@@ -159,6 +163,10 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
                     RenderMathUtil.scaleEntityModel(poseStack, 1.0F);
                     submitNodeCollector.submitModel(this.earthModel, visualState, poseStack, renderType, solidLight, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
                 }
+                case JutsuVisualEffectEntity.TYPE_STONE_SPIKES -> {
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.18F);
+                    submitNodeCollector.submitModel(this.stoneSpikesModel, visualState, poseStack, renderType, solidLight, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
+                }
             }
         } finally {
             poseStack.popPose();
@@ -191,6 +199,7 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
             case JutsuVisualEffectEntity.TYPE_AMATERASU_PILLAR -> TEX_AMATERASU;
             case JutsuVisualEffectEntity.TYPE_SHADOW_BIND -> TEX_SHADOW;
             case JutsuVisualEffectEntity.TYPE_EARTH_WALL -> TEX_EARTH;
+            case JutsuVisualEffectEntity.TYPE_STONE_SPIKES -> TEX_STONE_SPIKES;
             default -> TEX_RASENGAN;
         };
     }

@@ -156,5 +156,8 @@ public interface INinjaData extends ValueIOSerializable {
     boolean incrementMissionProgress(int amount);
     void abandonMission();
     boolean claimMissionReward();
+
+    default boolean isKageHatEquipped() { return false; }
+    default void setKageHatEquipped(boolean equipped) {}
 }
 

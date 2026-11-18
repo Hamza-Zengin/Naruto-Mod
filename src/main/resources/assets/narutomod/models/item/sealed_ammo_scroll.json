@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "narutomod:item/scrolls/sealed_ammo_scroll"
+  }
+}

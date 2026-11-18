@@ -167,6 +167,16 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
             List<Entity> others = this.level().getEntities(this, clashBox,
                     e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
             for (Entity e : others) {
+                if (e instanceof EarthBulletEntity earthBullet
+                        && com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(this.getOwner(), earthBullet.getOwner())) {
+                    com.sekwah.narutomod.events.ElementalInteractionHandler.igniteEarthWithFire(earthBullet, this);
+                    continue;
+                }
+                if (e instanceof VacuumSphereEntity vacuumSphere
+                        && com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(this.getOwner(), vacuumSphere.getOwner())) {
+                    com.sekwah.narutomod.events.ElementalInteractionHandler.boostFireballWithWind(this);
+                    continue;
+                }
                 if (e instanceof JutsuProjectile other && this.isAlive() && e.isAlive()) {
                     this.handleClash(other);
                     if (!this.isAlive()) {

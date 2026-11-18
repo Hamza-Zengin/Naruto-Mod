@@ -107,5 +107,60 @@ public class RecipeGen extends RecipeProvider {
                 .pattern("GGG")
                 .unlockedBy("has_gunpowder", has(Items.GUNPOWDER))
                 .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.JONIN_VEST.get())
+                .define('V', NarutoItems.CHUNIN_VEST.get())
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .define('I', Items.IRON_INGOT)
+                .define('L', Items.LEATHER)
+                .pattern("C C")
+                .pattern("IVI")
+                .pattern("LIL")
+                .unlockedBy("has_chunin_vest", has(NarutoItems.CHUNIN_VEST.get()))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.CHAKRA_BLADES.get())
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .define('I', Items.IRON_INGOT)
+                .define('D', Items.DIAMOND)
+                .pattern("C C")
+                .pattern("I I")
+                .pattern("D D")
+                .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.ANBU_TANTO.get())
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .define('S', Items.IRON_SWORD)
+                .define('L', Items.LEATHER)
+                .pattern("  C")
+                .pattern(" S ")
+                .pattern("L  ")
+                .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.TOOLS, NarutoItems.SEALED_AMMO_SCROLL.get())
+                .define('K', NarutoItems.KUNAI.get())
+                .define('S', NarutoItems.SHURIKEN.get())
+                .define('P', Items.PAPER)
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .define('L', Items.LEATHER)
+                .pattern("KPS")
+                .pattern("PCP")
+                .pattern("LPL")
+                .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.TOOLS, NarutoItems.BLANK_JUTSU_SCROLL.get())
+                .define('G', Items.GOLD_INGOT)
+                .define('P', Items.PAPER)
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .define('L', Items.LEATHER)
+                .define('I', Items.INK_SAC)
+                .pattern("GPG")
+                .pattern("PCP")
+                .pattern("LIL")
+                .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
+                .save(this.output);
     }
 }

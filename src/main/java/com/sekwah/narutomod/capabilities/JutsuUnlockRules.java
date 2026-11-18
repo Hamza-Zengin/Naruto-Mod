@@ -19,7 +19,8 @@ public final class JutsuUnlockRules {
         String path = id.getPath();
         return path.equals("rasengan") || path.equals("chidori") || path.equals("shadow_clone")
                 || path.equals("kirin") || path.equals("amaterasu") || path.equals("susanoo_ribcage")
-                || path.equals("eight_gates") || path.equals("eight_gates_death");
+                || path.equals("eight_gates") || path.equals("eight_gates_death")
+                || path.equals("stone_spikes") || path.equals("water_dragon");
     }
 
     public static boolean isClanRestrictedJutsu(Identifier id) {
@@ -38,6 +39,12 @@ public final class JutsuUnlockRules {
 
     public static boolean checkAbilityUnlocked(INinjaData data, Ability ability, Identifier abilityId) {
         if (ability == null || data == null) return false;
+
+        boolean isHybridScrollOrPrereq = abilityId != null
+                && (abilityId.getPath().equals("stone_spikes") || abilityId.getPath().equals("water_dragon"));
+        if (isHybridScrollOrPrereq && data.getUnlockedAbilities().contains(abilityId)) {
+            return true;
+        }
 
         if (!ability.getPrerequisites().isEmpty() && !ability.meetsPrerequisites(data)) {
             return false;

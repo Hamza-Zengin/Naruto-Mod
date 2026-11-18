@@ -25,6 +25,21 @@
         },
         {
           "type": "minecraft:item",
+          "weight": 4,
+          "name": "narutomod:warring_states_armor"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 4,
+          "name": "narutomod:anbu_tanto"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "narutomod:blank_jutsu_scroll"
+        },
+        {
+          "type": "minecraft:item",
           "weight": 12,
           "name": "narutomod:chakra_metal",
           "modifier": {

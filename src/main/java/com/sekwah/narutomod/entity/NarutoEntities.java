@@ -1,10 +1,12 @@
 package com.sekwah.narutomod.entity;
 
 import com.sekwah.narutomod.entity.item.PaperBombEntity;
+import com.sekwah.narutomod.entity.jutsuprojectile.EarthBulletEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.MudWallEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.RasenshurikenEntity;
+import com.sekwah.narutomod.entity.jutsuprojectile.VacuumSphereEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.WoodPrisonEntity;
 import com.sekwah.narutomod.entity.mob.AkatsukiNinjaEntity;
@@ -57,6 +59,12 @@ public class NarutoEntities {
 
     public static final DeferredHolder<EntityType<?>, EntityType<WaterBulletEntity>> WATER_BULLET = register("water_bullet",
             WaterBulletEntity::new, MobCategory.MISC, builder -> builder.sized(1.0F, 1.0F).clientTrackingRange(8).updateInterval(2));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<EarthBulletEntity>> EARTH_BULLET = register("earth_bullet",
+            EarthBulletEntity::new, MobCategory.MISC, builder -> builder.sized(0.95F, 0.95F).clientTrackingRange(8).updateInterval(2));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<VacuumSphereEntity>> VACUUM_SPHERE = register("vacuum_sphere",
+            VacuumSphereEntity::new, MobCategory.MISC, builder -> builder.sized(0.65F, 0.65F).clientTrackingRange(8).updateInterval(2));
 
     public static final DeferredHolder<EntityType<?>, EntityType<MudWallEntity>> MUD_WALL = register("mud_wall",
             MudWallEntity::new, MobCategory.MISC, builder -> builder.fireImmune().sized(3.2F, 2.8F).clientTrackingRange(10).updateInterval(2));

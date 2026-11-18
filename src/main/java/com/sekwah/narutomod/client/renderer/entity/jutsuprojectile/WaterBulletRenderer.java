@@ -27,6 +27,7 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
         public float xRot;
         public float age;
         public float progress;
+        public boolean isDragon;
     }
 
     public WaterBulletRenderer(EntityRendererProvider.Context ctx) {
@@ -48,6 +49,7 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
         state.xRot = entity.getXRot(partialTicks);
         state.age = age;
         state.progress = Mth.clamp(age / maxLife, 0.0F, 1.0F);
+        state.isDragon = entity.isDragon();
     }
 
     @Override
@@ -62,6 +64,7 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
             poseStack.translate(0.0D, 0.25D, 0.0D);
 
             // 1. High-resolution Dual-Layer 3D Fluid Water Core Sphere
+            float dragonSizeMult = state.isDragon ? 1.65F : 1.0F;
             float sphereAlpha = 0.90F * fadeOut;
             submitNodeCollector.submitCustomGeometry(
                     poseStack,
@@ -70,20 +73,22 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
                         PoseStack localStack = new PoseStack();
                         localStack.last().set(pose);
                         RasenganSphereModel.renderSmoothSphere(
-                                localStack, consumer, 0.42F, 20, 28, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                                localStack, consumer, 0.42F * dragonSizeMult, 20, 28, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
                                 0.10F, 0.54F, 0.98F, sphereAlpha
                         );
                         RasenganSphereModel.renderSmoothSphere(
-                                localStack, consumer, 0.52F, 18, 24, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                                localStack, consumer, 0.52F * dragonSizeMult, 18, 24, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
                                 0.35F, 0.78F, 1.0F, sphereAlpha * 0.42F
                         );
                     }
             );
 
             // 2. Surrounding Swirling Water Vortex Rings
-            float scale = 0.85F + (state.progress > 0.7F ? (state.progress - 0.7F) * 1.5F : 0.0F);
+            float scale = (state.isDragon ? 1.55F : 0.85F) + (state.progress > 0.7F ? (state.progress - 0.7F) * 1.5F : 0.0F);
             RenderMathUtil.scaleEntityModel(poseStack, scale);
-            int vortexColor = ColorUtil.argb(0.80F * fadeOut, 0.20F, 0.65F, 1.0F);
+            int vortexColor = state.isDragon
+                    ? ColorUtil.argb(0.88F * fadeOut, 0.14F, 0.58F, 1.0F)
+                    : ColorUtil.argb(0.80F * fadeOut, 0.20F, 0.65F, 1.0F);
             submitNodeCollector.submitModel(
                     this.waterModel,
                     new VisualState(state.age, state.progress),
@@ -95,6 +100,21 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
                     null,
                     state.outlineColor
             );
+
+            if (state.isDragon) {
+                poseStack.translate(0.0D, 0.0D, 0.65D);
+                submitNodeCollector.submitModel(
+                        this.waterModel,
+                        new VisualState(state.age + 4.0F, state.progress),
+                        poseStack,
+                        RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_WATER),
+                        RenderMathUtil.FULL_BRIGHT,
+                        OverlayTexture.NO_OVERLAY,
+                        ColorUtil.argb(0.70F * fadeOut, 0.30F, 0.80F, 1.0F),
+                        null,
+                        state.outlineColor
+                );
+            }
         } finally {
             poseStack.popPose();
         }

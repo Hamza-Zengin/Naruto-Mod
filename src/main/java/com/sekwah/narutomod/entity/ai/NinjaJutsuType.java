@@ -8,6 +8,8 @@ import com.sekwah.narutomod.abilities.ChakraElement;
 public enum NinjaJutsuType {
     FIREBALL(ChakraElement.FIRE, 0xFF5511),
     WATER_BULLET(ChakraElement.WATER, 0x2299FF),
+    EARTH_BULLET(ChakraElement.EARTH, 0xAA7733),
+    VACUUM_SPHERES(ChakraElement.WIND, 0x99FFDD),
     MUD_WALL(ChakraElement.EARTH, 0xAA7733),
     KAWARIMI(ChakraElement.NONE, 0x77CCFF);
 

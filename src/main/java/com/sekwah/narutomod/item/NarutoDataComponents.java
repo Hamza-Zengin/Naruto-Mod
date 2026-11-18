@@ -30,6 +30,26 @@ public class NarutoDataComponents {
                     .persistent(Codec.LONG)
                     .networkSynchronized(ByteBufCodecs.VAR_LONG));
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> CHAKRA_BLADE_FLOW_ACTIVE =
+            DATA_COMPONENTS.registerComponentType("chakra_blade_flow_active", builder -> builder
+                    .persistent(Codec.BOOL)
+                    .networkSynchronized(ByteBufCodecs.BOOL));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> CHAKRA_BLADE_ACTIVE_UNTIL =
+            DATA_COMPONENTS.registerComponentType("chakra_blade_active_until", builder -> builder
+                    .persistent(Codec.LONG)
+                    .networkSynchronized(ByteBufCodecs.VAR_LONG));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SealedAmmoContents>> SEALED_AMMO_CONTENTS =
+            DATA_COMPONENTS.registerComponentType("sealed_ammo_contents", builder -> builder
+                    .persistent(SealedAmmoContents.CODEC)
+                    .networkSynchronized(SealedAmmoContents.STREAM_CODEC));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Identifier>> BLANK_SCROLL_SELECTED_JUTSU =
+            DATA_COMPONENTS.registerComponentType("blank_scroll_selected_jutsu", builder -> builder
+                    .persistent(Identifier.CODEC)
+                    .networkSynchronized(Identifier.STREAM_CODEC));
+
     public static void register(IEventBus eventBus) {
         DATA_COMPONENTS.register(eventBus);
     }

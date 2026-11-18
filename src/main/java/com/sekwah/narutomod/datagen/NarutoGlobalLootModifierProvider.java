@@ -49,6 +49,9 @@ public class NarutoGlobalLootModifierProvider extends GlobalLootModifierProvider
         addChestLoot("chest_scroll_kirin", NarutoItems.SCROLL_KIRIN.get(), 0.03F, 1, 1);
         addChestLoot("chest_scroll_eight_gates", NarutoItems.SCROLL_EIGHT_GATES.get(), 0.02F, 1, 1);
         addChestLoot("chest_scroll_rasenshuriken", NarutoItems.SCROLL_RASENSHURIKEN.get(), 0.02F, 1, 1);
+        addChestLoot("chest_scroll_stone_spikes", NarutoItems.SCROLL_STONE_SPIKES.get(), 0.04F, 1, 1);
+        addChestLoot("chest_scroll_water_dragon", NarutoItems.SCROLL_WATER_DRAGON.get(), 0.03F, 1, 1);
+        addChestLoot("chest_blank_jutsu_scroll", NarutoItems.BLANK_JUTSU_SCROLL.get(), 0.06F, 1, 1);
     }
 
     private void addChestLoot(String name, Item item, float chance, int minCount, int maxCount) {

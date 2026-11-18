@@ -42,6 +42,10 @@ public class NarutoItems {
 
     public static final DeferredItem<Item> BONE_SWORD = ITEMS.registerItem("bone_sword", BoneSwordItem::new);
 
+    public static final DeferredItem<Item> CHAKRA_BLADES = ITEMS.registerItem("chakra_blades", ChakraBladesItem::new);
+
+    public static final DeferredItem<Item> ANBU_TANTO = ITEMS.registerItem("anbu_tanto", AnbuTantoItem::new);
+
     public static final DeferredItem<Item> SMOKE_BOMB = ITEMS.registerItem("smoke_bomb",
             props -> new SmokeBombItem(props.stacksTo(16)));
 
@@ -71,6 +75,18 @@ public class NarutoItems {
 
     public static final DeferredItem<Item> SCROLL_RASENSHURIKEN = ITEMS.registerItem("scroll_rasenshuriken",
             props -> new JutsuScrollItem(props.stacksTo(1).rarity(Rarity.EPIC), NarutoAbilities.RASENSHURIKEN.getId()));
+
+    public static final DeferredItem<Item> SCROLL_STONE_SPIKES = ITEMS.registerItem("scroll_stone_spikes",
+            props -> new JutsuScrollItem(props.stacksTo(1).rarity(Rarity.RARE), NarutoAbilities.STONE_SPIKES.getId()));
+
+    public static final DeferredItem<Item> SCROLL_WATER_DRAGON = ITEMS.registerItem("scroll_water_dragon",
+            props -> new JutsuScrollItem(props.stacksTo(1).rarity(Rarity.RARE), NarutoAbilities.WATER_DRAGON.getId()));
+
+    public static final DeferredItem<Item> SEALED_AMMO_SCROLL = ITEMS.registerItem("sealed_ammo_scroll",
+            SealedAmmoScrollItem::new);
+
+    public static final DeferredItem<Item> BLANK_JUTSU_SCROLL = ITEMS.registerItem("blank_jutsu_scroll",
+            props -> new BlankJutsuScrollItem(props.stacksTo(4).rarity(Rarity.UNCOMMON)));
 
     // Spawn Eggs
     public static final DeferredItem<Item> ROGUE_NINJA_SPAWN_EGG = ITEMS.registerItem("rogue_ninja_spawn_egg",
@@ -111,6 +127,18 @@ public class NarutoItems {
     public static final DeferredItem<Item> AKATSUKI_CLOAK = ITEMS.registerItem("akatsuki_cloak",
             props -> new NarutoArmorItem(NarutoArmorMaterial.AKATSUKI_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.RARE))
                     .setTooltipKey("item.narutomod.akatsuki_cloak.desc"));
+
+    public static final DeferredItem<Item> JONIN_VEST = ITEMS.registerItem("jonin_vest",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.JONIN_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.RARE))
+                    .setTooltipKey("item.narutomod.jonin_vest.desc"));
+
+    public static final DeferredItem<Item> WARRING_STATES_ARMOR = ITEMS.registerItem("warring_states_armor",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.WARRING_STATES_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.EPIC))
+                    .setTooltipKey("item.narutomod.warring_states_armor.desc"));
+
+    public static final DeferredItem<Item> KAGE_HAT = ITEMS.registerItem("kage_hat",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.KAGE_MAT, ArmorType.HELMET, props.rarity(Rarity.EPIC))
+                    .setTooltipKey("item.narutomod.kage_hat.desc"));
 
     public static final DeferredItem<Item> LONELY_MARCH = ITEMS.registerSimpleItem("lonely_march",
             props -> props.stacksTo(1).rarity(Rarity.RARE)
@@ -172,6 +200,8 @@ public class NarutoItems {
                         output.accept(KUSANAGI_SWORD.get());
                         output.accept(SAMEHADA.get());
                         output.accept(BONE_SWORD.get());
+                        output.accept(CHAKRA_BLADES.get());
+                        output.accept(ANBU_TANTO.get());
                         output.accept(SMOKE_BOMB.get());
                         output.accept(MILITARY_RATIONS_PILL.get());
                         output.accept(ICHIRAKU_RAMEN.get());
@@ -182,6 +212,10 @@ public class NarutoItems {
                         output.accept(SCROLL_KIRIN.get());
                         output.accept(SCROLL_EIGHT_GATES.get());
                         output.accept(SCROLL_RASENSHURIKEN.get());
+                        output.accept(SCROLL_STONE_SPIKES.get());
+                        output.accept(SCROLL_WATER_DRAGON.get());
+                        output.accept(SEALED_AMMO_SCROLL.get());
+                        output.accept(BLANK_JUTSU_SCROLL.get());
                         output.accept(ROGUE_NINJA_SPAWN_EGG.get());
                         output.accept(AKATSUKI_NINJA_SPAWN_EGG.get());
                         output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
@@ -195,8 +229,11 @@ public class NarutoItems {
                     .icon(() -> new ItemStack(RED_ANBU_MASK.get()))
                     .displayItems((parameters, output) -> {
                         output.accept(CHUNIN_VEST.get());
+                        output.accept(JONIN_VEST.get());
                         output.accept(ANBU_ARMOR.get());
                         output.accept(AKATSUKI_CLOAK.get());
+                        output.accept(WARRING_STATES_ARMOR.get());
+                        output.accept(KAGE_HAT.get());
                         output.accept(RED_ANBU_MASK.get());
                         output.accept(YELLOW_ANBU_MASK.get());
                         output.accept(GREEN_ANBU_MASK.get());

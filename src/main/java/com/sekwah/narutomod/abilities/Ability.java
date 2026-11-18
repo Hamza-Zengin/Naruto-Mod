@@ -387,6 +387,22 @@ public abstract class Ability {
         return getScaledActivationDelay(mastery);
     }
 
+    public static int applyArmorDelayReduction(Player player, int baseDelayTicks) {
+        if (player == null || baseDelayTicks <= 0) {
+            return Math.max(0, baseDelayTicks);
+        }
+        boolean hasJoninVest = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).getItem()
+                == com.sekwah.narutomod.item.NarutoItems.JONIN_VEST.get();
+        return applyArmorDelayReduction(hasJoninVest, baseDelayTicks);
+    }
+
+    public static int applyArmorDelayReduction(boolean hasJoninVest, int baseDelayTicks) {
+        if (baseDelayTicks <= 0) {
+            return 0;
+        }
+        return hasJoninVest ? Math.max(0, baseDelayTicks - 1) : baseDelayTicks;
+    }
+
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), 30);
     }

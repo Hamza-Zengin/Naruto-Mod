@@ -225,7 +225,7 @@ public class DatapackSchemaAuditTest {
     public void testEquipmentAssetsExistForAllArmorMaterials() throws IOException {
         Path equipmentDir = Path.of("src/main/resources/assets/narutomod/equipment");
         Assertions.assertTrue(Files.isDirectory(equipmentDir), "assets/narutomod/equipment directory must exist!");
-        for (String assetName : List.of("anbu", "headband", "chunin", "akatsuki")) {
+        for (String assetName : List.of("anbu", "headband", "chunin", "akatsuki", "jonin", "warring_states", "kage")) {
             Path file = equipmentDir.resolve(assetName + ".json");
             Assertions.assertTrue(Files.isRegularFile(file), "Missing equipment asset JSON: " + file);
             JsonObject root = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
@@ -254,7 +254,7 @@ public class DatapackSchemaAuditTest {
                     .sorted()
                     .toList();
         }
-        Assertions.assertEquals(13, modifierFiles.size(), "Expected 13 Global Loot Modifier JSON files!");
+        Assertions.assertEquals(16, modifierFiles.size(), "Expected 16 Global Loot Modifier JSON files!");
 
         for (Path modifierFile : modifierFiles) {
             JsonObject modObj = JsonParser.parseString(Files.readString(modifierFile)).getAsJsonObject();

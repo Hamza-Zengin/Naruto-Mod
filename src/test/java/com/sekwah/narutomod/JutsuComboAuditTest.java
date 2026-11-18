@@ -38,6 +38,8 @@ public class JutsuComboAuditTest {
             Map.entry("water_bullet", new WaterBulletAbility()),
             Map.entry("wind_breaker", new WindBreakerAbility()),
             Map.entry("mud_wall", new MudWallAbility()),
+            Map.entry("earth_dragon_bullet", new EarthDragonBulletAbility()),
+            Map.entry("vacuum_spheres", new VacuumSpheresAbility()),
             Map.entry("summoning", new SummoningAbility()),
             // [B] High Level (4 keys)
             Map.entry("sharingan", new SharinganAbility()),
@@ -46,6 +48,8 @@ public class JutsuComboAuditTest {
             Map.entry("shadow_possession", new ShadowPossessionAbility()),
             Map.entry("chidori", new ChidoriAbility()),
             Map.entry("rasengan", new RasenganAbility()),
+            Map.entry("stone_spikes", new StoneSpikesAbility()),
+            Map.entry("water_dragon", new WaterDragonAbility()),
             Map.entry("hakke_kusho", new HakkeKushoAbility()),
             Map.entry("bone_dance", new BoneDanceAbility()),
             Map.entry("wood_prison", new WoodPrisonAbility()),
@@ -61,7 +65,8 @@ public class JutsuComboAuditTest {
 
     private static final Set<String> HIGH_LEVEL = Set.of(
             "shadow_clone", "shadow_possession", "chidori",
-            "rasengan", "hakke_kusho", "bone_dance", "wood_prison", "eight_gates"
+            "rasengan", "stone_spikes", "water_dragon",
+            "hakke_kusho", "bone_dance", "wood_prison", "eight_gates"
     );
 
     private static final Set<String> ULTIMATE = Set.of(
@@ -69,7 +74,7 @@ public class JutsuComboAuditTest {
     );
 
     @Test
-    @DisplayName("Verify all 26 jutsu combos are 100% unique, match JSON, and obey tier key lengths")
+    @DisplayName("Verify all 30 jutsu combos are 100% unique, match JSON, and obey tier key lengths")
     public void testAllJutsuCombosUniqueAndTiered() throws IOException {
         assertTrue(Files.isDirectory(JUTSU_DIR), "Jutsu data directory must exist");
 

@@ -133,5 +133,17 @@ public class RogueNinjaEntity extends Monster implements NinjaJutsuUser {
         if (this.random.nextFloat() < 0.25f) {
             this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.MILITARY_RATIONS_PILL.get(), 1));
         }
+        if (this.random.nextFloat() < 0.08f) {
+            this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.BLANK_JUTSU_SCROLL.get(), 1));
+        }
+        if (this.random.nextFloat() < 0.06f) {
+            this.spawnAtLocation(serverLevel, new ItemStack(NarutoItems.ANBU_TANTO.get(), 1));
+        }
+        if (this.random.nextFloat() < 0.05f) {
+            var scroll = this.random.nextBoolean()
+                    ? NarutoItems.SCROLL_STONE_SPIKES.get()
+                    : NarutoItems.SCROLL_WATER_DRAGON.get();
+            this.spawnAtLocation(serverLevel, new ItemStack(scroll, 1));
+        }
     }
 }
