@@ -215,6 +215,73 @@ public class JutsuVisualEffectEntity extends Entity {
                         serverLevel.playSound(null, this.getX(), this.getY(), this.getZ(),
                                 NarutoSounds.CHIDORI_LOOP.get(), SoundSource.PLAYERS, 0.8f, 1.2f);
                     }
+                    if (targetId >= 0 && this.getEffectDamage() > 0.0F) {
+                        Entity trackedEntity = serverLevel.getEntity(targetId);
+                        if (!(trackedEntity instanceof LivingEntity fieldOwner) || !fieldOwner.isAlive()) {
+                            this.discard();
+                            return;
+                        }
+                        double radius = com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility.STREAM_RADIUS;
+                        double radiusSq = radius * radius;
+                        Vec3 center = fieldOwner.position();
+                        AABB fieldBox = fieldOwner.getBoundingBox().inflate(radius, 2.5D, radius);
+
+                        // Continuous projectile deflection while the electric field is active
+                        List<Projectile> incoming = serverLevel.getEntitiesOfClass(Projectile.class, fieldBox,
+                                p -> p.isAlive() && p.getOwner() != fieldOwner
+                                        && !ShadowCloneEntity.areAllies(fieldOwner, p.getOwner())
+                                        && p.position().distanceToSqr(center) <= radiusSq);
+                        for (Projectile projectile : incoming) {
+                            Vec3 away = projectile.position().subtract(center);
+                            if (away.lengthSqr() < 1.0E-4D) {
+                                away = new Vec3(0.0D, 1.0D, 0.0D);
+                            }
+                            projectile.setDeltaMovement(away.normalize().scale(1.15D).add(0.0D, 0.22D, 0.0D));
+                            projectile.needsSync = true;
+                        }
+
+                        // Continuous ambient electric sparks around the caster
+                        if (this.tickCount % 2 == 0) {
+                            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
+                                    center.x, center.y + 1.0D, center.z,
+                                    14, 1.9D, 0.7D, 1.9D, 0.14D,
+                                    ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                        }
+
+                        // Periodic lightning shockwave pulse every 10 ticks (0.5s)
+                        if (this.tickCount % com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility.PULSE_INTERVAL_TICKS == 0) {
+                            float pulseDmg = Math.max(4.0F, this.getEffectDamage());
+                            List<LivingEntity> shocked = serverLevel.getEntitiesOfClass(LivingEntity.class, fieldBox,
+                                    e -> e.isAlive() && e != fieldOwner
+                                            && !ShadowCloneEntity.areAllies(fieldOwner, e)
+                                            && e.position().distanceToSqr(center) <= radiusSq);
+                            for (LivingEntity victim : shocked) {
+                                float finalDmg = victim.isInWaterOrRain() ? pulseDmg * 1.25F : pulseDmg;
+                                victim.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), finalDmg);
+                                victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 35, 2));
+                                Vec3 away = victim.position().subtract(center);
+                                double horiz = Math.hypot(away.x, away.z);
+                                if (horiz > 1.0E-4D) {
+                                    victim.push((away.x / horiz) * 0.35D, 0.14D, (away.z / horiz) * 0.35D);
+                                }
+                                victim.needsSync = true;
+                                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
+                                        victim.getX(), victim.getY() + victim.getBbHeight() * 0.5D, victim.getZ(),
+                                        10, 0.25D, 0.35D, 0.25D, 0.12D,
+                                        ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                            }
+
+                            com.sekwah.narutomod.network.PacketHandler.sentToTracking(
+                                    new com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket(
+                                            net.minecraft.resources.Identifier.fromNamespaceAndPath(
+                                                    com.sekwah.narutomod.NarutoMod.MOD_ID, "elemental_burst"),
+                                            center.add(0.0D, 1.0D, 0.0D),
+                                            new Vec3(0.0D, 1.0D, 0.0D),
+                                            1.9F,
+                                            0x55CCFF),
+                                    fieldOwner);
+                        }
+                    }
                 }
 
                 case TYPE_RASENGAN_SPHERE -> {

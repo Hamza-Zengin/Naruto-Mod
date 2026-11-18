@@ -123,7 +123,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
 
     @Override
     public EntityDimensions getDimensions(Pose p_19721_) {
-        float baseSize = this.isPhoenixMini() ? ENTITY_SIZE * 0.45f : ENTITY_SIZE;
+        float baseSize = this.isPhoenixMini() ? ENTITY_SIZE * 0.24f : ENTITY_SIZE;
         return EntityDimensions.scalable(baseSize, baseSize)
                 .scale(Math.min(INITIAL_SCALE + (GROW_SCALE - (GROW_SCALE * ((GROW_TIME - time) / GROW_TIME))), 1.0f));
     }
@@ -182,7 +182,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         this.refreshDimensions();
 
         if (!this.level().isClientSide() && !this.isImpacted() && this.isAlive()) {
-            AABB clashBox = this.getBoundingBox().inflate(0.35D);
+            AABB clashBox = this.getBoundingBox().inflate(this.isPhoenixMini() ? 0.15D : 0.35D);
             List<Entity> others = this.level().getEntities(this, clashBox,
                     e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
             for (Entity e : others) {
@@ -194,6 +194,10 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                 if (e instanceof VacuumSphereEntity vacuumSphere
                         && com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(this.getOwner(), vacuumSphere.getOwner())) {
                     com.sekwah.narutomod.events.ElementalInteractionHandler.boostFireballWithWind(this);
+                    continue;
+                }
+                if (e instanceof net.minecraft.world.entity.projectile.Projectile otherProj
+                        && com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(this.getOwner(), otherProj.getOwner())) {
                     continue;
                 }
                 if (e instanceof JutsuProjectile other && this.isAlive() && e.isAlive()) {

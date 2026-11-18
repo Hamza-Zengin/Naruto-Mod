@@ -13,11 +13,15 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Katon: Hōsenka no Jutsu (Phoenix Flower / Phoenix Sage Fire)
- * Launches 5 fanned, rapid-fire mini fireballs that scatter across a wide arc and trigger Wind+Fire synergy.
+ * Launches 4 small fanned mini fireballs simultaneously across a 150-degree horizontal arc (equal 50-degree intervals).
  */
 public class PhoenixFlowerAbility extends Ability implements Ability.Cooldown {
 
-    private static final float[] YAW_OFFSETS = new float[]{-12.0F, -6.0F, 0.0F, 6.0F, 12.0F};
+    public static final float[] YAW_OFFSETS = new float[]{-75.0F, -25.0F, 25.0F, 75.0F};
+
+    public static Vec3 computeRotatedDirection(Vec3 baseLook, float yawOffsetDeg) {
+        return baseLook.yRot((float) Math.toRadians(-yawOffsetDeg)).normalize();
+    }
 
     @Override
     public ActivationType activationType() {
@@ -57,33 +61,25 @@ public class PhoenixFlowerAbility extends Ability implements Ability.Cooldown {
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         final float perBallDamage = this.getDamage(ninjaData);
-        for (int i = 0; i < YAW_OFFSETS.length; i++) {
-            final float yawDeg = YAW_OFFSETS[i];
-            int delay = i * 2;
-            if (delay == 0) {
-                spawnMiniFireball(player, yawDeg, perBallDamage);
-            } else {
-                ninjaData.scheduleDelayedTickEvent(delayedPlayer -> spawnMiniFireball(delayedPlayer, yawDeg, perBallDamage), delay);
-            }
+        for (float yawDeg : YAW_OFFSETS) {
+            spawnMiniFireball(player, yawDeg, perBallDamage);
         }
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                NarutoSounds.FIREBALL_CAST.get(), SoundSource.PLAYERS, 0.85f, 1.35f);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.GHAST_SHOOT, SoundSource.PLAYERS, 0.55f, 1.3f);
     }
 
     private static void spawnMiniFireball(Player player, float yawOffsetDeg, float perBallDamage) {
         if (player == null || !player.isAlive() || player.level().isClientSide()) {
             return;
         }
-        Vec3 look = player.getLookAngle()
-                .yRot((float) Math.toRadians(-yawOffsetDeg))
-                .normalize()
-                .scale(1.18D);
-        FireballJutsuEntity miniFireball = new FireballJutsuEntity(player, look.x, look.y, look.z);
+        Vec3 dir = computeRotatedDirection(player.getLookAngle(), yawOffsetDeg);
+        Vec3 vel = dir.scale(1.18D);
+        FireballJutsuEntity miniFireball = new FireballJutsuEntity(player, vel.x, vel.y, vel.z);
         miniFireball.setPhoenixMini(perBallDamage);
-        Vec3 spawnPos = player.getEyePosition().add(look.scale(0.65D)).subtract(0.0D, 0.12D, 0.0D);
+        Vec3 spawnPos = player.getEyePosition().add(dir.scale(1.15D)).subtract(0.0D, 0.12D, 0.0D);
         miniFireball.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
         player.level().addFreshEntity(miniFireball);
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                NarutoSounds.FIREBALL_CAST.get(), SoundSource.PLAYERS, 0.65f, 1.35f);
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.GHAST_SHOOT, SoundSource.PLAYERS, 0.45f, 1.3f);
     }
 }

@@ -338,6 +338,7 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
                     com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_CHIDORI_BURST,
                     14, this.mob.getYRot());
             effect.setCasterUUID(this.mob.getUUID());
+            effect.setEffectDamage(0.0F);
             serverLevel.addFreshEntity(effect);
 
             if (this.mob.distanceTo(target) <= 8.5D) {

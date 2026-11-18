@@ -227,15 +227,71 @@ public class NarutoModGameTests {
                     "Kumo Village Ninja must equip Cloud Jonin Vest");
         }
 
-        // Phase 3 structures & advancements loaded cleanly in datapack registries
+        // Phase 3 structures & template pools loaded cleanly in datapack registries
         var structureRegistry = helper.getLevel().registryAccess().lookupOrThrow(Registries.STRUCTURE);
         for (String structName : new String[]{
                 "konoha_village", "suna_village", "kiri_village", "kumo_village", "iwa_village",
-                "valley_of_the_end", "chunin_arena", "myobokuzan_shrine"}) {
+                "valley_of_the_end", "chunin_arena", "myobokuzan_shrine", "uchiha_shrine", "akatsuki_hideout"}) {
             helper.assertTrue(
                     structureRegistry.get(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, structName)).isPresent(),
                     "Structure must load cleanly: " + structName);
         }
+        var poolRegistry = helper.getLevel().registryAccess().lookupOrThrow(Registries.TEMPLATE_POOL);
+        for (String poolName : new String[]{
+                "konoha_village", "konoha_streets", "konoha_village_addons",
+                "suna_village", "suna_streets", "suna_village_addons",
+                "kiri_village", "kiri_streets", "kiri_village_addons",
+                "kumo_village", "kumo_streets", "kumo_village_addons",
+                "iwa_village", "iwa_streets", "iwa_village_addons",
+                "valley_of_the_end", "chunin_arena", "chunin_arena_addons",
+                "myobokuzan_shrine", "uchiha_shrine", "uchiha_shrine_addons",
+                "akatsuki_hideout", "akatsuki_hideout_addons"}) {
+            helper.assertTrue(
+                    poolRegistry.get(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, poolName)).isPresent(),
+                    "Template pool must load cleanly: " + poolName);
+        }
+
+        var structMgr = helper.getLevel().getStructureTemplateManager();
+        for (String nbtName : new String[]{
+                "konoha_plaza", "konoha_main_street", "konoha_crossroad", "konoha_gate", "konoha_training_ground", "konoha_ichiraku_house", "konoha_dojo",
+                "suna_dome", "suna_avenue", "suna_courtyard", "suna_gate", "suna_barracks", "suna_workshop",
+                "kiri_tower", "kiri_bridge", "kiri_canal_plaza", "kiri_gate", "kiri_harbor_house", "kiri_armory",
+                "kumo_peak_tower", "kumo_sky_bridge", "kumo_cloud_plaza", "kumo_gate", "kumo_thunder_dojo", "kumo_pavilion",
+                "iwa_keep", "iwa_stone_bridge", "iwa_pillars", "iwa_gate", "iwa_forge", "iwa_dwelling",
+                "valley_waterfall", "valley_shore",
+                "chunin_arena_floor", "chunin_stands", "chunin_kage_box",
+                "myobokuzan_sanctuary", "myobokuzan_torii",
+                "uchiha_shrine", "uchiha_courtyard",
+                "akatsuki_hideout", "akatsuki_canyon"}) {
+            helper.assertTrue(
+                    structMgr.get(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, nbtName)).isPresent(),
+                    "Structure template NBT must load cleanly in StructureTemplateManager: " + nbtName);
+        }
+
+        // Verify Phoenix Flower spawns 4 mini fireballs and Chidori Stream spawns persistent field effect
+        ServerPlayer caster = helper.makeMockServerPlayerInLevel();
+        net.minecraft.core.BlockPos testOrigin = helper.absolutePos(new net.minecraft.core.BlockPos(1, 2, 1));
+        caster.setPos(testOrigin.getX() + 0.5D, testOrigin.getY(), testOrigin.getZ() + 0.5D);
+        NinjaData casterData = caster.getData(NinjaCapabilityHandler.NINJA_DATA);
+        NarutoAbilities.PHOENIX_FLOWER.get().performServer(caster, casterData, 0);
+        var fireballs = helper.getLevel().getEntitiesOfClass(
+                com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity.class,
+                caster.getBoundingBox().inflate(8.0D),
+                fb -> fb.getOwner() == caster && fb.isPhoenixMini());
+        helper.assertValueEqual(fireballs.size(), 4, "Phoenix Flower mini fireball spawn count");
+        for (var fb : fireballs) {
+            fb.tick();
+            helper.assertTrue(fb.isAlive(), "Phoenix Flower mini fireball must not self-clash with sibling fireballs");
+        }
+
+        NarutoAbilities.CHIDORI_STREAM.get().performServer(caster, casterData, 0);
+        var fields = helper.getLevel().getEntitiesOfClass(
+                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.class,
+                caster.getBoundingBox().inflate(6.0D),
+                fx -> fx.getVisualType() == com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_CHIDORI_BURST
+                        && fx.getTargetId() == caster.getId());
+        helper.assertValueEqual(fields.size(), 1, "Chidori Stream persistent electric field entity count");
+        helper.assertTrue(fields.get(0).getMaxLife() >= 30, "Chidori Stream field maxLife must be >= 30 ticks (1.5s)");
 
         var advancements = helper.getLevel().getServer().getAdvancements();
         for (String advPath : new String[]{

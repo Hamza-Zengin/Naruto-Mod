@@ -235,6 +235,37 @@ public class ExpansionFeaturesTest {
     }
 
     @Test
+    @DisplayName("Verify Phoenix Flower 150-degree equal 4-bolt spread and Chidori Stream mastery field duration scaling")
+    void testPhoenixFlowerAndChidoriStreamRevisions() {
+        float[] offsets = com.sekwah.narutomod.abilities.jutsus.PhoenixFlowerAbility.YAW_OFFSETS;
+        assertArrayEquals(new float[]{-75.0F, -25.0F, 25.0F, 75.0F}, offsets, 0.001F);
+
+        Vec3 baseLook = new Vec3(0.0D, 0.0D, 1.0D);
+        Vec3[] dirs = new Vec3[offsets.length];
+        for (int i = 0; i < offsets.length; i++) {
+            dirs[i] = com.sekwah.narutomod.abilities.jutsus.PhoenixFlowerAbility.computeRotatedDirection(baseLook, offsets[i]);
+            assertEquals(1.0D, dirs[i].length(), 0.0001D);
+        }
+
+        double expectedStepCos = Math.cos(Math.toRadians(50.0D));
+        for (int i = 0; i < dirs.length - 1; i++) {
+            assertEquals(expectedStepCos, dirs[i].dot(dirs[i + 1]), 0.001D,
+                    "Adjacent Phoenix Flower fireballs must be spaced by 50 degrees");
+        }
+        assertEquals(Math.cos(Math.toRadians(150.0D)), dirs[0].dot(dirs[3]), 0.001D,
+                "Outer Phoenix Flower fireballs must span 150 degrees");
+
+        // Chidori Stream persistent electric field duration: 30 ticks base + 8 ticks per Mastery Tier (Tier 1..5 -> 38..70 ticks = 1.9s..3.5s)
+        assertEquals(38, com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility.computeFieldDurationTicks(0));
+        assertTrue(com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility.computeFieldDurationTicks(0) >= 20,
+                "Base electric field duration must be at least 1 second (20 ticks)");
+        assertEquals(46, com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility.computeFieldDurationTicks(50));
+        assertEquals(54, com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility.computeFieldDurationTicks(150));
+        assertEquals(62, com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility.computeFieldDurationTicks(350));
+        assertEquals(70, com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility.computeFieldDurationTicks(700));
+    }
+
+    @Test
     @DisplayName("Verify Phase 2 Kubikiribocho blood-repair, village Kage/Jonin passives, and Sage Cloak math")
     void testPhase2EquipmentExpansion() {
         // Kubikiribocho durability repair math

@@ -119,4 +119,81 @@ public class WorldgenStructureAuditTest {
             }
         }
     }
+
+    @Test
+    public void testAllStructuresMeetArchitecturalDetailThresholds() throws IOException {
+        List<String> expectedStructures = List.of(
+                "konoha_village", "suna_village", "kiri_village", "kumo_village", "iwa_village",
+                "valley_of_the_end", "chunin_arena", "myobokuzan_shrine", "uchiha_shrine", "akatsuki_hideout"
+        );
+        Path structureDir = DATA_DIR.resolve("narutomod/worldgen/structure");
+        for (String name : expectedStructures) {
+            Path structFile = structureDir.resolve(name + ".json");
+            Assertions.assertTrue(Files.isRegularFile(structFile), "Missing worldgen/structure/" + name + ".json");
+            JsonObject structJson = JsonParser.parseString(Files.readString(structFile)).getAsJsonObject();
+            String startPool = structJson.get("start_pool").getAsString();
+            String poolName = startPool.split(":", 2)[1];
+            Assertions.assertTrue(Files.isRegularFile(TEMPLATE_POOL_DIR.resolve(poolName + ".json")),
+                    "Missing start_pool JSON for " + name + ": " + startPool);
+        }
+
+        List<Path> poolFiles;
+        try (Stream<Path> walk = Files.walk(TEMPLATE_POOL_DIR)) {
+            poolFiles = walk
+                    .filter(Files::isRegularFile)
+                    .filter(p -> p.toString().endsWith(".json"))
+                    .sorted()
+                    .toList();
+        }
+        Assertions.assertTrue(poolFiles.size() >= 25, "Expected at least 25 template_pool files across all 10 structures");
+
+        for (Path poolFile : poolFiles) {
+            JsonObject root = JsonParser.parseString(Files.readString(poolFile)).getAsJsonObject();
+            JsonArray elements = root.getAsJsonArray("elements");
+            for (JsonElement elem : elements) {
+                JsonObject elementObj = elem.getAsJsonObject().getAsJsonObject("element");
+                if (!elementObj.has("location")) {
+                    continue;
+                }
+                String location = elementObj.get("location").getAsString();
+                String[] parts = location.split(":", 2);
+                Path nbtPath = DATA_DIR.resolve(parts[0]).resolve("structure").resolve(parts[1] + ".nbt");
+
+                net.minecraft.nbt.CompoundTag rootTag = net.minecraft.nbt.NbtIo.readCompressed(
+                        nbtPath, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+                net.minecraft.nbt.ListTag sizeTag = rootTag.getListOrEmpty("size");
+                Assertions.assertEquals(3, sizeTag.size(), "Structure NBT missing 3D size: " + location);
+                int sx = sizeTag.getIntOr(0, 0);
+                int sy = sizeTag.getIntOr(1, 0);
+                int sz = sizeTag.getIntOr(2, 0);
+                Assertions.assertTrue(
+                        Math.max(sx, sz) >= 15 && Math.min(sx, sz) >= 13 && sy >= 10 && (sx * sy * sz) >= 2000,
+                        "Structure piece is too small for architectural detail (" + sx + "x" + sy + "x" + sz + "): " + location);
+
+                net.minecraft.nbt.ListTag paletteTag = rootTag.getListOrEmpty("palette");
+                net.minecraft.nbt.ListTag blocksTag = rootTag.getListOrEmpty("blocks");
+                java.util.Set<String> nonAirNames = new java.util.HashSet<>();
+                int airState = -1;
+                for (int i = 0; i < paletteTag.size(); i++) {
+                    String blockName = paletteTag.getCompoundOrEmpty(i).getStringOr("Name", "");
+                    if ("minecraft:air".equals(blockName)) {
+                        airState = i;
+                    } else if (!blockName.isEmpty()) {
+                        nonAirNames.add(blockName);
+                    }
+                }
+                Assertions.assertTrue(nonAirNames.size() >= 6,
+                        "Structure piece lacks material/architectural variety (non-air palette=" + nonAirNames.size() + "): " + location);
+
+                int nonAirCount = 0;
+                for (int i = 0; i < blocksTag.size(); i++) {
+                    if (blocksTag.getCompoundOrEmpty(i).getIntOr("state", -1) != airState) {
+                        nonAirCount++;
+                    }
+                }
+                Assertions.assertTrue(nonAirCount >= 380,
+                        "Structure piece has too few blocks (" + nonAirCount + "): " + location);
+            }
+        }
+    }
 }

@@ -52,7 +52,7 @@ public class FireballJutsuRenderer extends EntityRenderer<FireballJutsuEntity, F
          scale = FireballJutsuEntity.INITIAL_SCALE
                  + (FireballJutsuEntity.GROW_SCALE * (age / FireballJutsuEntity.GROW_TIME));
       }
-      state.scale = scale * (state.isMini ? 0.65F : 1.65F);
+      state.scale = scale * (state.isMini ? 0.35F : 1.65F);
       state.alpha = entity.isImpacted()
               ? Math.max(0.15F, 0.92F - (entity.getImpactTicks() + partial) * (state.isMini ? 0.08F : 0.042F))
               : 0.92F;

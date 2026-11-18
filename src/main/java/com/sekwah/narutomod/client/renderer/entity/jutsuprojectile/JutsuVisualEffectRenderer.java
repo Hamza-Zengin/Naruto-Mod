@@ -132,7 +132,7 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
                 }
                 case JutsuVisualEffectEntity.TYPE_CHIDORI_BURST -> {
                     poseStack.translate(0.0D, 1.0D, 0.0D);
-                    RenderMathUtil.scaleEntityModel(poseStack, 1.05F + Mth.sin(state.age * 0.8F) * 0.18F);
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.45F + Mth.sin(state.age * 0.75F) * 0.22F);
                     int color = ColorUtil.argb(0.90F * fadeOut, 1.0F, 1.0F, 1.0F);
                     submitNodeCollector.submitModel(this.chidoriModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }

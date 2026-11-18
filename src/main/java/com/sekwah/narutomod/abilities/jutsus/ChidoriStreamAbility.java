@@ -24,7 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import com.sekwah.narutomod.network.PacketHandler;
 
 import java.util.List;
 
@@ -36,6 +36,14 @@ import java.util.List;
 public class ChidoriStreamAbility extends Ability implements Ability.Cooldown {
 
     public static final double STREAM_RADIUS = 5.5D;
+    public static final int BASE_DURATION_TICKS = 30;
+    public static final int TICKS_PER_MASTERY_TIER = 8;
+    public static final int PULSE_INTERVAL_TICKS = 10;
+
+    public static int computeFieldDurationTicks(int masteryScore) {
+        int tier = Ability.getMasteryTier(masteryScore);
+        return BASE_DURATION_TICKS + (tier * TICKS_PER_MASTERY_TIER);
+    }
 
     @Override
     public ActivationType activationType() {
@@ -88,7 +96,12 @@ public class ChidoriStreamAbility extends Ability implements Ability.Cooldown {
             return;
         }
 
-        float damage = this.getDamage(ninjaData);
+        float totalDamage = this.getDamage(ninjaData);
+        float pulseDamage = Math.max(4.0F, totalDamage * 0.35F);
+        float burstDamage = totalDamage * 0.55F;
+        int mastery = ninjaData.getMastery(this.getRegistryName());
+        int fieldDurationTicks = computeFieldDurationTicks(mastery);
+
         Vec3 center = player.position();
         AABB areaBox = player.getBoundingBox().inflate(STREAM_RADIUS, 2.5D, STREAM_RADIUS);
         double radiusSq = STREAM_RADIUS * STREAM_RADIUS;
@@ -98,7 +111,8 @@ public class ChidoriStreamAbility extends Ability implements Ability.Cooldown {
                         && e.position().distanceToSqr(center) <= radiusSq);
 
         for (LivingEntity target : targets) {
-            target.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), damage);
+            float hitDmg = target.isInWaterOrRain() ? burstDamage * 1.25F : burstDamage;
+            target.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), hitDmg);
             target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 2));
             Vec3 away = target.position().subtract(center);
             double horizontalDist = Math.hypot(away.x, away.z);
@@ -128,9 +142,10 @@ public class ChidoriStreamAbility extends Ability implements Ability.Cooldown {
 
         JutsuVisualEffectEntity burst = JutsuVisualEffectEntity.create(
                 serverLevel, player.getX(), player.getY(), player.getZ(),
-                JutsuVisualEffectEntity.TYPE_CHIDORI_BURST, 18, player.getYRot());
+                JutsuVisualEffectEntity.TYPE_CHIDORI_BURST, fieldDurationTicks, player.getYRot());
         burst.setCasterUUID(player.getUUID());
         burst.setTargetId(player.getId());
+        burst.setEffectDamage(pulseDamage);
         serverLevel.addFreshEntity(burst);
 
         serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
@@ -139,14 +154,15 @@ public class ChidoriStreamAbility extends Ability implements Ability.Cooldown {
                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
         Vec3 effectPos = center.add(0.0D, 1.0D, 0.0D);
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new ClientJutsuEffectPacket(
+        PacketHandler.sendToTrackingAndSelf(new ClientJutsuEffectPacket(
                 Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "elemental_burst"),
                 effectPos,
                 new Vec3(0.0D, 1.0D, 0.0D),
                 2.2f,
-                0x55CCFF));
+                0x55CCFF), player);
         if (player instanceof ServerPlayer serverPlayer) {
-            PacketDistributor.sendToPlayer(serverPlayer, new ClientCameraShakePacket(0.45f, 8, effectPos, 12.0f));
+            PacketHandler.sendToPlayer(
+                    new ClientCameraShakePacket(0.45f, 8, effectPos, 12.0f), serverPlayer);
         }
 
         serverLevel.playSound(null, player.blockPosition(), NarutoSounds.CHIDORI.get(), SoundSource.PLAYERS, 1.35f, 0.9f);
