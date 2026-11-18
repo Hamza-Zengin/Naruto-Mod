@@ -1,83 +1,2209 @@
 {
-  "credit": "NarutoMod ANBU Tanto 3D Model",
+  "credit": "NarutoMod Realistic Tapered ANBU Tanto (26.3)",
   "textures": {
     "texture": "narutomod:item/weapons/anbu_tanto_3d",
     "particle": "narutomod:item/weapons/anbu_tanto"
   },
   "elements": [
     {
-      "name": "pommel",
-      "from": [7.35, 0.5, 7.2],
-      "to": [8.65, 1.5, 8.8],
+      "name": "kashira_cap",
+      "from": [
+        7.45,
+        -1.4,
+        7.25
+      ],
+      "to": [
+        8.55,
+        -0.5,
+        8.75
+      ],
       "faces": {
-        "north": {"uv": [8, 0, 12, 4], "texture": "#texture"},
-        "south": {"uv": [8, 0, 12, 4], "texture": "#texture"},
-        "east": {"uv": [8, 0, 12, 4], "texture": "#texture"},
-        "west": {"uv": [8, 0, 12, 4], "texture": "#texture"},
-        "up": {"uv": [8, 0, 12, 4], "texture": "#texture"},
-        "down": {"uv": [8, 0, 12, 4], "texture": "#texture"}
+        "north": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        }
       }
     },
     {
-      "name": "handle",
-      "from": [7.45, 1.5, 7.3],
-      "to": [8.55, 6.2, 8.7],
+      "name": "tsuka_lower",
+      "from": [
+        7.52,
+        -0.5,
+        7.35
+      ],
+      "to": [
+        8.48,
+        2.5,
+        8.65
+      ],
       "faces": {
-        "north": {"uv": [4, 0, 8, 8], "texture": "#texture"},
-        "south": {"uv": [4, 0, 8, 8], "texture": "#texture"},
-        "east": {"uv": [4, 0, 8, 8], "texture": "#texture"},
-        "west": {"uv": [4, 0, 8, 8], "texture": "#texture"},
-        "up": {"uv": [4, 0, 8, 8], "texture": "#texture"},
-        "down": {"uv": [4, 0, 8, 8], "texture": "#texture"}
+        "north": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        }
       }
     },
     {
-      "name": "guard",
-      "from": [6.9, 6.2, 6.7],
-      "to": [9.1, 6.8, 9.3],
+      "name": "tsuka_upper",
+      "from": [
+        7.5,
+        2.5,
+        7.32
+      ],
+      "to": [
+        8.5,
+        5.4,
+        8.68
+      ],
       "faces": {
-        "north": {"uv": [8, 0, 12, 4], "texture": "#texture"},
-        "south": {"uv": [8, 0, 12, 4], "texture": "#texture"},
-        "east": {"uv": [8, 0, 12, 4], "texture": "#texture"},
-        "west": {"uv": [8, 0, 12, 4], "texture": "#texture"},
-        "up": {"uv": [8, 0, 12, 4], "texture": "#texture"},
-        "down": {"uv": [8, 0, 12, 4], "texture": "#texture"}
+        "north": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        }
       }
     },
     {
-      "name": "blade",
-      "from": [7.7, 6.8, 7.35],
-      "to": [8.3, 18.5, 8.65],
+      "name": "fuchi_collar",
+      "from": [
+        7.45,
+        5.4,
+        7.25
+      ],
+      "to": [
+        8.55,
+        5.9,
+        8.75
+      ],
       "faces": {
-        "north": {"uv": [0, 0, 4, 16], "texture": "#texture"},
-        "south": {"uv": [0, 0, 4, 16], "texture": "#texture"},
-        "east": {"uv": [0, 0, 4, 16], "texture": "#texture"},
-        "west": {"uv": [0, 0, 4, 16], "texture": "#texture"},
-        "up": {"uv": [0, 0, 4, 16], "texture": "#texture"},
-        "down": {"uv": [0, 0, 4, 16], "texture": "#texture"}
+        "north": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        }
       }
     },
     {
-      "name": "blade_tip",
-      "from": [7.75, 18.5, 7.55],
-      "to": [8.25, 20.6, 8.45],
+      "name": "tsuba_a",
+      "from": [
+        6.55,
+        5.9,
+        7.307
+      ],
+      "to": [
+        9.45,
+        6.35,
+        8.693
+      ],
       "faces": {
-        "north": {"uv": [0, 0, 4, 6], "texture": "#texture"},
-        "south": {"uv": [0, 0, 4, 6], "texture": "#texture"},
-        "east": {"uv": [0, 0, 4, 6], "texture": "#texture"},
-        "west": {"uv": [0, 0, 4, 6], "texture": "#texture"},
-        "up": {"uv": [0, 0, 4, 6], "texture": "#texture"},
-        "down": {"uv": [0, 0, 4, 6], "texture": "#texture"}
+        "north": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "tsuba_b",
+      "from": [
+        7.391,
+        5.9,
+        6.35
+      ],
+      "to": [
+        8.609,
+        6.35,
+        9.65
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "tsuba_c",
+      "from": [
+        6.956,
+        5.9,
+        6.812
+      ],
+      "to": [
+        9.044,
+        6.35,
+        9.188
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            0,
+            16,
+            8
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          6.125,
+          8
+        ],
+        "axis": "y",
+        "angle": 45
+      }
+    },
+    {
+      "name": "habaki",
+      "from": [
+        7.62,
+        6.35,
+        7.3
+      ],
+      "to": [
+        8.38,
+        7.45,
+        8.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_mune_0",
+      "from": [
+        7.76,
+        7.45,
+        8.2
+      ],
+      "to": [
+        8.24,
+        12.5,
+        8.66
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_shinogi_0",
+      "from": [
+        7.85,
+        7.45,
+        7.65
+      ],
+      "to": [
+        8.15,
+        12.5,
+        8.2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_ha_0",
+      "from": [
+        7.93,
+        7.45,
+        7.28
+      ],
+      "to": [
+        8.07,
+        12.5,
+        7.65
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_mune_1",
+      "from": [
+        7.76,
+        12.5,
+        8.28
+      ],
+      "to": [
+        8.24,
+        17.5,
+        8.74
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_shinogi_1",
+      "from": [
+        7.85,
+        12.5,
+        7.73
+      ],
+      "to": [
+        8.15,
+        17.5,
+        8.28
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_ha_1",
+      "from": [
+        7.93,
+        12.5,
+        7.36
+      ],
+      "to": [
+        8.07,
+        17.5,
+        7.73
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_mune_2",
+      "from": [
+        7.76,
+        17.5,
+        8.38
+      ],
+      "to": [
+        8.24,
+        22.0,
+        8.84
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_shinogi_2",
+      "from": [
+        7.85,
+        17.5,
+        7.83
+      ],
+      "to": [
+        8.15,
+        22.0,
+        8.38
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_ha_2",
+      "from": [
+        7.93,
+        17.5,
+        7.46
+      ],
+      "to": [
+        8.07,
+        22.0,
+        7.83
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_mune_3",
+      "from": [
+        7.76,
+        22.0,
+        8.48
+      ],
+      "to": [
+        8.24,
+        25.0,
+        8.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_shinogi_3",
+      "from": [
+        7.85,
+        22.0,
+        7.93
+      ],
+      "to": [
+        8.15,
+        25.0,
+        8.48
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_ha_3",
+      "from": [
+        7.93,
+        22.0,
+        7.56
+      ],
+      "to": [
+        8.07,
+        25.0,
+        7.93
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "kissaki_mune_0",
+      "from": [
+        7.8,
+        25.0,
+        8.16
+      ],
+      "to": [
+        8.2,
+        26.1,
+        8.9
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "kissaki_ha_0",
+      "from": [
+        7.87,
+        25.0,
+        7.42
+      ],
+      "to": [
+        8.13,
+        26.1,
+        8.16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "kissaki_mune_1",
+      "from": [
+        7.82,
+        26.1,
+        8.235
+      ],
+      "to": [
+        8.18,
+        27.1,
+        8.85
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "kissaki_ha_1",
+      "from": [
+        7.88,
+        26.1,
+        7.62
+      ],
+      "to": [
+        8.12,
+        27.1,
+        8.235
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "kissaki_mune_2",
+      "from": [
+        7.85,
+        27.1,
+        8.32
+      ],
+      "to": [
+        8.15,
+        28.0,
+        8.78
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "kissaki_ha_2",
+      "from": [
+        7.9,
+        27.1,
+        7.86
+      ],
+      "to": [
+        8.1,
+        28.0,
+        8.32
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "kissaki_mune_3",
+      "from": [
+        7.88,
+        28.0,
+        8.41
+      ],
+      "to": [
+        8.12,
+        28.8,
+        8.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "kissaki_ha_3",
+      "from": [
+        7.92,
+        28.0,
+        8.12
+      ],
+      "to": [
+        8.08,
+        28.8,
+        8.41
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "kissaki_mune_4",
+      "from": [
+        7.91,
+        28.8,
+        8.51
+      ],
+      "to": [
+        8.09,
+        29.5,
+        8.64
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "kissaki_ha_4",
+      "from": [
+        7.94,
+        28.8,
+        8.38
+      ],
+      "to": [
+        8.06,
+        29.5,
+        8.51
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            6,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            6,
+            4
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            6,
+            0,
+            8,
+            4
+          ],
+          "texture": "#texture"
+        }
       }
     }
   ],
   "display": {
-    "thirdperson_righthand": {"rotation": [0, -90, 10], "translation": [0, 3.5, 0.5], "scale": [0.82, 0.82, 0.82]},
-    "thirdperson_lefthand": {"rotation": [0, 90, -10], "translation": [0, 3.5, 0.5], "scale": [0.82, 0.82, 0.82]},
-    "firstperson_righthand": {"rotation": [0, -90, -20], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
-    "firstperson_lefthand": {"rotation": [0, 90, 20], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68]},
-    "ground": {"rotation": [0, 0, 45], "translation": [0, 3, 0], "scale": [0.5, 0.5, 0.5]},
-    "gui": {"rotation": [0, 0, -45], "translation": [0, -2, 0], "scale": [0.7, 0.7, 0.7]},
-    "fixed": {"rotation": [0, 180, -45], "translation": [0, -2, 0], "scale": [0.75, 0.75, 0.75]}
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3.6,
+        1.0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        3.6,
+        1.0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        -18
+      ],
+      "translation": [
+        1.13,
+        3.2,
+        1.13
+      ],
+      "scale": [
+        0.68,
+        0.68,
+        0.68
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        180,
+        18
+      ],
+      "translation": [
+        1.13,
+        3.2,
+        1.13
+      ],
+      "scale": [
+        0.68,
+        0.68,
+        0.68
+      ]
+    },
+    "ground": {
+      "rotation": [
+        90,
+        35,
+        0
+      ],
+      "translation": [
+        0,
+        1.5,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "gui": {
+      "rotation": [
+        0,
+        90,
+        -45
+      ],
+      "translation": [
+        0,
+        -2,
+        0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        -90,
+        -45
+      ],
+      "translation": [
+        0,
+        -2.5,
+        0
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ]
+    }
   }
 }

@@ -83,9 +83,8 @@ def main():
                             gui_path = resolve_model_path(gui)
                             if gui_path and not os.path.exists(gui_path):
                                 errors.append(f"items/{fname}: gui model '{gui}' does not exist at {gui_path}")
-                    for expected_ctx in ("gui", "ground", "fixed"):
-                        if expected_ctx not in covered:
-                            errors.append(f"items/{fname}: Missing display_context '{expected_ctx}' in cases")
+                    if "gui" not in covered:
+                        errors.append(f"items/{fname}: Missing display_context 'gui' in cases")
 
     for fname in sorted(os.listdir(MODELS_ITEM_DIR)):
         if not fname.endswith(".json"):

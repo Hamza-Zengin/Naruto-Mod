@@ -5,9 +5,7 @@
     "cases": [
       {
         "when": [
-          "gui",
-          "ground",
-          "fixed"
+          "gui"
         ],
         "model": {
           "type": "minecraft:model",

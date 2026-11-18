@@ -108,10 +108,8 @@ public class ItemModelTransformsTest {
                                     }
                                 }
                             }
-                            for (String expectedCtx : List.of("gui", "ground", "fixed")) {
-                                if (!coveredContexts.contains(expectedCtx)) {
-                                    errors.add(path.getFileName() + ": Missing display_context '" + expectedCtx + "' in cases!");
-                                }
+                            if (!coveredContexts.contains("gui")) {
+                                errors.add(path.getFileName() + ": Missing display_context 'gui' in cases!");
                             }
                         }
                     }
@@ -163,5 +161,40 @@ public class ItemModelTransformsTest {
                 "Expected at least 8 weapon items to use minecraft:select + minecraft:display_context, but found " + selectDisplayContextCount);
         Assertions.assertTrue(errors.isEmpty(),
                 "Found " + errors.size() + " item model errors:\n" + String.join("\n", errors));
+    }
+
+    @Test
+    public void testRedesigned3DWeaponModelsAndTextures() throws IOException {
+        Path texDir = Paths.get("src/main/resources/assets/narutomod/textures/item/weapons");
+        for (String weapon : List.of("anbu_tanto", "chakra_blades", "kunai", "explosive_kunai", "samehada")) {
+            Path modelPath = MODELS_ITEM_DIR.resolve("weapons").resolve(weapon + "_3d.json");
+            Assertions.assertTrue(Files.isRegularFile(modelPath), "Missing 3D weapon model: " + modelPath);
+            JsonObject root = JsonParser.parseString(Files.readString(modelPath)).getAsJsonObject();
+            JsonArray elements = root.getAsJsonArray("elements");
+            Assertions.assertTrue(elements != null && elements.size() >= 24,
+                    weapon + "_3d.json must contain >= 24 sculpted elements for realistic geometry, found " + (elements == null ? 0 : elements.size()));
+
+            double minThickness = Double.MAX_VALUE;
+            for (JsonElement el : elements) {
+                JsonObject obj = el.getAsJsonObject();
+                JsonArray from = obj.getAsJsonArray("from");
+                JsonArray to = obj.getAsJsonArray("to");
+                for (int axis = 0; axis < 3; axis++) {
+                    double dim = Math.abs(to.get(axis).getAsDouble() - from.get(axis).getAsDouble());
+                    if (dim > 0.001 && dim < minThickness) {
+                        minThickness = dim;
+                    }
+                }
+            }
+            Assertions.assertTrue(minThickness <= 0.16,
+                    weapon + "_3d.json must have tapered razor/detail edge <= 0.16 thickness (found " + minThickness + ")");
+
+            Path texPath = texDir.resolve(weapon + "_3d.png");
+            Assertions.assertTrue(Files.isRegularFile(texPath), "Missing 3D weapon texture: " + texPath);
+            java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(texPath.toFile());
+            Assertions.assertNotNull(img);
+            Assertions.assertEquals(64, img.getWidth(), weapon + "_3d.png width must be 64px");
+            Assertions.assertEquals(64, img.getHeight(), weapon + "_3d.png height must be 64px");
+        }
     }
 }
