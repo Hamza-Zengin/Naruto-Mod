@@ -27,3 +27,10 @@ Bu dosya `Naruto-Mod` projesinin sürüm geçmişini ve öne çıkan değişikli
 - **Global Loot Modifiers (GLM):** `AddNarutoLootModifier` ile vanilya sandıklarına veri odaklı ganimet enjeksiyonu (`data/narutomod/loot_modifiers/`).
 - **Shinobi Başarım Ağacı:** `NinjaProgressTrigger` tabanlı özel ilerleme ve başarım ağacı (`data/narutomod/advancement/shinobi/`).
 - **Dinamik Jutsu Ansiklopedisi:** `NinjaMenuScreen` üzerinde `JutsuDataManager` verilerini canlı gösteren Jutsu Detay Kartı (element rengi, çakra maliyeti, saniye cinsinden bekleme süresi, temel hasar ve kilit durumu).
+
+### İçerik Genişlemesi & Revizyonlar (2026-11-18)
+- **32 Veri Odaklı Jutsu:** `Phoenix Flower` (90° yaylı 4 ateş topu), `Chidori Stream` (ustalıkla uzayan elektrik alanı), `Mystical Palm`, `Earth Dragon Bullet`, `Vacuum Spheres`, `Stone Spikes` ve `Water Dragon` eklendi.
+- **Parşömen & Ekonomi Sistemleri:** Tier 4+ jutsuları parşömene aktaran `BlankJutsuScrollItem` ve 64'lü cephane taşıyan `SealedAmmoScrollItem` eklendi.
+- **10 Dünya Yapısı & 47 `.nbt` Şablonu:** 5 Büyük Shinobi Köyü (`Konoha` — tek İchiraku Ramen ile, `Suna`, `Kiri`, `Kumo`, `Iwa`), dev 5 parçalı `Son Vadi`, `Chūnin Sınav Arenası`, `Myōbokuzan`, `Uchiha Tapınağı` ve tek seferlik savunuculu `Akatsuki Sığınağı`; tüm yapılar birleşik `narutomod_structures.json` ızgarasında en az `24` chunk (`384` blok) aralıkla konumlandırıldı.
+- **10 Yeni Köy Mobu & Doku Güncellemesi:** Her köye özel `5` Köy Ninjası (`VillageNinjaEntity`) ve `5` Tüccar Köylü (`ShinobiVillagerEntity`); 3D kafa bandıyla çakışmayan `y=12` göz hizası.
+- **Gerçekçi 3D Silahlar (`64×64`) & Köy Zırhları:** `Kunai`, `Patlayıcı Kunai`, `Samehada`, `Chakra Kılıcı (Hien)` ve `ANBU Kılıcı (Tanto)` için kademeli incelen 3D modeller, `64×64` kaplamalar, yerde/çerçevede/fırlatıldığında 3D görünüm; 5 köy Kage Şapkası, Jōnin Yeleği, Savaşan Devletler Zırhı ve Bilge Pelerini pasifleri.
