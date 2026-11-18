@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "S S",
+    "IVI",
+    "LIL"
+  ],
+  "key": {
+    "S": "minecraft:prismarine_shard",
+    "V": "narutomod:jonin_vest",
+    "I": "narutomod:chakra_metal",
+    "L": "minecraft:cyan_dye"
+  },
+  "result": {
+    "id": "narutomod:mist_jonin_vest",
+    "count": 1
+  }
+}

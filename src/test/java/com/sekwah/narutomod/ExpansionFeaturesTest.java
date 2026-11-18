@@ -194,4 +194,114 @@ public class ExpansionFeaturesTest {
         assertEquals(20.0F, PlayerEvents.applyWarringStatesReduction(20.0F, false, true), 0.001F);
         assertEquals(20.0F, PlayerEvents.applyWarringStatesReduction(20.0F, true, false), 0.001F);
     }
+
+    @Test
+    @DisplayName("Verify Phase 1 new jutsus (Phoenix Flower, Chidori Stream, Mystical Palm) metadata and hybrid unlock")
+    void testPhase1JutsuExpansion() {
+        var phoenix = new com.sekwah.narutomod.abilities.jutsus.PhoenixFlowerAbility();
+        assertEquals(ChakraElement.FIRE, phoenix.getChakraElement());
+        assertEquals(NinjaRank.CHUNIN, phoenix.getRequiredRank());
+        assertEquals(Ability.ActivationType.INSTANT, phoenix.activationType());
+        assertEquals(131L, phoenix.defaultCombo());
+
+        var chidoriStream = new com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility();
+        assertEquals(ChakraElement.LIGHTNING, chidoriStream.getChakraElement());
+        assertEquals(NinjaRank.JONIN, chidoriStream.getRequiredRank());
+        assertEquals(Ability.ActivationType.INSTANT, chidoriStream.activationType());
+        assertEquals(1313L, chidoriStream.defaultCombo());
+        assertTrue(chidoriStream.getPrerequisites().contains(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori")));
+        assertEquals(150, chidoriStream.getRequiredMastery());
+
+        var mysticalPalm = new com.sekwah.narutomod.abilities.jutsus.MysticalPalmAbility();
+        assertEquals(ChakraElement.NONE, mysticalPalm.getChakraElement());
+        assertEquals(NinjaRank.CHUNIN, mysticalPalm.getRequiredRank());
+        assertEquals(Ability.ActivationType.CHANNELED, mysticalPalm.activationType());
+        assertEquals(332L, mysticalPalm.defaultCombo());
+        assertFalse(mysticalPalm.canActivateBelowMinCharge());
+
+        Identifier streamId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori_stream");
+        Identifier chidoriId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori");
+
+        NinjaData joninWithChidori = new NinjaData(true);
+        joninWithChidori.setRank(NinjaRank.JONIN.name());
+        joninWithChidori.unlockAbility(chidoriId);
+        joninWithChidori.addMastery(chidoriId, 150);
+        assertTrue(JutsuUnlockRules.checkAbilityUnlocked(joninWithChidori, chidoriStream, streamId));
+
+        NinjaData chuninWithScroll = new NinjaData(true);
+        chuninWithScroll.setRank(NinjaRank.CHUNIN.name());
+        chuninWithScroll.unlockAbility(streamId);
+        assertTrue(JutsuUnlockRules.checkAbilityUnlocked(chuninWithScroll, chidoriStream, streamId));
+    }
+
+    @Test
+    @DisplayName("Verify Phase 2 Kubikiribocho blood-repair, village Kage/Jonin passives, and Sage Cloak math")
+    void testPhase2EquipmentExpansion() {
+        // Kubikiribocho durability repair math
+        assertEquals(98, com.sekwah.narutomod.item.weapons.KubikiribochoItem.computeRepairedDamageValue(100, false));
+        assertEquals(85, com.sekwah.narutomod.item.weapons.KubikiribochoItem.computeRepairedDamageValue(100, true));
+        assertEquals(0, com.sekwah.narutomod.item.weapons.KubikiribochoItem.computeRepairedDamageValue(10, true));
+
+        // Kage Hats -15% chakra cost on matching element only
+        assertEquals(34.0F, Ability.applyElementalHatDiscount(ChakraElement.WIND, ChakraElement.WIND, 40.0F), 0.001F);
+        assertEquals(40.0F, Ability.applyElementalHatDiscount(ChakraElement.WIND, ChakraElement.FIRE, 40.0F), 0.001F);
+        assertEquals(40.0F, Ability.applyElementalHatDiscount(ChakraElement.NONE, ChakraElement.LIGHTNING, 40.0F), 0.001F);
+
+        // Sage Cloak +50% chakra regen & +12% Senjutsu damage multiplier
+        assertEquals(1.50F, ChakraStaminaLogic.getChestplateChakraRegenMultiplier(true, false, false, false), 0.001F);
+        assertEquals(1.20F, ChakraStaminaLogic.getChestplateChakraRegenMultiplier(false, false, true, false), 0.001F);
+        assertEquals(1.25F, ChakraStaminaLogic.getChestplateStaminaRegenMultiplier(true, false), 0.001F);
+        assertEquals(11.2F, PlayerEvents.applySageCloakDamageMultiplier(10.0F, true), 0.001F);
+        assertEquals(10.0F, PlayerEvents.applySageCloakDamageMultiplier(10.0F, false), 0.001F);
+
+        // Village Kage Hat & Jonin Vest defensive passives
+        assertEquals(17.0F, PlayerEvents.applyVillageArmorDamageReduction(
+                20.0F, ChakraElement.WIND, false, false, false, false, false, false, true), 0.001F);
+        assertEquals(15.0F, PlayerEvents.applyVillageArmorDamageReduction(
+                20.0F, ChakraElement.NONE, true, false, false, true, false, false, false), 0.001F);
+        assertEquals(15.0F, PlayerEvents.applyVillageArmorDamageReduction(
+                20.0F, ChakraElement.NONE, false, true, false, false, true, false, false), 0.001F);
+        assertEquals(16.0F, PlayerEvents.applyVillageArmorDamageReduction(
+                20.0F, ChakraElement.NONE, false, false, true, false, false, true, false), 0.001F);
+    }
+
+    @Test
+    @DisplayName("Verify Phase 3 VillageNinjaEntity biome resolution, village presets, and Chidori Spark tactical AI")
+    void testPhase3VillageNpcAndJutsuProfiles() {
+        var VillageType = com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.KONOHA;
+        assertEquals(com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.SUNA,
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.fromId("suna"));
+        assertEquals(VillageType,
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.fromId("unknown"));
+
+        assertEquals(com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.SUNA,
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.fromBiomePath("desert"));
+        assertEquals(com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.KIRI,
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.fromBiomePath("frozen_ocean"));
+        assertEquals(com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.KUMO,
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.fromBiomePath("jagged_peaks"));
+        assertEquals(com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.IWA,
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.fromBiomePath("savanna"));
+        assertEquals(com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.KONOHA,
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.fromBiomePath("forest"));
+
+        var konoha = com.sekwah.narutomod.entity.ai.NinjaJutsuProfile.villagePreset("konoha");
+        var suna = com.sekwah.narutomod.entity.ai.NinjaJutsuProfile.villagePreset("suna");
+        var kiri = com.sekwah.narutomod.entity.ai.NinjaJutsuProfile.villagePreset("kiri");
+        var kumo = com.sekwah.narutomod.entity.ai.NinjaJutsuProfile.villagePreset("kumo");
+        var iwa = com.sekwah.narutomod.entity.ai.NinjaJutsuProfile.villagePreset("iwa");
+
+        assertTrue(konoha.isFireballEnabled());
+        assertTrue(suna.isVacuumSpheresEnabled());
+        assertTrue(kiri.isWaterBulletEnabled());
+        assertTrue(kumo.isChidoriSparkEnabled());
+        assertTrue(kumo.isVacuumSpheresEnabled());
+        assertTrue(iwa.isEarthBulletEnabled());
+        assertTrue(iwa.isMudWallEnabled());
+
+        var cooldowns = new com.sekwah.narutomod.entity.ai.NinjaJutsuCooldowns();
+        assertEquals(com.sekwah.narutomod.entity.ai.NinjaJutsuType.CHIDORI_SPARK,
+                com.sekwah.narutomod.entity.ai.NinjaJutsuAttackGoal.selectTacticalAction(
+                        kumo, cooldowns, 5.0D, true, 0.9F, 0));
+    }
 }

@@ -1,0 +1,73 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "weight": 6,
+          "name": "narutomod:chunin_vest"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 3,
+          "name": "narutomod:anbu_armor"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 6,
+          "name": "narutomod:scroll_shadow_clone"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 4,
+          "name": "narutomod:scroll_eight_gates"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 12,
+          "name": "narutomod:kunai",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 4,
+              "max": 12
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 12,
+          "name": "narutomod:shuriken",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 4,
+              "max": 12
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "narutomod:military_rations_pill",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 4
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

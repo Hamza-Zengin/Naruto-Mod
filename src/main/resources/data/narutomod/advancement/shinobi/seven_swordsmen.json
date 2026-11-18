@@ -1,0 +1,33 @@
+{
+  "parent": "narutomod:shinobi/rank_chunin",
+  "display": {
+    "icon": {
+      "id": "narutomod:kubikiribocho"
+    },
+    "title": {
+      "translate": "advancements.narutomod.seven_swordsmen.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.seven_swordsmen.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "mist_sword": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "narutomod:kubikiribocho",
+              "narutomod:samehada"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

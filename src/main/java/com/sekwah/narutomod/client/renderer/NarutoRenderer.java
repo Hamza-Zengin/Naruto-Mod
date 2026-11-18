@@ -37,6 +37,35 @@ public class NarutoRenderer implements ResourceManagerReloadListener {
         ((NarutoArmorItem) NarutoItems.KAGE_HAT.get())
                 .setArmorModel(new com.sekwah.narutomod.client.model.item.model.KageHatModel(modelSet.bakeLayer(NarutoRenderEvents.KAGE_HAT_LAYER)))
                 .setArmorTexture("textures/models/armor/kage_hat.png");
+        ((NarutoArmorItem) NarutoItems.KAZEKAGE_HAT.get())
+                .setArmorModel(new com.sekwah.narutomod.client.model.item.model.KageHatModel(modelSet.bakeLayer(NarutoRenderEvents.KAGE_HAT_LAYER)))
+                .setArmorTexture("textures/models/armor/kazekage_hat.png");
+        ((NarutoArmorItem) NarutoItems.MIZUKAGE_HAT.get())
+                .setArmorModel(new com.sekwah.narutomod.client.model.item.model.KageHatModel(modelSet.bakeLayer(NarutoRenderEvents.KAGE_HAT_LAYER)))
+                .setArmorTexture("textures/models/armor/mizukage_hat.png");
+        ((NarutoArmorItem) NarutoItems.RAIKAGE_HAT.get())
+                .setArmorModel(new com.sekwah.narutomod.client.model.item.model.KageHatModel(modelSet.bakeLayer(NarutoRenderEvents.KAGE_HAT_LAYER)))
+                .setArmorTexture("textures/models/armor/raikage_hat.png");
+        ((NarutoArmorItem) NarutoItems.TSUCHIKAGE_HAT.get())
+                .setArmorModel(new com.sekwah.narutomod.client.model.item.model.KageHatModel(modelSet.bakeLayer(NarutoRenderEvents.KAGE_HAT_LAYER)))
+                .setArmorTexture("textures/models/armor/tsuchikage_hat.png");
+
+        ((NarutoArmorItem) NarutoItems.SAND_JONIN_VEST.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.JONIN_VEST_LAYER)))
+                .setArmorTexture("textures/models/armor/sand_jonin_vest.png");
+        ((NarutoArmorItem) NarutoItems.MIST_JONIN_VEST.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.JONIN_VEST_LAYER)))
+                .setArmorTexture("textures/models/armor/mist_jonin_vest.png");
+        ((NarutoArmorItem) NarutoItems.CLOUD_JONIN_VEST.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.JONIN_VEST_LAYER)))
+                .setArmorTexture("textures/models/armor/cloud_jonin_vest.png");
+        ((NarutoArmorItem) NarutoItems.ROCK_JONIN_VEST.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.JONIN_VEST_LAYER)))
+                .setArmorTexture("textures/models/armor/rock_jonin_vest.png");
+
+        ((NarutoArmorItem) NarutoItems.SAGE_CLOAK.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.SAGE_CLOAK_LAYER)))
+                .setArmorTexture("textures/models/armor/sage_cloak.png");
 
         ((NarutoArmorItem) NarutoItems.RED_ANBU_MASK.get())
                 .setArmorModel(new AnbuMaskModel(modelSet.bakeLayer(NarutoRenderEvents.ANBU_MASK_LAYER)))

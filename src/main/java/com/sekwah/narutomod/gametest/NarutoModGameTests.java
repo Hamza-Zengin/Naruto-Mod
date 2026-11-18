@@ -42,6 +42,8 @@ public class NarutoModGameTests {
             ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "jutsu_chakra_and_cooldown"));
     private static final ResourceKey<Consumer<GameTestHelper>> FN_MISSION_AND_PACKET_CODECS =
             ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "mission_and_packet_codecs"));
+    private static final ResourceKey<Consumer<GameTestHelper>> FN_EXPANSION_INTEGRATION =
+            ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "expansion_structures_and_entities"));
 
     public static boolean isGameTestEnabled() {
         return Boolean.getBoolean("neoforge.enableGameTest")
@@ -61,6 +63,7 @@ public class NarutoModGameTests {
             helper.register(FN_SECURITY_AND_RATE_LIMIT, NarutoModGameTests::testSecurityAndRateLimit);
             helper.register(FN_JUTSU_CHAKRA_AND_COOLDOWN, NarutoModGameTests::testJutsuChakraAndCooldown);
             helper.register(FN_MISSION_AND_PACKET_CODECS, NarutoModGameTests::testMissionAndPacketCodecs);
+            helper.register(FN_EXPANSION_INTEGRATION, NarutoModGameTests::testExpansionStructuresAndEntities);
         });
     }
 
@@ -80,6 +83,10 @@ public class NarutoModGameTests {
         event.registerTest(
                 Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "mission_and_packet_codecs"),
                 new FunctionGameTestInstance(FN_MISSION_AND_PACKET_CODECS, new TestData<>(env, EMPTY_STRUCTURE, 40, 0, true))
+        );
+        event.registerTest(
+                Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "expansion_structures_and_entities"),
+                new FunctionGameTestInstance(FN_EXPANSION_INTEGRATION, new TestData<>(env, EMPTY_STRUCTURE, 40, 0, true))
         );
     }
 
@@ -185,6 +192,58 @@ public class NarutoModGameTests {
         ServerRankUpPacket.encode(new ServerRankUpPacket(), rankBuf);
         ServerRankUpPacket decodedRank = ServerRankUpPacket.decode(rankBuf);
         helper.assertTrue(decodedRank.type().equals(ServerRankUpPacket.TYPE), "rank packet type");
+
+        helper.succeed();
+    }
+
+    private static void testExpansionStructuresAndEntities(GameTestHelper helper) {
+        // Phase 1 abilities registered
+        helper.assertTrue(NarutoAbilities.PHOENIX_FLOWER.get() != null, "Phoenix Flower ability must be registered");
+        helper.assertTrue(NarutoAbilities.CHIDORI_STREAM.get() != null, "Chidori Stream ability must be registered");
+        helper.assertTrue(NarutoAbilities.MYSTICAL_PALM.get() != null, "Mystical Palm ability must be registered");
+
+        // Phase 2 Kubikiribocho live ItemStack blood-repair check
+        net.minecraft.world.item.ItemStack blade = new net.minecraft.world.item.ItemStack(
+                com.sekwah.narutomod.item.NarutoItems.KUBIKIRIBOCHO.get());
+        blade.setDamageValue(50);
+        com.sekwah.narutomod.item.weapons.KubikiribochoItem.applyBloodRepair(blade, true);
+        helper.assertValueEqual(blade.getDamageValue(), 35, "Kubikiribocho kill repair");
+
+        // Phase 3 VillageNinjaEntity spawn and village equipment check
+        com.sekwah.narutomod.entity.mob.VillageNinjaEntity guard =
+                com.sekwah.narutomod.entity.NarutoEntities.VILLAGE_NINJA.get().create(
+                        helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        helper.assertTrue(guard != null, "VillageNinjaEntity must instantiate cleanly");
+        if (guard != null) {
+            guard.setVillageType(com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.KUMO);
+            guard.equipForVillage(com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.KUMO, helper.getLevel().getRandom());
+            helper.assertTrue(
+                    guard.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).is(
+                            com.sekwah.narutomod.item.NarutoItems.HEADBAND_CLOUD.get()),
+                    "Kumo Village Ninja must equip Cloud Headband");
+            helper.assertTrue(
+                    guard.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).is(
+                            com.sekwah.narutomod.item.NarutoItems.CLOUD_JONIN_VEST.get()),
+                    "Kumo Village Ninja must equip Cloud Jonin Vest");
+        }
+
+        // Phase 3 structures & advancements loaded cleanly in datapack registries
+        var structureRegistry = helper.getLevel().registryAccess().lookupOrThrow(Registries.STRUCTURE);
+        for (String structName : new String[]{
+                "konoha_village", "suna_village", "kiri_village", "kumo_village", "iwa_village",
+                "valley_of_the_end", "chunin_arena", "myobokuzan_shrine"}) {
+            helper.assertTrue(
+                    structureRegistry.get(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, structName)).isPresent(),
+                    "Structure must load cleanly: " + structName);
+        }
+
+        var advancements = helper.getLevel().getServer().getAdvancements();
+        for (String advPath : new String[]{
+                "shinobi/five_great_nations", "shinobi/sage_of_myobokuzan", "shinobi/seven_swordsmen"}) {
+            helper.assertTrue(
+                    advancements.get(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, advPath)) != null,
+                    "Advancement must load cleanly: " + advPath);
+        }
 
         helper.succeed();
     }

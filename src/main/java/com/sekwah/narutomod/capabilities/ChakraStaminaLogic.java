@@ -119,8 +119,39 @@ public final class ChakraStaminaLogic {
         data.setRawStamina(Math.min(Math.max(data.getStamina() + amount, 0f), data.getMaxStamina()));
     }
 
+    public static float getChestplateStaminaRegenMultiplier(boolean isChuninOrJoninVest, boolean isAnbuArmor) {
+        if (isChuninOrJoninVest) {
+            return 1.25f;
+        }
+        if (isAnbuArmor) {
+            return 1.15f;
+        }
+        return 1.0f;
+    }
+
+    public static float getChestplateChakraRegenMultiplier(boolean isSageCloak, boolean isAkatsukiCloak, boolean isJoninVest, boolean isAnbuArmor) {
+        if (isSageCloak) {
+            return 1.50f;
+        }
+        if (isAkatsukiCloak) {
+            return 1.35f;
+        }
+        if (isJoninVest) {
+            return 1.20f;
+        }
+        if (isAnbuArmor) {
+            return 1.15f;
+        }
+        return 1.0f;
+    }
+
     public static void tickRegen(NinjaData data, Player player, RegenInfo staminaRegenInfo, RegenInfo chakraRegenInfo) {
         Item chestItem = player.getItemBySlot(EquipmentSlot.CHEST).getItem();
+        boolean isJoninVest = com.sekwah.narutomod.events.PlayerEvents.isJoninVest(chestItem);
+        boolean isChuninVest = chestItem == NarutoItems.CHUNIN_VEST.get();
+        boolean isAnbuArmor = chestItem == NarutoItems.ANBU_ARMOR.get();
+        boolean isAkatsukiCloak = chestItem == NarutoItems.AKATSUKI_CLOAK.get();
+        boolean isSageCloak = chestItem == NarutoItems.SAGE_CLOAK.get();
         Identifier clan = data.getClan();
 
         if (staminaRegenInfo.canRegen()) {
@@ -128,13 +159,7 @@ public final class ChakraStaminaLogic {
             if (clan != null && "nara".equals(clan.getPath())) {
                 staminaRegen *= 1.3f;
             }
-            if (chestItem == NarutoItems.CHUNIN_VEST.get()) {
-                staminaRegen *= 1.25f;
-            } else if (chestItem == NarutoItems.JONIN_VEST.get()) {
-                staminaRegen *= 1.25f;
-            } else if (chestItem == NarutoItems.ANBU_ARMOR.get()) {
-                staminaRegen *= 1.15f;
-            }
+            staminaRegen *= getChestplateStaminaRegenMultiplier(isChuninVest || isJoninVest, isAnbuArmor);
             data.setRawStamina(data.getStamina() + staminaRegen);
         }
 
@@ -145,13 +170,7 @@ public final class ChakraStaminaLogic {
             } else if (clan != null && "senju".equals(clan.getPath())) {
                 chakraRegen *= 1.4f;
             }
-            if (chestItem == NarutoItems.AKATSUKI_CLOAK.get()) {
-                chakraRegen *= 1.35f;
-            } else if (chestItem == NarutoItems.JONIN_VEST.get()) {
-                chakraRegen *= 1.20f;
-            } else if (chestItem == NarutoItems.ANBU_ARMOR.get()) {
-                chakraRegen *= 1.15f;
-            }
+            chakraRegen *= getChestplateChakraRegenMultiplier(isSageCloak, isAkatsukiCloak, isJoninVest, isAnbuArmor);
             data.setRawChakra(data.getChakra() + chakraRegen);
         }
 

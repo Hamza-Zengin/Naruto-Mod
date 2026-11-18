@@ -1,0 +1,62 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "narutomod:mist_jonin_vest"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 2,
+          "name": "narutomod:mizukage_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "narutomod:headband_mist"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 2,
+          "name": "narutomod:kubikiribocho"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 2,
+          "name": "narutomod:samehada"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 4,
+          "name": "narutomod:mist_anbu_mask"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 6,
+          "name": "narutomod:scroll_water_dragon"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 12,
+          "name": "narutomod:chakra_metal",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 5
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

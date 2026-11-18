@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "R R",
+    "BCR",
+    "RGR"
+  ],
+  "key": {
+    "R": "minecraft:red_wool",
+    "B": "narutomod:blank_jutsu_scroll",
+    "C": "narutomod:chakra_metal",
+    "G": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "narutomod:sage_cloak",
+    "count": 1
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "parent": "narutomod:shinobi/chakra_control",
+  "display": {
+    "icon": {
+      "id": "narutomod:sage_cloak"
+    },
+    "title": {
+      "translate": "advancements.narutomod.sage_of_myobokuzan.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.sage_of_myobokuzan.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "sage_cloak": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "narutomod:sage_cloak"
+          }
+        ]
+      }
+    }
+  }
+}

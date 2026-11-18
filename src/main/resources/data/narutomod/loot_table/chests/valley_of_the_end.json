@@ -1,0 +1,57 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "weight": 4,
+          "name": "narutomod:warring_states_armor"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 4,
+          "name": "narutomod:kusanagi_sword"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "narutomod:scroll_rasengan"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "narutomod:scroll_chidori"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 4,
+          "name": "narutomod:scroll_chidori_stream"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 6,
+          "name": "narutomod:blank_jutsu_scroll"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 12,
+          "name": "narutomod:chakra_metal",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 3,
+              "max": 6
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

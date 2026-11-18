@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "narutomod:iwa_village",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 21478315,
+    "spacing": 36,
+    "separation": 12
+  }
+}

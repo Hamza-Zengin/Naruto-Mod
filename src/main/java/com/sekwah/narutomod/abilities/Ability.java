@@ -391,8 +391,8 @@ public abstract class Ability {
         if (player == null || baseDelayTicks <= 0) {
             return Math.max(0, baseDelayTicks);
         }
-        boolean hasJoninVest = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).getItem()
-                == com.sekwah.narutomod.item.NarutoItems.JONIN_VEST.get();
+        boolean hasJoninVest = com.sekwah.narutomod.events.PlayerEvents.isJoninVest(
+                player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).getItem());
         return applyArmorDelayReduction(hasJoninVest, baseDelayTicks);
     }
 
@@ -403,8 +403,21 @@ public abstract class Ability {
         return hasJoninVest ? Math.max(0, baseDelayTicks - 1) : baseDelayTicks;
     }
 
+    public static float applyElementalHatDiscount(ChakraElement hatAffinity, ChakraElement abilityElement, float chakraCost) {
+        if (hatAffinity != null && hatAffinity != ChakraElement.NONE && hatAffinity == abilityElement) {
+            return Math.max(1.0f, chakraCost * 0.85f);
+        }
+        return chakraCost;
+    }
+
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), 30);
+        float scaledCost = getScaledChakraCost(ninjaData);
+        if (player != null) {
+            ChakraElement hatAffinity = com.sekwah.narutomod.events.PlayerEvents.getKageHatElement(
+                    player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).getItem());
+            scaledCost = applyElementalHatDiscount(hatAffinity, this.getChakraElement(), scaledCost);
+        }
+        return tryConsume(player, ninjaData, scaledCost, getStaminaCost(), 30);
     }
 
     public boolean handleCost(Player player, INinjaData ninjaData) {

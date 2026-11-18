@@ -52,7 +52,7 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
     }
 
     private final T mob;
-    private final NinjaJutsuProfile profile;
+    private final java.util.function.Supplier<NinjaJutsuProfile> profileSupplier;
 
     private State state = State.IDLE;
     @Nullable
@@ -60,15 +60,19 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
     private int windupTicksRemaining;
 
     public NinjaJutsuAttackGoal(T mob, NinjaJutsuProfile profile) {
+        this(mob, () -> profile);
+    }
+
+    public NinjaJutsuAttackGoal(T mob, java.util.function.Supplier<NinjaJutsuProfile> profileSupplier) {
         this.mob = mob;
-        this.profile = profile;
+        this.profileSupplier = profileSupplier;
         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
     }
 
     /**
      * Pure tactical decision function shared by the goal and unit tests.
      * Priority 1: Critical health (<= criticalHealthRatio) under close threat -> Kawarimi or Mud Wall.
-     * Priority 2: Ranged distance (min..max) with Line of Sight -> Fireball or Water Bullet.
+     * Priority 2: Ranged distance (min..max) with Line of Sight -> Elemental jutsu.
      */
     @Nullable
     public static NinjaJutsuType selectTacticalAction(
@@ -93,7 +97,13 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
             }
         }
 
-        // Priority 2: Ranged combat (10 - 24 blocks) with clear Line of Sight
+        // Mid/Close range Lightning discharge (Chidori Spark)
+        if (hasLineOfSight && distanceToTarget <= 7.5D
+                && profile.isEnabled(NinjaJutsuType.CHIDORI_SPARK) && cooldowns.isReady(NinjaJutsuType.CHIDORI_SPARK)) {
+            return NinjaJutsuType.CHIDORI_SPARK;
+        }
+
+        // Priority 2: Ranged combat (8 - 24 blocks) with clear Line of Sight
         if (hasLineOfSight
                 && distanceToTarget >= profile.getMinRangedDistance()
                 && distanceToTarget <= profile.getMaxRangedDistance()) {
@@ -135,7 +145,7 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
         float healthRatio = this.mob.getMaxHealth() > 0.0F ? this.mob.getHealth() / this.mob.getMaxHealth() : 1.0F;
 
         NinjaJutsuType chosen = selectTacticalAction(
-                this.profile,
+                this.profileSupplier.get(),
                 cooldowns,
                 dist,
                 los,
@@ -177,11 +187,13 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
             return;
         }
 
+        NinjaJutsuProfile profile = this.profileSupplier.get();
+
         // Ranged jutsu: lock global cooldown immediately to prevent same-tick or overlapping casts
         this.state = State.HAND_SEAL_WINDUP;
-        this.windupTicksRemaining = Math.max(1, this.profile.getHandSealWindupTicks());
+        this.windupTicksRemaining = Math.max(1, profile.getHandSealWindupTicks());
         this.mob.getJutsuCooldowns().setGlobalJutsuCooldown(
-                this.profile.getGlobalCooldownTicks() + this.windupTicksRemaining);
+                profile.getGlobalCooldownTicks() + this.windupTicksRemaining);
 
         this.sendHandSealEffect(serverLevel, target, this.pendingAction);
         serverLevel.playSound(null, this.mob.blockPosition(), NarutoSounds.SEAL_A.get(), SoundSource.HOSTILE, 0.9F, 1.05F);
@@ -228,6 +240,7 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
     }
 
     private void executeRangedJutsu(ServerLevel serverLevel, LivingEntity target, NinjaJutsuType type) {
+        NinjaJutsuProfile profile = this.profileSupplier.get();
         Vec3 dir = target.getEyePosition().subtract(this.mob.getEyePosition());
         if (dir.lengthSqr() < 1.0E-5D) {
             dir = this.mob.getLookAngle();
@@ -246,9 +259,9 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
             fireball.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
             serverLevel.addFreshEntity(fireball);
 
-            int cd = this.profile.getFireballCooldownTicks()
-                    + (this.profile.getFireballCooldownJitter() > 0 ? this.mob.getRandom().nextInt(this.profile.getFireballCooldownJitter()) : 0);
-            this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.FIREBALL, cd, this.profile.getGlobalCooldownTicks());
+            int cd = profile.getFireballCooldownTicks()
+                    + (profile.getFireballCooldownJitter() > 0 ? this.mob.getRandom().nextInt(profile.getFireballCooldownJitter()) : 0);
+            this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.FIREBALL, cd, profile.getGlobalCooldownTicks());
         } else if (type == NinjaJutsuType.WATER_BULLET) {
             serverLevel.playSound(null, this.mob.blockPosition(), NarutoSounds.JUTSU_CAST.get(), SoundSource.HOSTILE, 1.0F, 1.1F);
             serverLevel.playSound(null, this.mob.blockPosition(), SoundEvents.GENERIC_SPLASH, SoundSource.HOSTILE, 1.2F, 1.0F);
@@ -257,18 +270,18 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
             bullet.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
             bullet.setYRot(this.mob.getYRot());
             bullet.setXRot(this.mob.getXRot());
-            bullet.setDamage(this.profile.getWaterBulletDamage());
-            bullet.setMaxLife(this.profile.getWaterBulletMaxLife());
-            bullet.setDeltaMovement(dir.scale(this.profile.getWaterBulletSpeed()));
+            bullet.setDamage(profile.getWaterBulletDamage());
+            bullet.setMaxLife(profile.getWaterBulletMaxLife());
+            bullet.setDeltaMovement(dir.scale(profile.getWaterBulletSpeed()));
             serverLevel.addFreshEntity(bullet);
 
             serverLevel.sendParticles(ParticleTypes.SPLASH, spawnPos.x, spawnPos.y, spawnPos.z,
                     16, 0.35D, 0.35D, 0.35D, 0.08D,
                     ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
-            int cd = this.profile.getWaterBulletCooldownTicks()
-                    + (this.profile.getWaterBulletCooldownJitter() > 0 ? this.mob.getRandom().nextInt(this.profile.getWaterBulletCooldownJitter()) : 0);
-            this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.WATER_BULLET, cd, this.profile.getGlobalCooldownTicks());
+            int cd = profile.getWaterBulletCooldownTicks()
+                    + (profile.getWaterBulletCooldownJitter() > 0 ? this.mob.getRandom().nextInt(profile.getWaterBulletCooldownJitter()) : 0);
+            this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.WATER_BULLET, cd, profile.getGlobalCooldownTicks());
         } else if (type == NinjaJutsuType.EARTH_BULLET) {
             serverLevel.playSound(null, this.mob.blockPosition(), NarutoSounds.JUTSU_CAST.get(), SoundSource.HOSTILE, 1.0F, 0.9F);
             serverLevel.playSound(null, this.mob.blockPosition(), NarutoSounds.MUD_WALL_RISE.get(), SoundSource.HOSTILE, 1.1F, 1.0F);
@@ -277,9 +290,9 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
             bullet.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
             bullet.setYRot(this.mob.getYRot());
             bullet.setXRot(this.mob.getXRot());
-            bullet.setDamage(this.profile.getEarthBulletDamage());
-            bullet.setMaxLife(this.profile.getEarthBulletMaxLife());
-            bullet.setDeltaMovement(dir.scale(this.profile.getEarthBulletSpeed()));
+            bullet.setDamage(profile.getEarthBulletDamage());
+            bullet.setMaxLife(profile.getEarthBulletMaxLife());
+            bullet.setDeltaMovement(dir.scale(profile.getEarthBulletSpeed()));
             serverLevel.addFreshEntity(bullet);
 
             BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
@@ -287,9 +300,9 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
                     14, 0.3D, 0.3D, 0.3D, 0.08D,
                     ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
-            int cd = this.profile.getEarthBulletCooldownTicks()
-                    + (this.profile.getEarthBulletCooldownJitter() > 0 ? this.mob.getRandom().nextInt(this.profile.getEarthBulletCooldownJitter()) : 0);
-            this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.EARTH_BULLET, cd, this.profile.getGlobalCooldownTicks());
+            int cd = profile.getEarthBulletCooldownTicks()
+                    + (profile.getEarthBulletCooldownJitter() > 0 ? this.mob.getRandom().nextInt(profile.getEarthBulletCooldownJitter()) : 0);
+            this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.EARTH_BULLET, cd, profile.getGlobalCooldownTicks());
         } else if (type == NinjaJutsuType.VACUUM_SPHERES) {
             serverLevel.playSound(null, this.mob.blockPosition(), NarutoSounds.JUTSU_CAST.get(), SoundSource.HOSTILE, 1.0F, 1.2F);
             serverLevel.playSound(null, this.mob.blockPosition(), SoundEvents.PHANTOM_FLAP, SoundSource.HOSTILE, 1.1F, 1.35F);
@@ -304,9 +317,9 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
                 sphere.setPos(spawnPos.x + right.x * (i * 0.25D), spawnPos.y, spawnPos.z + right.z * (i * 0.25D));
                 sphere.setYRot(this.mob.getYRot());
                 sphere.setXRot(this.mob.getXRot());
-                sphere.setDamage(this.profile.getVacuumSpheresDamage());
-                sphere.setMaxLife(this.profile.getVacuumSpheresMaxLife());
-                sphere.setDeltaMovement(shotDir.scale(this.profile.getVacuumSpheresSpeed()));
+                sphere.setDamage(profile.getVacuumSpheresDamage());
+                sphere.setMaxLife(profile.getVacuumSpheresMaxLife());
+                sphere.setDeltaMovement(shotDir.scale(profile.getVacuumSpheresSpeed()));
                 serverLevel.addFreshEntity(sphere);
             }
 
@@ -314,40 +327,61 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
                     12, 0.25D, 0.25D, 0.25D, 0.08D,
                     ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
-            int cd = this.profile.getVacuumSpheresCooldownTicks()
-                    + (this.profile.getVacuumSpheresCooldownJitter() > 0 ? this.mob.getRandom().nextInt(this.profile.getVacuumSpheresCooldownJitter()) : 0);
-            this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.VACUUM_SPHERES, cd, this.profile.getGlobalCooldownTicks());
+            int cd = profile.getVacuumSpheresCooldownTicks()
+                    + (profile.getVacuumSpheresCooldownJitter() > 0 ? this.mob.getRandom().nextInt(profile.getVacuumSpheresCooldownJitter()) : 0);
+            this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.VACUUM_SPHERES, cd, profile.getGlobalCooldownTicks());
+        } else if (type == NinjaJutsuType.CHIDORI_SPARK) {
+            serverLevel.playSound(null, this.mob.blockPosition(), NarutoSounds.CHIDORI.get(), SoundSource.HOSTILE, 0.9F, 1.15F);
+            var effect = com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
+                    serverLevel,
+                    this.mob.getX(), this.mob.getY() + 0.9D, this.mob.getZ(),
+                    com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_CHIDORI_BURST,
+                    14, this.mob.getYRot());
+            effect.setCasterUUID(this.mob.getUUID());
+            serverLevel.addFreshEntity(effect);
+
+            if (this.mob.distanceTo(target) <= 8.5D) {
+                target.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), profile.getChidoriSparkDamage());
+                target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 1));
+            }
+            PacketHandler.sentToTracking(new ClientJutsuEffectPacket(
+                    Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "elemental_burst"),
+                    target.position().add(0.0D, target.getBbHeight() * 0.5D, 0.0D),
+                    dir, 1.2F, 0x55BBFF), target);
+            this.mob.getJutsuCooldowns().trigger(NinjaJutsuType.CHIDORI_SPARK, profile.getChidoriSparkCooldownTicks(), profile.getGlobalCooldownTicks());
         }
     }
 
     private void executeDefensiveReflex(ServerLevel serverLevel, LivingEntity target, NinjaJutsuType type) {
+        NinjaJutsuProfile profile = this.profileSupplier.get();
         if (type == NinjaJutsuType.KAWARIMI) {
             if (this.performSafeKawarimi(serverLevel, target)) {
                 this.mob.getJutsuCooldowns().trigger(
                         NinjaJutsuType.KAWARIMI,
-                        this.profile.getKawarimiCooldownTicks(),
-                        this.profile.getGlobalCooldownTicks());
+                        profile.getKawarimiCooldownTicks(),
+                        profile.getGlobalCooldownTicks());
                 return;
             }
             // Fallback to Mud Wall if Kawarimi has no safe destination and Mud Wall is ready
-            if (this.profile.isEnabled(NinjaJutsuType.MUD_WALL)
+            if (profile.isEnabled(NinjaJutsuType.MUD_WALL)
                     && this.mob.getJutsuCooldowns().getAbilityCooldown(NinjaJutsuType.MUD_WALL) <= 0) {
                 this.performMudWall(serverLevel, target);
                 this.mob.getJutsuCooldowns().trigger(
                         NinjaJutsuType.MUD_WALL,
-                        this.profile.getMudWallCooldownTicks(),
-                        this.profile.getGlobalCooldownTicks());
+                        profile.getMudWallCooldownTicks(),
+                        profile.getGlobalCooldownTicks());
             }
         } else if (type == NinjaJutsuType.MUD_WALL) {
             this.performMudWall(serverLevel, target);
             this.mob.getJutsuCooldowns().trigger(
                     NinjaJutsuType.MUD_WALL,
-                    this.profile.getMudWallCooldownTicks(),
-                    this.profile.getGlobalCooldownTicks());
+                    profile.getMudWallCooldownTicks(),
+                    profile.getGlobalCooldownTicks());
         }
     }
 
     private boolean performSafeKawarimi(ServerLevel serverLevel, LivingEntity target) {
+        NinjaJutsuProfile profile = this.profileSupplier.get();
         Vec3 oldPos = this.mob.position();
         Vec3 away = oldPos.subtract(target.position());
         Vec3 horizAway = new Vec3(away.x, 0.0D, away.z);
@@ -361,7 +395,7 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
             horizAway = horizAway.normalize();
         }
 
-        double dist = this.profile.getKawarimiDistance();
+        double dist = profile.getKawarimiDistance();
         Vec3 candidateCenter = oldPos.add(horizAway.scale(dist));
         Vec3 safePos = KawarimiJutsuAbility.findSafeOpenPosition(serverLevel, this.mob, candidateCenter, 5);
         if (safePos == null) {
@@ -384,16 +418,17 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
                 14, 0.25D, 0.4D, 0.25D, 0.03D,
                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
-        if (this.profile.getKawarimiSpeedDurationTicks() > 0) {
+        if (profile.getKawarimiSpeedDurationTicks() > 0) {
             this.mob.addEffect(new MobEffectInstance(
                     MobEffects.SPEED,
-                    this.profile.getKawarimiSpeedDurationTicks(),
-                    this.profile.getKawarimiSpeedAmplifier()));
+                    profile.getKawarimiSpeedDurationTicks(),
+                    profile.getKawarimiSpeedAmplifier()));
         }
         return true;
     }
 
     private void performMudWall(ServerLevel serverLevel, LivingEntity target) {
+        NinjaJutsuProfile profile = this.profileSupplier.get();
         Vec3 toTarget = target.position().subtract(this.mob.position());
         Vec3 horizDir = new Vec3(toTarget.x, 0.0D, toTarget.z);
         if (horizDir.lengthSqr() < 1.0E-4D) {
@@ -424,10 +459,10 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
                 wallPos.x,
                 this.mob.getY(),
                 wallPos.z,
-                this.profile.getMudWallMaxLifeTicks(),
+                profile.getMudWallMaxLifeTicks(),
                 wallYaw,
                 this.mob.getUUID());
-        mudWall.setHealth(this.profile.getMudWallHealth());
+        mudWall.setHealth(profile.getMudWallHealth());
         serverLevel.addFreshEntity(mudWall);
     }
 

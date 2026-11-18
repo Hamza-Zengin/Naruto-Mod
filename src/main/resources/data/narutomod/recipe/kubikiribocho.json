@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "IDC",
+    " H "
+  ],
+  "key": {
+    "I": "minecraft:iron_block",
+    "D": "minecraft:diamond_sword",
+    "C": "narutomod:chakra_metal",
+    "H": "minecraft:red_wool"
+  },
+  "result": {
+    "id": "narutomod:kubikiribocho",
+    "count": 1
+  }
+}

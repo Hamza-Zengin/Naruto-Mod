@@ -108,6 +108,19 @@ public class ClientEffectHandler {
                         pos.x + Math.cos(angle) * scale, pos.y + 0.5 + rand.nextDouble() * 1.2, pos.z + Math.sin(angle) * scale,
                         0.0, 0.05, 0.0);
             }
+        } else if ("mystical_palm".equals(path)) {
+            DustParticleOptions healDust = new DustParticleOptions(ARGB.opaque(msg.colorHex), 1.05f);
+            for (int i = 0; i < 16; i++) {
+                double angle = (2.0 * Math.PI * i) / 16.0;
+                double radius = 0.55 * scale;
+                double px = pos.x + Math.cos(angle) * radius;
+                double pz = pos.z + Math.sin(angle) * radius;
+                double py = pos.y + (rand.nextDouble() - 0.3) * 0.8;
+                level.addParticle(healDust, px, py, pz, 0.0, 0.06, 0.0);
+                if (i % 4 == 0) {
+                    level.addParticle(ParticleTypes.HAPPY_VILLAGER, px, py + 0.2, pz, 0.0, 0.08, 0.0);
+                }
+            }
         } else {
             for (int i = 0; i < 18; i++) {
                 level.addParticle(coloredDust,

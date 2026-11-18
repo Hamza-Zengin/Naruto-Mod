@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "S S",
+    "IVI",
+    "LIL"
+  ],
+  "key": {
+    "S": "minecraft:quartz",
+    "V": "narutomod:jonin_vest",
+    "I": "narutomod:chakra_metal",
+    "L": "minecraft:white_dye"
+  },
+  "result": {
+    "id": "narutomod:cloud_jonin_vest",
+    "count": 1
+  }
+}

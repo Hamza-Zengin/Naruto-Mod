@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "narutomod:kiri_village",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 21478313,
+    "spacing": 36,
+    "separation": 12
+  }
+}

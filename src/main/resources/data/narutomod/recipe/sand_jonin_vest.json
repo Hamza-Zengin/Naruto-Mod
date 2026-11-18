@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "S S",
+    "IVI",
+    "LIL"
+  ],
+  "key": {
+    "S": "minecraft:sandstone",
+    "V": "narutomod:jonin_vest",
+    "I": "narutomod:chakra_metal",
+    "L": "minecraft:yellow_dye"
+  },
+  "result": {
+    "id": "narutomod:sand_jonin_vest",
+    "count": 1
+  }
+}

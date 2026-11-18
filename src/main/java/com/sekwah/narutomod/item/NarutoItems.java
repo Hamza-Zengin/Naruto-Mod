@@ -40,6 +40,8 @@ public class NarutoItems {
 
     public static final DeferredItem<Item> SAMEHADA = ITEMS.registerItem("samehada", SamehadaItem::new);
 
+    public static final DeferredItem<Item> KUBIKIRIBOCHO = ITEMS.registerItem("kubikiribocho", KubikiribochoItem::new);
+
     public static final DeferredItem<Item> BONE_SWORD = ITEMS.registerItem("bone_sword", BoneSwordItem::new);
 
     public static final DeferredItem<Item> CHAKRA_BLADES = ITEMS.registerItem("chakra_blades", ChakraBladesItem::new);
@@ -82,6 +84,9 @@ public class NarutoItems {
     public static final DeferredItem<Item> SCROLL_WATER_DRAGON = ITEMS.registerItem("scroll_water_dragon",
             props -> new JutsuScrollItem(props.stacksTo(1).rarity(Rarity.RARE), NarutoAbilities.WATER_DRAGON.getId()));
 
+    public static final DeferredItem<Item> SCROLL_CHIDORI_STREAM = ITEMS.registerItem("scroll_chidori_stream",
+            props -> new JutsuScrollItem(props.stacksTo(1).rarity(Rarity.RARE), NarutoAbilities.CHIDORI_STREAM.getId()));
+
     public static final DeferredItem<Item> SEALED_AMMO_SCROLL = ITEMS.registerItem("sealed_ammo_scroll",
             SealedAmmoScrollItem::new);
 
@@ -94,6 +99,9 @@ public class NarutoItems {
 
     public static final DeferredItem<Item> AKATSUKI_NINJA_SPAWN_EGG = ITEMS.registerItem("akatsuki_ninja_spawn_egg",
             props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.AKATSUKI_NINJA.get())));
+
+    public static final DeferredItem<Item> VILLAGE_NINJA_SPAWN_EGG = ITEMS.registerItem("village_ninja_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.VILLAGE_NINJA.get())));
 
     // Armor
     public static final DeferredItem<Item> RED_ANBU_MASK = ITEMS.registerItem("red_anbu_mask",
@@ -132,6 +140,26 @@ public class NarutoItems {
             props -> new NarutoArmorItem(NarutoArmorMaterial.JONIN_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.RARE))
                     .setTooltipKey("item.narutomod.jonin_vest.desc"));
 
+    public static final DeferredItem<Item> SAND_JONIN_VEST = ITEMS.registerItem("sand_jonin_vest",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.JONIN_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.RARE))
+                    .setTooltipKey("item.narutomod.sand_jonin_vest.desc"));
+
+    public static final DeferredItem<Item> MIST_JONIN_VEST = ITEMS.registerItem("mist_jonin_vest",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.JONIN_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.RARE))
+                    .setTooltipKey("item.narutomod.mist_jonin_vest.desc"));
+
+    public static final DeferredItem<Item> CLOUD_JONIN_VEST = ITEMS.registerItem("cloud_jonin_vest",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.JONIN_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.RARE))
+                    .setTooltipKey("item.narutomod.cloud_jonin_vest.desc"));
+
+    public static final DeferredItem<Item> ROCK_JONIN_VEST = ITEMS.registerItem("rock_jonin_vest",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.JONIN_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.RARE))
+                    .setTooltipKey("item.narutomod.rock_jonin_vest.desc"));
+
+    public static final DeferredItem<Item> SAGE_CLOAK = ITEMS.registerItem("sage_cloak",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.SAGE_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.EPIC))
+                    .setTooltipKey("item.narutomod.sage_cloak.desc"));
+
     public static final DeferredItem<Item> WARRING_STATES_ARMOR = ITEMS.registerItem("warring_states_armor",
             props -> new NarutoArmorItem(NarutoArmorMaterial.WARRING_STATES_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.EPIC))
                     .setTooltipKey("item.narutomod.warring_states_armor.desc"));
@@ -139,6 +167,22 @@ public class NarutoItems {
     public static final DeferredItem<Item> KAGE_HAT = ITEMS.registerItem("kage_hat",
             props -> new NarutoArmorItem(NarutoArmorMaterial.KAGE_MAT, ArmorType.HELMET, props.rarity(Rarity.EPIC))
                     .setTooltipKey("item.narutomod.kage_hat.desc"));
+
+    public static final DeferredItem<Item> KAZEKAGE_HAT = ITEMS.registerItem("kazekage_hat",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.KAGE_MAT, ArmorType.HELMET, props.rarity(Rarity.EPIC))
+                    .setTooltipKey("item.narutomod.kazekage_hat.desc"));
+
+    public static final DeferredItem<Item> MIZUKAGE_HAT = ITEMS.registerItem("mizukage_hat",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.KAGE_MAT, ArmorType.HELMET, props.rarity(Rarity.EPIC))
+                    .setTooltipKey("item.narutomod.mizukage_hat.desc"));
+
+    public static final DeferredItem<Item> RAIKAGE_HAT = ITEMS.registerItem("raikage_hat",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.KAGE_MAT, ArmorType.HELMET, props.rarity(Rarity.EPIC))
+                    .setTooltipKey("item.narutomod.raikage_hat.desc"));
+
+    public static final DeferredItem<Item> TSUCHIKAGE_HAT = ITEMS.registerItem("tsuchikage_hat",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.KAGE_MAT, ArmorType.HELMET, props.rarity(Rarity.EPIC))
+                    .setTooltipKey("item.narutomod.tsuchikage_hat.desc"));
 
     public static final DeferredItem<Item> LONELY_MARCH = ITEMS.registerSimpleItem("lonely_march",
             props -> props.stacksTo(1).rarity(Rarity.RARE)
@@ -199,6 +243,7 @@ public class NarutoItems {
                         output.accept(FUMA_SHURIKEN.get());
                         output.accept(KUSANAGI_SWORD.get());
                         output.accept(SAMEHADA.get());
+                        output.accept(KUBIKIRIBOCHO.get());
                         output.accept(BONE_SWORD.get());
                         output.accept(CHAKRA_BLADES.get());
                         output.accept(ANBU_TANTO.get());
@@ -214,10 +259,12 @@ public class NarutoItems {
                         output.accept(SCROLL_RASENSHURIKEN.get());
                         output.accept(SCROLL_STONE_SPIKES.get());
                         output.accept(SCROLL_WATER_DRAGON.get());
+                        output.accept(SCROLL_CHIDORI_STREAM.get());
                         output.accept(SEALED_AMMO_SCROLL.get());
                         output.accept(BLANK_JUTSU_SCROLL.get());
                         output.accept(ROGUE_NINJA_SPAWN_EGG.get());
                         output.accept(AKATSUKI_NINJA_SPAWN_EGG.get());
+                        output.accept(VILLAGE_NINJA_SPAWN_EGG.get());
                         output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
                         output.accept(NarutoBlocks.ITEM_BONSAI_TREE.get());
                     })
@@ -230,10 +277,19 @@ public class NarutoItems {
                     .displayItems((parameters, output) -> {
                         output.accept(CHUNIN_VEST.get());
                         output.accept(JONIN_VEST.get());
+                        output.accept(SAND_JONIN_VEST.get());
+                        output.accept(MIST_JONIN_VEST.get());
+                        output.accept(CLOUD_JONIN_VEST.get());
+                        output.accept(ROCK_JONIN_VEST.get());
                         output.accept(ANBU_ARMOR.get());
                         output.accept(AKATSUKI_CLOAK.get());
+                        output.accept(SAGE_CLOAK.get());
                         output.accept(WARRING_STATES_ARMOR.get());
                         output.accept(KAGE_HAT.get());
+                        output.accept(KAZEKAGE_HAT.get());
+                        output.accept(MIZUKAGE_HAT.get());
+                        output.accept(RAIKAGE_HAT.get());
+                        output.accept(TSUCHIKAGE_HAT.get());
                         output.accept(RED_ANBU_MASK.get());
                         output.accept(YELLOW_ANBU_MASK.get());
                         output.accept(GREEN_ANBU_MASK.get());

@@ -1,0 +1,73 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "narutomod:sand_jonin_vest"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 2,
+          "name": "narutomod:kazekage_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "narutomod:headband_sand"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 4,
+          "name": "narutomod:sealed_ammo_scroll"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 6,
+          "name": "narutomod:fuma_shuriken",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 2
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "narutomod:military_rations_pill",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 1,
+              "max": 3
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 12,
+          "name": "narutomod:chakra_metal",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 5
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

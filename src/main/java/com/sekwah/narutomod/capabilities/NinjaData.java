@@ -635,8 +635,8 @@ public class NinjaData implements INinjaData {
             this.cooldownTickEvents.values().removeIf(CooldownTickEvent::tickAndCheckComplete);
         }
 
-        boolean wearingKageHat = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).getItem()
-                == com.sekwah.narutomod.item.NarutoItems.KAGE_HAT.get();
+        boolean wearingKageHat = com.sekwah.narutomod.events.PlayerEvents.isKageHat(
+                player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).getItem());
         if (this.kageHatEquipped != wearingKageHat) {
             this.setKageHatEquipped(wearingKageHat);
         }

@@ -32,12 +32,15 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
             net.minecraft.network.syncher.SynchedEntityData.defineId(FireballJutsuEntity.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
     private static final net.minecraft.network.syncher.EntityDataAccessor<Integer> DATA_IMPACT_TICKS =
             net.minecraft.network.syncher.SynchedEntityData.defineId(FireballJutsuEntity.class, net.minecraft.network.syncher.EntityDataSerializers.INT);
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> DATA_PHOENIX_MINI =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(FireballJutsuEntity.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
 
     public int time;
     public int lifeSpan = 70;
     public float explosionPower = 2;
     private int jutsuPower = 60;
     private boolean windBoosted = false;
+    private float customDamage = -1.0f;
 
     public boolean isWindBoosted() {
         return this.windBoosted;
@@ -45,6 +48,18 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
 
     public void markWindBoosted() {
         this.windBoosted = true;
+    }
+
+    public boolean isPhoenixMini() {
+        return this.entityData.get(DATA_PHOENIX_MINI);
+    }
+
+    public void setPhoenixMini(float damage) {
+        this.entityData.set(DATA_PHOENIX_MINI, true);
+        this.customDamage = damage;
+        this.explosionPower = 0.8f;
+        this.jutsuPower = 25;
+        this.lifeSpan = 45;
     }
 
     public static final float INITIAL_SCALE = 0.25f;
@@ -92,6 +107,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         super.defineSynchedData(builder);
         builder.define(DATA_IMPACTED, false);
         builder.define(DATA_IMPACT_TICKS, 0);
+        builder.define(DATA_PHOENIX_MINI, false);
     }
 
     public FireballJutsuEntity(EntityType<? extends AbstractHurtingProjectile> p_36817_, double p_36818_, double p_36819_, double p_36820_, double p_36821_, double p_36822_, double p_36823_, Level p_36824_) {
@@ -107,7 +123,8 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
 
     @Override
     public EntityDimensions getDimensions(Pose p_19721_) {
-        return EntityDimensions.scalable(ENTITY_SIZE, ENTITY_SIZE)
+        float baseSize = this.isPhoenixMini() ? ENTITY_SIZE * 0.45f : ENTITY_SIZE;
+        return EntityDimensions.scalable(baseSize, baseSize)
                 .scale(Math.min(INITIAL_SCALE + (GROW_SCALE - (GROW_SCALE * ((GROW_TIME - time) / GROW_TIME))), 1.0f));
     }
 
@@ -120,17 +137,19 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
             if (!this.level().isClientSide()) {
                 this.entityData.set(DATA_IMPACT_TICKS, it);
                 if (this.level() instanceof ServerLevel serverLevel) {
-                    for (int i = 0; i < 8; i++) {
-                        double angle = (it * 0.5) + (i * Math.PI / 4.0);
-                        double r = 1.2 + (it * 0.18);
+                    boolean mini = this.isPhoenixMini();
+                    int count = mini ? 2 : 8;
+                    for (int i = 0; i < count; i++) {
+                        double angle = (it * 0.5) + (i * Math.PI * 2.0 / count);
+                        double r = mini ? (0.45 + it * 0.08) : (1.2 + (it * 0.18));
                         serverLevel.sendParticles(ParticleTypes.FLAME,
                                 this.getX() + Math.cos(angle) * r,
-                                this.getY() + 0.5 + (this.random.nextDouble() - 0.3) * 1.8,
+                                this.getY() + (mini ? 0.25 : 0.5) + (this.random.nextDouble() - 0.3) * (mini ? 0.7 : 1.8),
                                 this.getZ() + Math.sin(angle) * r,
-                                2, 0.15, 0.15, 0.15, 0.03,
+                                mini ? 1 : 2, 0.15, 0.15, 0.15, 0.03,
                                 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
-                    if (it >= 18) {
+                    if (it >= (mini ? 8 : 18)) {
                         this.discard();
                     }
                 }
@@ -187,7 +206,9 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         }
 
         if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel && this.time % 2 == 0) {
-            serverLevel.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + 0.5, this.getZ(), 5, 0.35, 0.35, 0.35, 0.03,
+            boolean mini = this.isPhoenixMini();
+            serverLevel.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + (mini ? 0.25 : 0.5), this.getZ(),
+                    mini ? 2 : 5, mini ? 0.14 : 0.35, mini ? 0.14 : 0.35, mini ? 0.14 : 0.35, 0.03,
                     net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
@@ -204,7 +225,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                         this.getX(),
                         this.getY() + this.getBbHeight() + 1,
                         this.getZ(),
-                        40,
+                        this.isPhoenixMini() ? 12 : 40,
                         0.5, 0.2, 0.5, 0,
                         net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             }
@@ -227,17 +248,18 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         this.entityData.set(DATA_IMPACT_TICKS, 0);
         this.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
 
+        final boolean mini = this.isPhoenixMini();
         if(this.level() instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ParticleTypes.FLAME,
                     this.getX(), this.getY() + this.getBbHeight() / 2, this.getZ(),
-                    85, 1.2, 1.0, 1.2, 0.15,
+                    mini ? 22 : 85, mini ? 0.5 : 1.2, mini ? 0.4 : 1.0, mini ? 0.5 : 1.2, 0.12,
                     net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 
         if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
-            int flameRadius = 8;
+            int flameRadius = mini ? (this.isWindBoosted() ? 3 : 2) : 8;
             Entity owner = this.getOwner();
-            if (owner instanceof Player player) {
+            if (!mini && owner instanceof Player player) {
                 int mastery = player.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA)
                         .getMastery(com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.getId());
                 int tier = com.sekwah.narutomod.abilities.Ability.getMasteryTier(mastery);
@@ -246,32 +268,42 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
             }
 
             final int effectiveRadius = flameRadius;
+            final Entity directTarget = (hitResult instanceof EntityHitResult ehr) ? ehr.getEntity() : null;
             this.level().getEntities(this, this.getBoundingBox().inflate(flameRadius, flameRadius, flameRadius)).forEach(entity -> {
+                if (mini && (entity == owner || com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(owner, entity))) {
+                    return;
+                }
                 double distance = this.distanceToSqr(entity);
-                if (distance > effectiveRadius * effectiveRadius) {
+                if (distance > effectiveRadius * effectiveRadius && entity != directTarget) {
                     return;
                 }
 
                 // Line of Sight check via ClipContext RayTracing
-                HitResult los = this.level().clip(new ClipContext(
-                        this.position(), entity.getEyePosition(),
-                        ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-                if (los.getType() != HitResult.Type.MISS) {
-                    double blockDist = this.distanceToSqr(los.getLocation().x, los.getLocation().y, los.getLocation().z);
-                    if (blockDist < distance * 0.85D) {
-                        return; // Obstructed by terrain
+                if (entity != directTarget) {
+                    HitResult los = this.level().clip(new ClipContext(
+                            this.position(), entity.getEyePosition(),
+                            ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+                    if (los.getType() != HitResult.Type.MISS) {
+                        double blockDist = this.distanceToSqr(los.getLocation().x, los.getLocation().y, los.getLocation().z);
+                        if (blockDist < distance * 0.85D) {
+                            return; // Obstructed by terrain
+                        }
                     }
                 }
 
-                float fireSecs = (float) (8f - (distance / 6f)) * 20;
+                float fireSecs = mini ? 60.0f : (float) (8f - (distance / 6f)) * 20;
                 float baseDamage;
-                if (owner instanceof Player player) {
+                if (mini && this.customDamage > 0) {
+                    baseDamage = this.customDamage * (this.isWindBoosted() ? 1.25f : 1.0f);
+                } else if (owner instanceof Player player) {
                     baseDamage = com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.get().getDamage(
                             player.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA));
                 } else {
                     baseDamage = com.sekwah.narutomod.abilities.NarutoAbilities.FIREBALL.get().getDamage();
                 }
-                float fireDamage = (float) (baseDamage - (distance / 4f));
+                float fireDamage = mini
+                        ? (entity == directTarget ? baseDamage + 1.5f : (float) Math.max(0.0, baseDamage - (distance / 3.0f)))
+                        : (float) (baseDamage - (distance / 4f));
                 if(fireDamage > 0) {
                     Entity entity1 = this.getOwner();
                     DamageSource source = NarutoDamageSource.fireball(this, entity1);
@@ -285,24 +317,33 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                 }
             });
 
-            int fireSpread = 2;
-            BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
-            Entity fireOwner = this.getOwner();
-            for (int x = (int) this.getX() - fireSpread; x < (int) this.getX() + fireSpread - 1; x++) {
-                for (int y = (int) this.getY() - fireSpread + 1; y < (int) this.getY() + fireSpread; y++) {
-                    for (int z = (int) this.getZ() - fireSpread + 1; z < (int) this.getZ() + fireSpread; z++) {
-                        blockPos.set(x, y, z);
-                        if (this.random.nextInt(2) == 0
-                                && this.level().getBlockState(blockPos).isAir()
-                                && WorldProtectionHelper.canModifyBlock(serverLevel, blockPos, fireOwner)) {
-                            this.level().setBlockAndUpdate(blockPos.immutable(), BaseFireBlock.getState(this.level(), blockPos));
+            if (!mini) {
+                int fireSpread = 2;
+                BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
+                Entity fireOwner = this.getOwner();
+                for (int x = (int) this.getX() - fireSpread; x < (int) this.getX() + fireSpread - 1; x++) {
+                    for (int y = (int) this.getY() - fireSpread + 1; y < (int) this.getY() + fireSpread; y++) {
+                        for (int z = (int) this.getZ() - fireSpread + 1; z < (int) this.getZ() + fireSpread; z++) {
+                            blockPos.set(x, y, z);
+                            if (this.random.nextInt(2) == 0
+                                    && this.level().getBlockState(blockPos).isAir()
+                                    && WorldProtectionHelper.canModifyBlock(serverLevel, blockPos, fireOwner)) {
+                                this.level().setBlockAndUpdate(blockPos.immutable(), BaseFireBlock.getState(this.level(), blockPos));
+                            }
                         }
                     }
                 }
+            } else {
+                BlockPos impactPos = this.blockPosition();
+                if (this.random.nextInt(3) == 0
+                        && this.level().getBlockState(impactPos).isAir()
+                        && WorldProtectionHelper.canModifyBlock(serverLevel, impactPos, owner)) {
+                    this.level().setBlockAndUpdate(impactPos, BaseFireBlock.getState(this.level(), impactPos));
+                }
             }
 
-            this.playSound(SoundEvents.GENERIC_EXPLODE.value(), 3.0f, 0.9f);
-            this.playSound(com.sekwah.narutomod.sounds.NarutoSounds.SIZZLE.get(), 2.0f, 1.1f);
+            this.playSound(SoundEvents.GENERIC_EXPLODE.value(), mini ? 1.1f : 3.0f, mini ? 1.45f : 0.9f);
+            this.playSound(com.sekwah.narutomod.sounds.NarutoSounds.SIZZLE.get(), mini ? 0.9f : 2.0f, mini ? 1.3f : 1.1f);
         }
     }
 

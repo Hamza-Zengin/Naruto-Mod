@@ -10,6 +10,7 @@ public enum NinjaJutsuType {
     WATER_BULLET(ChakraElement.WATER, 0x2299FF),
     EARTH_BULLET(ChakraElement.EARTH, 0xAA7733),
     VACUUM_SPHERES(ChakraElement.WIND, 0x99FFDD),
+    CHIDORI_SPARK(ChakraElement.LIGHTNING, 0x55BBFF),
     MUD_WALL(ChakraElement.EARTH, 0xAA7733),
     KAWARIMI(ChakraElement.NONE, 0x77CCFF);
 

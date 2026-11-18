@@ -1,0 +1,73 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "weight": 5,
+          "name": "narutomod:rock_jonin_vest"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 2,
+          "name": "narutomod:tsuchikage_hat"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "narutomod:headband_rock"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 6,
+          "name": "narutomod:scroll_stone_spikes"
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 10,
+          "name": "narutomod:explosive_kunai",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 6
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 8,
+          "name": "narutomod:paper_bomb",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 4
+            }
+          }
+        },
+        {
+          "type": "minecraft:item",
+          "weight": 12,
+          "name": "narutomod:chakra_metal",
+          "modifier": {
+            "type": "minecraft:set_count",
+            "count": {
+              "type": "minecraft:uniform",
+              "min": 2,
+              "max": 5
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

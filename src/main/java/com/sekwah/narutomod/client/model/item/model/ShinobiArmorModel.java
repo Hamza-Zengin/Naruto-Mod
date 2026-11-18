@@ -176,6 +176,53 @@ public class ShinobiArmorModel extends HumanoidModel<HumanoidRenderState> {
         return LayerDefinition.create(mesh, 64, 64);
     }
 
+    public static LayerDefinition createSageCloakLayer() {
+        MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
+        PartDefinition root = mesh.getRoot();
+
+        PartDefinition body = root.addOrReplaceChild("body",
+                CubeListBuilder.create()
+                        // 1. Crimson & Black Flame-Hemmed Sage Cloak Torso (u=0..28, v=0..17)
+                        .texOffs(0, 0)
+                        .addBox(-4.5F, 0.0F, -2.5F, 9, 12, 5, new CubeDeformation(0.45F))
+                        // 2. High Sage Cloak Collar (u=0..32, v=34..44)
+                        .texOffs(0, 34)
+                        .addBox(-5.0F, -2.2F, -3.0F, 10, 4, 6, new CubeDeformation(0.65F, 0.0F, 0.65F)),
+                PartPose.ZERO);
+
+        // 3. Lower Flowing Flame-Hemmed Coat Skirt (u=0..32, v=18..33)
+        body.addOrReplaceChild("cloak_skirt",
+                CubeListBuilder.create()
+                        .texOffs(0, 18)
+                        .addBox(-5.0F, 0.0F, -3.0F, 10, 9, 6, new CubeDeformation(0.38F)),
+                PartPose.offset(0.0F, 11.2F, 0.0F));
+
+        // 4. Iconic Back-Mounted Myobokuzan Summoning Scroll Cylinder (u=34..62, v=0..8 & caps u=34..46, v=10..20)
+        body.addOrReplaceChild("sage_scroll",
+                CubeListBuilder.create()
+                        .texOffs(34, 0)
+                        .addBox(-5.0F, -2.0F, -2.0F, 10, 4, 4, new CubeDeformation(0.10F))
+                        .texOffs(34, 10)
+                        .addBox(-6.0F, -2.5F, -2.5F, 1, 5, 5, CubeDeformation.NONE)
+                        .texOffs(34, 10)
+                        .addBox(5.0F, -2.5F, -2.5F, 1, 5, 5, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(0.0F, 4.2F, 4.6F, 0.0F, 0.0F, -0.26F));
+
+        root.addOrReplaceChild("right_arm",
+                CubeListBuilder.create()
+                        .texOffs(0, 45)
+                        .addBox(-3.5F, -2.0F, -2.5F, 5, 11, 5, new CubeDeformation(0.35F)),
+                PartPose.offset(-5.0F, 2.0F, 0.0F));
+
+        root.addOrReplaceChild("left_arm",
+                CubeListBuilder.create()
+                        .texOffs(22, 45)
+                        .addBox(-1.5F, -2.0F, -2.5F, 5, 11, 5, new CubeDeformation(0.35F)),
+                PartPose.offset(5.0F, 2.0F, 0.0F));
+
+        return LayerDefinition.create(mesh, 64, 64);
+    }
+
     public static LayerDefinition createJoninVestLayer() {
         MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
         PartDefinition root = mesh.getRoot();

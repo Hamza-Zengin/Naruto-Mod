@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "S S",
+    "IVI",
+    "LIL"
+  ],
+  "key": {
+    "S": "minecraft:terracotta",
+    "V": "narutomod:jonin_vest",
+    "I": "narutomod:chakra_metal",
+    "L": "minecraft:red_dye"
+  },
+  "result": {
+    "id": "narutomod:rock_jonin_vest",
+    "count": 1
+  }
+}

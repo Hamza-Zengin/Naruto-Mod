@@ -136,6 +136,23 @@ public final class NarutoArmorMaterial {
             assetKey("kage")
     );
 
+    public static final ArmorMaterial SAGE_MAT = new ArmorMaterial(
+            42,
+            Map.of(
+                    ArmorType.BOOTS, 3,
+                    ArmorType.LEGGINGS, 7,
+                    ArmorType.CHESTPLATE, 8,
+                    ArmorType.HELMET, 3,
+                    ArmorType.BODY, 8
+            ),
+            16,
+            SoundEvents.ARMOR_EQUIP_LEATHER,
+            3.0F,
+            0.05F,
+            ItemTags.REPAIRS_LEATHER_ARMOR,
+            assetKey("sage")
+    );
+
     private static ResourceKey<EquipmentAsset> assetKey(String name) {
         return ResourceKey.create(EquipmentAssets.ROOT_ID, Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, name));
     }

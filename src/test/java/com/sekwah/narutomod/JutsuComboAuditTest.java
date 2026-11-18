@@ -40,6 +40,8 @@ public class JutsuComboAuditTest {
             Map.entry("mud_wall", new MudWallAbility()),
             Map.entry("earth_dragon_bullet", new EarthDragonBulletAbility()),
             Map.entry("vacuum_spheres", new VacuumSpheresAbility()),
+            Map.entry("phoenix_flower", new PhoenixFlowerAbility()),
+            Map.entry("mystical_palm", new MysticalPalmAbility()),
             Map.entry("summoning", new SummoningAbility()),
             // [B] High Level (4 keys)
             Map.entry("sharingan", new SharinganAbility()),
@@ -47,6 +49,7 @@ public class JutsuComboAuditTest {
             Map.entry("shadow_clone", new ShadowCloneAbility()),
             Map.entry("shadow_possession", new ShadowPossessionAbility()),
             Map.entry("chidori", new ChidoriAbility()),
+            Map.entry("chidori_stream", new ChidoriStreamAbility()),
             Map.entry("rasengan", new RasenganAbility()),
             Map.entry("stone_spikes", new StoneSpikesAbility()),
             Map.entry("water_dragon", new WaterDragonAbility()),
@@ -64,7 +67,7 @@ public class JutsuComboAuditTest {
     );
 
     private static final Set<String> HIGH_LEVEL = Set.of(
-            "shadow_clone", "shadow_possession", "chidori",
+            "shadow_clone", "shadow_possession", "chidori", "chidori_stream",
             "rasengan", "stone_spikes", "water_dragon",
             "hakke_kusho", "bone_dance", "wood_prison", "eight_gates"
     );

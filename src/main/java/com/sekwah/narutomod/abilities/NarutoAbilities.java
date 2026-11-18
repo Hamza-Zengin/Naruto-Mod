@@ -47,6 +47,11 @@ public class NarutoAbilities {
     public static final DeferredHolder<Ability, VacuumSpheresAbility> VACUUM_SPHERES = ABILITY.register("vacuum_spheres", VacuumSpheresAbility::new);
     public static final DeferredHolder<Ability, StoneSpikesAbility> STONE_SPIKES = ABILITY.register("stone_spikes", StoneSpikesAbility::new);
     public static final DeferredHolder<Ability, WaterDragonAbility> WATER_DRAGON = ABILITY.register("water_dragon", WaterDragonAbility::new);
+    public static final DeferredHolder<Ability, PhoenixFlowerAbility> PHOENIX_FLOWER = ABILITY.register("phoenix_flower", PhoenixFlowerAbility::new);
+    public static final DeferredHolder<Ability, ChidoriStreamAbility> CHIDORI_STREAM = ABILITY.register("chidori_stream", ChidoriStreamAbility::new);
+
+    // Medical Ninjutsu
+    public static final DeferredHolder<Ability, MysticalPalmAbility> MYSTICAL_PALM = ABILITY.register("mystical_palm", MysticalPalmAbility::new);
 
     // Dōjutsu
     public static final DeferredHolder<Ability, SharinganAbility> SHARINGAN = ABILITY.register("sharingan", SharinganAbility::new);

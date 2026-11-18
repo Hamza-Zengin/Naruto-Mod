@@ -11,6 +11,7 @@ import com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.WoodPrisonEntity;
 import com.sekwah.narutomod.entity.mob.AkatsukiNinjaEntity;
 import com.sekwah.narutomod.entity.mob.RogueNinjaEntity;
+import com.sekwah.narutomod.entity.mob.VillageNinjaEntity;
 import com.sekwah.narutomod.entity.projectile.ExplosiveKunaiEntity;
 import com.sekwah.narutomod.entity.projectile.FumaShurikenEntity;
 import com.sekwah.narutomod.entity.projectile.KunaiEntity;
@@ -87,6 +88,9 @@ public class NarutoEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<AkatsukiNinjaEntity>> AKATSUKI_NINJA = register("akatsuki_ninja",
             AkatsukiNinjaEntity::new, MobCategory.MONSTER, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(10));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<VillageNinjaEntity>> VILLAGE_NINJA = register("village_ninja",
+            VillageNinjaEntity::new, MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
+
     private static <T extends Entity> DeferredHolder<EntityType<?>, EntityType<T>> register(
             String key, EntityType.EntityFactory<T> factory, MobCategory category, UnaryOperator<EntityType.Builder<T>> builder) {
         return ENTITIES.registerEntityType(key, factory, category, builder);
@@ -101,5 +105,6 @@ public class NarutoEntities {
         event.put(SHADOW_CLONE.get(), ShadowCloneEntity.createAttributes().build());
         event.put(ROGUE_NINJA.get(), RogueNinjaEntity.createAttributes().build());
         event.put(AKATSUKI_NINJA.get(), AkatsukiNinjaEntity.createAttributes().build());
+        event.put(VILLAGE_NINJA.get(), VillageNinjaEntity.createAttributes().build());
     }
 }

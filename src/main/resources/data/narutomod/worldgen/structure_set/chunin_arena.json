@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "narutomod:chunin_arena",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 21478317,
+    "spacing": 40,
+    "separation": 12
+  }
+}

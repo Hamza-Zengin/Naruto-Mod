@@ -26,6 +26,7 @@ public class FireballJutsuRenderer extends EntityRenderer<FireballJutsuEntity, F
    public static class FireballRenderState extends EntityRenderState {
       public float scale = 1.65F;
       public float alpha = 0.92F;
+      public boolean isMini = false;
    }
 
    public FireballJutsuRenderer(EntityRendererProvider.Context manager) {
@@ -41,18 +42,19 @@ public class FireballJutsuRenderer extends EntityRenderer<FireballJutsuEntity, F
    @Override
    public void extractRenderState(FireballJutsuEntity entity, FireballRenderState state, float partial) {
       super.extractRenderState(entity, state, partial);
+      state.isMini = entity.isPhoenixMini();
       float age = entity.time + partial;
       state.ageInTicks = age;
       float scale = 1.0F;
       if (entity.isImpacted()) {
-         scale = 1.15F + (entity.getImpactTicks() + partial) * 0.14F;
+         scale = 1.15F + (entity.getImpactTicks() + partial) * (state.isMini ? 0.08F : 0.14F);
       } else if (age < FireballJutsuEntity.GROW_TIME) {
          scale = FireballJutsuEntity.INITIAL_SCALE
                  + (FireballJutsuEntity.GROW_SCALE * (age / FireballJutsuEntity.GROW_TIME));
       }
-      state.scale = scale * 1.65F;
+      state.scale = scale * (state.isMini ? 0.65F : 1.65F);
       state.alpha = entity.isImpacted()
-              ? Math.max(0.15F, 0.92F - (entity.getImpactTicks() + partial) * 0.042F)
+              ? Math.max(0.15F, 0.92F - (entity.getImpactTicks() + partial) * (state.isMini ? 0.08F : 0.042F))
               : 0.92F;
    }
 

@@ -1,0 +1,90 @@
+{
+  "parent": "narutomod:shinobi/root",
+  "display": {
+    "icon": {
+      "id": "narutomod:kazekage_hat"
+    },
+    "title": {
+      "translate": "advancements.narutomod.five_great_nations.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.five_great_nations.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "konoha": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "narutomod:headband_leaf",
+              "narutomod:jonin_vest",
+              "narutomod:kage_hat"
+            ]
+          }
+        ]
+      }
+    },
+    "suna": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "narutomod:headband_sand",
+              "narutomod:sand_jonin_vest",
+              "narutomod:kazekage_hat"
+            ]
+          }
+        ]
+      }
+    },
+    "kiri": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "narutomod:headband_mist",
+              "narutomod:mist_jonin_vest",
+              "narutomod:mizukage_hat"
+            ]
+          }
+        ]
+      }
+    },
+    "kumo": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "narutomod:headband_cloud",
+              "narutomod:cloud_jonin_vest",
+              "narutomod:raikage_hat"
+            ]
+          }
+        ]
+      }
+    },
+    "iwa": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "narutomod:headband_rock",
+              "narutomod:rock_jonin_vest",
+              "narutomod:tsuchikage_hat"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

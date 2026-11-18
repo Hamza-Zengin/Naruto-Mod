@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "narutomod:konoha_village",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 21478311,
+    "spacing": 34,
+    "separation": 12
+  }
+}

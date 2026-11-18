@@ -39,6 +39,10 @@ public final class NinjaJutsuProfile {
     private final int vacuumSpheresMaxLife;
     private final double vacuumSpheresSpeed;
 
+    private final boolean chidoriSparkEnabled;
+    private final int chidoriSparkCooldownTicks;
+    private final float chidoriSparkDamage;
+
     private final boolean kawarimiEnabled;
     private final int kawarimiCooldownTicks;
     private final double kawarimiDistance;
@@ -78,6 +82,9 @@ public final class NinjaJutsuProfile {
         this.vacuumSpheresDamage = builder.vacuumSpheresDamage;
         this.vacuumSpheresMaxLife = builder.vacuumSpheresMaxLife;
         this.vacuumSpheresSpeed = builder.vacuumSpheresSpeed;
+        this.chidoriSparkEnabled = builder.chidoriSparkEnabled;
+        this.chidoriSparkCooldownTicks = builder.chidoriSparkCooldownTicks;
+        this.chidoriSparkDamage = builder.chidoriSparkDamage;
         this.kawarimiEnabled = builder.kawarimiEnabled;
         this.kawarimiCooldownTicks = builder.kawarimiCooldownTicks;
         this.kawarimiDistance = builder.kawarimiDistance;
@@ -87,6 +94,25 @@ public final class NinjaJutsuProfile {
         this.mudWallCooldownTicks = builder.mudWallCooldownTicks;
         this.mudWallMaxLifeTicks = builder.mudWallMaxLifeTicks;
         this.mudWallHealth = builder.mudWallHealth;
+    }
+
+    public static NinjaJutsuProfile villagePreset(String villageId) {
+        String key = villageId == null ? "konoha" : villageId.toLowerCase(java.util.Locale.ROOT);
+        Builder b = new Builder()
+                .rangedDistances(8.0D, 24.0D)
+                .closeThreatDistance(6.5D)
+                .criticalHealthRatio(0.35F)
+                .globalCooldownTicks(45)
+                .handSealWindupTicks(10)
+                .kawarimi(true, 180, 5.0D, 80, 0);
+        switch (key) {
+            case "suna" -> b.vacuumSpheres(true, 95, 30, 5.5F, 32, 1.50D);
+            case "kiri" -> b.waterBullet(true, 95, 30, 9.5F, 32, 1.25D);
+            case "kumo" -> b.chidoriSpark(true, 100, 10.5F).vacuumSpheres(true, 120, 30, 5.0F, 30, 1.45D);
+            case "iwa" -> b.earthBullet(true, 100, 30, 10.5F, 38, 1.15D).mudWall(true, 180, 100, 40.0F);
+            default -> b.fireball(true, 100, 30);
+        }
+        return b.build();
     }
 
     /**
@@ -161,6 +187,10 @@ public final class NinjaJutsuProfile {
     public int getVacuumSpheresMaxLife() { return this.vacuumSpheresMaxLife; }
     public double getVacuumSpheresSpeed() { return this.vacuumSpheresSpeed; }
 
+    public boolean isChidoriSparkEnabled() { return this.chidoriSparkEnabled; }
+    public int getChidoriSparkCooldownTicks() { return this.chidoriSparkCooldownTicks; }
+    public float getChidoriSparkDamage() { return this.chidoriSparkDamage; }
+
     public boolean isKawarimiEnabled() { return this.kawarimiEnabled; }
     public int getKawarimiCooldownTicks() { return this.kawarimiCooldownTicks; }
     public double getKawarimiDistance() { return this.kawarimiDistance; }
@@ -178,6 +208,7 @@ public final class NinjaJutsuProfile {
             case WATER_BULLET -> this.waterBulletEnabled;
             case EARTH_BULLET -> this.earthBulletEnabled;
             case VACUUM_SPHERES -> this.vacuumSpheresEnabled;
+            case CHIDORI_SPARK -> this.chidoriSparkEnabled;
             case KAWARIMI -> this.kawarimiEnabled;
             case MUD_WALL -> this.mudWallEnabled;
         };
@@ -215,6 +246,10 @@ public final class NinjaJutsuProfile {
         private float vacuumSpheresDamage = 5.5F;
         private int vacuumSpheresMaxLife = 30;
         private double vacuumSpheresSpeed = 1.45D;
+
+        private boolean chidoriSparkEnabled = false;
+        private int chidoriSparkCooldownTicks = 100;
+        private float chidoriSparkDamage = 10.0F;
 
         private boolean kawarimiEnabled = true;
         private int kawarimiCooldownTicks = 180;
@@ -287,6 +322,13 @@ public final class NinjaJutsuProfile {
             this.vacuumSpheresDamage = damage;
             this.vacuumSpheresMaxLife = maxLife;
             this.vacuumSpheresSpeed = speed;
+            return this;
+        }
+
+        public Builder chidoriSpark(boolean enabled, int cooldownTicks, float damage) {
+            this.chidoriSparkEnabled = enabled;
+            this.chidoriSparkCooldownTicks = cooldownTicks;
+            this.chidoriSparkDamage = damage;
             return this;
         }
 
