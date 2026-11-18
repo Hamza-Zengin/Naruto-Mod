@@ -28,15 +28,6 @@
         "projection": "rigid",
         "processors": "minecraft:empty"
       }
-    },
-    {
-      "weight": 1,
-      "element": {
-        "element_type": "minecraft:single_pool_element",
-        "location": "narutomod:kiri_canal_plaza",
-        "projection": "rigid",
-        "processors": "minecraft:empty"
-      }
     }
   ]
 }

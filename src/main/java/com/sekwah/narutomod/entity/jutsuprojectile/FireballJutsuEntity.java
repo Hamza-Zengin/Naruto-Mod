@@ -66,6 +66,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
     public static final float GROW_SCALE = 1 - INITIAL_SCALE;
     public static final float GROW_TIME = 12.0f;
     public static final float ENTITY_SIZE = 1.5f;
+    public static final float PHOENIX_MINI_SIZE_MULT = 0.36f;
 
     @Override
     public ChakraElement getElement() {
@@ -123,7 +124,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
 
     @Override
     public EntityDimensions getDimensions(Pose p_19721_) {
-        float baseSize = this.isPhoenixMini() ? ENTITY_SIZE * 0.24f : ENTITY_SIZE;
+        float baseSize = this.isPhoenixMini() ? ENTITY_SIZE * PHOENIX_MINI_SIZE_MULT : ENTITY_SIZE;
         return EntityDimensions.scalable(baseSize, baseSize)
                 .scale(Math.min(INITIAL_SCALE + (GROW_SCALE - (GROW_SCALE * ((GROW_TIME - time) / GROW_TIME))), 1.0f));
     }

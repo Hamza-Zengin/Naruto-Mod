@@ -12,7 +12,7 @@
       }
     },
     {
-      "weight": 4,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "narutomod:konoha_house",
@@ -34,15 +34,6 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "narutomod:konoha_training_ground",
-        "projection": "rigid",
-        "processors": "minecraft:empty"
-      }
-    },
-    {
-      "weight": 1,
-      "element": {
-        "element_type": "minecraft:single_pool_element",
-        "location": "narutomod:konoha_crossroad",
         "projection": "rigid",
         "processors": "minecraft:empty"
       }

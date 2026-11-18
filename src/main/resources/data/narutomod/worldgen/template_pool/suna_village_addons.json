@@ -21,19 +21,10 @@
       }
     },
     {
-      "weight": 3,
+      "weight": 4,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "narutomod:suna_barracks",
-        "projection": "rigid",
-        "processors": "minecraft:empty"
-      }
-    },
-    {
-      "weight": 2,
-      "element": {
-        "element_type": "minecraft:single_pool_element",
-        "location": "narutomod:suna_courtyard",
         "projection": "rigid",
         "processors": "minecraft:empty"
       }

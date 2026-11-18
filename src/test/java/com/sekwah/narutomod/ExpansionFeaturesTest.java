@@ -255,6 +255,9 @@ public class ExpansionFeaturesTest {
         assertEquals(Math.cos(Math.toRadians(90.0D)), dirs[0].dot(dirs[3]), 0.001D,
                 "Outer Phoenix Flower fireballs must span 90 degrees");
 
+        assertEquals(0.45D, com.sekwah.narutomod.abilities.jutsus.PhoenixFlowerAbility.SPAWN_DISTANCE, 0.0001D);
+        assertEquals(0.36f, com.sekwah.narutomod.entity.jutsuprojectile.FireballJutsuEntity.PHOENIX_MINI_SIZE_MULT, 0.0001f);
+
         // Chidori Stream persistent electric field duration: 30 ticks base + 8 ticks per Mastery Tier (Tier 1..5 -> 38..70 ticks = 1.9s..3.5s)
         assertEquals(38, com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility.computeFieldDurationTicks(0));
         assertTrue(com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility.computeFieldDurationTicks(0) >= 20,

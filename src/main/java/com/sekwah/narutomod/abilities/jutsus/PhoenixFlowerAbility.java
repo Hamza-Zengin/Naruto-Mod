@@ -18,6 +18,7 @@ import net.minecraft.world.phys.Vec3;
 public class PhoenixFlowerAbility extends Ability implements Ability.Cooldown {
 
     public static final float[] YAW_OFFSETS = new float[]{-45.0F, -15.0F, 15.0F, 45.0F};
+    public static final double SPAWN_DISTANCE = 0.45D;
 
     public static Vec3 computeRotatedDirection(Vec3 baseLook, float yawOffsetDeg) {
         return baseLook.yRot((float) Math.toRadians(-yawOffsetDeg)).normalize();
@@ -78,7 +79,7 @@ public class PhoenixFlowerAbility extends Ability implements Ability.Cooldown {
         Vec3 vel = dir.scale(1.18D);
         FireballJutsuEntity miniFireball = new FireballJutsuEntity(player, vel.x, vel.y, vel.z);
         miniFireball.setPhoenixMini(perBallDamage);
-        Vec3 spawnPos = player.getEyePosition().add(dir.scale(1.15D)).subtract(0.0D, 0.12D, 0.0D);
+        Vec3 spawnPos = player.getEyePosition().add(dir.scale(SPAWN_DISTANCE)).subtract(0.0D, 0.12D, 0.0D);
         miniFireball.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
         player.level().addFreshEntity(miniFireball);
     }

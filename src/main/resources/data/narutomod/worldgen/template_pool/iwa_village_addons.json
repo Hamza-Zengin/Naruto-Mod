@@ -28,15 +28,6 @@
         "projection": "rigid",
         "processors": "minecraft:empty"
       }
-    },
-    {
-      "weight": 2,
-      "element": {
-        "element_type": "minecraft:single_pool_element",
-        "location": "narutomod:iwa_pillars",
-        "projection": "rigid",
-        "processors": "minecraft:empty"
-      }
     }
   ]
 }

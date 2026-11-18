@@ -1,0 +1,50 @@
+{
+  "structures": [
+    {
+      "structure": "narutomod:konoha_village",
+      "weight": 6
+    },
+    {
+      "structure": "narutomod:suna_village",
+      "weight": 6
+    },
+    {
+      "structure": "narutomod:kiri_village",
+      "weight": 6
+    },
+    {
+      "structure": "narutomod:kumo_village",
+      "weight": 6
+    },
+    {
+      "structure": "narutomod:iwa_village",
+      "weight": 6
+    },
+    {
+      "structure": "narutomod:valley_of_the_end",
+      "weight": 4
+    },
+    {
+      "structure": "narutomod:chunin_arena",
+      "weight": 4
+    },
+    {
+      "structure": "narutomod:myobokuzan_shrine",
+      "weight": 4
+    },
+    {
+      "structure": "narutomod:uchiha_shrine",
+      "weight": 4
+    },
+    {
+      "structure": "narutomod:akatsuki_hideout",
+      "weight": 4
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 21478310,
+    "spacing": 42,
+    "separation": 24
+  }
+}

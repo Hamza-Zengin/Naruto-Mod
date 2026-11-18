@@ -298,18 +298,78 @@ public class WorldgenStructureAuditTest {
                     v + " start piece must embed both " + v + "_ninja and " + v + "_villager");
         }
 
-        // 5. All 10 structure_sets reduced by 50% (spacing >= 50, separation >= 18)
+        // 5. Unified structure_set preventing adjacent structures (separation >= 24 chunks = 384 blocks)
         Path setDir = DATA_DIR.resolve("narutomod/worldgen/structure_set");
         try (Stream<Path> walk = Files.walk(setDir)) {
             List<Path> sets = walk.filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".json")).toList();
-            Assertions.assertEquals(10, sets.size(), "Expected 10 structure_set JSONs");
-            for (Path setFile : sets) {
-                JsonObject placement = JsonParser.parseString(Files.readString(setFile))
-                        .getAsJsonObject().getAsJsonObject("placement");
-                Assertions.assertTrue(placement.get("spacing").getAsInt() >= 50,
-                        setFile.getFileName() + " spacing must be >= 50");
-                Assertions.assertTrue(placement.get("separation").getAsInt() >= 18,
-                        setFile.getFileName() + " separation must be >= 18");
+            Assertions.assertEquals(1, sets.size(), "Expected 1 unified narutomod_structures.json structure_set");
+            Path unifiedSet = sets.get(0);
+            Assertions.assertEquals("narutomod_structures.json", unifiedSet.getFileName().toString());
+            JsonObject setRoot = JsonParser.parseString(Files.readString(unifiedSet)).getAsJsonObject();
+            JsonArray structuresArr = setRoot.getAsJsonArray("structures");
+            Assertions.assertEquals(10, structuresArr.size(), "Unified structure_set must contain all 10 structures");
+            java.util.Set<String> presentIds = new java.util.HashSet<>();
+            for (JsonElement elem : structuresArr) {
+                presentIds.add(elem.getAsJsonObject().get("structure").getAsString());
+            }
+            for (String name : List.of("konoha_village", "suna_village", "kiri_village", "kumo_village", "iwa_village",
+                    "valley_of_the_end", "chunin_arena", "myobokuzan_shrine", "uchiha_shrine", "akatsuki_hideout")) {
+                Assertions.assertTrue(presentIds.contains("narutomod:" + name),
+                        "Unified structure_set missing narutomod:" + name);
+            }
+            JsonObject placement = setRoot.getAsJsonObject("placement");
+            Assertions.assertTrue(placement.get("spacing").getAsInt() >= 40,
+                    "Unified structure_set spacing must be >= 40");
+            Assertions.assertTrue(placement.get("separation").getAsInt() >= 24,
+                    "Unified structure_set separation must be >= 24 chunks (384 blocks) to prevent adjacent structures");
+        }
+
+        // 6. 3rd revision audits: zero glass_pane blocks in any .nbt, no fountain/plaza in village_addons, and no y>=2 water in fountains
+        Path structNbtDir = DATA_DIR.resolve("narutomod/structure");
+        try (Stream<Path> walk = Files.walk(structNbtDir)) {
+            List<Path> nbtFiles = walk.filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".nbt")).toList();
+            Assertions.assertFalse(nbtFiles.isEmpty());
+            for (Path nbtPath : nbtFiles) {
+                net.minecraft.nbt.CompoundTag rootTag = net.minecraft.nbt.NbtIo.readCompressed(
+                        nbtPath, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+                net.minecraft.nbt.ListTag paletteTag = rootTag.getListOrEmpty("palette");
+                for (int i = 0; i < paletteTag.size(); i++) {
+                    String blockName = paletteTag.getCompoundOrEmpty(i).getStringOr("Name", "");
+                    Assertions.assertFalse(blockName.contains("glass_pane"),
+                            "Structure .nbt must use full glass blocks instead of glass_pane (" + blockName + "): " + nbtPath.getFileName());
+                }
+            }
+        }
+
+        for (String bannedPlaza : List.of("konoha_crossroad", "suna_courtyard", "kiri_canal_plaza", "kumo_cloud_plaza", "iwa_pillars")) {
+            String villagePrefix = bannedPlaza.split("_", 2)[0];
+            String addonsRaw = Files.readString(TEMPLATE_POOL_DIR.resolve(villagePrefix + "_village_addons.json"));
+            Assertions.assertFalse(addonsRaw.contains(bannedPlaza),
+                    villagePrefix + "_village_addons.json must not contain repeating fountain/plaza " + bannedPlaza);
+        }
+
+        for (String fountainPiece : List.of("konoha_crossroad", "suna_courtyard")) {
+            net.minecraft.nbt.CompoundTag nbt = net.minecraft.nbt.NbtIo.readCompressed(
+                    structNbtDir.resolve(fountainPiece + ".nbt"),
+                    net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+            net.minecraft.nbt.ListTag palette = nbt.getListOrEmpty("palette");
+            int waterState = -1;
+            for (int i = 0; i < palette.size(); i++) {
+                if ("minecraft:water".equals(palette.getCompoundOrEmpty(i).getStringOr("Name", ""))) {
+                    waterState = i;
+                    break;
+                }
+            }
+            if (waterState >= 0) {
+                net.minecraft.nbt.ListTag blocks = nbt.getListOrEmpty("blocks");
+                for (int i = 0; i < blocks.size(); i++) {
+                    net.minecraft.nbt.CompoundTag b = blocks.getCompoundOrEmpty(i);
+                    if (b.getIntOr("state", -1) == waterState) {
+                        int y = b.getListOrEmpty("pos").getIntOr(1, -1);
+                        Assertions.assertTrue(y <= 1,
+                                fountainPiece + ".nbt must recess fountain water at y<=1 to avoid slab leaks (found y=" + y + ")");
+                    }
+                }
             }
         }
     }

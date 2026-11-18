@@ -85,9 +85,8 @@ public class RogueNinjaEntity extends Monster implements NinjaJutsuUser {
         } else {
             this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
         }
-        if (random.nextFloat() < 0.35f) {
-            this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(NarutoItems.HEADBAND_LEAF_SCRATCHED.get()));
-        }
+        this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(NarutoItems.HEADBAND_LEAF_SCRATCHED.get()));
+        this.setDropChance(EquipmentSlot.HEAD, 0.06F);
     }
 
     @Override

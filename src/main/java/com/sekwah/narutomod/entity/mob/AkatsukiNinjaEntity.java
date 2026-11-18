@@ -100,7 +100,9 @@ public class AkatsukiNinjaEntity extends Monster implements NinjaJutsuUser {
         } else {
             this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(NarutoItems.SAMEHADA.get()));
         }
+        this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(NarutoItems.HEADBAND_LEAF_SCRATCHED.get()));
         this.setItemSlot(EquipmentSlot.CHEST, new ItemStack(NarutoItems.AKATSUKI_CLOAK.get()));
+        this.setDropChance(EquipmentSlot.HEAD, 0.08F);
         this.setDropChance(EquipmentSlot.MAINHAND, 0.12F);
         this.setDropChance(EquipmentSlot.CHEST, 0.18F);
     }
