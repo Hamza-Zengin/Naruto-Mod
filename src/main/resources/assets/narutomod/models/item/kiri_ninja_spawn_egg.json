@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "narutomod:item/kiri_ninja_spawn_egg"
+  }
+}

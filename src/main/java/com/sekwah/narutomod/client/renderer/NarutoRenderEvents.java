@@ -186,6 +186,16 @@ public class NarutoRenderEvents {
         event.registerEntityRenderer(NarutoEntities.ROGUE_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "rogue_ninja"));
         event.registerEntityRenderer(NarutoEntities.AKATSUKI_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "akatsuki_ninja"));
         event.registerEntityRenderer(NarutoEntities.VILLAGE_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "village_ninja"));
+        event.registerEntityRenderer(NarutoEntities.KONOHA_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "konoha_ninja"));
+        event.registerEntityRenderer(NarutoEntities.SUNA_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "suna_ninja"));
+        event.registerEntityRenderer(NarutoEntities.KIRI_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "kiri_ninja"));
+        event.registerEntityRenderer(NarutoEntities.KUMO_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "kumo_ninja"));
+        event.registerEntityRenderer(NarutoEntities.IWA_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "iwa_ninja"));
+        event.registerEntityRenderer(NarutoEntities.KONOHA_VILLAGER.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "konoha_villager"));
+        event.registerEntityRenderer(NarutoEntities.SUNA_VILLAGER.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "suna_villager"));
+        event.registerEntityRenderer(NarutoEntities.KIRI_VILLAGER.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "kiri_villager"));
+        event.registerEntityRenderer(NarutoEntities.KUMO_VILLAGER.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "kumo_villager"));
+        event.registerEntityRenderer(NarutoEntities.IWA_VILLAGER.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "iwa_villager"));
     }
 
     @SubscribeEvent

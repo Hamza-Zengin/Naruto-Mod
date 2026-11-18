@@ -13,11 +13,11 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * Katon: Hōsenka no Jutsu (Phoenix Flower / Phoenix Sage Fire)
- * Launches 4 small fanned mini fireballs simultaneously across a 150-degree horizontal arc (equal 50-degree intervals).
+ * Launches 4 small fanned mini fireballs simultaneously across a 90-degree horizontal arc (equal 30-degree intervals).
  */
 public class PhoenixFlowerAbility extends Ability implements Ability.Cooldown {
 
-    public static final float[] YAW_OFFSETS = new float[]{-75.0F, -25.0F, 25.0F, 75.0F};
+    public static final float[] YAW_OFFSETS = new float[]{-45.0F, -15.0F, 15.0F, 45.0F};
 
     public static Vec3 computeRotatedDirection(Vec3 baseLook, float yawOffsetDeg) {
         return baseLook.yRot((float) Math.toRadians(-yawOffsetDeg)).normalize();

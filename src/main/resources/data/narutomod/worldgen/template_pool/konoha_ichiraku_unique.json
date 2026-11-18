@@ -1,0 +1,15 @@
+{
+  "name": "narutomod:konoha_ichiraku_unique",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "narutomod:konoha_ichiraku_house",
+        "projection": "rigid",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
+}

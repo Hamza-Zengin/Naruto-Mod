@@ -103,6 +103,36 @@ public class NarutoItems {
     public static final DeferredItem<Item> VILLAGE_NINJA_SPAWN_EGG = ITEMS.registerItem("village_ninja_spawn_egg",
             props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.VILLAGE_NINJA.get())));
 
+    public static final DeferredItem<Item> KONOHA_NINJA_SPAWN_EGG = ITEMS.registerItem("konoha_ninja_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.KONOHA_NINJA.get())));
+
+    public static final DeferredItem<Item> SUNA_NINJA_SPAWN_EGG = ITEMS.registerItem("suna_ninja_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.SUNA_NINJA.get())));
+
+    public static final DeferredItem<Item> KIRI_NINJA_SPAWN_EGG = ITEMS.registerItem("kiri_ninja_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.KIRI_NINJA.get())));
+
+    public static final DeferredItem<Item> KUMO_NINJA_SPAWN_EGG = ITEMS.registerItem("kumo_ninja_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.KUMO_NINJA.get())));
+
+    public static final DeferredItem<Item> IWA_NINJA_SPAWN_EGG = ITEMS.registerItem("iwa_ninja_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.IWA_NINJA.get())));
+
+    public static final DeferredItem<Item> KONOHA_VILLAGER_SPAWN_EGG = ITEMS.registerItem("konoha_villager_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.KONOHA_VILLAGER.get())));
+
+    public static final DeferredItem<Item> SUNA_VILLAGER_SPAWN_EGG = ITEMS.registerItem("suna_villager_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.SUNA_VILLAGER.get())));
+
+    public static final DeferredItem<Item> KIRI_VILLAGER_SPAWN_EGG = ITEMS.registerItem("kiri_villager_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.KIRI_VILLAGER.get())));
+
+    public static final DeferredItem<Item> KUMO_VILLAGER_SPAWN_EGG = ITEMS.registerItem("kumo_villager_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.KUMO_VILLAGER.get())));
+
+    public static final DeferredItem<Item> IWA_VILLAGER_SPAWN_EGG = ITEMS.registerItem("iwa_villager_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.IWA_VILLAGER.get())));
+
     // Armor
     public static final DeferredItem<Item> RED_ANBU_MASK = ITEMS.registerItem("red_anbu_mask",
             props -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.HELMET, props)
@@ -265,6 +295,16 @@ public class NarutoItems {
                         output.accept(ROGUE_NINJA_SPAWN_EGG.get());
                         output.accept(AKATSUKI_NINJA_SPAWN_EGG.get());
                         output.accept(VILLAGE_NINJA_SPAWN_EGG.get());
+                        output.accept(KONOHA_NINJA_SPAWN_EGG.get());
+                        output.accept(SUNA_NINJA_SPAWN_EGG.get());
+                        output.accept(KIRI_NINJA_SPAWN_EGG.get());
+                        output.accept(KUMO_NINJA_SPAWN_EGG.get());
+                        output.accept(IWA_NINJA_SPAWN_EGG.get());
+                        output.accept(KONOHA_VILLAGER_SPAWN_EGG.get());
+                        output.accept(SUNA_VILLAGER_SPAWN_EGG.get());
+                        output.accept(KIRI_VILLAGER_SPAWN_EGG.get());
+                        output.accept(KUMO_VILLAGER_SPAWN_EGG.get());
+                        output.accept(IWA_VILLAGER_SPAWN_EGG.get());
                         output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
                         output.accept(NarutoBlocks.ITEM_BONSAI_TREE.get());
                     })

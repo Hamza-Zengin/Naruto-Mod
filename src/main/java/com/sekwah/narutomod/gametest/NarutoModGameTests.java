@@ -209,7 +209,7 @@ public class NarutoModGameTests {
         com.sekwah.narutomod.item.weapons.KubikiribochoItem.applyBloodRepair(blade, true);
         helper.assertValueEqual(blade.getDamageValue(), 35, "Kubikiribocho kill repair");
 
-        // Phase 3 VillageNinjaEntity spawn and village equipment check
+        // Phase 3 & 2nd Revision VillageNinja & ShinobiVillager spawns and merchant offers
         com.sekwah.narutomod.entity.mob.VillageNinjaEntity guard =
                 com.sekwah.narutomod.entity.NarutoEntities.VILLAGE_NINJA.get().create(
                         helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
@@ -227,6 +227,35 @@ public class NarutoModGameTests {
                     "Kumo Village Ninja must equip Cloud Jonin Vest");
         }
 
+        for (var entry : java.util.Map.of(
+                com.sekwah.narutomod.entity.NarutoEntities.KONOHA_NINJA.get(), com.sekwah.narutomod.item.NarutoItems.HEADBAND_LEAF.get(),
+                com.sekwah.narutomod.entity.NarutoEntities.SUNA_NINJA.get(), com.sekwah.narutomod.item.NarutoItems.HEADBAND_SAND.get(),
+                com.sekwah.narutomod.entity.NarutoEntities.KIRI_NINJA.get(), com.sekwah.narutomod.item.NarutoItems.HEADBAND_MIST.get(),
+                com.sekwah.narutomod.entity.NarutoEntities.KUMO_NINJA.get(), com.sekwah.narutomod.item.NarutoItems.HEADBAND_CLOUD.get(),
+                com.sekwah.narutomod.entity.NarutoEntities.IWA_NINJA.get(), com.sekwah.narutomod.item.NarutoItems.HEADBAND_ROCK.get()).entrySet()) {
+            var ninja = entry.getKey().create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            helper.assertTrue(ninja != null, "Per-village ninja must instantiate");
+            if (ninja != null) {
+                ninja.equipForVillage(ninja.getVillageType(), helper.getLevel().getRandom());
+                helper.assertTrue(ninja.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).is(entry.getValue()),
+                        "Per-village ninja must equip matching headband: " + ninja.getVillageType());
+            }
+        }
+
+        for (var villagerType : java.util.List.of(
+                com.sekwah.narutomod.entity.NarutoEntities.KONOHA_VILLAGER.get(),
+                com.sekwah.narutomod.entity.NarutoEntities.SUNA_VILLAGER.get(),
+                com.sekwah.narutomod.entity.NarutoEntities.KIRI_VILLAGER.get(),
+                com.sekwah.narutomod.entity.NarutoEntities.KUMO_VILLAGER.get(),
+                com.sekwah.narutomod.entity.NarutoEntities.IWA_VILLAGER.get())) {
+            var villager = villagerType.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            helper.assertTrue(villager != null, "ShinobiVillagerEntity must instantiate");
+            if (villager != null) {
+                helper.assertValueEqual(villager.getOffers().size(), 10,
+                        "ShinobiVillagerEntity offer count for " + villager.getVillageType());
+            }
+        }
+
         // Phase 3 structures & template pools loaded cleanly in datapack registries
         var structureRegistry = helper.getLevel().registryAccess().lookupOrThrow(Registries.STRUCTURE);
         for (String structName : new String[]{
@@ -238,13 +267,15 @@ public class NarutoModGameTests {
         }
         var poolRegistry = helper.getLevel().registryAccess().lookupOrThrow(Registries.TEMPLATE_POOL);
         for (String poolName : new String[]{
-                "konoha_village", "konoha_streets", "konoha_village_addons",
+                "konoha_village", "konoha_streets", "konoha_village_addons", "konoha_ichiraku_unique",
                 "suna_village", "suna_streets", "suna_village_addons",
                 "kiri_village", "kiri_streets", "kiri_village_addons",
                 "kumo_village", "kumo_streets", "kumo_village_addons",
                 "iwa_village", "iwa_streets", "iwa_village_addons",
-                "valley_of_the_end", "chunin_arena", "chunin_arena_addons",
-                "myobokuzan_shrine", "uchiha_shrine", "uchiha_shrine_addons",
+                "valley_of_the_end", "valley_of_the_end_addons", "valley_hashirama_pool", "valley_madara_pool", "valley_river_pool",
+                "chunin_arena", "chunin_arena_addons", "chunin_kage_pool",
+                "myobokuzan_shrine", "myobokuzan_shrine_addons",
+                "uchiha_shrine", "uchiha_shrine_addons",
                 "akatsuki_hideout", "akatsuki_hideout_addons"}) {
             helper.assertTrue(
                     poolRegistry.get(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, poolName)).isPresent(),
@@ -253,12 +284,12 @@ public class NarutoModGameTests {
 
         var structMgr = helper.getLevel().getStructureTemplateManager();
         for (String nbtName : new String[]{
-                "konoha_plaza", "konoha_main_street", "konoha_crossroad", "konoha_gate", "konoha_training_ground", "konoha_ichiraku_house", "konoha_dojo",
+                "konoha_plaza", "konoha_main_street", "konoha_crossroad", "konoha_gate", "konoha_training_ground", "konoha_ichiraku_house", "konoha_house", "konoha_dojo",
                 "suna_dome", "suna_avenue", "suna_courtyard", "suna_gate", "suna_barracks", "suna_workshop",
                 "kiri_tower", "kiri_bridge", "kiri_canal_plaza", "kiri_gate", "kiri_harbor_house", "kiri_armory",
                 "kumo_peak_tower", "kumo_sky_bridge", "kumo_cloud_plaza", "kumo_gate", "kumo_thunder_dojo", "kumo_pavilion",
                 "iwa_keep", "iwa_stone_bridge", "iwa_pillars", "iwa_gate", "iwa_forge", "iwa_dwelling",
-                "valley_waterfall", "valley_shore",
+                "valley_waterfall", "valley_hashirama_statue", "valley_madara_statue", "valley_lower_river", "valley_canyon_walls", "valley_shore",
                 "chunin_arena_floor", "chunin_stands", "chunin_kage_box",
                 "myobokuzan_sanctuary", "myobokuzan_torii",
                 "uchiha_shrine", "uchiha_courtyard",

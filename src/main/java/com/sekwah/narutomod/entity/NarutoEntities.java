@@ -11,6 +11,7 @@ import com.sekwah.narutomod.entity.jutsuprojectile.WaterBulletEntity;
 import com.sekwah.narutomod.entity.jutsuprojectile.WoodPrisonEntity;
 import com.sekwah.narutomod.entity.mob.AkatsukiNinjaEntity;
 import com.sekwah.narutomod.entity.mob.RogueNinjaEntity;
+import com.sekwah.narutomod.entity.mob.ShinobiVillagerEntity;
 import com.sekwah.narutomod.entity.mob.VillageNinjaEntity;
 import com.sekwah.narutomod.entity.projectile.ExplosiveKunaiEntity;
 import com.sekwah.narutomod.entity.projectile.FumaShurikenEntity;
@@ -91,6 +92,48 @@ public class NarutoEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<VillageNinjaEntity>> VILLAGE_NINJA = register("village_ninja",
             VillageNinjaEntity::new, MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
 
+    // Per-village Ninja Defenders
+    public static final DeferredHolder<EntityType<?>, EntityType<VillageNinjaEntity>> KONOHA_NINJA = register("konoha_ninja",
+            (type, level) -> new VillageNinjaEntity(type, level, VillageNinjaEntity.VillageType.KONOHA),
+            MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<VillageNinjaEntity>> SUNA_NINJA = register("suna_ninja",
+            (type, level) -> new VillageNinjaEntity(type, level, VillageNinjaEntity.VillageType.SUNA),
+            MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<VillageNinjaEntity>> KIRI_NINJA = register("kiri_ninja",
+            (type, level) -> new VillageNinjaEntity(type, level, VillageNinjaEntity.VillageType.KIRI),
+            MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<VillageNinjaEntity>> KUMO_NINJA = register("kumo_ninja",
+            (type, level) -> new VillageNinjaEntity(type, level, VillageNinjaEntity.VillageType.KUMO),
+            MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<VillageNinjaEntity>> IWA_NINJA = register("iwa_ninja",
+            (type, level) -> new VillageNinjaEntity(type, level, VillageNinjaEntity.VillageType.IWA),
+            MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
+
+    // Per-village Civilian / Merchant Villagers
+    public static final DeferredHolder<EntityType<?>, EntityType<ShinobiVillagerEntity>> KONOHA_VILLAGER = register("konoha_villager",
+            (type, level) -> new ShinobiVillagerEntity(type, level, VillageNinjaEntity.VillageType.KONOHA),
+            MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ShinobiVillagerEntity>> SUNA_VILLAGER = register("suna_villager",
+            (type, level) -> new ShinobiVillagerEntity(type, level, VillageNinjaEntity.VillageType.SUNA),
+            MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ShinobiVillagerEntity>> KIRI_VILLAGER = register("kiri_villager",
+            (type, level) -> new ShinobiVillagerEntity(type, level, VillageNinjaEntity.VillageType.KIRI),
+            MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ShinobiVillagerEntity>> KUMO_VILLAGER = register("kumo_villager",
+            (type, level) -> new ShinobiVillagerEntity(type, level, VillageNinjaEntity.VillageType.KUMO),
+            MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ShinobiVillagerEntity>> IWA_VILLAGER = register("iwa_villager",
+            (type, level) -> new ShinobiVillagerEntity(type, level, VillageNinjaEntity.VillageType.IWA),
+            MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
+
     private static <T extends Entity> DeferredHolder<EntityType<?>, EntityType<T>> register(
             String key, EntityType.EntityFactory<T> factory, MobCategory category, UnaryOperator<EntityType.Builder<T>> builder) {
         return ENTITIES.registerEntityType(key, factory, category, builder);
@@ -106,5 +149,15 @@ public class NarutoEntities {
         event.put(ROGUE_NINJA.get(), RogueNinjaEntity.createAttributes().build());
         event.put(AKATSUKI_NINJA.get(), AkatsukiNinjaEntity.createAttributes().build());
         event.put(VILLAGE_NINJA.get(), VillageNinjaEntity.createAttributes().build());
+        event.put(KONOHA_NINJA.get(), VillageNinjaEntity.createAttributes().build());
+        event.put(SUNA_NINJA.get(), VillageNinjaEntity.createAttributes().build());
+        event.put(KIRI_NINJA.get(), VillageNinjaEntity.createAttributes().build());
+        event.put(KUMO_NINJA.get(), VillageNinjaEntity.createAttributes().build());
+        event.put(IWA_NINJA.get(), VillageNinjaEntity.createAttributes().build());
+        event.put(KONOHA_VILLAGER.get(), ShinobiVillagerEntity.createAttributes().build());
+        event.put(SUNA_VILLAGER.get(), ShinobiVillagerEntity.createAttributes().build());
+        event.put(KIRI_VILLAGER.get(), ShinobiVillagerEntity.createAttributes().build());
+        event.put(KUMO_VILLAGER.get(), ShinobiVillagerEntity.createAttributes().build());
+        event.put(IWA_VILLAGER.get(), ShinobiVillagerEntity.createAttributes().build());
     }
 }

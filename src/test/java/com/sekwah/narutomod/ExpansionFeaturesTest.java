@@ -235,10 +235,10 @@ public class ExpansionFeaturesTest {
     }
 
     @Test
-    @DisplayName("Verify Phoenix Flower 150-degree equal 4-bolt spread and Chidori Stream mastery field duration scaling")
+    @DisplayName("Verify Phoenix Flower 90-degree equal 4-bolt spread and Chidori Stream mastery field duration scaling")
     void testPhoenixFlowerAndChidoriStreamRevisions() {
         float[] offsets = com.sekwah.narutomod.abilities.jutsus.PhoenixFlowerAbility.YAW_OFFSETS;
-        assertArrayEquals(new float[]{-75.0F, -25.0F, 25.0F, 75.0F}, offsets, 0.001F);
+        assertArrayEquals(new float[]{-45.0F, -15.0F, 15.0F, 45.0F}, offsets, 0.001F);
 
         Vec3 baseLook = new Vec3(0.0D, 0.0D, 1.0D);
         Vec3[] dirs = new Vec3[offsets.length];
@@ -247,13 +247,13 @@ public class ExpansionFeaturesTest {
             assertEquals(1.0D, dirs[i].length(), 0.0001D);
         }
 
-        double expectedStepCos = Math.cos(Math.toRadians(50.0D));
+        double expectedStepCos = Math.cos(Math.toRadians(30.0D));
         for (int i = 0; i < dirs.length - 1; i++) {
             assertEquals(expectedStepCos, dirs[i].dot(dirs[i + 1]), 0.001D,
-                    "Adjacent Phoenix Flower fireballs must be spaced by 50 degrees");
+                    "Adjacent Phoenix Flower fireballs must be spaced by 30 degrees");
         }
-        assertEquals(Math.cos(Math.toRadians(150.0D)), dirs[0].dot(dirs[3]), 0.001D,
-                "Outer Phoenix Flower fireballs must span 150 degrees");
+        assertEquals(Math.cos(Math.toRadians(90.0D)), dirs[0].dot(dirs[3]), 0.001D,
+                "Outer Phoenix Flower fireballs must span 90 degrees");
 
         // Chidori Stream persistent electric field duration: 30 ticks base + 8 ticks per Mastery Tier (Tier 1..5 -> 38..70 ticks = 1.9s..3.5s)
         assertEquals(38, com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility.computeFieldDurationTicks(0));
@@ -334,5 +334,24 @@ public class ExpansionFeaturesTest {
         assertEquals(com.sekwah.narutomod.entity.ai.NinjaJutsuType.CHIDORI_SPARK,
                 com.sekwah.narutomod.entity.ai.NinjaJutsuAttackGoal.selectTacticalAction(
                         kumo, cooldowns, 5.0D, true, 0.9F, 0));
+    }
+
+    @Test
+    @DisplayName("Verify ShinobiVillagerEntity per-village specialty trade definitions across all 5 villages")
+    void testShinobiVillagerMerchantOffers() {
+        for (var vt : com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.values()) {
+            var specialties = com.sekwah.narutomod.entity.mob.ShinobiVillagerEntity.getVillageSpecialtyItemIds(vt);
+            assertEquals(3, specialties.size(), "Each village merchant must define 3 unique specialty trades: " + vt);
+        }
+        assertTrue(com.sekwah.narutomod.entity.mob.ShinobiVillagerEntity.getVillageSpecialtyItemIds(
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.KONOHA).contains("ichiraku_ramen"));
+        assertTrue(com.sekwah.narutomod.entity.mob.ShinobiVillagerEntity.getVillageSpecialtyItemIds(
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.SUNA).contains("fuma_shuriken"));
+        assertTrue(com.sekwah.narutomod.entity.mob.ShinobiVillagerEntity.getVillageSpecialtyItemIds(
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.KIRI).contains("anbu_tanto"));
+        assertTrue(com.sekwah.narutomod.entity.mob.ShinobiVillagerEntity.getVillageSpecialtyItemIds(
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.KUMO).contains("chakra_blades"));
+        assertTrue(com.sekwah.narutomod.entity.mob.ShinobiVillagerEntity.getVillageSpecialtyItemIds(
+                com.sekwah.narutomod.entity.mob.VillageNinjaEntity.VillageType.IWA).contains("scroll_stone_spikes"));
     }
 }

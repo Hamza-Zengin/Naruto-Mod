@@ -8,22 +8,7 @@
     "minecraft:stony_shore"
   ],
   "step": "surface_structures",
-  "spawn_overrides": {
-    "creature": {
-      "bounding_box": "piece",
-      "spawns": [
-        {
-          "type": "narutomod:village_ninja",
-          "count": {
-            "type": "minecraft:uniform",
-            "min_inclusive": 2,
-            "max_inclusive": 4
-          },
-          "weight": 20
-        }
-      ]
-    }
-  },
+  "spawn_overrides": {},
   "terrain_adaptation": "beard_box",
   "start_pool": "narutomod:kiri_village",
   "size": 5,

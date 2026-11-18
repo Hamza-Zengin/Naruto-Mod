@@ -15,7 +15,7 @@
       "weight": 4,
       "element": {
         "element_type": "minecraft:single_pool_element",
-        "location": "narutomod:konoha_ichiraku_house",
+        "location": "narutomod:konoha_house",
         "projection": "rigid",
         "processors": "minecraft:empty"
       }

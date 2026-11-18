@@ -108,10 +108,20 @@ public class VillageNinjaEntity extends PathfinderMob implements NinjaJutsuUser 
 
     private final NinjaJutsuCooldowns jutsuCooldowns = new NinjaJutsuCooldowns(45);
     private int kunaiCooldown = 40;
+    @Nullable
+    private final VillageType fixedVillageType;
 
     public VillageNinjaEntity(EntityType<? extends PathfinderMob> type, Level level) {
+        this(type, level, null);
+    }
+
+    public VillageNinjaEntity(EntityType<? extends PathfinderMob> type, Level level, @Nullable VillageType fixedVillageType) {
         super(type, level);
         this.xpReward = 18;
+        this.fixedVillageType = fixedVillageType;
+        if (fixedVillageType != null) {
+            this.setVillageType(fixedVillageType);
+        }
     }
 
     @Override
@@ -121,11 +131,12 @@ public class VillageNinjaEntity extends PathfinderMob implements NinjaJutsuUser 
     }
 
     public VillageType getVillageType() {
-        return VillageType.fromId(this.entityData.get(DATA_VILLAGE_TYPE));
+        return this.fixedVillageType != null ? this.fixedVillageType : VillageType.fromId(this.entityData.get(DATA_VILLAGE_TYPE));
     }
 
     public void setVillageType(VillageType type) {
-        this.entityData.set(DATA_VILLAGE_TYPE, (type != null ? type : VillageType.KONOHA).getId());
+        VillageType resolved = this.fixedVillageType != null ? this.fixedVillageType : (type != null ? type : VillageType.KONOHA);
+        this.entityData.set(DATA_VILLAGE_TYPE, resolved.getId());
     }
 
     @Override
@@ -160,10 +171,15 @@ public class VillageNinjaEntity extends PathfinderMob implements NinjaJutsuUser 
 
     @Override
     public boolean canAttack(LivingEntity target) {
-        if (target instanceof VillageNinjaEntity || target instanceof ShadowCloneEntity) {
+        if (target instanceof VillageNinjaEntity || target instanceof ShinobiVillagerEntity || target instanceof ShadowCloneEntity) {
             return false;
         }
         return super.canAttack(target);
+    }
+
+    @Override
+    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
+        return false;
     }
 
     @Nullable
@@ -171,12 +187,18 @@ public class VillageNinjaEntity extends PathfinderMob implements NinjaJutsuUser 
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason,
                                         @Nullable SpawnGroupData spawnData) {
         SpawnGroupData data = super.finalizeSpawn(level, difficulty, reason, spawnData);
-        BlockPos pos = this.blockPosition();
-        Holder<Biome> biomeHolder = level.getBiome(pos);
-        String biomePath = biomeHolder.unwrapKey().map(k -> k.identifier().getPath()).orElse("plains");
-        VillageType resolved = VillageType.fromBiomePath(biomePath);
+        VillageType resolved;
+        if (this.fixedVillageType != null) {
+            resolved = this.fixedVillageType;
+        } else {
+            BlockPos pos = this.blockPosition();
+            Holder<Biome> biomeHolder = level.getBiome(pos);
+            String biomePath = biomeHolder.unwrapKey().map(k -> k.identifier().getPath()).orElse("plains");
+            resolved = VillageType.fromBiomePath(biomePath);
+        }
         this.setVillageType(resolved);
         this.equipForVillage(resolved, level.getRandom());
+        this.setPersistenceRequired();
         return data;
     }
 

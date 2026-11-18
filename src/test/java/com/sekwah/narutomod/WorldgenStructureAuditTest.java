@@ -196,4 +196,121 @@ public class WorldgenStructureAuditTest {
             }
         }
     }
+
+    @Test
+    public void testSecondRevisionStructureLightingEntitiesAndSparsity() throws IOException {
+        java.util.Set<String> lightBlocks = java.util.Set.of(
+                "minecraft:lantern", "minecraft:soul_lantern", "minecraft:ochre_froglight",
+                "minecraft:sea_lantern", "minecraft:shroomlight", "minecraft:glowstone", "minecraft:torch");
+
+        // 1. Every .nbt structure piece in template pools must include illumination blocks
+        List<Path> poolFiles;
+        try (Stream<Path> walk = Files.walk(TEMPLATE_POOL_DIR)) {
+            poolFiles = walk
+                    .filter(Files::isRegularFile)
+                    .filter(p -> p.toString().endsWith(".json"))
+                    .sorted()
+                    .toList();
+        }
+        Assertions.assertTrue(poolFiles.size() >= 30, "Expected 30 template_pool files including Valley & Ichiraku pools");
+
+        for (Path poolFile : poolFiles) {
+            JsonObject root = JsonParser.parseString(Files.readString(poolFile)).getAsJsonObject();
+            for (JsonElement elem : root.getAsJsonArray("elements")) {
+                JsonObject elementObj = elem.getAsJsonObject().getAsJsonObject("element");
+                if (!elementObj.has("location")) {
+                    continue;
+                }
+                String location = elementObj.get("location").getAsString();
+                String[] parts = location.split(":", 2);
+                Path nbtPath = DATA_DIR.resolve(parts[0]).resolve("structure").resolve(parts[1] + ".nbt");
+                net.minecraft.nbt.CompoundTag rootTag = net.minecraft.nbt.NbtIo.readCompressed(
+                        nbtPath, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+                net.minecraft.nbt.ListTag paletteTag = rootTag.getListOrEmpty("palette");
+                boolean hasLight = false;
+                for (int i = 0; i < paletteTag.size(); i++) {
+                    if (lightBlocks.contains(paletteTag.getCompoundOrEmpty(i).getStringOr("Name", ""))) {
+                        hasLight = true;
+                        break;
+                    }
+                }
+                Assertions.assertTrue(hasLight, "Structure piece lacks illumination blocks: " + location);
+            }
+        }
+
+        // 2. Single Ichiraku Ramen per Konoha village
+        JsonObject uniqueIchiraku = JsonParser.parseString(
+                Files.readString(TEMPLATE_POOL_DIR.resolve("konoha_ichiraku_unique.json"))).getAsJsonObject();
+        Assertions.assertEquals(1, uniqueIchiraku.getAsJsonArray("elements").size());
+        Assertions.assertEquals("narutomod:konoha_ichiraku_house",
+                uniqueIchiraku.getAsJsonArray("elements").get(0).getAsJsonObject()
+                        .getAsJsonObject("element").get("location").getAsString());
+
+        String konohaAddonsRaw = Files.readString(TEMPLATE_POOL_DIR.resolve("konoha_village_addons.json"));
+        Assertions.assertFalse(konohaAddonsRaw.contains("konoha_ichiraku_house"),
+                "konoha_village_addons must not contain konoha_ichiraku_house so it spawns only once");
+
+        // 3. Akatsuki Hideout: empty spawn_overrides + exact 2 akatsuki_ninja + 5 rogue_ninja embedded in NBT
+        Path structureDir = DATA_DIR.resolve("narutomod/worldgen/structure");
+        JsonObject akatsukiStruct = JsonParser.parseString(
+                Files.readString(structureDir.resolve("akatsuki_hideout.json"))).getAsJsonObject();
+        Assertions.assertEquals(0, akatsukiStruct.getAsJsonObject("spawn_overrides").size(),
+                "akatsuki_hideout must not continuously spawn mobs via spawn_overrides");
+
+        net.minecraft.nbt.CompoundTag akatsukiNbt = net.minecraft.nbt.NbtIo.readCompressed(
+                DATA_DIR.resolve("narutomod/structure/akatsuki_hideout.nbt"),
+                net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+        net.minecraft.nbt.ListTag akatsukiEntities = akatsukiNbt.getListOrEmpty("entities");
+        int akatsukiCount = 0;
+        int rogueCount = 0;
+        for (int i = 0; i < akatsukiEntities.size(); i++) {
+            String entId = akatsukiEntities.getCompoundOrEmpty(i).getCompoundOrEmpty("nbt").getStringOr("id", "");
+            if ("narutomod:akatsuki_ninja".equals(entId)) {
+                akatsukiCount++;
+            } else if ("narutomod:rogue_ninja".equals(entId)) {
+                rogueCount++;
+            }
+        }
+        Assertions.assertEquals(2, akatsukiCount, "akatsuki_hideout.nbt must contain exact 2 akatsuki_ninja");
+        Assertions.assertEquals(5, rogueCount, "akatsuki_hideout.nbt must contain exact 5 rogue_ninja");
+
+        // 4. All 5 villages: empty spawn_overrides + village-specific ninja & villager embedded in NBTs
+        for (String v : List.of("konoha", "suna", "kiri", "kumo", "iwa")) {
+            JsonObject vStruct = JsonParser.parseString(
+                    Files.readString(structureDir.resolve(v + "_village.json"))).getAsJsonObject();
+            Assertions.assertEquals(0, vStruct.getAsJsonObject("spawn_overrides").size(),
+                    v + "_village must rely on one-time NBT entities instead of continuous spawn_overrides");
+            String startLoc = JsonParser.parseString(Files.readString(TEMPLATE_POOL_DIR.resolve(v + "_village.json")))
+                    .getAsJsonObject().getAsJsonArray("elements").get(0).getAsJsonObject()
+                    .getAsJsonObject("element").get("location").getAsString().split(":", 2)[1];
+            net.minecraft.nbt.CompoundTag hubNbt = net.minecraft.nbt.NbtIo.readCompressed(
+                    DATA_DIR.resolve("narutomod/structure/" + startLoc + ".nbt"),
+                    net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+            net.minecraft.nbt.ListTag hubEnts = hubNbt.getListOrEmpty("entities");
+            int ninjas = 0;
+            int villagers = 0;
+            for (int i = 0; i < hubEnts.size(); i++) {
+                String entId = hubEnts.getCompoundOrEmpty(i).getCompoundOrEmpty("nbt").getStringOr("id", "");
+                if (("narutomod:" + v + "_ninja").equals(entId)) ninjas++;
+                if (("narutomod:" + v + "_villager").equals(entId)) villagers++;
+            }
+            Assertions.assertTrue(ninjas >= 1 && villagers >= 1,
+                    v + " start piece must embed both " + v + "_ninja and " + v + "_villager");
+        }
+
+        // 5. All 10 structure_sets reduced by 50% (spacing >= 50, separation >= 18)
+        Path setDir = DATA_DIR.resolve("narutomod/worldgen/structure_set");
+        try (Stream<Path> walk = Files.walk(setDir)) {
+            List<Path> sets = walk.filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".json")).toList();
+            Assertions.assertEquals(10, sets.size(), "Expected 10 structure_set JSONs");
+            for (Path setFile : sets) {
+                JsonObject placement = JsonParser.parseString(Files.readString(setFile))
+                        .getAsJsonObject().getAsJsonObject("placement");
+                Assertions.assertTrue(placement.get("spacing").getAsInt() >= 50,
+                        setFile.getFileName() + " spacing must be >= 50");
+                Assertions.assertTrue(placement.get("separation").getAsInt() >= 18,
+                        setFile.getFileName() + " separation must be >= 18");
+            }
+        }
+    }
 }
