@@ -4,6 +4,14 @@ Bu dosya `Naruto-Mod` projesinin sürüm geçmişini ve öne çıkan değişikli
 
 ## [Unreleased]
 
+### Düzeltmeler & Dengeleme (Polish Pass 2)
+- **Çakra Bıçağı (`chakra_blades`):** Boyut %50 küçültüldü; normal kılıçlar gibi dik/yatay elde tutuşta uç oyuncunun sağına, keskin kenar ise ileri bakacak şekilde yeniden hizalandı.
+- **ANBU Taktik Tanto (`anbu_tanto`):** 3D el/yer/çerçeve boyutları %25 küçültüldü.
+- **Son Vadi (`valley_of_the_end`):** Yalnızca yağmur ormanı biyomlarında (`#minecraft:is_jungle`) oluşacak şekilde güncellendi; dış sınırlar keskin dikdörtgen duvarlar yerine araziye organik olarak karışan yumuşak kenarlarla yeniden üretildi.
+- **Sis Bombası (`smoke_bomb`):** 64×64 dokulu basit 3D model ve `SmokeBombRenderer` eklendi; elde tutulurken ve fırlatıldığında 3D görünür.
+- **Kağıt Bomba (`paper_bomb`):** Yaratıcı menüde "Naruto Blokları" sekmesinden çıkarılıp "Ninja Silahları" sekmesine taşındı.
+- **Yapı Oluşma Sıklığı:** Diğer 9 yapının spawn sıklığı ~%25 azaltıldı (`spacing`: 42 → 49); `valley_of_the_end` ağırlığı 4 → 5 olarak dengelendi.
+
 ### Düzeltmeler & Görsel Revizyon (Polish Pass 1)
 - **Shuriken 3D Birliği:** `ShurikenRenderer` uçuşta 3D modeli (`ItemDisplayContext.NONE`) kullanacak şekilde güncellendi; `items/shuriken.json`'dan `fixed` istisnası kaldırıldı. Yeni `64×64` `shuriken_3d.png` ve merkez halkalı, 4 eğimli bıçaklı 32 parçalı `shuriken_3d.json` eklendi.
 - **Gunbai & Kunai Elde Tutuşu:** `gunbai_uchiwa_3d.json` el rotasyonlarına Y `+90°` düzeltmesi uygulanarak ince kenarın karşıya bakması sağlandı; `kunai_3d.json` ve `explosive_kunai_3d.json` `firstperson`/`thirdperson` dönüşümleri ANBU Tanto referansına hizalandı.

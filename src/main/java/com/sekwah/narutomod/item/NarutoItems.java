@@ -320,6 +320,7 @@ public class NarutoItems {
                         output.accept(CHAKRA_BLADES.get());
                         output.accept(ANBU_TANTO.get());
                         output.accept(GUNBAI_UCHIWA.get());
+                        output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
                         output.accept(SMOKE_BOMB.get());
                         output.accept(MILITARY_RATIONS_PILL.get());
                         output.accept(MEDICAL_POUCH.get());
@@ -345,7 +346,9 @@ public class NarutoItems {
                     .title(Component.translatable("itemGroup.narutomod_blocks"))
                     .icon(() -> new ItemStack(NarutoBlocks.ITEM_STONE_LANTERN.get()))
                     .displayItems((parameters, output) ->
-                            NarutoBlocks.BLOCK_ITEMS.getEntries().forEach(entry -> output.accept(entry.get())))
+                            NarutoBlocks.BLOCK_ITEMS.getEntries().stream()
+                                    .filter(entry -> entry != NarutoBlocks.ITEM_PAPER_BOMB)
+                                    .forEach(entry -> output.accept(entry.get())))
                     .build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> NINJA_ARMOR_TAB = CREATIVE_MODE_TABS.register("narutomod_armor", () ->
