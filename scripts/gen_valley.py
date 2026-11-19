@@ -100,7 +100,32 @@ class StructureBuilder:
         self.set(x, y + 1, z, wall_mat)
         self.set(x, y + 2, z, lantern_mat, {"hanging": "false"})
 
+    def apply_buried_foundation(self, depth: int = 4, dark_theme: bool = False):
+        if depth <= 0 or not self.blocks:
+            return
+        shifted = {}
+        footprint = set()
+        for (x, y, z), val in self.blocks.items():
+            shifted[(x, y + depth, z)] = val
+            if y <= 1 and val[0] not in ("minecraft:air", "minecraft:vine"):
+                footprint.add((x, z))
+        self.sy += depth
+        self.blocks = shifted
+
+        rng = random.Random(707 + (1 if dark_theme else 0))
+        for (x, z) in sorted(footprint):
+            base_name = self.blocks.get((x, depth, z), ("minecraft:stone", (), None))[0]
+            for fy in range(depth):
+                if dark_theme:
+                    mat = "minecraft:deepslate" if fy < depth - 1 else ("minecraft:cobbled_deepslate" if rng.random() < 0.45 else "minecraft:deepslate")
+                elif base_name == "minecraft:cobblestone":
+                    mat = "minecraft:stone" if fy < depth - 2 else ("minecraft:mossy_cobblestone" if rng.random() < 0.2 else "minecraft:cobblestone")
+                else:
+                    mat = "minecraft:deepslate" if fy == 0 and rng.random() < 0.35 else ("minecraft:cobblestone" if fy == depth - 1 and rng.random() < 0.3 else "minecraft:stone")
+                self.set(x, fy, z, mat)
+
     def save(self, filename: str):
+        self.apply_buried_foundation(depth=4, dark_theme=("madara" in filename))
         palette_list = []
         palette_map = {}
 

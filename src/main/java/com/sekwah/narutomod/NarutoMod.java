@@ -64,6 +64,7 @@ public class NarutoMod {
         NarutoAbilities.register(modEventBus);
         NarutoClans.register(modEventBus);
         NarutoGameRules.register(modEventBus);
+        com.sekwah.narutomod.worldgen.NarutoStructures.register(modEventBus);
         NinjaCapabilityHandler.register(modEventBus);
         com.sekwah.narutomod.gametest.NarutoModGameTests.register(modEventBus);
 

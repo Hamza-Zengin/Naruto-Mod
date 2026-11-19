@@ -34,7 +34,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "location": "narutomod:konoha_training_ground",
-        "projection": "rigid",
+        "projection": "terrain_matching",
         "processors": "minecraft:empty"
       }
     }

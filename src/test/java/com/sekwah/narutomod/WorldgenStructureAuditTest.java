@@ -373,4 +373,87 @@ public class WorldgenStructureAuditTest {
             }
         }
     }
+
+    @Test
+    public void testFourthRevisionTerrainAnchoringAndFoundations() throws IOException {
+        Path structureDir = DATA_DIR.resolve("narutomod/worldgen/structure");
+        for (String name : List.of(
+                "konoha_village", "suna_village", "kiri_village", "kumo_village", "iwa_village",
+                "valley_of_the_end", "chunin_arena", "myobokuzan_shrine", "uchiha_shrine", "akatsuki_hideout")) {
+            JsonObject root = JsonParser.parseString(
+                    Files.readString(structureDir.resolve(name + ".json"))).getAsJsonObject();
+            Assertions.assertEquals("narutomod:anchored_jigsaw", root.get("type").getAsString(),
+                    name + ".json must use narutomod:anchored_jigsaw for terrain anchoring");
+            Assertions.assertTrue(root.get("max_height_variance").getAsInt() >= 4,
+                    name + ".json must specify valid max_height_variance");
+            Assertions.assertTrue(root.get("max_foundation_depth").getAsInt() >= 16,
+                    name + ".json must specify max_foundation_depth >= 16");
+        }
+
+        // Verify terrain_matching projections on rolling path/shore/wall pools
+        java.util.Map<String, List<String>> expectedTerrainMatching = java.util.Map.of(
+                "konoha_streets", List.of("narutomod:konoha_main_street"),
+                "konoha_village_addons", List.of("narutomod:konoha_training_ground"),
+                "suna_streets", List.of("narutomod:suna_avenue"),
+                "akatsuki_hideout_addons", List.of("narutomod:akatsuki_canyon"),
+                "valley_of_the_end_addons", List.of("narutomod:valley_canyon_walls", "narutomod:valley_shore")
+        );
+        for (var entry : expectedTerrainMatching.entrySet()) {
+            JsonObject pool = JsonParser.parseString(
+                    Files.readString(TEMPLATE_POOL_DIR.resolve(entry.getKey() + ".json"))).getAsJsonObject();
+            for (String targetLoc : entry.getValue()) {
+                boolean matched = false;
+                for (JsonElement el : pool.getAsJsonArray("elements")) {
+                    JsonObject obj = el.getAsJsonObject().getAsJsonObject("element");
+                    if (targetLoc.equals(obj.get("location").getAsString())) {
+                        Assertions.assertEquals("terrain_matching", obj.get("projection").getAsString(),
+                                targetLoc + " in " + entry.getKey() + " must use terrain_matching projection");
+                        matched = true;
+                    }
+                }
+                Assertions.assertTrue(matched, "Expected element " + targetLoc + " in " + entry.getKey());
+            }
+        }
+
+        // Verify every grounded .nbt piece has y=0 support under every y=1 non-air column
+        Path structNbtDir = DATA_DIR.resolve("narutomod/structure");
+        try (Stream<Path> walk = Files.walk(structNbtDir)) {
+            List<Path> nbtFiles = walk.filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".nbt")).sorted().toList();
+            for (Path nbtPath : nbtFiles) {
+                String fname = nbtPath.getFileName().toString();
+                if ("empty.nbt".equals(fname) || "kumo_sky_bridge.nbt".equals(fname)) {
+                    continue;
+                }
+                net.minecraft.nbt.CompoundTag rootTag = net.minecraft.nbt.NbtIo.readCompressed(
+                        nbtPath, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+                net.minecraft.nbt.ListTag palette = rootTag.getListOrEmpty("palette");
+                java.util.Set<Integer> airStates = new java.util.HashSet<>();
+                for (int i = 0; i < palette.size(); i++) {
+                    String bName = palette.getCompoundOrEmpty(i).getStringOr("Name", "");
+                    if ("minecraft:air".equals(bName) || "minecraft:cave_air".equals(bName) || "minecraft:void_air".equals(bName)) {
+                        airStates.add(i);
+                    }
+                }
+                java.util.Set<Long> y0 = new java.util.HashSet<>();
+                java.util.Set<Long> y1 = new java.util.HashSet<>();
+                net.minecraft.nbt.ListTag blocks = rootTag.getListOrEmpty("blocks");
+                for (int i = 0; i < blocks.size(); i++) {
+                    net.minecraft.nbt.CompoundTag b = blocks.getCompoundOrEmpty(i);
+                    if (airStates.contains(b.getIntOr("state", -1))) {
+                        continue;
+                    }
+                    net.minecraft.nbt.ListTag pos = b.getListOrEmpty("pos");
+                    int x = pos.getIntOr(0, 0);
+                    int y = pos.getIntOr(1, 0);
+                    int z = pos.getIntOr(2, 0);
+                    long key = (((long) x) << 32) | (z & 0xffffffffL);
+                    if (y == 0) y0.add(key);
+                    else if (y == 1) y1.add(key);
+                }
+                y1.removeAll(y0);
+                Assertions.assertTrue(y1.isEmpty(),
+                        fname + " has " + y1.size() + " column(s) with y=1 blocks lacking y=0 foundation support");
+            }
+        }
+    }
 }

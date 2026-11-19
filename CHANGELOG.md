@@ -4,6 +4,11 @@ Bu dosya `Naruto-Mod` projesinin sürüm geçmişini ve öne çıkan değişikli
 
 ## [Unreleased]
 
+### Yapı Zemin Sabitleme & Temel Sistemi (Polish Pass 3)
+- **Özel `narutomod:anchored_jigsaw` Yapı Türü:** Tüm `10` mod yapısı (`valley_of_the_end`, `5` büyük köy, `chunin_arena`, `myobokuzan_shrine`, `uchiha_shrine`, `akatsuki_hideout`) için `AnchoredJigsawStructure` eklendi. `17` noktalı radyal yükseklik/su derinliği taramasıyla aşırı dik uçurumlar elenir; başlangıç yüksekliği küçük tepe çıkıntıları yerine çevre arazi medyanına çekilir ve `afterPlace` aşamasında her parçanın tabanından doğal sağlam zemine kadar dinamik taş/deepslate/kumtaşı/toprak temel sütunları indirilir.
+- **Son Vadi Gömülü Temel Eteği & `beard_box`:** `scripts/gen_valley.py` tüm `6` Son Vadi parçasına `4` blok derinliğinde gömülü kaya temeli (`start_height: -4`, `jig_y: 6`) ekledi; `valley_of_the_end.json` `terrain_adaptation: "beard_box"` olarak güncellendi.
+- **Karma `terrain_matching` & `foundation.py`:** Yol/kanyon/kıyı/eğitim alanı parçaları (`konoha_main_street`, `konoha_training_ground`, `suna_avenue`, `akatsuki_canyon`, `valley_canyon_walls`, `valley_shore`) `terrain_matching` projeksiyonuna geçirildi ve tüm `.nbt` taban katmanlarını denetleyen `scripts/foundation.py` eklendi.
+
 ### Düzeltmeler & Dengeleme (Polish Pass 2)
 - **Çakra Bıçağı (`chakra_blades`):** Boyut %50 küçültüldü; normal kılıçlar gibi dik/yatay elde tutuşta uç oyuncunun sağına, keskin kenar ise ileri bakacak şekilde yeniden hizalandı.
 - **ANBU Taktik Tanto (`anbu_tanto`):** 3D el/yer/çerçeve boyutları %25 küçültüldü.

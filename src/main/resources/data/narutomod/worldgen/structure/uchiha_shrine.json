@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:jigsaw",
+  "type": "narutomod:anchored_jigsaw",
   "biomes": "#minecraft:is_forest",
   "step": "surface_structures",
   "spawn_overrides": {},
@@ -11,5 +11,9 @@
   },
   "project_start_to_heightmap": "WORLD_SURFACE_WG",
   "max_distance_from_center": 96,
-  "use_expansion_hack": false
+  "use_expansion_hack": false,
+  "max_height_variance": 14,
+  "sample_radius": 16,
+  "max_foundation_depth": 32,
+  "allow_shallow_water": false
 }
