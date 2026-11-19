@@ -99,7 +99,7 @@ public class NarutoBlocks {
                     .noCollision()
                     .noOcclusion()
                     .strength(0.8F)
-                    .pushReaction(PushReaction.DESTROY)
+                    .pushReaction(PushReaction.POPPED)
                     .sound(SoundType.METAL)));
 
     public static final DeferredItem<BlockItem> ITEM_MAKIBISHI = BLOCK_ITEMS.registerSimpleBlockItem(MAKIBISHI);
@@ -110,7 +110,7 @@ public class NarutoBlocks {
                     .noCollision()
                     .noOcclusion()
                     .strength(0.6F)
-                    .pushReaction(PushReaction.DESTROY)
+                    .pushReaction(PushReaction.POPPED)
                     .sound(SoundType.METAL)));
 
     public static final DeferredItem<BlockItem> ITEM_WIRE_TRAP = BLOCK_ITEMS.registerSimpleBlockItem(WIRE_TRAP);

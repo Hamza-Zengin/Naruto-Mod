@@ -47,7 +47,7 @@ public class WeaponRackRenderer implements BlockEntityRenderer<WeaponRackBlockEn
     public void extractRenderState(WeaponRackBlockEntity blockEntity, WeaponRackRenderState renderState,
                                    float partialTick, Vec3 cameraPos,
                                    @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
-        super.extractRenderState(blockEntity, renderState, partialTick, cameraPos, crumblingOverlay);
+        BlockEntityRenderer.super.extractRenderState(blockEntity, renderState, partialTick, cameraPos, crumblingOverlay);
         renderState.facing = blockEntity.getBlockState().hasProperty(WeaponRackBlock.FACING)
                 ? blockEntity.getBlockState().getValue(WeaponRackBlock.FACING)
                 : Direction.NORTH;

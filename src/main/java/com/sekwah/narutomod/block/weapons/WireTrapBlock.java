@@ -94,7 +94,7 @@ public class WireTrapBlock extends RotatableDecorativeBlock {
         living.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, ROOT_DURATION_TICKS, ROOT_SLOWNESS_AMPLIFIER));
         Vec3 motion = living.getDeltaMovement();
         living.setDeltaMovement(0.0D, Math.min(0.0D, motion.y), 0.0D);
-        living.hurtMarked = true;
+        living.needsSync = true;
 
         serverLevel.playSound(null, pos, SoundEvents.TRIPWIRE_CLICK_ON, SoundSource.BLOCKS, 1.0F, 1.35F);
         serverLevel.playSound(null, pos, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 0.35F, 1.85F);

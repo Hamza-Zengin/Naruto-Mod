@@ -124,7 +124,7 @@ public class WeaponRackBlock extends RotatableDecorativeBlock implements EntityB
             if (player.getMainHandItem().isEmpty()) {
                 player.setItemInHand(InteractionHand.MAIN_HAND, extracted);
             } else if (!player.getInventory().add(extracted)) {
-                player.drop(extracted, false);
+                Containers.dropItemStack(level, player.getX(), player.getY() + 0.5D, player.getZ(), extracted);
             }
             level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.9F, 1.1F);
             return InteractionResult.SUCCESS_SERVER;
