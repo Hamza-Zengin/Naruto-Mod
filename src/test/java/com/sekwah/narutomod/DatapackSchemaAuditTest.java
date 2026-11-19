@@ -133,6 +133,20 @@ public class DatapackSchemaAuditTest {
                 JsonObject pool = pools.get(pIdx).getAsJsonObject();
                 Assertions.assertTrue(pool.has("rolls"), fileName + " pool[" + pIdx + "] missing 'rolls'");
                 assertValid263NumberProvider(fileName + " pool[" + pIdx + "].rolls", pool.get("rolls"));
+                Assertions.assertFalse(pool.has("conditions"),
+                        fileName + " pool[" + pIdx + "] uses legacy 1.20.1 'conditions' array instead of 26.3 'condition'");
+                if (pool.has("condition")) {
+                    JsonElement condElem = pool.get("condition");
+                    if (condElem.isJsonObject()) {
+                        JsonObject condObj = condElem.getAsJsonObject();
+                        Assertions.assertFalse(condObj.has("condition"),
+                                fileName + " pool[" + pIdx + "].condition uses legacy 'condition' instead of 26.3 'type'");
+                        Assertions.assertTrue(condObj.has("type"),
+                                fileName + " pool[" + pIdx + "].condition missing 26.3 'type'");
+                    } else if (!condElem.isJsonPrimitive()) {
+                        Assertions.fail(fileName + " pool[" + pIdx + "].condition must be object or predicate id");
+                    }
+                }
 
                 JsonArray entries = pool.getAsJsonArray("entries");
                 Assertions.assertNotNull(entries, fileName + " pool[" + pIdx + "] missing 'entries'");
@@ -310,13 +324,24 @@ public class DatapackSchemaAuditTest {
 
     @Test
     public void testPhase2WorldgenAndBlockTagsValid() throws IOException {
-        Path configured = DATA_DIR.resolve("worldgen/configured_feature/ore_chakra_metal.json");
-        Assertions.assertTrue(Files.isRegularFile(configured), "ore_chakra_metal.json must exist!");
-        JsonObject confObj = JsonParser.parseString(Files.readString(configured)).getAsJsonObject();
-        Assertions.assertEquals("minecraft:ore", confObj.get("type").getAsString());
-        JsonObject config = confObj.getAsJsonObject("config");
-        Assertions.assertTrue(config.get("size").getAsInt() > 0);
-        Assertions.assertEquals(2, config.getAsJsonArray("targets").size());
+        Path legacyConfigured = DATA_DIR.resolve("worldgen/configured_feature/ore_chakra_metal.json");
+        Assertions.assertFalse(Files.exists(legacyConfigured),
+                "Legacy worldgen/configured_feature/ore_chakra_metal.json must not exist in MC 26.3!");
+
+        Path feature = DATA_DIR.resolve("worldgen/feature/ore_chakra_metal.json");
+        Assertions.assertTrue(Files.isRegularFile(feature), "worldgen/feature/ore_chakra_metal.json must exist!");
+        JsonObject featObj = JsonParser.parseString(Files.readString(feature)).getAsJsonObject();
+        Assertions.assertEquals("minecraft:ore", featObj.get("type").getAsString());
+        Assertions.assertFalse(featObj.has("config"),
+                "MC 26.3 worldgen/feature JSON must inline fields at root instead of nesting 'config'");
+        Assertions.assertTrue(featObj.get("size").getAsInt() > 0);
+        JsonArray targets = featObj.getAsJsonArray("targets");
+        Assertions.assertEquals(2, targets.size());
+        for (JsonElement tElem : targets) {
+            JsonObject stateObj = tElem.getAsJsonObject().getAsJsonObject("state");
+            Assertions.assertFalse(stateObj.has("Name"), "MC 26.3 BlockState uses 'id' instead of 'Name'");
+            Assertions.assertTrue(stateObj.has("id"), "MC 26.3 BlockState missing 'id'");
+        }
 
         Path placed = DATA_DIR.resolve("worldgen/placed_feature/ore_chakra_metal_placed.json");
         Assertions.assertTrue(Files.isRegularFile(placed), "ore_chakra_metal_placed.json must exist!");
