@@ -84,10 +84,8 @@ public class GunbaiUchiwaItem extends Item {
 
             float fireBonus = computeBonusFireDamage(target.isOnFire());
             if (fireBonus > 0.0F) {
-                int prevInvuln = target.invulnerableTime;
-                target.invulnerableTime = 0;
+                target.setInvulnerableTime(0);
                 target.hurtServer(serverLevel, serverLevel.damageSources().inFire(), fireBonus);
-                target.invulnerableTime = prevInvuln;
                 serverLevel.sendParticles(ParticleTypes.FLAME,
                         target.getX(), target.getY() + target.getBbHeight() * 0.6D, target.getZ(),
                         12, 0.3D, 0.3D, 0.3D, 0.06D,
