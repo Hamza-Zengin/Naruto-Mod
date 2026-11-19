@@ -5,6 +5,7 @@ import com.sekwah.narutomod.client.model.item.model.AnbuMaskModel;
 import com.sekwah.narutomod.client.model.item.model.HeadbandModel;
 import com.sekwah.narutomod.client.model.item.model.KageHatModel;
 import com.sekwah.narutomod.client.model.item.model.ShinobiArmorModel;
+import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels;
 import net.minecraft.client.model.geom.ModelPart;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -94,6 +95,20 @@ public class ModelPartsAuditTest {
                 ShinobiArmorModel.createAkatsukiCloakLayer().bakeRoot(), "ShinobiArmorModel(akatsukiCloak)");
         assertHumanoidModel(new ShinobiArmorModel(ShinobiArmorModel.createWarringStatesArmorLayer().bakeRoot()),
                 ShinobiArmorModel.createWarringStatesArmorLayer().bakeRoot(), "ShinobiArmorModel(warringStatesArmor)");
+
+        assertLegArmorModel(ShinobiArmorModel.createShinobiLeggingsLayer().bakeRoot(), "ShinobiArmorModel(shinobiLeggings)");
+        assertLegArmorModel(ShinobiArmorModel.createShinobiSandalsLayer().bakeRoot(), "ShinobiArmorModel(shinobiSandals)");
+        assertLegArmorModel(ShinobiArmorModel.createAnbuLeggingsLayer().bakeRoot(), "ShinobiArmorModel(anbuLeggings)");
+        assertLegArmorModel(ShinobiArmorModel.createAnbuBootsLayer().bakeRoot(), "ShinobiArmorModel(anbuBoots)");
+        assertLegArmorModel(ShinobiArmorModel.createWarringStatesLeggingsLayer().bakeRoot(), "ShinobiArmorModel(warringStatesLeggings)");
+        assertLegArmorModel(ShinobiArmorModel.createWarringStatesBootsLayer().bakeRoot(), "ShinobiArmorModel(warringStatesBoots)");
+
+        ModelPart chainsRoot = JutsuVisualModels.AdamantineChainsModel.createLayer().bakeRoot();
+        Assertions.assertNotNull(new JutsuVisualModels.AdamantineChainsModel(chainsRoot),
+                "AdamantineChainsModel should instantiate cleanly");
+        Assertions.assertNotNull(chainsRoot.getChild("seal_ring"));
+        Assertions.assertNotNull(chainsRoot.getChild("inner_seal_ring"));
+        Assertions.assertNotNull(chainsRoot.getChild("chains_group"));
     }
 
     private static void assertHumanoidModel(Object instance, ModelPart root, String label) {
@@ -102,6 +117,12 @@ public class ModelPartsAuditTest {
         Assertions.assertNotNull(head, label + " missing 'head' child");
         ModelPart hat = head.getChild("hat");
         Assertions.assertNotNull(hat, label + " missing 'hat' child under 'head'");
+    }
+
+    private static void assertLegArmorModel(ModelPart root, String label) {
+        assertHumanoidModel(new ShinobiArmorModel(root), root, label);
+        Assertions.assertNotNull(root.getChild("right_leg"), label + " missing 'right_leg' child");
+        Assertions.assertNotNull(root.getChild("left_leg"), label + " missing 'left_leg' child");
     }
 }
 

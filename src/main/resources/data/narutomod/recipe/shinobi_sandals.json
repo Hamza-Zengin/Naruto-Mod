@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "S S",
+    "L L",
+    "I I"
+  ],
+  "key": {
+    "S": "minecraft:string",
+    "L": "minecraft:leather",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "narutomod:shinobi_sandals",
+    "count": 1
+  }
+}

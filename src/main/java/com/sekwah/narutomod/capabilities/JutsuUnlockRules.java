@@ -35,7 +35,8 @@ public final class JutsuUnlockRules {
                 || path.equals("hakke_kusho")
                 || path.equals("bone_dance")
                 || path.equals("wood_prison")
-                || path.equals("shadow_possession");
+                || path.equals("shadow_possession")
+                || path.equals("adamantine_chains");
     }
 
     public static boolean checkAbilityUnlocked(INinjaData data, Ability ability, Identifier abilityId) {
@@ -79,6 +80,8 @@ public final class JutsuUnlockRules {
                 if (clan == null || !clan.getPath().equals("kaguya")) return false;
             } else if (path.equals("wood_prison")) {
                 if (clan == null || !clan.getPath().equals("senju")) return false;
+            } else if (path.equals("adamantine_chains")) {
+                if (clan == null || !clan.getPath().equals("uzumaki")) return false;
             }
 
             if (isScrollRequiredJutsu(abilityId)) {

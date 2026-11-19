@@ -100,6 +100,7 @@ final class NinjaMenuJutsuTab {
             if (path.equals("wood_prison")) return "§2[Senju Klan\u0131 - Genin]";
             if (path.equals("bone_dance")) return "§f[Kaguya Klan\u0131 - Genin]";
             if (path.equals("shadow_possession")) return "§8[Nara Klan\u0131 - Genin / Par\u015f\u00f6men]";
+            if (path.equals("adamantine_chains")) return "§c[Uzumaki Klan\u0131 - Ch\u016bnin]";
         }
         if (NinjaData.isScrollRequiredJutsu(id)) return "§6[Par\u015f\u00f6men Gerekir]";
         if (ability.getRequiredRank() == NinjaRank.ACADEMY_STUDENT) return "§7[Temel Yetenek]";

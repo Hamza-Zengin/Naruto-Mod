@@ -2,6 +2,7 @@ package com.sekwah.narutomod.capabilities;
 
 import com.sekwah.narutomod.config.NarutoConfig;
 import com.sekwah.narutomod.item.NarutoItems;
+import com.sekwah.narutomod.item.armor.NarutoArmorItem;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -145,6 +146,10 @@ public final class ChakraStaminaLogic {
         return 1.0f;
     }
 
+    public static float getAccessoryRegenMultiplier(float bonus) {
+        return 1.0f + Math.max(0.0f, bonus);
+    }
+
     public static void tickRegen(NinjaData data, Player player, RegenInfo staminaRegenInfo, RegenInfo chakraRegenInfo) {
         Item chestItem = player.getItemBySlot(EquipmentSlot.CHEST).getItem();
         boolean isJoninVest = com.sekwah.narutomod.events.PlayerEvents.isJoninVest(chestItem);
@@ -160,6 +165,7 @@ public final class ChakraStaminaLogic {
                 staminaRegen *= 1.3f;
             }
             staminaRegen *= getChestplateStaminaRegenMultiplier(isChuninVest || isJoninVest, isAnbuArmor);
+            staminaRegen *= getAccessoryRegenMultiplier(NarutoArmorItem.getAccessoryStaminaRegenBonus(player));
             data.setRawStamina(data.getStamina() + staminaRegen);
         }
 
@@ -171,6 +177,7 @@ public final class ChakraStaminaLogic {
                 chakraRegen *= 1.4f;
             }
             chakraRegen *= getChestplateChakraRegenMultiplier(isSageCloak, isAkatsukiCloak, isJoninVest, isAnbuArmor);
+            chakraRegen *= getAccessoryRegenMultiplier(NarutoArmorItem.getAccessoryChakraRegenBonus(player));
             data.setRawChakra(data.getChakra() + chakraRegen);
         }
 

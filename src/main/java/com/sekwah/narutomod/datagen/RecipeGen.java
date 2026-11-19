@@ -162,5 +162,124 @@ public class RecipeGen extends RecipeProvider {
                 .pattern("LIL")
                 .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
                 .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.SHINOBI_LEGGINGS.get())
+                .define('L', Items.LEATHER)
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .pattern("LLL")
+                .pattern("LCL")
+                .pattern("L L")
+                .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.SHINOBI_SANDALS.get())
+                .define('S', Items.STRING)
+                .define('L', Items.LEATHER)
+                .define('I', Items.IRON_INGOT)
+                .pattern("S S")
+                .pattern("L L")
+                .pattern("I I")
+                .unlockedBy("has_leather", has(Items.LEATHER))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.ANBU_LEGGINGS.get())
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .define('I', Items.IRON_INGOT)
+                .define('L', Items.LEATHER)
+                .define('K', NarutoItems.KUNAI.get())
+                .pattern("CIC")
+                .pattern("LKL")
+                .pattern("I I")
+                .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.ANBU_BOOTS.get())
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .define('I', Items.IRON_INGOT)
+                .define('L', Items.LEATHER)
+                .pattern("C C")
+                .pattern("I I")
+                .pattern("L L")
+                .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.WARRING_STATES_ARMOR.get())
+                .define('N', Items.NETHERITE_SCRAP)
+                .define('R', Items.DYE.red())
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .pattern("N N")
+                .pattern("RCR")
+                .pattern("NNN")
+                .unlockedBy("has_netherite_scrap", has(Items.NETHERITE_SCRAP))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.WARRING_STATES_LEGGINGS.get())
+                .define('N', Items.NETHERITE_SCRAP)
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .define('R', Items.DYE.red())
+                .define('I', Items.IRON_INGOT)
+                .pattern("NCN")
+                .pattern("R R")
+                .pattern("I I")
+                .unlockedBy("has_netherite_scrap", has(Items.NETHERITE_SCRAP))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.WARRING_STATES_BOOTS.get())
+                .define('I', Items.IRON_INGOT)
+                .define('N', Items.NETHERITE_SCRAP)
+                .define('R', Items.DYE.red())
+                .pattern("I I")
+                .pattern("N N")
+                .pattern("R R")
+                .unlockedBy("has_netherite_scrap", has(Items.NETHERITE_SCRAP))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.HEADBAND_BLUE.get())
+                .define('L', Items.LEATHER)
+                .define('I', Items.IRON_INGOT)
+                .define('D', Items.DYE.blue())
+                .pattern("LIL")
+                .pattern("LDL")
+                .unlockedBy("has_iron_ingot", has(Items.IRON_INGOT))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.HEADBAND_BLACK.get())
+                .define('L', Items.LEATHER)
+                .define('I', Items.IRON_INGOT)
+                .define('D', Items.DYE.black())
+                .pattern("LIL")
+                .pattern("LDL")
+                .unlockedBy("has_iron_ingot", has(Items.IRON_INGOT))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.HEADBAND_RED.get())
+                .define('L', Items.LEATHER)
+                .define('I', Items.IRON_INGOT)
+                .define('D', Items.DYE.red())
+                .pattern("LIL")
+                .pattern("LDL")
+                .unlockedBy("has_iron_ingot", has(Items.IRON_INGOT))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.KAGE_HAT.get())
+                .define('R', Items.DYE.red())
+                .define('L', Items.LEATHER)
+                .define('G', Items.GOLD_INGOT)
+                .pattern(" R ")
+                .pattern("RLR")
+                .pattern("GLG")
+                .unlockedBy("has_gold_ingot", has(Items.GOLD_INGOT))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.MISC, NarutoBlocks.ITEM_TRAINING_DUMMY.get())
+                .define('L', Items.LEATHER)
+                .define('S', Items.STICK)
+                .define('H', Items.HAY_BLOCK)
+                .define('P', Items.OAK_PLANKS)
+                .pattern(" L ")
+                .pattern("SHS")
+                .pattern(" P ")
+                .unlockedBy("has_hay_block", has(Items.HAY_BLOCK))
+                .save(this.output);
     }
 }

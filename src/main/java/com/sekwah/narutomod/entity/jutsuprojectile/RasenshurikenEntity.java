@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -257,6 +258,10 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
 
     @Override
     protected void onHit(HitResult hitResult) {
+        if (!this.level().isClientSide() && hitResult instanceof BlockHitResult blockHitResult) {
+            BlockState hitState = this.level().getBlockState(blockHitResult.getBlockPos());
+            hitState.onProjectileHit(this.level(), hitState, blockHitResult, this);
+        }
         if (!this.isImpacted()) {
             this.entityData.set(DATA_IMPACTED, true);
             this.entityData.set(DATA_VORTEX_TICKS, 0);

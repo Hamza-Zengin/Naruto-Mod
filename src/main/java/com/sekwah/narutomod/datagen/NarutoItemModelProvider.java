@@ -52,6 +52,12 @@ public class NarutoItemModelProvider extends ModelProvider {
         simpleItemWithTexture(itemModels, NarutoItems.CHUNIN_VEST.get(), "item/armor/chunin_vest");
         simpleItemWithTexture(itemModels, NarutoItems.ANBU_ARMOR.get(), "item/armor/anbu_armor");
         simpleItemWithTexture(itemModels, NarutoItems.AKATSUKI_CLOAK.get(), "item/armor/akatsuki_cloak");
+        simpleItemWithTexture(itemModels, NarutoItems.SHINOBI_LEGGINGS.get(), "item/armor/shinobi_leggings");
+        simpleItemWithTexture(itemModels, NarutoItems.SHINOBI_SANDALS.get(), "item/armor/shinobi_sandals");
+        simpleItemWithTexture(itemModels, NarutoItems.ANBU_LEGGINGS.get(), "item/armor/anbu_leggings");
+        simpleItemWithTexture(itemModels, NarutoItems.ANBU_BOOTS.get(), "item/armor/anbu_boots");
+        simpleItemWithTexture(itemModels, NarutoItems.WARRING_STATES_LEGGINGS.get(), "item/armor/warring_states_leggings");
+        simpleItemWithTexture(itemModels, NarutoItems.WARRING_STATES_BOOTS.get(), "item/armor/warring_states_boots");
         simpleItemWithTexture(itemModels, NarutoItems.RED_ANBU_MASK.get(), "item/armor/red_anbu_mask");
         simpleItemWithTexture(itemModels, NarutoItems.YELLOW_ANBU_MASK.get(), "item/armor/yellow_anbu_mask");
         simpleItemWithTexture(itemModels, NarutoItems.GREEN_ANBU_MASK.get(), "item/armor/green_anbu_mask");
@@ -66,6 +72,8 @@ public class NarutoItemModelProvider extends ModelProvider {
         // --- Block Items ---
         itemModels.itemModelOutput.accept(NarutoBlocks.ITEM_BONSAI_TREE.get(),
                 ItemModelUtils.plainModel(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/bonsai_tree")));
+        itemModels.itemModelOutput.accept(NarutoBlocks.ITEM_TRAINING_DUMMY.get(),
+                ItemModelUtils.plainModel(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/training_dummy")));
 
         // --- Headbands (Blank / Custom) ---
         simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_BLACK.get(), "item/armor/headbands/headband_black_blank");

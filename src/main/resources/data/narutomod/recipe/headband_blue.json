@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LIL",
+    "LDL"
+  ],
+  "key": {
+    "L": "minecraft:leather",
+    "I": "minecraft:iron_ingot",
+    "D": "minecraft:blue_dye"
+  },
+  "result": {
+    "id": "narutomod:headband_blue",
+    "count": 1
+  }
+}

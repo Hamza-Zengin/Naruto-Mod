@@ -1,5 +1,7 @@
 package com.sekwah.narutomod.entity.jutsuprojectile;
 
+import com.sekwah.narutomod.abilities.JutsuCombatHelper;
+import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.entity.ShadowCloneEntity;
 import com.sekwah.narutomod.sounds.NarutoSounds;
@@ -11,9 +13,9 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -21,6 +23,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
@@ -48,6 +51,7 @@ public class JutsuVisualEffectEntity extends Entity {
     public static final int TYPE_SHADOW_BIND = 8;
     public static final int TYPE_EARTH_WALL = 9;
     public static final int TYPE_STONE_SPIKES = 10;
+    public static final int TYPE_ADAMANTINE_CHAINS = 11;
 
     private static final EntityDataAccessor<Integer> DATA_VISUAL_TYPE =
             SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.INT);
@@ -318,6 +322,63 @@ public class JutsuVisualEffectEntity extends Entity {
                                 v.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 1));
                             }
                         }
+                    }
+                }
+
+                // --- UZUMAKI FŪINJUTSU: KONGŌ FŪSA (Adamantine Sealing Chains) ---
+                case TYPE_ADAMANTINE_CHAINS -> {
+                    final double sealRadius = 3.4D;
+                    final double sealHalfHeight = 2.5D;
+                    if (this.tickCount == 1) {
+                        serverLevel.sendParticles(ParticleTypes.END_ROD,
+                                this.getX(), this.getY() + 0.5D, this.getZ(),
+                                18, 1.4D, 0.4D, 1.4D, 0.08D,
+                                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                    }
+                    if (this.tickCount % 2 == 0 && this.tickCount <= 52) {
+                        List<LivingEntity> pinned = JutsuCombatHelper.findHostileTargetsInRadius(
+                                serverLevel, caster, this.position(), sealRadius, sealHalfHeight);
+                        for (LivingEntity victim : pinned) {
+                            Vec3 toCenter = this.position().subtract(victim.position());
+                            double pullX = Mth.clamp(toCenter.x * 0.08D, -0.18D, 0.18D);
+                            double pullZ = Mth.clamp(toCenter.z * 0.08D, -0.18D, 0.18D);
+                            double clampedY = Math.min(0.0D, victim.getDeltaMovement().y);
+                            JutsuCombatHelper.applyVelocity(victim, new Vec3(pullX, clampedY, pullZ), false);
+                        }
+                    }
+                    if (this.tickCount == 3 || this.tickCount == 18 || this.tickCount == 33 || this.tickCount == 48) {
+                        float baseDmg = Math.max(4.0F, this.getEffectDamage());
+                        float pulseDmg = (this.tickCount == 3) ? baseDmg * 0.40F : baseDmg * 0.20F;
+                        serverLevel.playSound(null, this.blockPosition(), SoundEvents.CHAIN_HIT, SoundSource.PLAYERS,
+                                1.35F, this.tickCount == 3 ? 0.82F : 1.08F);
+                        serverLevel.sendParticles(ParticleTypes.END_ROD,
+                                this.getX(), this.getY() + 0.85D, this.getZ(),
+                                14, 1.35D, 0.65D, 1.35D, 0.04D,
+                                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                        serverLevel.sendParticles(ParticleTypes.ENCHANT,
+                                this.getX(), this.getY() + 0.45D, this.getZ(),
+                                18, 1.7D, 0.4D, 1.7D, 0.14D,
+                                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+
+                        List<LivingEntity> victims = JutsuCombatHelper.findHostileTargetsInRadius(
+                                serverLevel, caster, this.position(), sealRadius, sealHalfHeight);
+                        DamageSource source = JutsuCombatHelper.playerOrMagicDamage(serverLevel, caster);
+                        for (LivingEntity victim : victims) {
+                            victim.hurtServer(serverLevel, source, pulseDmg);
+                            victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 50, 3, false, false));
+                            victim.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 50, 0, false, false));
+                            if (victim instanceof Player targetPlayer) {
+                                var targetData = targetPlayer.getData(NinjaCapabilityHandler.NINJA_DATA);
+                                targetData.lockChakraRegen(120);
+                                float siphon = (this.tickCount == 3) ? 12.0F : 4.0F;
+                                targetData.setChakra(Math.max(0.0F, targetData.getChakra() - siphon));
+                            }
+                        }
+                    } else if (this.tickCount == 12 || this.tickCount == 27 || this.tickCount == 42) {
+                        serverLevel.sendParticles(ParticleTypes.END_ROD,
+                                this.getX(), this.getY() + 0.6D, this.getZ(),
+                                6, 1.5D, 0.4D, 1.5D, 0.02D,
+                                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
                 }
             }
