@@ -519,7 +519,7 @@ def build_valley_madara_monument():
 
 
 def build_valley_lower_river():
-    sx, sy, sz = 53, 28, 49
+    sx, sy, sz = 53, 28, 45
     sb = StructureBuilder(sx, sy, sz)
     rng = random.Random(404)
 
@@ -543,15 +543,13 @@ def build_valley_lower_river():
                 decorate_cliff_foliage(sb, x, top_y, z, rng)
 
     # Riverside shrine pier & lanterns
-    sb.fill(11, 1, 20, 15, 3, 28, "minecraft:stone_bricks")
-    sb.add_lantern_post(14, 4, 21, "minecraft:stone_brick_wall", "minecraft:lantern")
-    sb.add_lantern_post(14, 4, 27, "minecraft:stone_brick_wall", "minecraft:lantern")
-    sb.add_lantern_post(39, 4, 16, "minecraft:stone_brick_wall", "minecraft:soul_lantern")
-    sb.add_lantern_post(39, 4, 32, "minecraft:stone_brick_wall", "minecraft:soul_lantern")
+    sb.fill(11, 1, 18, 15, 3, 26, "minecraft:stone_bricks")
+    sb.add_lantern_post(14, 4, 19, "minecraft:stone_brick_wall", "minecraft:lantern")
+    sb.add_lantern_post(14, 4, 25, "minecraft:stone_brick_wall", "minecraft:lantern")
+    sb.add_lantern_post(39, 4, 14, "minecraft:stone_brick_wall", "minecraft:soul_lantern")
+    sb.add_lantern_post(39, 4, 30, "minecraft:stone_brick_wall", "minecraft:soul_lantern")
 
-    sb.set(12, 4, 24, "minecraft:chest", {"facing": "east", "type": "single", "waterlogged": "false"})
-
-    sb.add_jigsaw(26, 2, 48, "south_up", "narutomod:entry", "narutomod:entry", "minecraft:empty")
+    sb.add_jigsaw(26, 2, 44, "south_up", "narutomod:entry", "narutomod:entry", "minecraft:empty")
     sb.add_jigsaw(26, 2, 0, "north_up", "narutomod:out", "narutomod:entry", "narutomod:valley_of_the_end_addons")
 
     sb.save("valley_lower_river.nbt")
