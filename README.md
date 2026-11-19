@@ -67,7 +67,7 @@ Ninja Menüsü (`J` tuşu) üzerinden klanınızı seçin, görevleri tamamlayı
 | :--- | :--- |
 | **Konoha Köyü** (`konoha_village`) | Hokage Köşkü/Meydanı, tek seferlik **İchiraku Ramen**, eğitim alanı, dōjō, iç mekan aydınlatmaları ve Konoha ninja/tüccarları |
 | **Suna, Kiri, Kumo, Iwa Köyleri** | Her biri kendi biyomuna uygun mimariye, köy ninjalarına ve köye özel ticaret sunan tüccar köylülere sahip 4 büyük köy |
-| **Son Vadi** (`valley_of_the_end`) | 2x ölçekli 6 parçalı dev kanyon kompleksi (çok kademeli şelale, Senju arması & ahşap/yaprak motifli açık taş Hashirama obeliski, kırmızı/beyaz Uchiha yelpazesi taçlı koyu taş Madara obeliski, nehir ve kanyon duvarları) |
+| **Son Vadi** (`valley_of_the_end`) | Yalnızca yağmur ormanı biyomlarında araziye yumuşak geçişle oluşan 2x ölçekli 6 parçalı dev kanyon kompleksi (çok kademeli şelale, Senju arması & ahşap/yaprak motifli açık taş Hashirama obeliski, kırmızı/beyaz Uchiha yelpazesi taçlı koyu taş Madara obeliski, nehir ve organik kanyon duvarları) |
 | **Chūnin Sınav Arenası** (`chunin_arena`) | Yükseltilmiş `360°` seyirci galerisi, tribün oturakları ve 2 katlı Kage locası |
 | **Myōbokuzan & Uchiha Tapınakları** | Kurbağa Bilge tapınağı (`myobokuzan_shrine`) ve Uchiha taş tablet tapınağı (`uchiha_shrine`) |
 | **Akatsuki Sığınağı** (`akatsuki_hideout`) | Tek seferlik kalıcı **2 Akatsuki Üyesi + 5 Kaçak Ninja** savunucusu barındıran ritüel mağarası |

@@ -1,10 +1,6 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": [
-    "minecraft:river",
-    "minecraft:forest",
-    "minecraft:birch_forest"
-  ],
+  "biomes": "#minecraft:is_jungle",
   "step": "surface_structures",
   "spawn_overrides": {},
   "terrain_adaptation": "beard_thin",
