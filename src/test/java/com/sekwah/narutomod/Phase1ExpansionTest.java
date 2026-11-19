@@ -11,9 +11,14 @@ import com.sekwah.narutomod.capabilities.NinjaRank;
 import com.sekwah.narutomod.events.PlayerEvents;
 import com.sekwah.narutomod.item.armor.NarutoArmorItem;
 import com.sekwah.narutomod.item.armor.NarutoArmorMaterial;
+import net.minecraft.SharedConstants;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.Bootstrap;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.equipment.ArmorType;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +31,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * - Shinobi Training Dummy cooldown gating, melee damage, & projectile estimation helpers
  */
 public class Phase1ExpansionTest {
+
+    @BeforeAll
+    static void bootstrapMinecraftRegistries() {
+        SharedConstants.tryDetectVersion();
+        Bootstrap.bootStrap();
+    }
 
     @Test
     @DisplayName("Verify AdamantineChainsAbility metadata and Uzumaki clan + Chunin unlock rules")
@@ -67,7 +78,9 @@ public class Phase1ExpansionTest {
     @Test
     @DisplayName("Verify declarative armor passives and PlayerEvents / ChakraStaminaLogic math helpers")
     void testDeclarativeArmorPassivesAndMath() {
-        NarutoArmorItem dummyBoot = new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.BOOTS, new Item.Properties())
+        Item.Properties bootProps = new Item.Properties()
+                .setId(ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "test_anbu_boot")));
+        NarutoArmorItem dummyBoot = new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.BOOTS, bootProps)
                 .setChakraRegenBonus(0.10F)
                 .setStaminaRegenBonus(0.15F)
                 .setFallDamageReduction(1.20F)
