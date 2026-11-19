@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "narutomod:block/wire_trap"
+    },
+    "facing=south": {
+      "model": "narutomod:block/wire_trap",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "narutomod:block/wire_trap",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "narutomod:block/wire_trap",
+      "y": 270
+    }
+  }
+}

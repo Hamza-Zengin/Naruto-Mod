@@ -2,6 +2,7 @@ package com.sekwah.narutomod;
 
 import com.google.gson.reflect.TypeToken;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
+import com.sekwah.narutomod.block.NarutoBlockEntities;
 import com.sekwah.narutomod.block.NarutoBlocks;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.capabilities.NinjaData;
@@ -58,6 +59,7 @@ public class NarutoMod {
         NarutoDataComponents.register(modEventBus);
         NarutoItems.register(modEventBus);
         NarutoBlocks.register(modEventBus);
+        NarutoBlockEntities.register(modEventBus);
         NarutoEntities.register(modEventBus);
         NarutoAbilities.register(modEventBus);
         NarutoClans.register(modEventBus);

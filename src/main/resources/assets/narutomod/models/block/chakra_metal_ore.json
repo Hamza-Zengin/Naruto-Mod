@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "narutomod:block/chakra_metal_ore",
+    "particle": "narutomod:block/chakra_metal_ore"
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "credit": "Made for Naruto-Mod Phase 2",
+  "textures": {
+    "0": "narutomod:block/makibishi",
+    "particle": "narutomod:block/makibishi"
+  },
+  "elements": [
+    {
+      "name": "caltrop_1_base_a",
+      "from": [2.5, 0.0, 3.6],
+      "to": [5.5, 0.7, 4.4],
+      "rotation": {"angle": 45, "axis": "y", "origin": [4.0, 0.35, 4.0]},
+      "faces": {
+        "north": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "east": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "south": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "west": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "up": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "down": {"uv": [0, 0, 16, 8], "texture": "#0"}
+      }
+    },
+    {
+      "name": "caltrop_1_base_b",
+      "from": [2.5, 0.0, 3.6],
+      "to": [5.5, 0.7, 4.4],
+      "rotation": {"angle": -45, "axis": "y", "origin": [4.0, 0.35, 4.0]},
+      "faces": {
+        "north": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "east": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "south": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "west": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "up": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "down": {"uv": [0, 0, 16, 8], "texture": "#0"}
+      }
+    },
+    {
+      "name": "caltrop_1_spike",
+      "from": [3.55, 0.4, 3.55],
+      "to": [4.45, 2.3, 4.45],
+      "faces": {
+        "north": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "east": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "south": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "west": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "up": {"uv": [0, 12, 16, 16], "texture": "#0"},
+        "down": {"uv": [0, 8, 16, 12], "texture": "#0"}
+      }
+    },
+    {
+      "name": "caltrop_2_base_a",
+      "from": [10.5, 0.0, 3.6],
+      "to": [13.5, 0.7, 4.4],
+      "rotation": {"angle": 45, "axis": "y", "origin": [12.0, 0.35, 4.0]},
+      "faces": {
+        "north": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "east": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "south": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "west": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "up": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "down": {"uv": [0, 0, 16, 8], "texture": "#0"}
+      }
+    },
+    {
+      "name": "caltrop_2_base_b",
+      "from": [10.5, 0.0, 3.6],
+      "to": [13.5, 0.7, 4.4],
+      "rotation": {"angle": -45, "axis": "y", "origin": [12.0, 0.35, 4.0]},
+      "faces": {
+        "north": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "east": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "south": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "west": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "up": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "down": {"uv": [0, 0, 16, 8], "texture": "#0"}
+      }
+    },
+    {
+      "name": "caltrop_2_spike",
+      "from": [11.55, 0.4, 3.55],
+      "to": [12.45, 2.3, 4.45],
+      "faces": {
+        "north": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "east": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "south": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "west": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "up": {"uv": [0, 12, 16, 16], "texture": "#0"},
+        "down": {"uv": [0, 8, 16, 12], "texture": "#0"}
+      }
+    },
+    {
+      "name": "caltrop_3_base_a",
+      "from": [2.5, 0.0, 11.6],
+      "to": [5.5, 0.7, 12.4],
+      "rotation": {"angle": 45, "axis": "y", "origin": [4.0, 0.35, 12.0]},
+      "faces": {
+        "north": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "east": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "south": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "west": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "up": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "down": {"uv": [0, 0, 16, 8], "texture": "#0"}
+      }
+    },
+    {
+      "name": "caltrop_3_base_b",
+      "from": [2.5, 0.0, 11.6],
+      "to": [5.5, 0.7, 12.4],
+      "rotation": {"angle": -45, "axis": "y", "origin": [4.0, 0.35, 12.0]},
+      "faces": {
+        "north": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "east": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "south": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "west": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "up": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "down": {"uv": [0, 0, 16, 8], "texture": "#0"}
+      }
+    },
+    {
+      "name": "caltrop_3_spike",
+      "from": [3.55, 0.4, 11.55],
+      "to": [4.45, 2.3, 12.45],
+      "faces": {
+        "north": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "east": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "south": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "west": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "up": {"uv": [0, 12, 16, 16], "texture": "#0"},
+        "down": {"uv": [0, 8, 16, 12], "texture": "#0"}
+      }
+    },
+    {
+      "name": "caltrop_4_base_a",
+      "from": [10.5, 0.0, 11.6],
+      "to": [13.5, 0.7, 12.4],
+      "rotation": {"angle": 45, "axis": "y", "origin": [12.0, 0.35, 12.0]},
+      "faces": {
+        "north": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "east": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "south": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "west": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "up": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "down": {"uv": [0, 0, 16, 8], "texture": "#0"}
+      }
+    },
+    {
+      "name": "caltrop_4_base_b",
+      "from": [10.5, 0.0, 11.6],
+      "to": [13.5, 0.7, 12.4],
+      "rotation": {"angle": -45, "axis": "y", "origin": [12.0, 0.35, 12.0]},
+      "faces": {
+        "north": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "east": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "south": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "west": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "up": {"uv": [0, 0, 16, 8], "texture": "#0"},
+        "down": {"uv": [0, 0, 16, 8], "texture": "#0"}
+      }
+    },
+    {
+      "name": "caltrop_4_spike",
+      "from": [11.55, 0.4, 11.55],
+      "to": [12.45, 2.3, 12.45],
+      "faces": {
+        "north": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "east": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "south": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "west": {"uv": [0, 8, 16, 16], "texture": "#0"},
+        "up": {"uv": [0, 12, 16, 16], "texture": "#0"},
+        "down": {"uv": [0, 8, 16, 12], "texture": "#0"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [60, 25, 0],
+      "translation": [0, 4, 2],
+      "scale": [0.55, 0.55, 0.55]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, 35, 0],
+      "translation": [0, 4, 0],
+      "scale": [0.6, 0.6, 0.6]
+    },
+    "ground": {
+      "translation": [0, 3, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    "gui": {
+      "rotation": [32, 45, 0],
+      "translation": [0, 4.5, 0],
+      "scale": [0.95, 0.95, 0.95]
+    },
+    "fixed": {
+      "rotation": [0, 180, 0],
+      "translation": [0, 4, 0],
+      "scale": [0.8, 0.8, 0.8]
+    }
+  }
+}

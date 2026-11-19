@@ -48,6 +48,11 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
     }
 
     @Override
+    public boolean requiresScroll() {
+        return true;
+    }
+
+    @Override
     public List<Identifier> getPrerequisites() {
         return List.of(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates"));
     }

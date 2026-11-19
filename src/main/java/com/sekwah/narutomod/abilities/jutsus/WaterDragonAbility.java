@@ -54,6 +54,11 @@ public class WaterDragonAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public boolean requiresScroll() {
+        return true;
+    }
+
+    @Override
     public float getDefaultChakraCost() {
         return 48.0f;
     }

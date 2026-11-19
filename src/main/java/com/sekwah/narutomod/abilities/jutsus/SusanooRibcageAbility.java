@@ -40,6 +40,16 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
     }
 
     @Override
+    public boolean requiresScroll() {
+        return true;
+    }
+
+    @Override
+    public String getRequiredClanPath() {
+        return "uchiha";
+    }
+
+    @Override
     public List<net.minecraft.resources.Identifier> getPrerequisites() {
         return List.of(net.minecraft.resources.Identifier.fromNamespaceAndPath(com.sekwah.narutomod.NarutoMod.MOD_ID, "sharingan"));
     }

@@ -3,6 +3,7 @@ package com.sekwah.narutomod.client.renderer;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
+import com.sekwah.narutomod.block.NarutoBlockEntities;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
@@ -14,6 +15,7 @@ import com.sekwah.narutomod.client.model.jutsu.FireballJutsuModel;
 import com.sekwah.narutomod.client.model.jutsu.FumaShurikenModel;
 import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels;
 import com.sekwah.narutomod.client.model.jutsu.RasenshurikenModel;
+import com.sekwah.narutomod.client.renderer.blockentity.WeaponRackRenderer;
 import com.sekwah.narutomod.client.renderer.entity.*;
 import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.*;
 import com.sekwah.narutomod.client.renderer.entity.layers.JutsuHandAuraLayer;
@@ -211,6 +213,8 @@ public class NarutoRenderEvents {
         event.registerEntityRenderer(NarutoEntities.KIRI_VILLAGER.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "kiri_villager"));
         event.registerEntityRenderer(NarutoEntities.KUMO_VILLAGER.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "kumo_villager"));
         event.registerEntityRenderer(NarutoEntities.IWA_VILLAGER.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "iwa_villager"));
+
+        event.registerBlockEntityRenderer(NarutoBlockEntities.WEAPON_RACK.get(), WeaponRackRenderer::new);
     }
 
     @SubscribeEvent

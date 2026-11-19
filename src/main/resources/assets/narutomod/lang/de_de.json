@@ -435,5 +435,19 @@
   "item.narutomod.training_dummy": "Shinobi-Trainingspuppe",
   "block.narutomod.training_dummy.hit_melee": "Puppen-Treffer: %s Schaden (+Ausdauer-EP)",
   "block.narutomod.training_dummy.hit_jutsu": "Puppen-Jutsu-Treffer: %1$s Schaden [%2$s] (+Chakra-EP & Meisterschaft)",
-  "block.narutomod.training_dummy.use": "Shinobi-Trainingspuppe: Mit Nahkampf, Waffen oder Jutsu angreifen, um EP & Meisterschaft zu trainieren!"
+  "block.narutomod.training_dummy.use": "Shinobi-Trainingspuppe: Mit Nahkampf, Waffen oder Jutsu angreifen, um EP & Meisterschaft zu trainieren!",
+  "block.narutomod.chakra_metal_ore": "Chakra-Metallerz",
+  "item.narutomod.chakra_metal_ore": "Chakra-Metallerz",
+  "block.narutomod.deepslate_chakra_metal_ore": "Tiefenschiefer-Chakra-Metallerz",
+  "item.narutomod.deepslate_chakra_metal_ore": "Tiefenschiefer-Chakra-Metallerz",
+  "block.narutomod.chakra_metal_block": "Chakra-Metallblock",
+  "item.narutomod.chakra_metal_block": "Chakra-Metallblock",
+  "item.narutomod.raw_chakra_metal": "Rohes Chakra-Metall",
+  "block.narutomod.makibishi": "Makibishi-Krähenfüße",
+  "item.narutomod.makibishi": "Makibishi-Krähenfüße",
+  "block.narutomod.wire_trap": "Stolperdraht-Falle",
+  "item.narutomod.wire_trap": "Stolperdraht-Falle",
+  "block.narutomod.weapon_rack": "Shinobi-Waffenständer",
+  "item.narutomod.weapon_rack": "Shinobi-Waffenständer",
+  "block.narutomod.weapon_rack.empty": "Der Waffenständer ist leer. Rechtsklick mit einem Gegenstand zum Ausstellen."
 }

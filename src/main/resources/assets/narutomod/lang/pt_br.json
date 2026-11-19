@@ -435,5 +435,19 @@
   "item.narutomod.training_dummy": "Boneco de Treino Shinobi",
   "block.narutomod.training_dummy.hit_melee": "Golpe no Boneco: %s Dano (+EXP Vigor)",
   "block.narutomod.training_dummy.hit_jutsu": "Acerto de Jutsu: %1$s Dano [%2$s] (+EXP Chakra e Maestria)",
-  "block.narutomod.training_dummy.use": "Boneco de Treino Shinobi: Ataque com golpes, armas ou Jutsu para treinar EXP e Maestria!"
+  "block.narutomod.training_dummy.use": "Boneco de Treino Shinobi: Ataque com golpes, armas ou Jutsu para treinar EXP e Maestria!",
+  "block.narutomod.chakra_metal_ore": "Minério de Metal de Chakra",
+  "item.narutomod.chakra_metal_ore": "Minério de Metal de Chakra",
+  "block.narutomod.deepslate_chakra_metal_ore": "Minério de Metal de Chakra de Ardósia",
+  "item.narutomod.deepslate_chakra_metal_ore": "Minério de Metal de Chakra de Ardósia",
+  "block.narutomod.chakra_metal_block": "Bloco de Metal de Chakra",
+  "item.narutomod.chakra_metal_block": "Bloco de Metal de Chakra",
+  "item.narutomod.raw_chakra_metal": "Metal de Chakra Bruto",
+  "block.narutomod.makibishi": "Estrepes Makibishi",
+  "item.narutomod.makibishi": "Estrepes Makibishi",
+  "block.narutomod.wire_trap": "Armadilha de Fio",
+  "item.narutomod.wire_trap": "Armadilha de Fio",
+  "block.narutomod.weapon_rack": "Suporte de Armas Shinobi",
+  "item.narutomod.weapon_rack": "Suporte de Armas Shinobi",
+  "block.narutomod.weapon_rack.empty": "O suporte está vazio. Clique com o botão direito segurando um item para exibi-lo."
 }

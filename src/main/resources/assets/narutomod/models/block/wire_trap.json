@@ -1,0 +1,100 @@
+{
+  "credit": "Made for Naruto-Mod Phase 2",
+  "textures": {
+    "0": "narutomod:block/wire_trap",
+    "particle": "narutomod:block/wire_trap"
+  },
+  "elements": [
+    {
+      "name": "left_peg",
+      "from": [0.5, 0, 7.0],
+      "to": [2.0, 3.6, 9.0],
+      "faces": {
+        "north": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "east": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "south": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "west": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "up": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "down": {"uv": [0, 0, 8, 8], "texture": "#0"}
+      }
+    },
+    {
+      "name": "left_collar",
+      "from": [0.3, 2.3, 6.8],
+      "to": [2.2, 3.1, 9.2],
+      "faces": {
+        "north": {"uv": [0, 8, 16, 12], "texture": "#0"},
+        "east": {"uv": [0, 8, 16, 12], "texture": "#0"},
+        "south": {"uv": [0, 8, 16, 12], "texture": "#0"},
+        "west": {"uv": [0, 8, 16, 12], "texture": "#0"},
+        "up": {"uv": [0, 8, 16, 12], "texture": "#0"},
+        "down": {"uv": [0, 8, 16, 12], "texture": "#0"}
+      }
+    },
+    {
+      "name": "right_peg",
+      "from": [14.0, 0, 7.0],
+      "to": [15.5, 3.6, 9.0],
+      "faces": {
+        "north": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "east": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "south": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "west": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "up": {"uv": [0, 0, 8, 8], "texture": "#0"},
+        "down": {"uv": [0, 0, 8, 8], "texture": "#0"}
+      }
+    },
+    {
+      "name": "right_collar",
+      "from": [13.8, 2.3, 6.8],
+      "to": [15.7, 3.1, 9.2],
+      "faces": {
+        "north": {"uv": [0, 8, 16, 12], "texture": "#0"},
+        "east": {"uv": [0, 8, 16, 12], "texture": "#0"},
+        "south": {"uv": [0, 8, 16, 12], "texture": "#0"},
+        "west": {"uv": [0, 8, 16, 12], "texture": "#0"},
+        "up": {"uv": [0, 8, 16, 12], "texture": "#0"},
+        "down": {"uv": [0, 8, 16, 12], "texture": "#0"}
+      }
+    },
+    {
+      "name": "tripwire_strand",
+      "from": [1.5, 2.5, 7.75],
+      "to": [14.5, 2.95, 8.25],
+      "faces": {
+        "north": {"uv": [0, 12, 16, 16], "texture": "#0"},
+        "east": {"uv": [0, 12, 4, 16], "texture": "#0"},
+        "south": {"uv": [0, 12, 16, 16], "texture": "#0"},
+        "west": {"uv": [0, 12, 4, 16], "texture": "#0"},
+        "up": {"uv": [0, 12, 16, 16], "texture": "#0"},
+        "down": {"uv": [0, 12, 16, 16], "texture": "#0"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [65, 25, 0],
+      "translation": [0, 3, 2],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, 35, 0],
+      "translation": [0, 3, 0],
+      "scale": [0.55, 0.55, 0.55]
+    },
+    "ground": {
+      "translation": [0, 2, 0],
+      "scale": [0.45, 0.45, 0.45]
+    },
+    "gui": {
+      "rotation": [28, 142, 0],
+      "translation": [0, 3, 0],
+      "scale": [0.82, 0.82, 0.82]
+    },
+    "fixed": {
+      "rotation": [0, 180, 0],
+      "translation": [0, 3, 0],
+      "scale": [0.75, 0.75, 0.75]
+    }
+  }
+}

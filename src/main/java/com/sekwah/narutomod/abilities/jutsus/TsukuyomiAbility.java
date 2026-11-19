@@ -40,6 +40,11 @@ public class TsukuyomiAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public String getRequiredClanPath() {
+        return "uchiha";
+    }
+
+    @Override
     public float getDefaultChakraCost() {
         return 45.0f;
     }

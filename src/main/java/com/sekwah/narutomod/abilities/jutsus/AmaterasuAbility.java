@@ -60,6 +60,16 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public boolean requiresScroll() {
+        return true;
+    }
+
+    @Override
+    public String getRequiredClanPath() {
+        return "uchiha";
+    }
+
+    @Override
     public float getDefaultChakraCost() {
         return 110.0f;
     }

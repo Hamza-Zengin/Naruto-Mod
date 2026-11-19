@@ -4,6 +4,7 @@ import com.mojang.math.Quadrant;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.block.NarutoBlocks;
 import com.sekwah.narutomod.block.RotatableDecorativeBlock;
+import com.sekwah.narutomod.block.weapons.MakibishiBlock;
 import com.sekwah.narutomod.block.weapons.PaperBombBlock;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
@@ -29,7 +30,14 @@ public class NarutoBlockStateProvider extends ModelProvider {
 
     @Override
     protected Stream<? extends Holder<Block>> getKnownBlocks() {
-        return Stream.of(NarutoBlocks.BONSAI_TREE, NarutoBlocks.TRAINING_DUMMY, NarutoBlocks.PAPER_BOMB);
+        return Stream.of(
+                NarutoBlocks.BONSAI_TREE,
+                NarutoBlocks.TRAINING_DUMMY,
+                NarutoBlocks.PAPER_BOMB,
+                NarutoBlocks.WIRE_TRAP,
+                NarutoBlocks.WEAPON_RACK,
+                NarutoBlocks.MAKIBISHI
+        );
     }
 
     @Override
@@ -70,6 +78,44 @@ public class NarutoBlockStateProvider extends ModelProvider {
                                         BlockModelGenerators.plainModel(trainingDummyModel).withYRot(Quadrant.R90)))
                                 .select(Direction.WEST, BlockModelGenerators.variant(
                                         BlockModelGenerators.plainModel(trainingDummyModel).withYRot(Quadrant.R270))))
+        );
+
+        // Wire Trap
+        Identifier wireTrapModel = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/wire_trap");
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(NarutoBlocks.WIRE_TRAP.get())
+                        .with(PropertyDispatch.initial(RotatableDecorativeBlock.FACING)
+                                .select(Direction.NORTH, BlockModelGenerators.plainVariant(wireTrapModel))
+                                .select(Direction.SOUTH, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(wireTrapModel).withYRot(Quadrant.R180)))
+                                .select(Direction.EAST, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(wireTrapModel).withYRot(Quadrant.R90)))
+                                .select(Direction.WEST, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(wireTrapModel).withYRot(Quadrant.R270))))
+        );
+
+        // Weapon Rack
+        Identifier weaponRackModel = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/weapon_rack");
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(NarutoBlocks.WEAPON_RACK.get())
+                        .with(PropertyDispatch.initial(RotatableDecorativeBlock.FACING)
+                                .select(Direction.NORTH, BlockModelGenerators.plainVariant(weaponRackModel))
+                                .select(Direction.SOUTH, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(weaponRackModel).withYRot(Quadrant.R180)))
+                                .select(Direction.EAST, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(weaponRackModel).withYRot(Quadrant.R90)))
+                                .select(Direction.WEST, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(weaponRackModel).withYRot(Quadrant.R270))))
+        );
+
+        // Makibishi (1..4 charges)
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(NarutoBlocks.MAKIBISHI.get())
+                        .with(PropertyDispatch.initial(MakibishiBlock.CHARGES)
+                                .select(1, BlockModelGenerators.plainVariant(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/makibishi_1")))
+                                .select(2, BlockModelGenerators.plainVariant(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/makibishi_2")))
+                                .select(3, BlockModelGenerators.plainVariant(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/makibishi_3")))
+                                .select(4, BlockModelGenerators.plainVariant(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/makibishi_4"))))
         );
 
         // Paper Bomb

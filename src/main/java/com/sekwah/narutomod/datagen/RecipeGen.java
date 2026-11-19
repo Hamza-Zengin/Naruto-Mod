@@ -281,5 +281,46 @@ public class RecipeGen extends RecipeProvider {
                 .pattern(" P ")
                 .unlockedBy("has_hay_block", has(Items.HAY_BLOCK))
                 .save(this.output);
+
+        this.shaped(RecipeCategory.BUILDING_BLOCKS, NarutoBlocks.ITEM_CHAKRA_METAL_BLOCK.get())
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .pattern("CCC")
+                .pattern("CCC")
+                .pattern("CCC")
+                .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
+                .save(this.output);
+
+        this.shapeless(RecipeCategory.MISC, NarutoItems.CHAKRA_METAL.get(), 9)
+                .requires(NarutoBlocks.ITEM_CHAKRA_METAL_BLOCK.get())
+                .unlockedBy("has_chakra_metal_block", has(NarutoBlocks.ITEM_CHAKRA_METAL_BLOCK.get()))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoBlocks.ITEM_MAKIBISHI.get(), 4)
+                .define('I', Items.IRON_INGOT)
+                .define('N', Items.IRON_NUGGET)
+                .pattern(" N ")
+                .pattern("NIN")
+                .pattern("N N")
+                .unlockedBy("has_iron_ingot", has(Items.IRON_INGOT))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoBlocks.ITEM_WIRE_TRAP.get(), 2)
+                .define('I', Items.IRON_INGOT)
+                .define('S', Items.STRING)
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .pattern("I I")
+                .pattern("SCS")
+                .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.DECORATIONS, NarutoBlocks.ITEM_WEAPON_RACK.get())
+                .define('P', Items.OAK_PLANKS)
+                .define('S', Items.STICK)
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .pattern("P P")
+                .pattern("SCS")
+                .pattern("PPP")
+                .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
+                .save(this.output);
     }
 }

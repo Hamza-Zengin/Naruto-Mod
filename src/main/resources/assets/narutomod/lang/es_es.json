@@ -435,5 +435,19 @@
   "item.narutomod.training_dummy": "Muñeco de Entrenamiento Shinobi",
   "block.narutomod.training_dummy.hit_melee": "Impacto al Muñeco: %s Daño (+EXP Resistencia)",
   "block.narutomod.training_dummy.hit_jutsu": "Impacto de Jutsu: %1$s Daño [%2$s] (+EXP Chakra y Maestría)",
-  "block.narutomod.training_dummy.use": "Muñeco de Entrenamiento: ¡Ataca cuerpo a cuerpo, con armas o Jutsu para ganar EXP y Maestría!"
+  "block.narutomod.training_dummy.use": "Muñeco de Entrenamiento: ¡Ataca cuerpo a cuerpo, con armas o Jutsu para ganar EXP y Maestría!",
+  "block.narutomod.chakra_metal_ore": "Mena de Metal de Chakra",
+  "item.narutomod.chakra_metal_ore": "Mena de Metal de Chakra",
+  "block.narutomod.deepslate_chakra_metal_ore": "Mena de Metal de Chakra de Pizarra Profunda",
+  "item.narutomod.deepslate_chakra_metal_ore": "Mena de Metal de Chakra de Pizarra Profunda",
+  "block.narutomod.chakra_metal_block": "Bloque de Metal de Chakra",
+  "item.narutomod.chakra_metal_block": "Bloque de Metal de Chakra",
+  "item.narutomod.raw_chakra_metal": "Metal de Chakra en Bruto",
+  "block.narutomod.makibishi": "Abrojos Makibishi",
+  "item.narutomod.makibishi": "Abrojos Makibishi",
+  "block.narutomod.wire_trap": "Trampa de Alambre",
+  "item.narutomod.wire_trap": "Trampa de Alambre",
+  "block.narutomod.weapon_rack": "Armero Shinobi",
+  "item.narutomod.weapon_rack": "Armero Shinobi",
+  "block.narutomod.weapon_rack.empty": "El armero está vacío. Haz clic derecho con un objeto para exhibirlo."
 }

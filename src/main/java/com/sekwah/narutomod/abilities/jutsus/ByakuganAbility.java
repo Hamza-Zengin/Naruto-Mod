@@ -47,6 +47,11 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
     }
 
     @Override
+    public String getRequiredClanPath() {
+        return "hyuga";
+    }
+
+    @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("hyuga")) {
             player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",

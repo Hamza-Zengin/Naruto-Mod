@@ -43,6 +43,11 @@ public class AdamantineChainsAbility extends Ability implements Ability.Cooldown
     }
 
     @Override
+    public String getRequiredClanPath() {
+        return "uzumaki";
+    }
+
+    @Override
     public float getDefaultChakraCost() {
         return 42.0f;
     }

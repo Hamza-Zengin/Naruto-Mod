@@ -1,8 +1,12 @@
 package com.sekwah.narutomod.block;
 
+import com.sekwah.narutomod.block.weapons.MakibishiBlock;
 import com.sekwah.narutomod.block.weapons.PaperBombBlock;
+import com.sekwah.narutomod.block.weapons.WireTrapBlock;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DropExperienceBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -59,6 +63,66 @@ public class NarutoBlocks {
                     .sound(SoundType.WOOL)
                     .pushReaction(PushReaction.POPPED)
                     .noLootTable()));
+
+    public static final DeferredBlock<Block> CHAKRA_METAL_ORE = BLOCKS.registerBlock("chakra_metal_ore",
+            props -> new DropExperienceBlock(UniformInt.of(1, 3), props
+                    .mapColor(MapColor.STONE)
+                    .requiresCorrectToolForDrops()
+                    .strength(3.0F, 3.0F)
+                    .lightLevel(state -> 3)
+                    .sound(SoundType.STONE)));
+
+    public static final DeferredItem<BlockItem> ITEM_CHAKRA_METAL_ORE = BLOCK_ITEMS.registerSimpleBlockItem(CHAKRA_METAL_ORE);
+
+    public static final DeferredBlock<Block> DEEPSLATE_CHAKRA_METAL_ORE = BLOCKS.registerBlock("deepslate_chakra_metal_ore",
+            props -> new DropExperienceBlock(UniformInt.of(1, 3), props
+                    .mapColor(MapColor.DEEPSLATE)
+                    .requiresCorrectToolForDrops()
+                    .strength(4.5F, 3.0F)
+                    .lightLevel(state -> 3)
+                    .sound(SoundType.DEEPSLATE)));
+
+    public static final DeferredItem<BlockItem> ITEM_DEEPSLATE_CHAKRA_METAL_ORE = BLOCK_ITEMS.registerSimpleBlockItem(DEEPSLATE_CHAKRA_METAL_ORE);
+
+    public static final DeferredBlock<Block> CHAKRA_METAL_BLOCK = BLOCKS.registerBlock("chakra_metal_block",
+            props -> new Block(props
+                    .mapColor(MapColor.COLOR_CYAN)
+                    .requiresCorrectToolForDrops()
+                    .strength(5.0F, 6.0F)
+                    .sound(SoundType.METAL)));
+
+    public static final DeferredItem<BlockItem> ITEM_CHAKRA_METAL_BLOCK = BLOCK_ITEMS.registerSimpleBlockItem(CHAKRA_METAL_BLOCK);
+
+    public static final DeferredBlock<Block> MAKIBISHI = BLOCKS.registerBlock("makibishi",
+            props -> new MakibishiBlock(props
+                    .mapColor(MapColor.METAL)
+                    .noCollision()
+                    .noOcclusion()
+                    .strength(0.8F)
+                    .pushReaction(PushReaction.POPPED)
+                    .sound(SoundType.METAL)));
+
+    public static final DeferredItem<BlockItem> ITEM_MAKIBISHI = BLOCK_ITEMS.registerSimpleBlockItem(MAKIBISHI);
+
+    public static final DeferredBlock<Block> WIRE_TRAP = BLOCKS.registerBlock("wire_trap",
+            props -> new WireTrapBlock(props
+                    .mapColor(MapColor.METAL)
+                    .noCollision()
+                    .noOcclusion()
+                    .strength(0.6F)
+                    .pushReaction(PushReaction.POPPED)
+                    .sound(SoundType.METAL)));
+
+    public static final DeferredItem<BlockItem> ITEM_WIRE_TRAP = BLOCK_ITEMS.registerSimpleBlockItem(WIRE_TRAP);
+
+    public static final DeferredBlock<Block> WEAPON_RACK = BLOCKS.registerBlock("weapon_rack",
+            props -> new WeaponRackBlock(props
+                    .mapColor(MapColor.WOOD)
+                    .noOcclusion()
+                    .strength(2.5F, 4.0F)
+                    .sound(SoundType.WOOD)));
+
+    public static final DeferredItem<BlockItem> ITEM_WEAPON_RACK = BLOCK_ITEMS.registerSimpleBlockItem(WEAPON_RACK);
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);

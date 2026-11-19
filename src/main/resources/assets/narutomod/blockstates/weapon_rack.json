@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "narutomod:block/weapon_rack"
+    },
+    "facing=south": {
+      "model": "narutomod:block/weapon_rack",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "narutomod:block/weapon_rack",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "narutomod:block/weapon_rack",
+      "y": 270
+    }
+  }
+}
