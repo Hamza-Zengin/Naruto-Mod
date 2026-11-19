@@ -22,9 +22,9 @@
         }
       ],
       "condition": {
-        "type": "minecraft:block_state_property",
-        "block": "narutomod:tatami_slab",
-        "properties": {
+        "type": "minecraft:match_block",
+        "blocks": "narutomod:tatami_slab",
+        "state": {
           "type": "double"
         }
       }
