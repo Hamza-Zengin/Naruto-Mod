@@ -57,7 +57,7 @@ Ninja Menüsü (`J` tuşu) üzerinden klanınızı seçin, görevleri tamamlayı
 - **Köy Zırhları & Pasif Bonuslar:** `5` Büyük Köyün **Kage Şapkası** (eşleşen elementte %-15 çakra maliyeti + Max Çakra) ve **Jōnin Yeleği** (-1 tick el mührü gecikmesi), **Savaşan Devletler Zırhı** (%-15 jutsu/patlama hasarı), **Bilge Pelerini (*Sage Cloak*)** (+%50 çakra yenilenmesi & +%12 Senjutsu hasarı), **Akatsuki Pelerini**, **ANBU Zırhı** ve alın koruyucuları.
 
 ### 🏯 Dünya Üretimi (10 Yapı) & Shinobi Ekosistemi (13 Mob)
-- **Birbirine Bitişmeyen 10 Dünya Yapısı:** Tüm yapılar tek bir [`narutomod_structures.json`](src/main/resources/data/narutomod/worldgen/structure_set/narutomod_structures.json) yerleşim ızgarasında (`separation: 24` chunk = minimum `384` blok mesafe) oluşur.
+- **Birbirine Bitişmeyen 10 Dünya Yapısı:** Tüm yapılar tek bir [`narutomod_structures.json`](src/main/resources/data/narutomod/worldgen/structure_set/narutomod_structures.json) yerleşim ızgarasında (`separation: 24` chunk = minimum `384` blok mesafe) oluşur ve özel `narutomod:anchored_jigsaw` sistemiyle çevre arazi eğimine göre hizalanıp altlarına dinamik temel sütunları örülür.
 - **13 Özel NPC & Düşman:** Her köye özel `5` **Köy Ninjası** ve `5` **Tüccar Köylü** (`Merchant` arayüzü ile 7 ortak + 3 köye özel ticaret teklifi), ayrıca `Kaçak Ninja`, `Akatsuki Üyesi` ve `Kage Bunshin`.
 
 <details>
