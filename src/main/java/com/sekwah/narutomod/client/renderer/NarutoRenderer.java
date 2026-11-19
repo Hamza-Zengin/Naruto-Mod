@@ -67,6 +67,25 @@ public class NarutoRenderer implements ResourceManagerReloadListener {
                 .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.SAGE_CLOAK_LAYER)))
                 .setArmorTexture("textures/models/armor/sage_cloak.png");
 
+        ((NarutoArmorItem) NarutoItems.SHINOBI_LEGGINGS.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.SHINOBI_LEGGINGS_LAYER)))
+                .setArmorTexture("textures/models/armor/shinobi_leggings.png");
+        ((NarutoArmorItem) NarutoItems.SHINOBI_SANDALS.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.SHINOBI_SANDALS_LAYER)))
+                .setArmorTexture("textures/models/armor/shinobi_sandals.png");
+        ((NarutoArmorItem) NarutoItems.ANBU_LEGGINGS.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.ANBU_LEGGINGS_LAYER)))
+                .setArmorTexture("textures/models/armor/anbu_leggings.png");
+        ((NarutoArmorItem) NarutoItems.ANBU_BOOTS.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.ANBU_BOOTS_LAYER)))
+                .setArmorTexture("textures/models/armor/anbu_boots.png");
+        ((NarutoArmorItem) NarutoItems.WARRING_STATES_LEGGINGS.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.WARRING_STATES_LEGGINGS_LAYER)))
+                .setArmorTexture("textures/models/armor/warring_states_leggings.png");
+        ((NarutoArmorItem) NarutoItems.WARRING_STATES_BOOTS.get())
+                .setArmorModel(new ShinobiArmorModel(modelSet.bakeLayer(NarutoRenderEvents.WARRING_STATES_BOOTS_LAYER)))
+                .setArmorTexture("textures/models/armor/warring_states_boots.png");
+
         ((NarutoArmorItem) NarutoItems.RED_ANBU_MASK.get())
                 .setArmorModel(new AnbuMaskModel(modelSet.bakeLayer(NarutoRenderEvents.ANBU_MASK_LAYER)))
                 .setArmorTexture("textures/models/armor/red_anbu_mask.png");

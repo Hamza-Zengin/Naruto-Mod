@@ -110,7 +110,13 @@ public class AnbuTantoItem extends Item {
             List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, dashHitBox,
                     e -> e.isAlive() && e != player);
             for (LivingEntity target : targets) {
-                float dmg = isStealthBackstab(player, target) ? 5.5F * BACKSTAB_MULTIPLIER : 5.5F;
+                float dmg = 5.5F;
+                if (isStealthBackstab(player, target)) {
+                    dmg *= BACKSTAB_MULTIPLIER;
+                    if (com.sekwah.narutomod.item.armor.NarutoArmorItem.hasAnbuStealthSynergy(player)) {
+                        dmg *= (1.0F + com.sekwah.narutomod.item.armor.NarutoArmorItem.ANBU_BOOTS_BACKSTAB_SYNERGY_BONUS);
+                    }
+                }
                 target.hurtServer(serverLevel, player.damageSources().playerAttack(player), dmg);
             }
             return InteractionResult.SUCCESS_SERVER;

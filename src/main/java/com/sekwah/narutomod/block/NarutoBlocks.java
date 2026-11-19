@@ -40,6 +40,15 @@ public class NarutoBlocks {
 
     public static final DeferredItem<BlockItem> ITEM_BONSAI_TREE = BLOCK_ITEMS.registerSimpleBlockItem(BONSAI_TREE);
 
+    public static final DeferredBlock<Block> TRAINING_DUMMY = BLOCKS.registerBlock("training_dummy",
+            props -> new TrainingDummyBlock(props
+                    .mapColor(MapColor.WOOD)
+                    .noOcclusion()
+                    .strength(3.0F, 18.0F)
+                    .sound(SoundType.WOOD)));
+
+    public static final DeferredItem<BlockItem> ITEM_TRAINING_DUMMY = BLOCK_ITEMS.registerSimpleBlockItem(TRAINING_DUMMY);
+
     public static final DeferredBlock<Block> AMATERASU_FIRE = BLOCKS.registerBlock("amaterasu_fire",
             props -> new AmaterasuFireBlock(props
                     .mapColor(MapColor.COLOR_BLACK)

@@ -56,6 +56,7 @@ public class JutsuComboAuditTest {
             Map.entry("hakke_kusho", new HakkeKushoAbility()),
             Map.entry("bone_dance", new BoneDanceAbility()),
             Map.entry("wood_prison", new WoodPrisonAbility()),
+            Map.entry("adamantine_chains", new AdamantineChainsAbility()),
             Map.entry("eight_gates", new EightGatesAbility()),
             // [C] Ultimate (5 keys)
             Map.entry("rasenshuriken", new RasenshurikenAbility()),
@@ -69,7 +70,7 @@ public class JutsuComboAuditTest {
     private static final Set<String> HIGH_LEVEL = Set.of(
             "shadow_clone", "shadow_possession", "chidori", "chidori_stream",
             "rasengan", "stone_spikes", "water_dragon",
-            "hakke_kusho", "bone_dance", "wood_prison", "eight_gates"
+            "hakke_kusho", "bone_dance", "wood_prison", "adamantine_chains", "eight_gates"
     );
 
     private static final Set<String> ULTIMATE = Set.of(
@@ -77,7 +78,7 @@ public class JutsuComboAuditTest {
     );
 
     @Test
-    @DisplayName("Verify all 30 jutsu combos are 100% unique, match JSON, and obey tier key lengths")
+    @DisplayName("Verify all 33 jutsu combos are 100% unique, match JSON, and obey tier key lengths")
     public void testAllJutsuCombosUniqueAndTiered() throws IOException {
         assertTrue(Files.isDirectory(JUTSU_DIR), "Jutsu data directory must exist");
 

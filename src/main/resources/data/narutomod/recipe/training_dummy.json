@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " L ",
+    "SHS",
+    " P "
+  ],
+  "key": {
+    "L": "minecraft:leather",
+    "S": "minecraft:stick",
+    "H": "minecraft:hay_block",
+    "P": "minecraft:oak_planks"
+  },
+  "result": {
+    "id": "narutomod:training_dummy",
+    "count": 1
+  }
+}

@@ -29,7 +29,7 @@ public class NarutoBlockStateProvider extends ModelProvider {
 
     @Override
     protected Stream<? extends Holder<Block>> getKnownBlocks() {
-        return Stream.of(NarutoBlocks.BONSAI_TREE, NarutoBlocks.PAPER_BOMB);
+        return Stream.of(NarutoBlocks.BONSAI_TREE, NarutoBlocks.TRAINING_DUMMY, NarutoBlocks.PAPER_BOMB);
     }
 
     @Override
@@ -56,6 +56,20 @@ public class NarutoBlockStateProvider extends ModelProvider {
                                         BlockModelGenerators.plainModel(bonsaiModel).withYRot(Quadrant.R90)))
                                 .select(Direction.WEST, BlockModelGenerators.variant(
                                         BlockModelGenerators.plainModel(bonsaiModel).withYRot(Quadrant.R270))))
+        );
+
+        // Training Dummy
+        Identifier trainingDummyModel = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/training_dummy");
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(NarutoBlocks.TRAINING_DUMMY.get())
+                        .with(PropertyDispatch.initial(RotatableDecorativeBlock.FACING)
+                                .select(Direction.NORTH, BlockModelGenerators.plainVariant(trainingDummyModel))
+                                .select(Direction.SOUTH, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(trainingDummyModel).withYRot(Quadrant.R180)))
+                                .select(Direction.EAST, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(trainingDummyModel).withYRot(Quadrant.R90)))
+                                .select(Direction.WEST, BlockModelGenerators.variant(
+                                        BlockModelGenerators.plainModel(trainingDummyModel).withYRot(Quadrant.R270))))
         );
 
         // Paper Bomb

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " R ",
+    "RLR",
+    "GLG"
+  ],
+  "key": {
+    "R": "minecraft:red_dye",
+    "L": "minecraft:leather",
+    "G": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "narutomod:kage_hat",
+    "count": 1
+  }
+}

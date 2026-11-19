@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "N N",
+    "RCR",
+    "NNN"
+  ],
+  "key": {
+    "N": "minecraft:netherite_scrap",
+    "R": "minecraft:red_dye",
+    "C": "narutomod:chakra_metal"
+  },
+  "result": {
+    "id": "narutomod:warring_states_armor",
+    "count": 1
+  }
+}

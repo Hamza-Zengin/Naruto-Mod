@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "LLL",
+    "LCL",
+    "L L"
+  ],
+  "key": {
+    "L": "minecraft:leather",
+    "C": "narutomod:chakra_metal"
+  },
+  "result": {
+    "id": "narutomod:shinobi_leggings",
+    "count": 1
+  }
+}

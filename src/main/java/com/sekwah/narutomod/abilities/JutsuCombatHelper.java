@@ -1,0 +1,78 @@
+package com.sekwah.narutomod.abilities;
+
+import com.sekwah.narutomod.entity.ShadowCloneEntity;
+import com.sekwah.sekclib.util.PlayerUtil;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+
+import javax.annotation.Nullable;
+import java.util.List;
+
+/**
+ * Shared ally-safe AOE targeting, damage source resolution, and velocity synchronization helpers for jutsus.
+ */
+public final class JutsuCombatHelper {
+
+    private JutsuCombatHelper() {}
+
+    /**
+     * Queries all living hostile entities inside {@code box}, excluding the caster and allied shadow clones/summons.
+     */
+    public static List<LivingEntity> findHostileTargetsInBox(ServerLevel level, @Nullable LivingEntity caster, AABB box) {
+        return level.getEntitiesOfClass(LivingEntity.class, box,
+                e -> e.isAlive() && (caster == null || (!e.equals(caster) && !ShadowCloneEntity.areAllies(caster, e))));
+    }
+
+    /**
+     * Queries all living hostile entities within cylindrical/spherical horizontal radius around {@code center}.
+     */
+    public static List<LivingEntity> findHostileTargetsInRadius(ServerLevel level, @Nullable LivingEntity caster,
+                                                                Vec3 center, double radius, double halfHeight) {
+        AABB box = new AABB(
+                center.x - radius, center.y - halfHeight, center.z - radius,
+                center.x + radius, center.y + halfHeight, center.z + radius);
+        double radiusSq = radius * radius;
+        return level.getEntitiesOfClass(LivingEntity.class, box,
+                e -> e.isAlive()
+                        && (caster == null || (!e.equals(caster) && !ShadowCloneEntity.areAllies(caster, e)))
+                        && horizDistSq(e.position(), center) <= radiusSq);
+    }
+
+    private static double horizDistSq(Vec3 a, Vec3 b) {
+        double dx = a.x - b.x;
+        double dz = a.z - b.z;
+        return dx * dx + dz * dz;
+    }
+
+    /**
+     * Applies velocity reliably to both Players (via SekCLib {@link PlayerUtil#setVelocity}) and non-player entities.
+     */
+    public static void applyVelocity(LivingEntity target, Vec3 velocity, boolean ignoreGround) {
+        if (target == null || velocity == null) {
+            return;
+        }
+        if (target instanceof Player player) {
+            PlayerUtil.setVelocity(player, velocity, ignoreGround);
+        } else {
+            target.setDeltaMovement(velocity);
+            target.needsSync = true;
+        }
+    }
+
+    /**
+     * Resolves an appropriate damage source for jutsu effects given an optional caster.
+     */
+    public static DamageSource playerOrMagicDamage(ServerLevel level, @Nullable LivingEntity caster) {
+        if (caster instanceof Player player) {
+            return level.damageSources().playerAttack(player);
+        }
+        if (caster != null) {
+            return level.damageSources().mobAttack(caster);
+        }
+        return level.damageSources().magic();
+    }
+}

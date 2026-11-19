@@ -37,6 +37,7 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
     public static final Identifier TEX_SHADOW = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/shadow_bind.png");
     public static final Identifier TEX_EARTH = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/earth_wall.png");
     public static final Identifier TEX_STONE_SPIKES = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/stone_spikes.png");
+    public static final Identifier TEX_ADAMANTINE_CHAINS = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/adamantine_chains.png");
 
     private final KirinDragonModel kirinModel;
     private final WoodPrisonModel woodModel;
@@ -49,6 +50,7 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
     private final ShadowBindModel shadowModel;
     private final EarthWallModel earthModel;
     private final StoneSpikesModel stoneSpikesModel;
+    private final AdamantineChainsModel adamantineChainsModel;
 
     public static class VisualEffectRenderState extends EntityRenderState {
         public int visualType;
@@ -70,6 +72,7 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
         this.shadowModel = new ShadowBindModel(ctx.bakeLayer(NarutoRenderEvents.SHADOW_BIND_LAYER));
         this.earthModel = new EarthWallModel(ctx.bakeLayer(NarutoRenderEvents.EARTH_WALL_LAYER));
         this.stoneSpikesModel = new StoneSpikesModel(ctx.bakeLayer(NarutoRenderEvents.STONE_SPIKES_LAYER));
+        this.adamantineChainsModel = new AdamantineChainsModel(ctx.bakeLayer(NarutoRenderEvents.ADAMANTINE_CHAINS_LAYER));
     }
 
     @Override
@@ -167,6 +170,11 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
                     RenderMathUtil.scaleEntityModel(poseStack, 1.18F);
                     submitNodeCollector.submitModel(this.stoneSpikesModel, visualState, poseStack, renderType, solidLight, OverlayTexture.NO_OVERLAY, -1, null, state.outlineColor);
                 }
+                case JutsuVisualEffectEntity.TYPE_ADAMANTINE_CHAINS -> {
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.25F);
+                    int color = ColorUtil.argb(0.95F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.adamantineChainsModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
+                }
             }
         } finally {
             poseStack.popPose();
@@ -181,7 +189,8 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
                 || type == JutsuVisualEffectEntity.TYPE_RASENGAN_SPHERE
                 || type == JutsuVisualEffectEntity.TYPE_CHIDORI_BURST
                 || type == JutsuVisualEffectEntity.TYPE_AMATERASU_PILLAR
-                || type == JutsuVisualEffectEntity.TYPE_EARTH_WALL) {
+                || type == JutsuVisualEffectEntity.TYPE_EARTH_WALL
+                || type == JutsuVisualEffectEntity.TYPE_ADAMANTINE_CHAINS) {
             return 15;
         }
         return super.getBlockLightLevel(entity, pos);
@@ -200,6 +209,7 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
             case JutsuVisualEffectEntity.TYPE_SHADOW_BIND -> TEX_SHADOW;
             case JutsuVisualEffectEntity.TYPE_EARTH_WALL -> TEX_EARTH;
             case JutsuVisualEffectEntity.TYPE_STONE_SPIKES -> TEX_STONE_SPIKES;
+            case JutsuVisualEffectEntity.TYPE_ADAMANTINE_CHAINS -> TEX_ADAMANTINE_CHAINS;
             default -> TEX_RASENGAN;
         };
     }

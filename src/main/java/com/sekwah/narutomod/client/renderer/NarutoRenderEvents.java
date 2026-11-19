@@ -134,6 +134,19 @@ public class NarutoRenderEvents {
     public static final ModelLayerLocation SAGE_CLOAK_LAYER =
             new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sage_cloak"), "main");
 
+    public static final ModelLayerLocation SHINOBI_LEGGINGS_LAYER =
+            new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shinobi_leggings"), "main");
+    public static final ModelLayerLocation SHINOBI_SANDALS_LAYER =
+            new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shinobi_sandals"), "main");
+    public static final ModelLayerLocation ANBU_LEGGINGS_LAYER =
+            new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "anbu_leggings"), "main");
+    public static final ModelLayerLocation ANBU_BOOTS_LAYER =
+            new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "anbu_boots"), "main");
+    public static final ModelLayerLocation WARRING_STATES_LEGGINGS_LAYER =
+            new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "warring_states_leggings"), "main");
+    public static final ModelLayerLocation WARRING_STATES_BOOTS_LAYER =
+            new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "warring_states_boots"), "main");
+
     public static final ModelLayerLocation SUSANOO_RIBCAGE_LAYER =
             new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "susanoo_ribcage"), "main");
 
@@ -159,6 +172,8 @@ public class NarutoRenderEvents {
             new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "earth_wall"), "main");
     public static final ModelLayerLocation STONE_SPIKES_LAYER =
             new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "stone_spikes"), "main");
+    public static final ModelLayerLocation ADAMANTINE_CHAINS_LAYER =
+            new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "adamantine_chains"), "main");
     public static final ModelLayerLocation EIGHT_GATES_AURA_LAYER =
             new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates_aura"), "main");
 
@@ -218,6 +233,12 @@ public class NarutoRenderEvents {
         event.registerLayerDefinition(WARRING_STATES_ARMOR_LAYER, ShinobiArmorModel::createWarringStatesArmorLayer);
         event.registerLayerDefinition(KAGE_HAT_LAYER, com.sekwah.narutomod.client.model.item.model.KageHatModel::createLayer);
         event.registerLayerDefinition(SAGE_CLOAK_LAYER, ShinobiArmorModel::createSageCloakLayer);
+        event.registerLayerDefinition(SHINOBI_LEGGINGS_LAYER, ShinobiArmorModel::createShinobiLeggingsLayer);
+        event.registerLayerDefinition(SHINOBI_SANDALS_LAYER, ShinobiArmorModel::createShinobiSandalsLayer);
+        event.registerLayerDefinition(ANBU_LEGGINGS_LAYER, ShinobiArmorModel::createAnbuLeggingsLayer);
+        event.registerLayerDefinition(ANBU_BOOTS_LAYER, ShinobiArmorModel::createAnbuBootsLayer);
+        event.registerLayerDefinition(WARRING_STATES_LEGGINGS_LAYER, ShinobiArmorModel::createWarringStatesLeggingsLayer);
+        event.registerLayerDefinition(WARRING_STATES_BOOTS_LAYER, ShinobiArmorModel::createWarringStatesBootsLayer);
         event.registerLayerDefinition(SUSANOO_RIBCAGE_LAYER, SusanooRibcageModel::createLayer);
 
         event.registerLayerDefinition(KIRIN_DRAGON_LAYER, JutsuVisualModels.KirinDragonModel::createLayer);
@@ -231,6 +252,7 @@ public class NarutoRenderEvents {
         event.registerLayerDefinition(SHADOW_BIND_LAYER, JutsuVisualModels.ShadowBindModel::createLayer);
         event.registerLayerDefinition(EARTH_WALL_LAYER, JutsuVisualModels.EarthWallModel::createLayer);
         event.registerLayerDefinition(STONE_SPIKES_LAYER, JutsuVisualModels.StoneSpikesModel::createLayer);
+        event.registerLayerDefinition(ADAMANTINE_CHAINS_LAYER, JutsuVisualModels.AdamantineChainsModel::createLayer);
         event.registerLayerDefinition(EIGHT_GATES_AURA_LAYER, JutsuVisualModels.EightGatesAuraModel::createLayer);
     }
 

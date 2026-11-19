@@ -311,5 +311,246 @@ public class ShinobiArmorModel extends HumanoidModel<HumanoidRenderState> {
 
         return LayerDefinition.create(mesh, 64, 64);
     }
+
+    public static LayerDefinition createShinobiLeggingsLayer() {
+        MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
+        PartDefinition root = mesh.getRoot();
+
+        root.addOrReplaceChild("body",
+                CubeListBuilder.create()
+                        // Shinobi waist belt (u=0..24, v=0..6)
+                        .texOffs(0, 0)
+                        .addBox(-4.0F, 10.0F, -2.0F, 8, 2, 4, new CubeDeformation(0.35F))
+                        // Hip scroll pouch (u=26..34, v=0..5)
+                        .texOffs(26, 0)
+                        .addBox(-4.4F, 9.5F, -2.5F, 2, 3, 2, CubeDeformation.NONE),
+                PartPose.ZERO);
+
+        root.addOrReplaceChild("right_leg",
+                CubeListBuilder.create()
+                        // Navy shinobi trousers (u=0..16, v=8..21)
+                        .texOffs(0, 8)
+                        .addBox(-2.0F, 0.0F, -2.0F, 4, 9, 4, new CubeDeformation(0.28F))
+                        // 3D Bandage thigh wrap (u=0..16, v=22..29)
+                        .texOffs(0, 22)
+                        .addBox(-2.2F, 2.5F, -2.2F, 4, 3, 4, new CubeDeformation(0.36F))
+                        // 3D Outer thigh kunai holster pouch (u=18..26, v=22..28)
+                        .texOffs(18, 22)
+                        .addBox(-3.0F, 2.6F, -1.3F, 1, 3, 3, new CubeDeformation(0.05F))
+                        // 3D Kunai hilt protruding from holster (u=28..32, v=22..25)
+                        .texOffs(28, 22)
+                        .addBox(-2.8F, 1.4F, -0.5F, 1, 2, 1, CubeDeformation.NONE)
+                        // 3D Olive knee guard (u=0..10, v=30..33)
+                        .texOffs(0, 30)
+                        .addBox(-2.0F, 5.2F, -2.4F, 4, 2, 1, new CubeDeformation(0.12F)),
+                PartPose.offset(-1.9F, 12.0F, 0.0F));
+
+        root.addOrReplaceChild("left_leg",
+                CubeListBuilder.create()
+                        // Navy shinobi trousers (u=18..34, v=8..21)
+                        .texOffs(18, 8)
+                        .addBox(-2.0F, 0.0F, -2.0F, 4, 9, 4, new CubeDeformation(0.28F))
+                        // 3D Knee strap (u=36..52, v=8..14)
+                        .texOffs(36, 8)
+                        .addBox(-2.1F, 5.4F, -2.1F, 4, 2, 4, new CubeDeformation(0.32F))
+                        // 3D Olive knee guard (u=12..22, v=30..33)
+                        .texOffs(12, 30)
+                        .addBox(-2.0F, 5.2F, -2.4F, 4, 2, 1, new CubeDeformation(0.12F)),
+                PartPose.offset(1.9F, 12.0F, 0.0F));
+
+        return LayerDefinition.create(mesh, 64, 64);
+    }
+
+    public static LayerDefinition createShinobiSandalsLayer() {
+        MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
+        PartDefinition root = mesh.getRoot();
+
+        root.addOrReplaceChild("right_leg",
+                CubeListBuilder.create()
+                        // Ankle bandage wraps (u=0..16, v=0..7)
+                        .texOffs(0, 0)
+                        .addBox(-2.0F, 6.5F, -2.0F, 4, 3, 4, new CubeDeformation(0.26F))
+                        // Open-toe navy sandal upper & heel guard (u=0..14, v=9..14)
+                        .texOffs(0, 9)
+                        .addBox(-2.0F, 9.5F, -1.4F, 4, 2, 3, new CubeDeformation(0.30F))
+                        // Exposed toes front tip (u=16..24, v=9..11)
+                        .texOffs(16, 9)
+                        .addBox(-1.6F, 10.4F, -2.3F, 3, 1, 1, new CubeDeformation(0.08F))
+                        // Sandal sole (u=0..16, v=16..21)
+                        .texOffs(0, 16)
+                        .addBox(-2.1F, 11.2F, -2.3F, 4, 1, 4, new CubeDeformation(0.28F)),
+                PartPose.offset(-1.9F, 12.0F, 0.0F));
+
+        root.addOrReplaceChild("left_leg",
+                CubeListBuilder.create()
+                        // Ankle bandage wraps (u=18..34, v=0..7)
+                        .texOffs(18, 0)
+                        .addBox(-2.0F, 6.5F, -2.0F, 4, 3, 4, new CubeDeformation(0.26F))
+                        // Open-toe navy sandal upper & heel guard (u=26..40, v=9..14)
+                        .texOffs(26, 9)
+                        .addBox(-2.0F, 9.5F, -1.4F, 4, 2, 3, new CubeDeformation(0.30F))
+                        // Exposed toes front tip (u=42..50, v=9..11)
+                        .texOffs(42, 9)
+                        .addBox(-1.4F, 10.4F, -2.3F, 3, 1, 1, new CubeDeformation(0.08F))
+                        // Sandal sole (u=18..34, v=16..21)
+                        .texOffs(18, 16)
+                        .addBox(-2.1F, 11.2F, -2.3F, 4, 1, 4, new CubeDeformation(0.28F)),
+                PartPose.offset(1.9F, 12.0F, 0.0F));
+
+        return LayerDefinition.create(mesh, 64, 64);
+    }
+
+    public static LayerDefinition createAnbuLeggingsLayer() {
+        MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
+        PartDefinition root = mesh.getRoot();
+
+        root.addOrReplaceChild("body",
+                CubeListBuilder.create()
+                        // Tactical ANBU waist belt (u=0..24, v=0..6)
+                        .texOffs(0, 0)
+                        .addBox(-4.0F, 10.0F, -2.0F, 8, 2, 4, new CubeDeformation(0.34F))
+                        // Rear smoke/scroll pouch (u=26..38, v=0..4)
+                        .texOffs(26, 0)
+                        .addBox(-2.5F, 9.5F, 2.2F, 5, 3, 1, new CubeDeformation(0.08F)),
+                PartPose.ZERO);
+
+        root.addOrReplaceChild("right_leg",
+                CubeListBuilder.create()
+                        // Charcoal ANBU combat trousers (u=0..16, v=8..21)
+                        .texOffs(0, 8)
+                        .addBox(-2.0F, 0.0F, -2.0F, 4, 9, 4, new CubeDeformation(0.28F))
+                        // Strapped thigh wraps & buckle (u=0..16, v=22..29)
+                        .texOffs(0, 22)
+                        .addBox(-2.1F, 2.2F, -2.1F, 4, 3, 4, new CubeDeformation(0.36F))
+                        // Dual kunai holster pouch (u=18..26, v=22..29)
+                        .texOffs(18, 22)
+                        .addBox(-3.0F, 2.4F, -1.5F, 1, 4, 3, new CubeDeformation(0.05F))
+                        // Titanium armored knee plate (u=0..10, v=31..35)
+                        .texOffs(0, 31)
+                        .addBox(-2.0F, 5.2F, -2.6F, 4, 3, 1, new CubeDeformation(0.14F)),
+                PartPose.offset(-1.9F, 12.0F, 0.0F));
+
+        root.addOrReplaceChild("left_leg",
+                CubeListBuilder.create()
+                        // Charcoal ANBU combat trousers (u=18..34, v=8..21)
+                        .texOffs(18, 8)
+                        .addBox(-2.0F, 0.0F, -2.0F, 4, 9, 4, new CubeDeformation(0.28F))
+                        // Left thigh strap (u=36..52, v=8..14)
+                        .texOffs(36, 8)
+                        .addBox(-2.1F, 2.8F, -2.1F, 4, 2, 4, new CubeDeformation(0.34F))
+                        // Titanium armored knee plate (u=12..22, v=31..35)
+                        .texOffs(12, 31)
+                        .addBox(-2.0F, 5.2F, -2.6F, 4, 3, 1, new CubeDeformation(0.14F)),
+                PartPose.offset(1.9F, 12.0F, 0.0F));
+
+        return LayerDefinition.create(mesh, 64, 64);
+    }
+
+    public static LayerDefinition createAnbuBootsLayer() {
+        MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
+        PartDefinition root = mesh.getRoot();
+
+        root.addOrReplaceChild("right_leg",
+                CubeListBuilder.create()
+                        // Tall strapped ANBU combat boot shaft (u=0..16, v=0..10)
+                        .texOffs(0, 0)
+                        .addBox(-2.0F, 6.0F, -2.0F, 4, 6, 4, new CubeDeformation(0.30F))
+                        // Titanium shin greave plate (u=0..10, v=12..17)
+                        .texOffs(0, 12)
+                        .addBox(-1.8F, 5.6F, -2.5F, 4, 4, 1, new CubeDeformation(0.12F))
+                        // Silent stealth padded sole & toe cap (u=0..16, v=19..25)
+                        .texOffs(0, 19)
+                        .addBox(-2.1F, 10.6F, -2.4F, 4, 2, 4, new CubeDeformation(0.28F)),
+                PartPose.offset(-1.9F, 12.0F, 0.0F));
+
+        root.addOrReplaceChild("left_leg",
+                CubeListBuilder.create()
+                        // Tall strapped ANBU combat boot shaft (u=18..34, v=0..10)
+                        .texOffs(18, 0)
+                        .addBox(-2.0F, 6.0F, -2.0F, 4, 6, 4, new CubeDeformation(0.30F))
+                        // Titanium shin greave plate (u=12..22, v=12..17)
+                        .texOffs(12, 12)
+                        .addBox(-2.2F, 5.6F, -2.5F, 4, 4, 1, new CubeDeformation(0.12F))
+                        // Silent stealth padded sole & toe cap (u=18..34, v=19..25)
+                        .texOffs(18, 19)
+                        .addBox(-2.1F, 10.6F, -2.4F, 4, 2, 4, new CubeDeformation(0.28F)),
+                PartPose.offset(1.9F, 12.0F, 0.0F));
+
+        return LayerDefinition.create(mesh, 64, 64);
+    }
+
+    public static LayerDefinition createWarringStatesLeggingsLayer() {
+        MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
+        PartDefinition root = mesh.getRoot();
+
+        root.addOrReplaceChild("body",
+                CubeListBuilder.create()
+                        // Gold-trimmed Sengoku waist sash (u=0..24, v=0..7)
+                        .texOffs(0, 0)
+                        .addBox(-4.0F, 9.5F, -2.0F, 8, 3, 4, new CubeDeformation(0.36F)),
+                PartPose.ZERO);
+
+        root.addOrReplaceChild("right_leg",
+                CubeListBuilder.create()
+                        // Dark armored hakama base (u=0..16, v=9..22)
+                        .texOffs(0, 9)
+                        .addBox(-2.0F, 0.0F, -2.0F, 4, 9, 4, new CubeDeformation(0.28F))
+                        // Layered crimson haidate thigh plates (u=0..16, v=24..34)
+                        .texOffs(0, 24)
+                        .addBox(-2.2F, 1.2F, -2.5F, 4, 6, 4, new CubeDeformation(0.38F))
+                        // Steel knee boss (u=0..10, v=36..39)
+                        .texOffs(0, 36)
+                        .addBox(-2.0F, 5.8F, -2.7F, 4, 2, 1, new CubeDeformation(0.15F)),
+                PartPose.offset(-1.9F, 12.0F, 0.0F));
+
+        root.addOrReplaceChild("left_leg",
+                CubeListBuilder.create()
+                        // Dark armored hakama base (u=18..34, v=9..22)
+                        .texOffs(18, 9)
+                        .addBox(-2.0F, 0.0F, -2.0F, 4, 9, 4, new CubeDeformation(0.28F))
+                        // Layered crimson haidate thigh plates (u=18..34, v=24..34)
+                        .texOffs(18, 24)
+                        .addBox(-2.0F, 1.2F, -2.5F, 4, 6, 4, new CubeDeformation(0.38F))
+                        // Steel knee boss (u=12..22, v=36..39)
+                        .texOffs(12, 36)
+                        .addBox(-2.0F, 5.8F, -2.7F, 4, 2, 1, new CubeDeformation(0.15F)),
+                PartPose.offset(1.9F, 12.0F, 0.0F));
+
+        return LayerDefinition.create(mesh, 64, 64);
+    }
+
+    public static LayerDefinition createWarringStatesBootsLayer() {
+        MeshDefinition mesh = ModelUtils.createBlankHumanoidMesh();
+        PartDefinition root = mesh.getRoot();
+
+        root.addOrReplaceChild("right_leg",
+                CubeListBuilder.create()
+                        // Suneate armored shin greave (u=0..16, v=0..10)
+                        .texOffs(0, 0)
+                        .addBox(-2.0F, 5.6F, -2.0F, 4, 6, 4, new CubeDeformation(0.32F))
+                        // Layered front iron-crimson splint (u=0..10, v=12..18)
+                        .texOffs(0, 12)
+                        .addBox(-1.8F, 5.2F, -2.6F, 4, 5, 1, new CubeDeformation(0.14F))
+                        // Heavy iron-capped war sandal (u=0..18, v=20..27)
+                        .texOffs(0, 20)
+                        .addBox(-2.2F, 10.4F, -2.5F, 4, 2, 5, new CubeDeformation(0.28F)),
+                PartPose.offset(-1.9F, 12.0F, 0.0F));
+
+        root.addOrReplaceChild("left_leg",
+                CubeListBuilder.create()
+                        // Suneate armored shin greave (u=18..34, v=0..10)
+                        .texOffs(18, 0)
+                        .addBox(-2.0F, 5.6F, -2.0F, 4, 6, 4, new CubeDeformation(0.32F))
+                        // Layered front iron-crimson splint (u=12..22, v=12..18)
+                        .texOffs(12, 12)
+                        .addBox(-2.2F, 5.2F, -2.6F, 4, 5, 1, new CubeDeformation(0.14F))
+                        // Heavy iron-capped war sandal (u=20..38, v=20..27)
+                        .texOffs(20, 20)
+                        .addBox(-2.2F, 10.4F, -2.5F, 4, 2, 5, new CubeDeformation(0.28F)),
+                PartPose.offset(1.9F, 12.0F, 0.0F));
+
+        return LayerDefinition.create(mesh, 64, 64);
+    }
 }
+
 

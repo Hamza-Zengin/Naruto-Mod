@@ -194,6 +194,40 @@ public class NarutoItems {
             props -> new NarutoArmorItem(NarutoArmorMaterial.WARRING_STATES_MAT, ArmorType.CHESTPLATE, props.rarity(Rarity.EPIC))
                     .setTooltipKey("item.narutomod.warring_states_armor.desc"));
 
+    public static final DeferredItem<Item> SHINOBI_LEGGINGS = ITEMS.registerItem("shinobi_leggings",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.CHUNIN_MAT, ArmorType.LEGGINGS, props)
+                    .setStaminaRegenBonus(0.10F)
+                    .setTooltipKey("item.narutomod.shinobi_leggings.desc"));
+
+    public static final DeferredItem<Item> SHINOBI_SANDALS = ITEMS.registerItem("shinobi_sandals",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.CHUNIN_MAT, ArmorType.BOOTS, props)
+                    .setFallDamageReduction(0.20F)
+                    .setMovementSpeedBonus(0.04F)
+                    .setTooltipKey("item.narutomod.shinobi_sandals.desc"));
+
+    public static final DeferredItem<Item> ANBU_LEGGINGS = ITEMS.registerItem("anbu_leggings",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.LEGGINGS, props.rarity(Rarity.UNCOMMON))
+                    .setChakraRegenBonus(0.10F)
+                    .setStaminaRegenBonus(0.10F)
+                    .setTooltipKey("item.narutomod.anbu_leggings.desc"));
+
+    public static final DeferredItem<Item> ANBU_BOOTS = ITEMS.registerItem("anbu_boots",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.BOOTS, props.rarity(Rarity.UNCOMMON))
+                    .setFallDamageReduction(0.15F)
+                    .setStealthSpeedBonus(0.15F)
+                    .setAnbuStealthSynergy(true)
+                    .setTooltipKey("item.narutomod.anbu_boots.desc"));
+
+    public static final DeferredItem<Item> WARRING_STATES_LEGGINGS = ITEMS.registerItem("warring_states_leggings",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.WARRING_STATES_MAT, ArmorType.LEGGINGS, props.rarity(Rarity.RARE))
+                    .setJutsuDamageReduction(0.10F)
+                    .setTooltipKey("item.narutomod.warring_states_leggings.desc"));
+
+    public static final DeferredItem<Item> WARRING_STATES_BOOTS = ITEMS.registerItem("warring_states_boots",
+            props -> new NarutoArmorItem(NarutoArmorMaterial.WARRING_STATES_MAT, ArmorType.BOOTS, props.rarity(Rarity.RARE))
+                    .setKnockbackResistanceBonus(0.20F)
+                    .setTooltipKey("item.narutomod.warring_states_boots.desc"));
+
     public static final DeferredItem<Item> KAGE_HAT = ITEMS.registerItem("kage_hat",
             props -> new NarutoArmorItem(NarutoArmorMaterial.KAGE_MAT, ArmorType.HELMET, props.rarity(Rarity.EPIC))
                     .setTooltipKey("item.narutomod.kage_hat.desc"));
@@ -307,6 +341,7 @@ public class NarutoItems {
                         output.accept(IWA_VILLAGER_SPAWN_EGG.get());
                         output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
                         output.accept(NarutoBlocks.ITEM_BONSAI_TREE.get());
+                        output.accept(NarutoBlocks.ITEM_TRAINING_DUMMY.get());
                     })
                     .build());
 
@@ -325,6 +360,12 @@ public class NarutoItems {
                         output.accept(AKATSUKI_CLOAK.get());
                         output.accept(SAGE_CLOAK.get());
                         output.accept(WARRING_STATES_ARMOR.get());
+                        output.accept(SHINOBI_LEGGINGS.get());
+                        output.accept(SHINOBI_SANDALS.get());
+                        output.accept(ANBU_LEGGINGS.get());
+                        output.accept(ANBU_BOOTS.get());
+                        output.accept(WARRING_STATES_LEGGINGS.get());
+                        output.accept(WARRING_STATES_BOOTS.get());
                         output.accept(KAGE_HAT.get());
                         output.accept(KAZEKAGE_HAT.get());
                         output.accept(MIZUKAGE_HAT.get());

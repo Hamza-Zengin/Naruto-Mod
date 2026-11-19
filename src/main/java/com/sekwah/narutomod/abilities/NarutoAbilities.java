@@ -69,6 +69,7 @@ public class NarutoAbilities {
     public static final DeferredHolder<Ability, RasenshurikenAbility> RASENSHURIKEN = ABILITY.register("rasenshuriken", RasenshurikenAbility::new);
     public static final DeferredHolder<Ability, TsukuyomiAbility> TSUKUYOMI = ABILITY.register("tsukuyomi", TsukuyomiAbility::new);
     public static final DeferredHolder<Ability, HakkeKushoAbility> HAKKE_KUSHO = ABILITY.register("hakke_kusho", HakkeKushoAbility::new);
+    public static final DeferredHolder<Ability, AdamantineChainsAbility> ADAMANTINE_CHAINS = ABILITY.register("adamantine_chains", AdamantineChainsAbility::new);
     public static final DeferredHolder<Ability, SummoningAbility> SUMMONING = ABILITY.register("summoning", SummoningAbility::new);
 
     public static void register(IEventBus eventBus) {

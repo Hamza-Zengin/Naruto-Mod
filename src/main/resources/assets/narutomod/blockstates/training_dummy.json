@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "narutomod:block/training_dummy"
+    },
+    "facing=south": {
+      "model": "narutomod:block/training_dummy",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "narutomod:block/training_dummy",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "narutomod:block/training_dummy",
+      "y": 270
+    }
+  }
+}

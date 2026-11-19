@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C C",
+    "I I",
+    "L L"
+  ],
+  "key": {
+    "C": "narutomod:chakra_metal",
+    "I": "minecraft:iron_ingot",
+    "L": "minecraft:leather"
+  },
+  "result": {
+    "id": "narutomod:anbu_boots",
+    "count": 1
+  }
+}

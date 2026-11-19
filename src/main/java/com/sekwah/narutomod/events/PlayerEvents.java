@@ -10,9 +10,11 @@ import com.sekwah.narutomod.entity.jutsuprojectile.JutsuProjectile;
 import com.sekwah.narutomod.entity.mob.AkatsukiNinjaEntity;
 import com.sekwah.narutomod.entity.mob.RogueNinjaEntity;
 import com.sekwah.narutomod.item.NarutoItems;
+import com.sekwah.narutomod.item.armor.NarutoArmorItem;
 import com.sekwah.narutomod.item.weapons.AnbuTantoItem;
 import com.sekwah.narutomod.item.weapons.KubikiribochoItem;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -21,6 +23,9 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -41,6 +46,10 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 public class PlayerEvents {
 
     public static final float SAGE_CLOAK_DAMAGE_MULTIPLIER = 1.12F;
+    public static final Identifier ARMOR_AGILITY_MODIFIER_ID =
+            Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "armor_movement_agility");
+    public static final Identifier ARMOR_STEALTH_AGILITY_MODIFIER_ID =
+            Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "armor_stealth_agility");
 
     public static boolean isKageHat(Item item) {
         return item == NarutoItems.KAGE_HAT.get()
@@ -73,6 +82,46 @@ public class PlayerEvents {
 
     public static float applyWarringStatesReduction(float amount, boolean wearingWarringStatesArmor, boolean isJutsuOrExplosion) {
         return (wearingWarringStatesArmor && isJutsuOrExplosion) ? amount * 0.85F : amount;
+    }
+
+    public static float applyDeclarativeJutsuDamageReduction(float amount, float reduction) {
+        float clamped = Math.max(0.0F, Math.min(0.60F, reduction));
+        return amount * (1.0F - clamped);
+    }
+
+    public static float applyAnbuStealthSynergyDamage(float amount, boolean hasSynergy) {
+        return hasSynergy ? amount * (1.0F + NarutoArmorItem.ANBU_BOOTS_BACKSTAB_SYNERGY_BONUS) : amount;
+    }
+
+    public static float applyKnockbackResistance(float strength, float bonus) {
+        float clamped = Math.max(0.0F, Math.min(0.85F, bonus));
+        return strength * (1.0F - clamped);
+    }
+
+    public static double applyArmorFallReduction(double distance, float reduction) {
+        double clamped = Math.max(0.0D, Math.min(0.90D, reduction));
+        return distance * (1.0D - clamped);
+    }
+
+    public static double computeArmorMovementAttributeDelta(float movementSpeedBonus, float stealthSpeedBonus, boolean isCrouching) {
+        double pct = Math.max(0.0F, movementSpeedBonus) + (isCrouching ? Math.max(0.0F, stealthSpeedBonus) : 0.0F);
+        return pct * 0.1D;
+    }
+
+    private static void syncTransientSpeedModifier(AttributeInstance attr, Identifier id, double amount) {
+        AttributeModifier existing = attr.getModifier(id);
+        if (amount <= 1.0E-5D) {
+            if (existing != null) {
+                attr.removeModifier(id);
+            }
+            return;
+        }
+        if (existing == null || Math.abs(existing.amount() - amount) > 1.0E-5D) {
+            if (existing != null) {
+                attr.removeModifier(id);
+            }
+            attr.addTransientModifier(new AttributeModifier(id, amount, AttributeModifier.Operation.ADD_VALUE));
+        }
     }
 
     public static float applyVillageArmorDamageReduction(
@@ -125,6 +174,16 @@ public class PlayerEvents {
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         Player player = event.getEntity();
         if (!player.level().isClientSide() && player.level() instanceof ServerLevel serverLevel) {
+            AttributeInstance speedAttr = player.getAttribute(Attributes.MOVEMENT_SPEED);
+            if (speedAttr != null) {
+                double moveDelta = computeArmorMovementAttributeDelta(
+                        NarutoArmorItem.getTotalMovementSpeedBonus(player), 0.0F, false);
+                double stealthDelta = computeArmorMovementAttributeDelta(
+                        0.0F, NarutoArmorItem.getTotalStealthSpeedBonus(player), player.isCrouching());
+                syncTransientSpeedModifier(speedAttr, ARMOR_AGILITY_MODIFIER_ID, moveDelta);
+                syncTransientSpeedModifier(speedAttr, ARMOR_STEALTH_AGILITY_MODIFIER_ID, stealthDelta);
+            }
+
             // Check every 30 seconds at night in the Overworld for natural Shinobi encounters
             if (player.tickCount % 600 == 0 && serverLevel.dimension() == Level.OVERWORLD && serverLevel.isDarkOutside() && !player.isCreative() && !player.isSpectator()) {
                 if (serverLevel.getRandom().nextFloat() < 0.22f) {
@@ -220,7 +279,9 @@ public class PlayerEvents {
                     && attacker.getMainHandItem().getItem() instanceof AnbuTantoItem
                     && event.getEntity() instanceof LivingEntity livingTarget
                     && AnbuTantoItem.isStealthBackstab(attacker, livingTarget)) {
-                event.setAmount(event.getAmount() * AnbuTantoItem.BACKSTAB_MULTIPLIER);
+                float backstabDamage = event.getAmount() * AnbuTantoItem.BACKSTAB_MULTIPLIER;
+                backstabDamage = applyAnbuStealthSynergyDamage(backstabDamage, NarutoArmorItem.hasAnbuStealthSynergy(attacker));
+                event.setAmount(backstabDamage);
             }
             if (attacker.getItemBySlot(EquipmentSlot.CHEST).getItem() == NarutoItems.SAGE_CLOAK.get()) {
                 event.setAmount(applySageCloakDamageMultiplier(event.getAmount(), true));
@@ -236,6 +297,10 @@ public class PlayerEvents {
             boolean wearingWarringStates = chestItem == NarutoItems.WARRING_STATES_ARMOR.get();
             if (wearingWarringStates && isWarringStatesReducedDamage(event.getSource())) {
                 event.setAmount(applyWarringStatesReduction(event.getAmount(), true, true));
+            }
+            float declarativeJutsuReduction = NarutoArmorItem.getTotalJutsuDamageReduction(defender);
+            if (declarativeJutsuReduction > 0.0F && isWarringStatesReducedDamage(event.getSource())) {
+                event.setAmount(applyDeclarativeJutsuDamageReduction(event.getAmount(), declarativeJutsuReduction));
             }
 
             event.setAmount(applyVillageArmorDamageReduction(
@@ -258,6 +323,10 @@ public class PlayerEvents {
             Item headItem = player.getItemBySlot(EquipmentSlot.HEAD).getItem();
             if (headItem == NarutoItems.TSUCHIKAGE_HAT.get()) {
                 event.setStrength(event.getStrength() * 0.60F);
+            }
+            float kbBonus = NarutoArmorItem.getTotalKnockbackResistance(player);
+            if (kbBonus > 0.0F) {
+                event.setStrength(applyKnockbackResistance(event.getStrength(), kbBonus));
             }
         }
     }
@@ -288,6 +357,10 @@ public class PlayerEvents {
             if (distance > 3) {
                 distance -= 5f;
                 distance *= 0.6f;
+            }
+            float fallReduction = NarutoArmorItem.getTotalFallDamageReduction(player);
+            if (fallReduction > 0.0F) {
+                distance = applyArmorFallReduction(distance, fallReduction);
             }
             event.setDistance(distance);
         }
