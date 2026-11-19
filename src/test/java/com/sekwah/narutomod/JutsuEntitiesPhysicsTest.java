@@ -119,4 +119,15 @@ public class JutsuEntitiesPhysicsTest {
         assertFalse(src.contains("sendParticles"), "Kawarimi must not spawn particles");
         assertFalse(src.contains("playSound"), "Kawarimi must not play sounds");
     }
+
+    @Test
+    @DisplayName("Verify WaterBulletEntity yaw=atan2(-x,z) and pitch=atan2(y,horiz) conventions")
+    public void testWaterBulletMotionRotationConvention() {
+        assertEquals(0.0F, WaterBulletEntity.computeYawFromMotion(new net.minecraft.world.phys.Vec3(0, 0, 1)), 0.01F);
+        assertEquals(-90.0F, WaterBulletEntity.computeYawFromMotion(new net.minecraft.world.phys.Vec3(1, 0, 0)), 0.01F);
+        assertEquals(90.0F, WaterBulletEntity.computeYawFromMotion(new net.minecraft.world.phys.Vec3(-1, 0, 0)), 0.01F);
+        assertEquals(180.0F, Math.abs(WaterBulletEntity.computeYawFromMotion(new net.minecraft.world.phys.Vec3(0, 0, -1))), 0.01F);
+        assertEquals(45.0F, WaterBulletEntity.computePitchFromMotion(new net.minecraft.world.phys.Vec3(0, 1, 1)), 0.01F);
+        assertEquals(-45.0F, WaterBulletEntity.computePitchFromMotion(new net.minecraft.world.phys.Vec3(0, -1, 1)), 0.01F);
+    }
 }

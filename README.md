@@ -52,8 +52,8 @@ Ninja Menüsü (`J` tuşu) üzerinden klanınızı seçin, görevleri tamamlayı
 </details>
 
 ### ⚔️ Gerçekçi 3D Silahlar & Köy Zırh Setleri
-- **Kademeli İncelen `64×64` 3D Silahlar:** `Kunai`, `Patlayıcı Kunai` (「爆」 parşömenli), `Samehada` (kafatası dipçikli, bandajlı ve dikenli), `Chakra Kılıcı` (4 halkalı Hien muştası) ve `ANBU Kılıcı` (sekizgen *tsuba* & *kissaki* uçlu *tanto*) — elde, yerde, eşya çerçevesinde ve fırlatıldığında tam 3D görünüm.
-- **Efsanevi & Fırlatılabilir Silahlar:** `Kubikiribōchō` (hasar/öldürme ile kendi kendini onaran), `Kusanagi Kılıcı`, `Kemik Kılıcı`, `Fūma Shuriken`, `Shuriken`, `Senbon`, `Patlayıcı Mühür` ve `Sis Bombası`.
+- **Kademeli İncelen `64×64` 3D Silahlar:** `Kunai`, `Patlayıcı Kunai` (「爆」 parşömenli), `Shuriken` (4 uçlu eğimli bıçak & merkez halkalı), `Samehada` (kafatası dipçikli, bandajlı ve dikenli), `Çakra Bıçağı` (Asuma tarzı 4 halkalı Hien muşta bıçağı), `Kusanagi Kılıcı` (kavisli *sori* namlu & süslü *tsuba*), `Gunbai Uchiwa` ve `ANBU Kılıcı` (sekizgen *tsuba* & *kissaki* uçlu *tanto*) — elde, yerde, eşya çerçevesinde ve fırlatıldığında tam 3D görünüm.
+- **Efsanevi & Fırlatılabilir Silahlar:** `Kubikiribōchō` (hasar/öldürme ile kendi kendini onaran), `Kemik Kılıcı`, `Fūma Shuriken`, `Senbon`, `Patlayıcı Mühür` ve `Sis Bombası`.
 - **Köy Zırhları & Pasif Bonuslar:** `5` Büyük Köyün **Kage Şapkası** (eşleşen elementte %-15 çakra maliyeti + Max Çakra) ve **Jōnin Yeleği** (-1 tick el mührü gecikmesi), **Savaşan Devletler Zırhı** (%-15 jutsu/patlama hasarı), **Bilge Pelerini (*Sage Cloak*)** (+%50 çakra yenilenmesi & +%12 Senjutsu hasarı), **Akatsuki Pelerini**, **ANBU Zırhı** ve alın koruyucuları.
 
 ### 🏯 Dünya Üretimi (10 Yapı) & Shinobi Ekosistemi (13 Mob)
@@ -67,7 +67,7 @@ Ninja Menüsü (`J` tuşu) üzerinden klanınızı seçin, görevleri tamamlayı
 | :--- | :--- |
 | **Konoha Köyü** (`konoha_village`) | Hokage Köşkü/Meydanı, tek seferlik **İchiraku Ramen**, eğitim alanı, dōjō, iç mekan aydınlatmaları ve Konoha ninja/tüccarları |
 | **Suna, Kiri, Kumo, Iwa Köyleri** | Her biri kendi biyomuna uygun mimariye, köy ninjalarına ve köye özel ticaret sunan tüccar köylülere sahip 4 büyük köy |
-| **Son Vadi** (`valley_of_the_end`) | 5 parçalı dev kanyon kompleksi (şelale, ~28 blokluk Hashirama & Madara heykelleri, nehir ve kanyon duvarları) |
+| **Son Vadi** (`valley_of_the_end`) | 2x ölçekli 6 parçalı dev kanyon kompleksi (çok kademeli şelale, Senju arması & ahşap/yaprak motifli açık taş Hashirama obeliski, kırmızı/beyaz Uchiha yelpazesi taçlı koyu taş Madara obeliski, nehir ve kanyon duvarları) |
 | **Chūnin Sınav Arenası** (`chunin_arena`) | Yükseltilmiş `360°` seyirci galerisi, tribün oturakları ve 2 katlı Kage locası |
 | **Myōbokuzan & Uchiha Tapınakları** | Kurbağa Bilge tapınağı (`myobokuzan_shrine`) ve Uchiha taş tablet tapınağı (`uchiha_shrine`) |
 | **Akatsuki Sığınağı** (`akatsuki_hideout`) | Tek seferlik kalıcı **2 Akatsuki Üyesi + 5 Kaçak Ninja** savunucusu barındıran ritüel mağarası |
@@ -81,7 +81,7 @@ Ninja Menüsü (`J` tuşu) üzerinden klanınızı seçin, görevleri tamamlayı
 Naruto-Mod v0.1.0, sunucu sahiplerinin modpack ve PvP/PvE dengesini kod değiştirmeden ayarlayabilmesi için veri odaklı tasarlanmıştır:
 
 1. **DataPack Jutsu Dengeleme (`data/narutomod/jutsus/*.json`):**
-   Her jutsu'nun `chakra_cost`, `cooldown_ticks`, `base_damage`, `required_rank` ve `element` değerlerini DataPack ile geçersiz kılabilirsiniz. Değerler sunucudan istemcilere otomatik senkronize edilir.
+   Her jutsu'nun `chakra_cost`, `cooldown_ticks`, `base_damage`, `required_rank` ve `element` değerlerini DataPack ile geçersiz kılabilirsiniz. Değerler sunucudan istemcilere otomatik senkronizasyon edilir.
 2. **Global Loot Modifiers (`data/narutomod/loot_modifiers/*.json`):**
    Sandık ganimet tablolarına düşen parşömen/eşya olasılıkları (`chance`, `min_count`, `max_count`, `target_loot_tables`) tamamen JSON üzerinden yönetilir.
 3. **Griefing & Alan Koruma (`narutoJutsuGriefing`):**
@@ -95,7 +95,7 @@ Naruto-Mod v0.1.0, sunucu sahiplerinin modpack ve PvP/PvE dengesini kod değişt
 
 ## 🌐 Çoklu Dil Desteği
 
-Tüm `8` dil dosyası (`en_us`, `tr_tr`, `de_de`, `es_es`, `fr_fr`, `ja_jp`, `pt_br`, `ru_ru`) **`465` anahtar** ile %100 eşitliğe sahiptir.
+Tüm `8` dil dosyası (`en_us`, `tr_tr`, `de_de`, `es_es`, `fr_fr`, `ja_jp`, `pt_br`, `ru_ru`) **`466` anahtar** ile %100 eşitliğe sahiptir.
 
 ---
 

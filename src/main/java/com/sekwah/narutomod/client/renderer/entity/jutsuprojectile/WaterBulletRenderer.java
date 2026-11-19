@@ -17,6 +17,7 @@ import com.sekwah.sekclib.util.ColorUtil;
 import com.sekwah.sekclib.util.RenderMathUtil;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
 public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, WaterBulletRenderer.WaterBulletRenderState> {
 
@@ -45,8 +46,21 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
         super.extractRenderState(entity, state, partialTicks);
         float age = entity.tickCount + partialTicks;
         float maxLife = Math.max(1.0F, (float) entity.getMaxLife());
-        state.yRot = entity.getYRot(partialTicks);
-        state.xRot = entity.getXRot(partialTicks);
+        Vec3 motion = entity.getDeltaMovement();
+        if (motion.lengthSqr() > 1.0E-6D) {
+            float targetYaw = WaterBulletEntity.computeYawFromMotion(motion);
+            float targetPitch = WaterBulletEntity.computePitchFromMotion(motion);
+            if (entity.hasMotionRot()) {
+                state.yRot = Mth.rotLerp(partialTicks, entity.getPrevMotionYaw(), targetYaw);
+                state.xRot = Mth.lerp(partialTicks, entity.getPrevMotionPitch(), targetPitch);
+            } else {
+                state.yRot = targetYaw;
+                state.xRot = targetPitch;
+            }
+        } else {
+            state.yRot = entity.getYRot(partialTicks);
+            state.xRot = entity.getXRot(partialTicks);
+        }
         state.age = age;
         state.progress = Mth.clamp(age / maxLife, 0.0F, 1.0F);
         state.isDragon = entity.isDragon();

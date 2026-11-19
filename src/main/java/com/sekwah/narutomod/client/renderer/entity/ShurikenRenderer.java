@@ -53,7 +53,7 @@ public class ShurikenRenderer extends EntityRenderer<ShurikenEntity, ShurikenRen
       if (this.renderingItem == null) {
          this.renderingItem = new ItemStack(NarutoItems.SHURIKEN.get());
       }
-      this.itemModelResolver.updateForNonLiving(state.item, this.renderingItem, ItemDisplayContext.FIXED, entity);
+      this.itemModelResolver.updateForNonLiving(state.item, this.renderingItem, ItemDisplayContext.NONE, entity);
    }
 
    @Override
@@ -61,9 +61,9 @@ public class ShurikenRenderer extends EntityRenderer<ShurikenEntity, ShurikenRen
       matrixStackIn.pushPose();
       matrixStackIn.rotateDegrees(Axis.YP, state.yRot - 90.0F);
       matrixStackIn.rotateDegrees(Axis.ZP, state.xRot);
-      matrixStackIn.rotateDegrees(Axis.XP, state.rotOffset);
+      matrixStackIn.rotateDegrees(Axis.XP, 90.0F + state.rotOffset * 0.6F);
       matrixStackIn.rotateDegrees(Axis.ZP, state.spinDegrees);
-      matrixStackIn.scale(0.5F, 0.5F, 0.5F);
+      matrixStackIn.scale(0.65F, 0.65F, 0.65F);
       state.item.submit(matrixStackIn, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, state.outlineColor);
       matrixStackIn.popPose();
       super.submit(state, matrixStackIn, submitNodeCollector, cameraRenderState);

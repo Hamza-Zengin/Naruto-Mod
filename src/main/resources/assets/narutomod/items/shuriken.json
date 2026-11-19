@@ -6,8 +6,7 @@
       {
         "when": [
           "gui",
-          "ground",
-          "fixed"
+          "ground"
         ],
         "model": {
           "type": "minecraft:model",

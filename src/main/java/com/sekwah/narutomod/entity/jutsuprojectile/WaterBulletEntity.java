@@ -9,6 +9,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,6 +42,61 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
             SynchedEntityData.defineId(WaterBulletEntity.class, EntityDataSerializers.BOOLEAN);
 
     private int jutsuPower = 50;
+    private float prevMotionYaw;
+    private float prevMotionPitch;
+    private float motionYaw;
+    private float motionPitch;
+    private boolean hasMotionRot = false;
+
+    public static float computeYawFromMotion(Vec3 motion) {
+        return (float) (Mth.atan2(-motion.x, motion.z) * (180.0D / Math.PI));
+    }
+
+    public static float computePitchFromMotion(Vec3 motion) {
+        return (float) (Mth.atan2(motion.y, motion.horizontalDistance()) * (180.0D / Math.PI));
+    }
+
+    public void alignRotationToMovement() {
+        Vec3 motion = this.getDeltaMovement();
+        if (motion.lengthSqr() > 1.0E-6D) {
+            float yaw = computeYawFromMotion(motion);
+            float pitch = computePitchFromMotion(motion);
+            this.setYRot(yaw);
+            this.setXRot(pitch);
+            this.prevMotionYaw = yaw;
+            this.prevMotionPitch = pitch;
+            this.motionYaw = yaw;
+            this.motionPitch = pitch;
+            this.hasMotionRot = true;
+        }
+    }
+
+    public boolean hasMotionRot() {
+        return this.hasMotionRot;
+    }
+
+    public float getPrevMotionYaw() {
+        return this.prevMotionYaw;
+    }
+
+    public float getPrevMotionPitch() {
+        return this.prevMotionPitch;
+    }
+
+    private void syncRotationFromMotion() {
+        Vec3 motion = this.getDeltaMovement();
+        if (motion.lengthSqr() > 1.0E-6D) {
+            this.motionYaw = computeYawFromMotion(motion);
+            this.motionPitch = computePitchFromMotion(motion);
+            if (!this.hasMotionRot) {
+                this.prevMotionYaw = this.motionYaw;
+                this.prevMotionPitch = this.motionPitch;
+                this.hasMotionRot = true;
+            }
+            this.setYRot(this.motionYaw);
+            this.setXRot(this.motionPitch);
+        }
+    }
 
     @Override
     public ChakraElement getElement() {
@@ -147,9 +203,18 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
 
     @Override
     public void tick() {
+        Vec3 preMotion = this.getDeltaMovement();
+        if (!this.hasMotionRot && preMotion.lengthSqr() > 1.0E-6D) {
+            this.alignRotationToMovement();
+        } else if (this.hasMotionRot) {
+            this.prevMotionYaw = this.motionYaw;
+            this.prevMotionPitch = this.motionPitch;
+        }
+
         super.tick();
 
         if (this.level().isClientSide()) {
+            this.syncRotationFromMotion();
             int particleCount = this.isDragon() ? 5 : 3;
             for (int i = 0; i < particleCount; i++) {
                 this.level().addParticle(ParticleTypes.SPLASH,
@@ -167,6 +232,7 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
             if (this.isDragon() && this.tickCount > 2) {
                 this.steerTowardNearestTarget(serverLevel);
             }
+            this.syncRotationFromMotion();
 
             serverLevel.sendParticles(ParticleTypes.SPLASH,
                     this.getX(), this.getY() + 0.4D, this.getZ(),
