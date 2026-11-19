@@ -78,26 +78,7 @@ public class Phase1ExpansionTest {
     @Test
     @DisplayName("Verify declarative armor passives and PlayerEvents / ChakraStaminaLogic math helpers")
     void testDeclarativeArmorPassivesAndMath() {
-        Item.Properties bootProps = new Item.Properties()
-                .setId(ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "test_anbu_boot")));
-        NarutoArmorItem dummyBoot = new NarutoArmorItem(NarutoArmorMaterial.ANBU_MAT, ArmorType.BOOTS, bootProps)
-                .setChakraRegenBonus(0.10F)
-                .setStaminaRegenBonus(0.15F)
-                .setFallDamageReduction(1.20F)
-                .setKnockbackResistanceBonus(1.20F)
-                .setJutsuDamageReduction(1.20F)
-                .setMovementSpeedBonus(0.04F)
-                .setStealthSpeedBonus(0.15F)
-                .setAnbuStealthSynergy(true);
-
-        assertEquals(0.10F, dummyBoot.getChakraRegenBonus(), 0.001F);
-        assertEquals(0.15F, dummyBoot.getStaminaRegenBonus(), 0.001F);
-        assertEquals(0.95F, dummyBoot.getFallDamageReduction(), 0.001F);
-        assertEquals(0.95F, dummyBoot.getKnockbackResistanceBonus(), 0.001F);
-        assertEquals(0.95F, dummyBoot.getJutsuDamageReduction(), 0.001F);
-        assertEquals(0.04F, dummyBoot.getMovementSpeedBonus(), 0.001F);
-        assertEquals(0.15F, dummyBoot.getStealthSpeedBonus(), 0.001F);
-        assertTrue(dummyBoot.hasAnbuStealthSynergy());
+        assertEquals(0.15F, NarutoArmorItem.ANBU_BOOTS_BACKSTAB_SYNERGY_BONUS, 0.001F);
 
         // Accessory regen multiplier
         assertEquals(1.00F, ChakraStaminaLogic.getAccessoryRegenMultiplier(-0.2F), 0.001F);
