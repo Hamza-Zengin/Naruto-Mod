@@ -459,5 +459,9 @@
   "item.narutomod.gunbai_uchiwa.ability": "Sağ Tık: Uchiwa Gaeshi (14 Çakra) — Mermileri yansıtır (1.6x), Ateş Toplarını güçlendirir ve Rüzgar şok dalgası yayar.",
   "item.narutomod.medical_pouch": "Medikal Şinobi Çantası",
   "item.narutomod.medical_pouch.desc": "Sağ Tık (15 Çakra, 16 Kullanım): Zehir, Solma, Yavaşlık, Zayıflık ve Körlüğü temizler, 6 Can yeniler ve Yenilenme II verir.",
-  "item.narutomod.medical_pouch.used": "Medikal Çanta Uygulandı — Durum Etkileri Temizlendi ve Yaralar İyileştirildi!"
+  "item.narutomod.medical_pouch.used": "Medikal Çanta Uygulandı — Durum Etkileri Temizlendi ve Yaralar İyileştirildi!",
+  "block.narutomod.tatami": "Tatami Hasırı",
+  "block.narutomod.tatami_slab": "Tatami Hasırı Plakası",
+  "block.narutomod.shoji_panel": "Şoji Paneli",
+  "block.narutomod.stone_lantern": "Taş Fener"
 }

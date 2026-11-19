@@ -459,5 +459,9 @@
   "item.narutomod.gunbai_uchiwa.ability": "Right-Click: Uchiwa Gaeshi (14 Chakra) — Reflects projectiles (1.6x), boosts Fireballs & unleashes a Wind shockwave.",
   "item.narutomod.medical_pouch": "Medical Shinobi Pouch",
   "item.narutomod.medical_pouch.desc": "Right-Click (15 Chakra, 16 Uses): Cleanses Poison, Wither, Slowness, Weakness & Blindness, heals 6 HP & grants Regeneration II.",
-  "item.narutomod.medical_pouch.used": "Medical Pouch Applied — Status Effects Cleansed & Wounds Stabilized!"
+  "item.narutomod.medical_pouch.used": "Medical Pouch Applied — Status Effects Cleansed & Wounds Stabilized!",
+  "block.narutomod.tatami": "Tatami Mat",
+  "block.narutomod.tatami_slab": "Tatami Mat Slab",
+  "block.narutomod.shoji_panel": "Shoji Panel",
+  "block.narutomod.stone_lantern": "Stone Lantern"
 }

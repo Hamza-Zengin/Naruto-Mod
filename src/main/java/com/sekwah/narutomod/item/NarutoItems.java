@@ -358,6 +358,10 @@ public class NarutoItems {
                         output.accept(NarutoBlocks.ITEM_MAKIBISHI.get());
                         output.accept(NarutoBlocks.ITEM_WIRE_TRAP.get());
                         output.accept(NarutoBlocks.ITEM_WEAPON_RACK.get());
+                        output.accept(NarutoBlocks.ITEM_TATAMI.get());
+                        output.accept(NarutoBlocks.ITEM_TATAMI_SLAB.get());
+                        output.accept(NarutoBlocks.ITEM_SHOJI_PANEL.get());
+                        output.accept(NarutoBlocks.ITEM_STONE_LANTERN.get());
                     })
                     .build());
 

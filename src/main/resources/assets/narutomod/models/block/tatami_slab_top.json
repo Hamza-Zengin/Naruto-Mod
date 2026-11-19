@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "narutomod:block/deco/tatami_top",
+    "top": "narutomod:block/deco/tatami_top",
+    "side": "narutomod:block/deco/tatami_side"
+  }
+}

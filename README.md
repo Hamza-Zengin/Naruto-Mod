@@ -95,7 +95,7 @@ Naruto-Mod v0.1.0, sunucu sahiplerinin modpack ve PvP/PvE dengesini kod değişt
 
 ## 🌐 Çoklu Dil Desteği
 
-Tüm `8` dil dosyası (`en_us`, `tr_tr`, `de_de`, `es_es`, `fr_fr`, `ja_jp`, `pt_br`, `ru_ru`) **`419` anahtar** ile %100 eşitliğe sahiptir.
+Tüm `8` dil dosyası (`en_us`, `tr_tr`, `de_de`, `es_es`, `fr_fr`, `ja_jp`, `pt_br`, `ru_ru`) **`465` anahtar** ile %100 eşitliğe sahiptir.
 
 ---
 

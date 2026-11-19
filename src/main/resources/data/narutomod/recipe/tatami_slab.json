@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "TTT"
+  ],
+  "key": {
+    "T": "narutomod:tatami"
+  },
+  "result": {
+    "id": "narutomod:tatami_slab",
+    "count": 6
+  }
+}
