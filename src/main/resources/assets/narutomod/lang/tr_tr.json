@@ -449,5 +449,15 @@
   "item.narutomod.wire_trap": "Tel Tuzağı",
   "block.narutomod.weapon_rack": "Shinobi Silah Standı",
   "item.narutomod.weapon_rack": "Shinobi Silah Standı",
-  "block.narutomod.weapon_rack.empty": "Silah standı boş. Sergilemek için elinde bir eşyayla sağ tıkla."
+  "block.narutomod.weapon_rack.empty": "Silah standı boş. Sergilemek için elinde bir eşyayla sağ tıkla.",
+  "narutomod:ash_pile_burning": "Katon: Haisekisho",
+  "narutomod:water_encampment_wall": "Suiton: Suijinheki",
+  "narutomod:chakra_scalpel": "Chakura no Mesu",
+  "jutsu.chakra_scalpel.ready": "Çakra Neşteri Hazır — Hassas Darbeler Tendonları Keser ve Çakrayı Bozar!",
+  "item.narutomod.gunbai_uchiwa": "Gunbai Uchiwa",
+  "item.narutomod.gunbai_uchiwa.desc": "Gelen jutsuları yansıtmak ve alevleri savurmak için dövülmüş efsanevi Uchiha savaş yelpazesi (yanan rakiplere +4 Ateş Hasarı).",
+  "item.narutomod.gunbai_uchiwa.ability": "Sağ Tık: Uchiwa Gaeshi (14 Çakra) — Mermileri yansıtır (1.6x), Ateş Toplarını güçlendirir ve Rüzgar şok dalgası yayar.",
+  "item.narutomod.medical_pouch": "Medikal Şinobi Çantası",
+  "item.narutomod.medical_pouch.desc": "Sağ Tık (15 Çakra, 16 Kullanım): Zehir, Solma, Yavaşlık, Zayıflık ve Körlüğü temizler, 6 Can yeniler ve Yenilenme II verir.",
+  "item.narutomod.medical_pouch.used": "Medikal Çanta Uygulandı — Durum Etkileri Temizlendi ve Yaralar İyileştirildi!"
 }

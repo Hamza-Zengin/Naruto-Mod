@@ -449,5 +449,15 @@
   "item.narutomod.wire_trap": "Armadilha de Fio",
   "block.narutomod.weapon_rack": "Suporte de Armas Shinobi",
   "item.narutomod.weapon_rack": "Suporte de Armas Shinobi",
-  "block.narutomod.weapon_rack.empty": "O suporte está vazio. Clique com o botão direito segurando um item para exibi-lo."
+  "block.narutomod.weapon_rack.empty": "O suporte está vazio. Clique com o botão direito segurando um item para exibi-lo.",
+  "narutomod:ash_pile_burning": "Katon: Haisekisho",
+  "narutomod:water_encampment_wall": "Suiton: Suijinheki",
+  "narutomod:chakra_scalpel": "Chakura no Mesu",
+  "jutsu.chakra_scalpel.ready": "Bisturi de Chakra pronto — Golpes precisos cortam tendões e interrompem o chakra!",
+  "item.narutomod.gunbai_uchiwa": "Gunbai Uchiwa",
+  "item.narutomod.gunbai_uchiwa.desc": "Leque de guerra lendário Uchiha forjado para refletir jutsus e espalhar chamas (+4 de dano ígneo contra alvos em chamas).",
+  "item.narutomod.gunbai_uchiwa.ability": "Botão Direito: Uchiwa Gaeshi (14 Chakra) — Reflete projéteis (1.6x), potencializa bolas de fogo e libera onda de vento.",
+  "item.narutomod.medical_pouch": "Bolsa Médica Shinobi",
+  "item.narutomod.medical_pouch.desc": "Botão Direito (15 Chakra, 16 Usos): Purifica Veneno, Decomposição, Lentidão, Fraqueza e Cegueira, cura 6 HP e concede Regeneração II.",
+  "item.narutomod.medical_pouch.used": "Bolsa Médica aplicada — Efeitos purificados e ferimentos estabilizados!"
 }

@@ -165,6 +165,9 @@ public class NinjaCapabilityHandler {
             } else if ("chidori".equalsIgnoreCase(activeJutsu)) {
                 com.sekwah.narutomod.abilities.jutsus.ChidoriAbility.executeStrike(player, ninjaData, livingTarget);
                 event.setCanceled(true);
+            } else if ("chakra_scalpel".equalsIgnoreCase(activeJutsu)) {
+                com.sekwah.narutomod.abilities.jutsus.ChakraScalpelAbility.executeStrike(player, ninjaData, livingTarget);
+                event.setCanceled(true);
             }
         }
     }

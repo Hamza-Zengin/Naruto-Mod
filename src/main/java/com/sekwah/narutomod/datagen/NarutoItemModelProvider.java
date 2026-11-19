@@ -45,6 +45,7 @@ public class NarutoItemModelProvider extends ModelProvider {
         simpleItemWithTexture(itemModels, NarutoItems.RAW_CHAKRA_METAL.get(), "item/weapons/raw_chakra_metal");
         simpleItemWithTexture(itemModels, NarutoItems.ICHIRAKU_RAMEN.get(), "item/weapons/ichiraku_ramen");
         simpleItemWithTexture(itemModels, NarutoItems.MILITARY_RATIONS_PILL.get(), "item/weapons/military_rations_pill");
+        simpleItemWithTexture(itemModels, NarutoItems.MEDICAL_POUCH.get(), "item/weapons/medical_pouch");
         simpleItemWithTexture(itemModels, NarutoItems.SMOKE_BOMB.get(), "item/weapons/smoke_bomb");
         simpleItemWithTexture(itemModels, NarutoBlocks.ITEM_PAPER_BOMB.get(), "item/weapons/paperbomb");
         simpleItemWithTexture(itemModels, NarutoItems.LONELY_MARCH.get(), "item/lonely_march");

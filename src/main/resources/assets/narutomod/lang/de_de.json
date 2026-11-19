@@ -449,5 +449,15 @@
   "item.narutomod.wire_trap": "Stolperdraht-Falle",
   "block.narutomod.weapon_rack": "Shinobi-Waffenständer",
   "item.narutomod.weapon_rack": "Shinobi-Waffenständer",
-  "block.narutomod.weapon_rack.empty": "Der Waffenständer ist leer. Rechtsklick mit einem Gegenstand zum Ausstellen."
+  "block.narutomod.weapon_rack.empty": "Der Waffenständer ist leer. Rechtsklick mit einem Gegenstand zum Ausstellen.",
+  "narutomod:ash_pile_burning": "Katon: Haisekisho",
+  "narutomod:water_encampment_wall": "Suiton: Suijinheki",
+  "narutomod:chakra_scalpel": "Chakura no Mesu",
+  "jutsu.chakra_scalpel.ready": "Chakra-Skalpell bereit — Präzise Hiebe durchtrennen Sehnen & stören Chakra!",
+  "item.narutomod.gunbai_uchiwa": "Gunbai Uchiwa",
+  "item.narutomod.gunbai_uchiwa.desc": "Legendärer Uchiha-Kriegsfächer zum Zurückwerfen von Jutsus und Anfachen von Flammen (+4 Feuerschaden gegen brennende Gegner).",
+  "item.narutomod.gunbai_uchiwa.ability": "Rechtsklick: Uchiwa Gaeshi (14 Chakra) — Reflektiert Geschosse (1,6x), verstärkt Feuerbälle & entfesselt eine Wind-Schockwelle.",
+  "item.narutomod.medical_pouch": "Medizinischer Shinobi-Beutel",
+  "item.narutomod.medical_pouch.desc": "Rechtsklick (15 Chakra, 16 Nutzungen): Entfernt Gift, Wither, Langsamkeit, Schwäche & Blindheit, heilt 6 LP & gewährt Regeneration II.",
+  "item.narutomod.medical_pouch.used": "Medizinbeutel angewendet — Statuseffekte gereinigt & Wunden stabilisiert!"
 }

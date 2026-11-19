@@ -52,6 +52,8 @@ public class JutsuVisualEffectEntity extends Entity {
     public static final int TYPE_EARTH_WALL = 9;
     public static final int TYPE_STONE_SPIKES = 10;
     public static final int TYPE_ADAMANTINE_CHAINS = 11;
+    public static final int TYPE_ASH_CLOUD = 12;
+    public static final int TYPE_WATER_WALL = 13;
 
     private static final EntityDataAccessor<Integer> DATA_VISUAL_TYPE =
             SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.INT);
@@ -381,6 +383,103 @@ public class JutsuVisualEffectEntity extends Entity {
                                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
                 }
+
+                // --- KATON: HAISEKISHŌ (Ash Pile Burning Cloud & Chain Ignition) ---
+                case TYPE_ASH_CLOUD -> {
+                    final double cloudRadius = com.sekwah.narutomod.abilities.jutsus.AshPileBurningAbility.CLOUD_RADIUS;
+                    if (this.tickCount % 3 == 0) {
+                        serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE,
+                                this.getX(), this.getY() + 0.9D, this.getZ(),
+                                10, 1.45D, 0.55D, 1.45D, 0.02D,
+                                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                        serverLevel.sendParticles(ParticleTypes.ASH,
+                                this.getX(), this.getY() + 1.0D, this.getZ(),
+                                14, 1.6D, 0.7D, 1.6D, 0.01D,
+                                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                    }
+
+                    // Check for Fire/Explosive ignition triggers every 4 ticks
+                    if (!this.ashDetonated && this.tickCount % 4 == 0) {
+                        AABB cloudBox = this.getBoundingBox().inflate(cloudRadius, 2.0D, cloudRadius);
+                        List<Projectile> igniters = serverLevel.getEntitiesOfClass(Projectile.class, cloudBox,
+                                p -> p.isAlive() && (p instanceof FireballJutsuEntity
+                                        || p instanceof com.sekwah.narutomod.entity.projectile.ExplosiveKunaiEntity
+                                        || p.isOnFire()));
+                        if (!igniters.isEmpty()) {
+                            detonateAshCloud(serverLevel);
+                            return;
+                        }
+                    }
+
+                    // Periodic searing ash tick damage + Blindness + Slowness II
+                    if (!this.ashDetonated && this.tickCount % 10 == 0) {
+                        float baseDmg = Math.max(6.0F, this.getEffectDamage());
+                        float dotDmg = baseDmg * 0.12F;
+                        List<LivingEntity> victims = JutsuCombatHelper.findHostileTargetsInRadius(
+                                serverLevel, caster, this.position(), cloudRadius, 2.2D);
+                        DamageSource source = JutsuCombatHelper.playerOrMagicDamage(serverLevel, caster);
+                        for (LivingEntity victim : victims) {
+                            victim.hurtServer(serverLevel, source, dotDmg);
+                            victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 1, false, false));
+                            victim.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 45, 0, false, false));
+                        }
+                    }
+
+                    // Final auto-detonation right before expiry
+                    if (!this.ashDetonated && this.tickCount >= this.getMaxLife() - 2) {
+                        detonateAshCloud(serverLevel);
+                        return;
+                    }
+                }
+
+                // --- SUITON: SUIJINHEKI (Water Encampment Wall & Projectile Dampening) ---
+                case TYPE_WATER_WALL -> {
+                    final double wallRadius = 2.6D;
+                    if (this.tickCount % 3 == 0) {
+                        serverLevel.sendParticles(ParticleTypes.SPLASH,
+                                this.getX(), this.getY() + 1.1D, this.getZ(),
+                                12, 1.35D, 0.75D, 1.35D, 0.08D,
+                                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                    }
+
+                    AABB barrierBox = this.getBoundingBox().inflate(wallRadius, 2.2D, wallRadius);
+                    List<Projectile> incoming = serverLevel.getEntitiesOfClass(Projectile.class, barrierBox,
+                            p -> p.isAlive() && (caster == null || (p.getOwner() != caster && !ShadowCloneEntity.areAllies(caster, p.getOwner()))));
+                    for (Projectile projectile : incoming) {
+                        if (projectile instanceof FireballJutsuEntity fireball) {
+                            serverLevel.playSound(null, fireball.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1.1F, 1.1F);
+                            serverLevel.sendParticles(ParticleTypes.CLOUD,
+                                    fireball.getX(), fireball.getY() + 0.3D, fireball.getZ(),
+                                    16, 0.5D, 0.5D, 0.5D, 0.06D,
+                                    ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+                            fireball.discard();
+                        } else {
+                            Vec3 dampened = projectile.getDeltaMovement().scale(0.15D);
+                            projectile.setDeltaMovement(dampened.x, -0.25D, dampened.z);
+                            projectile.needsSync = true;
+                        }
+                    }
+
+                    if (this.tickCount % 6 == 0) {
+                        float pushDmg = this.tickCount == 6 ? Math.max(4.0F, this.getEffectDamage() * 0.5F) : 1.5F;
+                        List<LivingEntity> pushed = JutsuCombatHelper.findHostileTargetsInRadius(
+                                serverLevel, caster, this.position(), wallRadius, 2.0D);
+                        DamageSource source = JutsuCombatHelper.playerOrMagicDamage(serverLevel, caster);
+                        for (LivingEntity target : pushed) {
+                            if (target.isOnFire()) {
+                                target.clearFire();
+                            }
+                            if (this.tickCount == 6 || this.tickCount % 18 == 0) {
+                                target.hurtServer(serverLevel, source, pushDmg);
+                            }
+                            Vec3 away = target.position().subtract(caster != null ? caster.position() : this.position());
+                            double horiz = Math.hypot(away.x, away.z);
+                            if (horiz > 1.0E-4D) {
+                                JutsuCombatHelper.applyVelocity(target, new Vec3((away.x / horiz) * 0.65D, 0.20D, (away.z / horiz) * 0.65D), false);
+                            }
+                        }
+                    }
+                }
             }
 
             // Expiration
@@ -388,6 +487,46 @@ public class JutsuVisualEffectEntity extends Entity {
                 this.discard();
             }
         }
+    }
+
+    private boolean ashDetonated = false;
+
+    public void detonateAshCloud(ServerLevel serverLevel) {
+        if (this.ashDetonated || this.getVisualType() != TYPE_ASH_CLOUD) {
+            return;
+        }
+        this.ashDetonated = true;
+        Player caster = this.getCasterPlayer();
+        float baseDmg = Math.max(8.0F, this.getEffectDamage());
+        float burstDmg = baseDmg * 0.75F;
+        double radius = com.sekwah.narutomod.abilities.jutsus.AshPileBurningAbility.CLOUD_RADIUS + 0.4D;
+
+        serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 1.7F, 0.9F);
+        serverLevel.playSound(null, this.blockPosition(), SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.3F, 0.65F);
+        serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
+                this.getX(), this.getY() + 0.9D, this.getZ(),
+                2, 0.8D, 0.4D, 0.8D, 0.02D,
+                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+        serverLevel.sendParticles(ParticleTypes.FLAME,
+                this.getX(), this.getY() + 0.8D, this.getZ(),
+                48, 1.6D, 0.7D, 1.6D, 0.14D,
+                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+
+        List<LivingEntity> victims = JutsuCombatHelper.findHostileTargetsInRadius(
+                serverLevel, caster, this.position(), radius, 2.5D);
+        DamageSource source = caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().inFire();
+        for (LivingEntity victim : victims) {
+            victim.hurtServer(serverLevel, source, burstDmg);
+            victim.setRemainingFireTicks(100);
+            Vec3 away = victim.position().subtract(this.position());
+            double horiz = Math.hypot(away.x, away.z);
+            if (horiz > 1.0E-4D) {
+                JutsuCombatHelper.applyVelocity(victim, new Vec3((away.x / horiz) * 1.15D, 0.48D, (away.z / horiz) * 1.15D), true);
+            } else {
+                JutsuCombatHelper.applyVelocity(victim, new Vec3(0.0D, 0.55D, 0.0D), true);
+            }
+        }
+        this.discard();
     }
 
     public int getVisualType() {

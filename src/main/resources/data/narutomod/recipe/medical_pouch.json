@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "SLS",
+    "LGL",
+    "LML"
+  ],
+  "key": {
+    "S": "minecraft:string",
+    "L": "minecraft:leather",
+    "G": "minecraft:glistering_melon_slice",
+    "M": "narutomod:military_rations_pill"
+  },
+  "result": {
+    "id": "narutomod:medical_pouch",
+    "count": 1
+  }
+}

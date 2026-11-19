@@ -1,6 +1,7 @@
 package com.sekwah.narutomod.client.renderer.entity.layers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.ChakraScalpelModel;
 import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.ChidoriBurstModel;
 import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.EightGatesAuraModel;
 import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.RasenganSphereModel;
@@ -22,18 +23,21 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
  * Renders 3D Jutsu Models directly on the player's hand and torso:
  * - 3D Crackling Chidori Lightning Blade on the right hand during Chidori dash/charge
  * - 3D Swirling Chakra / Rasengan Sphere on the right hand during Rasengan
+ * - 3D Teal Medical Chakra Scalpel blade on the right hand during Chakura no Mesu
  * - 3D Eight Gates (Hachimon Tonkō) Crimson/Blue Steam Vortex Rings around the body
  */
 public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerModel> {
 
     private final RasenganSphereModel rasenganHandModel;
     private final ChidoriBurstModel chidoriHandModel;
+    private final ChakraScalpelModel scalpelHandModel;
     private final EightGatesAuraModel gatesAuraModel;
 
     public JutsuHandAuraLayer(RenderLayerParent<AvatarRenderState, PlayerModel> parent, EntityModelSet modelSet) {
         super(parent);
         this.rasenganHandModel = new RasenganSphereModel(modelSet.bakeLayer(NarutoRenderEvents.RASENGAN_SPHERE_LAYER));
         this.chidoriHandModel = new ChidoriBurstModel(modelSet.bakeLayer(NarutoRenderEvents.CHIDORI_BURST_LAYER));
+        this.scalpelHandModel = new ChakraScalpelModel(modelSet.bakeLayer(NarutoRenderEvents.CHAKRA_SCALPEL_LAYER));
         this.gatesAuraModel = new EightGatesAuraModel(modelSet.bakeLayer(NarutoRenderEvents.EIGHT_GATES_AURA_LAYER));
     }
 
@@ -52,13 +56,14 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
         String activeHand = data.activeHandJutsu();
         boolean hasChidori = "chidori".equalsIgnoreCase(activeHand);
         boolean hasRasengan = "rasengan".equalsIgnoreCase(activeHand);
+        boolean hasScalpel = "chakra_scalpel".equalsIgnoreCase(activeHand);
         boolean hasEightGatesDeath = data.hasEightGatesDeath();
         boolean hasEightGates = data.hasEightGates();
         boolean hasByakugan = data.hasByakugan();
         boolean hasWaterWalk = data.hasWaterWalk();
 
         // Early Exit: skip all matrix transformations and collector submissions if no aura is active
-        if (!hasChidori && !hasRasengan && !hasEightGates && !hasByakugan && !hasWaterWalk) {
+        if (!hasChidori && !hasRasengan && !hasScalpel && !hasEightGates && !hasByakugan && !hasWaterWalk) {
             return;
         }
 
@@ -97,6 +102,27 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
                     (pose, vc) -> this.rasenganHandModel.renderProcedural(
                             pose, vc, ageInTicks, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.85F
                     )
+            );
+            poseStack.popPose();
+        }
+
+        // 2b. 3D Surgical Chakra Scalpel on right forearm/hand
+        if (hasScalpel) {
+            poseStack.pushPose();
+            this.getParentModel().rightArm.translateAndRotate(poseStack);
+            poseStack.translate(-0.06D, 0.64D, -0.10D);
+            RenderMathUtil.scaleUniform(poseStack, 0.52F);
+            int scalpelColor = ColorUtil.argb(0.92F, 1.0F, 1.0F, 1.0F);
+            submitNodeCollector.submitModel(
+                    this.scalpelHandModel,
+                    new VisualState(ageInTicks, 0.0F),
+                    poseStack,
+                    RenderTypes.entityTranslucent(JutsuVisualEffectRenderer.TEX_CHAKRA_SCALPEL),
+                    fullBright,
+                    OverlayTexture.NO_OVERLAY,
+                    scalpelColor,
+                    null,
+                    state.outlineColor
             );
             poseStack.popPose();
         }
