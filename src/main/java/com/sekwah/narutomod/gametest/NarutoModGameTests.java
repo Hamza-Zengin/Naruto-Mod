@@ -342,7 +342,8 @@ public class NarutoModGameTests {
         helper.assertTrue(com.sekwah.narutomod.item.NarutoItems.RAW_CHAKRA_METAL.get() != null, "Raw Chakra Metal must be registered");
         helper.assertTrue(com.sekwah.narutomod.block.NarutoBlockEntities.WEAPON_RACK.get() != null, "Weapon Rack BlockEntity must be registered");
         helper.assertTrue(
-                helper.getLevel().registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE)
+                helper.getLevel().registryAccess()
+                        .lookupOrThrow(ResourceKey.createRegistryKey(Identifier.withDefaultNamespace("worldgen/feature")))
                         .get(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "ore_chakra_metal")).isPresent(),
                 "Chakra Metal ore feature must load cleanly in worldgen/feature registry");
         helper.assertTrue(
