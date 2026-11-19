@@ -268,11 +268,10 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
             WaterBulletEntity bullet = new WaterBulletEntity(serverLevel, this.mob);
             Vec3 spawnPos = this.mob.getEyePosition().add(dir.scale(1.25D));
             bullet.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
-            bullet.setYRot(this.mob.getYRot());
-            bullet.setXRot(this.mob.getXRot());
             bullet.setDamage(profile.getWaterBulletDamage());
             bullet.setMaxLife(profile.getWaterBulletMaxLife());
             bullet.setDeltaMovement(dir.scale(profile.getWaterBulletSpeed()));
+            bullet.alignRotationToMovement();
             serverLevel.addFreshEntity(bullet);
 
             serverLevel.sendParticles(ParticleTypes.SPLASH, spawnPos.x, spawnPos.y, spawnPos.z,

@@ -89,12 +89,11 @@ public class WaterDragonAbility extends Ability implements Ability.Cooldown {
 
         WaterBulletEntity dragon = new WaterBulletEntity(serverLevel, player);
         dragon.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
-        dragon.setYRot(player.getYRot());
-        dragon.setXRot(player.getXRot());
         dragon.setDragon(true);
         dragon.setDamage(dragonDamage);
         dragon.setMaxLife(45);
         dragon.setDeltaMovement(look.scale(1.05D * Math.min(1.3D, powerMult)));
+        dragon.alignRotationToMovement();
         serverLevel.addFreshEntity(dragon);
 
         serverLevel.sendParticles(ParticleTypes.SPLASH, spawnPos.x, spawnPos.y, spawnPos.z,

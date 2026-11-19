@@ -65,11 +65,10 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
         WaterBulletEntity waterBullet = new WaterBulletEntity(serverLevel, player);
         Vec3 spawnPos = player.getEyePosition().add(look.scale(1.3));
         waterBullet.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
-        waterBullet.setYRot(player.getYRot());
-        waterBullet.setXRot(player.getXRot());
         waterBullet.setDamage(bulletDamage);
         waterBullet.setMaxLife(25);
         waterBullet.setDeltaMovement(look.scale(1.1 * Math.min(1.4, powerMult)));
+        waterBullet.alignRotationToMovement();
         serverLevel.addFreshEntity(waterBullet);
 
         // Spawn initial splash particles at launch point

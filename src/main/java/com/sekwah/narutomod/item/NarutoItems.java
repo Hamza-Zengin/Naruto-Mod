@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -336,33 +337,15 @@ public class NarutoItems {
                         output.accept(SCROLL_CHIDORI_STREAM.get());
                         output.accept(SEALED_AMMO_SCROLL.get());
                         output.accept(BLANK_JUTSU_SCROLL.get());
-                        output.accept(ROGUE_NINJA_SPAWN_EGG.get());
-                        output.accept(AKATSUKI_NINJA_SPAWN_EGG.get());
-                        output.accept(VILLAGE_NINJA_SPAWN_EGG.get());
-                        output.accept(KONOHA_NINJA_SPAWN_EGG.get());
-                        output.accept(SUNA_NINJA_SPAWN_EGG.get());
-                        output.accept(KIRI_NINJA_SPAWN_EGG.get());
-                        output.accept(KUMO_NINJA_SPAWN_EGG.get());
-                        output.accept(IWA_NINJA_SPAWN_EGG.get());
-                        output.accept(KONOHA_VILLAGER_SPAWN_EGG.get());
-                        output.accept(SUNA_VILLAGER_SPAWN_EGG.get());
-                        output.accept(KIRI_VILLAGER_SPAWN_EGG.get());
-                        output.accept(KUMO_VILLAGER_SPAWN_EGG.get());
-                        output.accept(IWA_VILLAGER_SPAWN_EGG.get());
-                        output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
-                        output.accept(NarutoBlocks.ITEM_BONSAI_TREE.get());
-                        output.accept(NarutoBlocks.ITEM_TRAINING_DUMMY.get());
-                        output.accept(NarutoBlocks.ITEM_CHAKRA_METAL_ORE.get());
-                        output.accept(NarutoBlocks.ITEM_DEEPSLATE_CHAKRA_METAL_ORE.get());
-                        output.accept(NarutoBlocks.ITEM_CHAKRA_METAL_BLOCK.get());
-                        output.accept(NarutoBlocks.ITEM_MAKIBISHI.get());
-                        output.accept(NarutoBlocks.ITEM_WIRE_TRAP.get());
-                        output.accept(NarutoBlocks.ITEM_WEAPON_RACK.get());
-                        output.accept(NarutoBlocks.ITEM_TATAMI.get());
-                        output.accept(NarutoBlocks.ITEM_TATAMI_SLAB.get());
-                        output.accept(NarutoBlocks.ITEM_SHOJI_PANEL.get());
-                        output.accept(NarutoBlocks.ITEM_STONE_LANTERN.get());
                     })
+                    .build());
+
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> NARUTO_BLOCKS_TAB = CREATIVE_MODE_TABS.register("narutomod_blocks", () ->
+            CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.narutomod_blocks"))
+                    .icon(() -> new ItemStack(NarutoBlocks.ITEM_STONE_LANTERN.get()))
+                    .displayItems((parameters, output) ->
+                            NarutoBlocks.BLOCK_ITEMS.getEntries().forEach(entry -> output.accept(entry.get())))
                     .build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> NINJA_ARMOR_TAB = CREATIVE_MODE_TABS.register("narutomod_armor", () ->
@@ -433,8 +416,27 @@ public class NarutoItems {
                     })
                     .build());
 
+    public static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
+            event.accept(ROGUE_NINJA_SPAWN_EGG.get());
+            event.accept(AKATSUKI_NINJA_SPAWN_EGG.get());
+            event.accept(VILLAGE_NINJA_SPAWN_EGG.get());
+            event.accept(KONOHA_NINJA_SPAWN_EGG.get());
+            event.accept(SUNA_NINJA_SPAWN_EGG.get());
+            event.accept(KIRI_NINJA_SPAWN_EGG.get());
+            event.accept(KUMO_NINJA_SPAWN_EGG.get());
+            event.accept(IWA_NINJA_SPAWN_EGG.get());
+            event.accept(KONOHA_VILLAGER_SPAWN_EGG.get());
+            event.accept(SUNA_VILLAGER_SPAWN_EGG.get());
+            event.accept(KIRI_VILLAGER_SPAWN_EGG.get());
+            event.accept(KUMO_VILLAGER_SPAWN_EGG.get());
+            event.accept(IWA_VILLAGER_SPAWN_EGG.get());
+        }
+    }
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
         CREATIVE_MODE_TABS.register(eventBus);
+        eventBus.addListener(NarutoItems::addCreativeTabContents);
     }
 }

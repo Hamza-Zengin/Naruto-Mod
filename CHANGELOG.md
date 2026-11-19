@@ -4,6 +4,15 @@ Bu dosya `Naruto-Mod` projesinin sürüm geçmişini ve öne çıkan değişikli
 
 ## [Unreleased]
 
+### Düzeltmeler & Görsel Revizyon (Polish Pass 1)
+- **Shuriken 3D Birliği:** `ShurikenRenderer` uçuşta 3D modeli (`ItemDisplayContext.NONE`) kullanacak şekilde güncellendi; `items/shuriken.json`'dan `fixed` istisnası kaldırıldı. Yeni `64×64` `shuriken_3d.png` ve merkez halkalı, 4 eğimli bıçaklı 32 parçalı `shuriken_3d.json` eklendi.
+- **Gunbai & Kunai Elde Tutuşu:** `gunbai_uchiwa_3d.json` el rotasyonlarına Y `+90°` düzeltmesi uygulanarak ince kenarın karşıya bakması sağlandı; `kunai_3d.json` ve `explosive_kunai_3d.json` `firstperson`/`thirdperson` dönüşümleri ANBU Tanto referansına hizalandı.
+- **Kusanagi & Çakra Bıçağı Yeniden Modelleme:** `kusanagi_sword_3d` ANBU Tanto mimarisinde (`0.5px` keskin ağız, kavisli *sori*, *tsuba*, sargılı *tsuka*, ~%15 daha uzun) yeni `64×64` dokuyla yeniden modellendi. `chakra_blades_3d` Asuma tarzı parmak halkalı kabza, kıvrık koruma ve ince geniş bıçakla yeniden modellendi; 8 dilde adı güncellendi (`Çakra Bıçağı` / `Chakra Blade`).
+- **Son Vadi (2x Ölçek) & Anıt Obeliskleri:** `scripts/gen_valley.py` ile tüm Son Vadi parçaları 2x ölçekte yeniden üretildi; heykeller yerine Hashirama tarafında Senju arması ve ahşap/yaprak motifli açık taş obelisk, Madara tarafında kırmızı/beyaz Uchiha yelpazesi taçlı koyu taş obelisk, kaide, merdiven, kemer ve fener detayları eklendi (`max_distance_from_center: 128`).
+- **Yapı Sandık Dengelemesi:** Tüm `.nbt` yapılarındaki sandık ve varil sayıları yapı başına yarıya (yukarı yuvarlama, min `1`) indirildi.
+- **Yaratıcı Sekmeler:** Spawn yumurtaları mod sekmesinden çıkarılıp `BuildCreativeModeTabContentsEvent` ile vanilya `SPAWN_EGGS` sekmesine taşındı; bloklar için `BLOCK_ITEMS` üzerinden otomatik dolan yeni `narutomod_blocks` ("Naruto Blokları", ikon `stone_lantern`) sekmesi ve 8 dil anahtarı (`466` anahtar) eklendi.
+- **Water Dragon Rotasyonu:** `WaterBulletEntity` ve `WaterBulletRenderer` rotasyonu `deltaMovement`'tan `atan2(-x, z)` kuralıyla interpolasyonlu hesaplayacak ve spawn'da aynı kurala hizalanacak şekilde düzeltildi.
+
 ### İçerik
 - **Köy Yapı Blokları (Parti C-1):** Oyuncunun kendi shinobi köyünü inşa edebilmesi için **Tatami Hasırı** (`tatami`), **Tatami Hasırı Plakası** (`tatami_slab`), komşulara bağlanan yarı saydam **Şoji Paneli** (`shoji_panel`) ve ışık seviyesi `13` olan **Taş Fener** (`stone_lantern`) blokları, kraft tarifleri, loot tabloları ve `8` dil desteğiyle eklendi.
 

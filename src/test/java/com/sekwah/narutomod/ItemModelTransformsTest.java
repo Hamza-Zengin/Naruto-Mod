@@ -166,7 +166,7 @@ public class ItemModelTransformsTest {
     @Test
     public void testRedesigned3DWeaponModelsAndTextures() throws IOException {
         Path texDir = Paths.get("src/main/resources/assets/narutomod/textures/item/weapons");
-        for (String weapon : List.of("anbu_tanto", "chakra_blades", "kunai", "explosive_kunai", "samehada", "gunbai_uchiwa")) {
+        for (String weapon : List.of("anbu_tanto", "chakra_blades", "kunai", "explosive_kunai", "samehada", "gunbai_uchiwa", "shuriken", "kusanagi_sword")) {
             Path modelPath = MODELS_ITEM_DIR.resolve("weapons").resolve(weapon + "_3d.json");
             Assertions.assertTrue(Files.isRegularFile(modelPath), "Missing 3D weapon model: " + modelPath);
             JsonObject root = JsonParser.parseString(Files.readString(modelPath)).getAsJsonObject();

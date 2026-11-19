@@ -252,6 +252,7 @@ public final class ShadowCloneGoals {
                 bullet.setDamage(10.0F * CLONE_JUTSU_DAMAGE_MULTIPLIER);
                 bullet.setMaxLife(25);
                 bullet.setDeltaMovement(dir.scale(1.1));
+                bullet.alignRotationToMovement();
                 serverLevel.addFreshEntity(bullet);
             } else if ("wind_breaker".equals(path)) {
                 serverLevel.sendParticles(ParticleTypes.CLOUD, target.getX(), target.getY() + 1.0, target.getZ(), 18, 0.5, 0.5, 0.5, 0.15,
