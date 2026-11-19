@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "narutomod:block/tatami_slab"
+    },
+    "type=double": {
+      "model": "narutomod:block/tatami"
+    },
+    "type=top": {
+      "model": "narutomod:block/tatami_slab_top"
+    }
+  }
+}

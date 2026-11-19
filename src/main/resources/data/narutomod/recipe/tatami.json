@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "WWW",
+    "PPP"
+  ],
+  "key": {
+    "W": "minecraft:wheat",
+    "P": "minecraft:oak_planks"
+  },
+  "result": {
+    "id": "narutomod:tatami",
+    "count": 3
+  }
+}

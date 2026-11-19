@@ -7,10 +7,14 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DropExperienceBlock;
+import net.minecraft.world.level.block.IronBarsBlock;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -123,6 +127,51 @@ public class NarutoBlocks {
                     .sound(SoundType.WOOD)));
 
     public static final DeferredItem<BlockItem> ITEM_WEAPON_RACK = BLOCK_ITEMS.registerSimpleBlockItem(WEAPON_RACK);
+
+    // --- Village building blocks (Phase C-1) ---
+    public static final DeferredBlock<Block> TATAMI = BLOCKS.registerBlock("tatami",
+            props -> new Block(props
+                    .mapColor(MapColor.SAND)
+                    .strength(0.5F)
+                    .sound(SoundType.WOOL)));
+
+    public static final DeferredItem<BlockItem> ITEM_TATAMI = BLOCK_ITEMS.registerSimpleBlockItem(TATAMI);
+
+    public static final DeferredBlock<Block> TATAMI_SLAB = BLOCKS.registerBlock("tatami_slab",
+            props -> new SlabBlock(props
+                    .mapColor(MapColor.SAND)
+                    .strength(0.5F)
+                    .sound(SoundType.WOOL)));
+
+    public static final DeferredItem<BlockItem> ITEM_TATAMI_SLAB = BLOCK_ITEMS.registerSimpleBlockItem(TATAMI_SLAB);
+
+    public static final DeferredBlock<Block> SHOJI_PANEL = BLOCKS.registerBlock("shoji_panel",
+            props -> new IronBarsBlock(props
+                    .mapColor(MapColor.WOOD)
+                    .strength(0.3F)
+                    .noOcclusion()
+                    .sound(SoundType.BAMBOO)));
+
+    public static final DeferredItem<BlockItem> ITEM_SHOJI_PANEL = BLOCK_ITEMS.registerSimpleBlockItem(SHOJI_PANEL);
+
+    private static final VoxelShape STONE_LANTERN_SHAPE = Shapes.or(
+            Block.box(3.0D, 0.0D, 3.0D, 13.0D, 2.0D, 13.0D),
+            Block.box(6.0D, 2.0D, 6.0D, 10.0D, 7.0D, 10.0D),
+            Block.box(4.0D, 7.0D, 4.0D, 12.0D, 12.0D, 12.0D),
+            Block.box(2.0D, 12.0D, 2.0D, 14.0D, 14.0D, 14.0D),
+            Block.box(6.0D, 14.0D, 6.0D, 10.0D, 16.0D, 10.0D));
+
+    public static final DeferredBlock<Block> STONE_LANTERN = BLOCKS.registerBlock("stone_lantern",
+            props -> new RotatableDecorativeBlock(props
+                    .mapColor(MapColor.STONE)
+                    .requiresCorrectToolForDrops()
+                    .strength(2.0F, 6.0F)
+                    .noOcclusion()
+                    .lightLevel(state -> 13)
+                    .sound(SoundType.STONE),
+                    STONE_LANTERN_SHAPE));
+
+    public static final DeferredItem<BlockItem> ITEM_STONE_LANTERN = BLOCK_ITEMS.registerSimpleBlockItem(STONE_LANTERN);
 
     public static void register(IEventBus eventBus) {
         BLOCKS.register(eventBus);

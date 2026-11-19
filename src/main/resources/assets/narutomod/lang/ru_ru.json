@@ -459,5 +459,9 @@
   "item.narutomod.gunbai_uchiwa.ability": "ПКМ: Учива Гаэси (14 чакры) — Отражает снаряды (1.6x), усиливает огненные шары и создаёт ударную волну ветра.",
   "item.narutomod.medical_pouch": "Медицинская сумка шиноби",
   "item.narutomod.medical_pouch.desc": "ПКМ (15 чакры, 16 исп.): Снимает Отравление, Иссушение, Замедление, Слабость и Слепоту, лечит 6 ОЗ и даёт Регенерацию II.",
-  "item.narutomod.medical_pouch.used": "Медицинская сумка применена — негативные эффекты сняты, раны обработаны!"
+  "item.narutomod.medical_pouch.used": "Медицинская сумка применена — негативные эффекты сняты, раны обработаны!",
+  "block.narutomod.tatami": "Татами",
+  "block.narutomod.tatami_slab": "Плита из татами",
+  "block.narutomod.shoji_panel": "Панель сёдзи",
+  "block.narutomod.stone_lantern": "Каменный фонарь"
 }

@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "narutomod:weapon_rack"
+    "narutomod:weapon_rack",
+    "narutomod:tatami",
+    "narutomod:tatami_slab",
+    "narutomod:shoji_panel"
   ]
 }

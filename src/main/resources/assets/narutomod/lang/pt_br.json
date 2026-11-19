@@ -459,5 +459,9 @@
   "item.narutomod.gunbai_uchiwa.ability": "Botão Direito: Uchiwa Gaeshi (14 Chakra) — Reflete projéteis (1.6x), potencializa bolas de fogo e libera onda de vento.",
   "item.narutomod.medical_pouch": "Bolsa Médica Shinobi",
   "item.narutomod.medical_pouch.desc": "Botão Direito (15 Chakra, 16 Usos): Purifica Veneno, Decomposição, Lentidão, Fraqueza e Cegueira, cura 6 HP e concede Regeneração II.",
-  "item.narutomod.medical_pouch.used": "Bolsa Médica aplicada — Efeitos purificados e ferimentos estabilizados!"
+  "item.narutomod.medical_pouch.used": "Bolsa Médica aplicada — Efeitos purificados e ferimentos estabilizados!",
+  "block.narutomod.tatami": "Tatame",
+  "block.narutomod.tatami_slab": "Laje de tatame",
+  "block.narutomod.shoji_panel": "Painel shoji",
+  "block.narutomod.stone_lantern": "Lanterna de pedra"
 }

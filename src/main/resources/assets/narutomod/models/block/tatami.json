@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "narutomod:block/deco/tatami_top",
+    "side": "narutomod:block/deco/tatami_side"
+  }
+}

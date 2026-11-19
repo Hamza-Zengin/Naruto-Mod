@@ -459,5 +459,9 @@
   "item.narutomod.gunbai_uchiwa.ability": "右クリック：うちは返し（チャクラ14）— 投射物を1.6倍で反射し、火遁を増幅して風遁衝撃波を放つ。",
   "item.narutomod.medical_pouch": "医療忍者ポーチ",
   "item.narutomod.medical_pouch.desc": "右クリック（チャクラ15・16回使用）：毒・衰弱・鈍足・弱体・盲目を解除し、HP6回復＋再生IIを付与。",
-  "item.narutomod.medical_pouch.used": "医療ポーチ使用 — 状態異常を治療し傷を応急処置した！"
+  "item.narutomod.medical_pouch.used": "医療ポーチ使用 — 状態異常を治療し傷を応急処置した！",
+  "block.narutomod.tatami": "畳",
+  "block.narutomod.tatami_slab": "畳のハーフブロック",
+  "block.narutomod.shoji_panel": "障子パネル",
+  "block.narutomod.stone_lantern": "石灯籠"
 }

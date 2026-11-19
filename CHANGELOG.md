@@ -2,6 +2,11 @@
 
 Bu dosya `Naruto-Mod` projesinin sürüm geçmişini ve öne çıkan değişikliklerini içerir.
 
+## [Unreleased]
+
+### İçerik
+- **Köy Yapı Blokları (Parti C-1):** Oyuncunun kendi shinobi köyünü inşa edebilmesi için **Tatami Hasırı** (`tatami`), **Tatami Hasırı Plakası** (`tatami_slab`), komşulara bağlanan yarı saydam **Şoji Paneli** (`shoji_panel`) ve ışık seviyesi `13` olan **Taş Fener** (`stone_lantern`) blokları, kraft tarifleri, loot tabloları ve `8` dil desteğiyle eklendi.
+
 ## [0.1.0] - 2026-11-16
 
 ### Mimari & Altyapı

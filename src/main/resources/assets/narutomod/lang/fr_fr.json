@@ -459,5 +459,9 @@
   "item.narutomod.gunbai_uchiwa.ability": "Clic droit : Uchiwa Gaeshi (14 Chakra) — Renvoie les projectiles (1,6x), renforce les boules de feu et libère une onde de vent.",
   "item.narutomod.medical_pouch": "Sacoche Médicale Shinobi",
   "item.narutomod.medical_pouch.desc": "Clic droit (15 Chakra, 16 Utilisations) : Dissipe Poison, Wither, Lenteur, Faiblesse et Cécité, soigne 6 PV et confère Régénération II.",
-  "item.narutomod.medical_pouch.used": "Sacoche Médicale appliquée — Effets dissipés et blessures stabilisées !"
+  "item.narutomod.medical_pouch.used": "Sacoche Médicale appliquée — Effets dissipés et blessures stabilisées !",
+  "block.narutomod.tatami": "Tatami",
+  "block.narutomod.tatami_slab": "Dalle de tatami",
+  "block.narutomod.shoji_panel": "Panneau shoji",
+  "block.narutomod.stone_lantern": "Lanterne de pierre"
 }

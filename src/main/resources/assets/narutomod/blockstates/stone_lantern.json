@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "narutomod:block/stone_lantern"
+    },
+    "facing=south": {
+      "model": "narutomod:block/stone_lantern",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "narutomod:block/stone_lantern",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "narutomod:block/stone_lantern",
+      "y": 270
+    }
+  }
+}
