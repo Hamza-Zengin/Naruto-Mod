@@ -449,5 +449,15 @@
   "item.narutomod.wire_trap": "ワイヤートラップ",
   "block.narutomod.weapon_rack": "忍具掛け",
   "item.narutomod.weapon_rack": "忍具掛け",
-  "block.narutomod.weapon_rack.empty": "忍具掛けは空です。アイテムを持って右クリックで飾れます。"
+  "block.narutomod.weapon_rack.empty": "忍具掛けは空です。アイテムを持って右クリックで飾れます。",
+  "narutomod:ash_pile_burning": "Katon: Haisekisho",
+  "narutomod:water_encampment_wall": "Suiton: Suijinheki",
+  "narutomod:chakra_scalpel": "Chakura no Mesu",
+  "jutsu.chakra_scalpel.ready": "チャクラのメス準備完了 — 精密な斬撃で腱を断ちチャクラ回復を阻害！",
+  "item.narutomod.gunbai_uchiwa": "軍配団扇",
+  "item.narutomod.gunbai_uchiwa.desc": "忍術を跳ね返し炎を煽る伝説のうちは一族の軍配団扇（炎上中の敵に+4火炎ダメージ）。",
+  "item.narutomod.gunbai_uchiwa.ability": "右クリック：うちは返し（チャクラ14）— 投射物を1.6倍で反射し、火遁を増幅して風遁衝撃波を放つ。",
+  "item.narutomod.medical_pouch": "医療忍者ポーチ",
+  "item.narutomod.medical_pouch.desc": "右クリック（チャクラ15・16回使用）：毒・衰弱・鈍足・弱体・盲目を解除し、HP6回復＋再生IIを付与。",
+  "item.narutomod.medical_pouch.used": "医療ポーチ使用 — 状態異常を治療し傷を応急処置した！"
 }

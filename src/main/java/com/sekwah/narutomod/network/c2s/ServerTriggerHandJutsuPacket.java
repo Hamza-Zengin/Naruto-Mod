@@ -75,6 +75,8 @@ public class ServerTriggerHandJutsuPacket implements CustomPacketPayload {
                     ? NarutoAbilities.RASENGAN.get()
                     : "chidori".equalsIgnoreCase(activeJutsu)
                     ? NarutoAbilities.CHIDORI.get()
+                    : "chakra_scalpel".equalsIgnoreCase(activeJutsu)
+                    ? NarutoAbilities.CHAKRA_SCALPEL.get()
                     : null;
             if (struckAbility == null || !ServerSecurityValidator.isAbilityUnlocked(ninjaData, struckAbility)) {
                 return;
@@ -108,6 +110,8 @@ public class ServerTriggerHandJutsuPacket implements CustomPacketPayload {
                 RasenganAbility.executeStrike(player, ninjaData, target);
             } else if ("chidori".equalsIgnoreCase(activeJutsu)) {
                 ChidoriAbility.executeStrike(player, ninjaData, target);
+            } else if ("chakra_scalpel".equalsIgnoreCase(activeJutsu)) {
+                com.sekwah.narutomod.abilities.jutsus.ChakraScalpelAbility.executeStrike(player, ninjaData, target);
             }
             ninjaData.clearSeals();
         });

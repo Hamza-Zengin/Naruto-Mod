@@ -449,5 +449,15 @@
   "item.narutomod.wire_trap": "Piège à Fil",
   "block.narutomod.weapon_rack": "Râtelier d'Armes Shinobi",
   "item.narutomod.weapon_rack": "Râtelier d'Armes Shinobi",
-  "block.narutomod.weapon_rack.empty": "Le râtelier est vide. Faites clic droit avec un objet pour l'exposer."
+  "block.narutomod.weapon_rack.empty": "Le râtelier est vide. Faites clic droit avec un objet pour l'exposer.",
+  "narutomod:ash_pile_burning": "Katon: Haisekisho",
+  "narutomod:water_encampment_wall": "Suiton: Suijinheki",
+  "narutomod:chakra_scalpel": "Chakura no Mesu",
+  "jutsu.chakra_scalpel.ready": "Scalpel de Chakra prêt — Les frappes précises tranchent les tendons et perturbent le chakra !",
+  "item.narutomod.gunbai_uchiwa": "Gunbai Uchiwa",
+  "item.narutomod.gunbai_uchiwa.desc": "Éventail de guerre légendaire des Uchiha forgé pour renvoyer les jutsus et attiser les flammes (+4 dégâts de feu sur cibles enflammées).",
+  "item.narutomod.gunbai_uchiwa.ability": "Clic droit : Uchiwa Gaeshi (14 Chakra) — Renvoie les projectiles (1,6x), renforce les boules de feu et libère une onde de vent.",
+  "item.narutomod.medical_pouch": "Sacoche Médicale Shinobi",
+  "item.narutomod.medical_pouch.desc": "Clic droit (15 Chakra, 16 Utilisations) : Dissipe Poison, Wither, Lenteur, Faiblesse et Cécité, soigne 6 PV et confère Régénération II.",
+  "item.narutomod.medical_pouch.used": "Sacoche Médicale appliquée — Effets dissipés et blessures stabilisées !"
 }

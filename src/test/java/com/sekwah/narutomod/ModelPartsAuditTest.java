@@ -109,6 +109,26 @@ public class ModelPartsAuditTest {
         Assertions.assertNotNull(chainsRoot.getChild("seal_ring"));
         Assertions.assertNotNull(chainsRoot.getChild("inner_seal_ring"));
         Assertions.assertNotNull(chainsRoot.getChild("chains_group"));
+
+        ModelPart ashRoot = JutsuVisualModels.AshCloudModel.createLayer().bakeRoot();
+        Assertions.assertNotNull(new JutsuVisualModels.AshCloudModel(ashRoot),
+                "AshCloudModel should instantiate cleanly");
+        Assertions.assertNotNull(ashRoot.getChild("core_plume"));
+        Assertions.assertNotNull(ashRoot.getChild("swirl_ring"));
+        Assertions.assertNotNull(ashRoot.getChild("ember_crown"));
+
+        ModelPart waterWallRoot = JutsuVisualModels.WaterWallModel.createLayer().bakeRoot();
+        Assertions.assertNotNull(new JutsuVisualModels.WaterWallModel(waterWallRoot),
+                "WaterWallModel should instantiate cleanly");
+        Assertions.assertNotNull(waterWallRoot.getChild("wave_base"));
+        Assertions.assertNotNull(waterWallRoot.getChild("crest_surge"));
+        Assertions.assertNotNull(waterWallRoot.getChild("foam_rings"));
+
+        ModelPart scalpelRoot = JutsuVisualModels.ChakraScalpelModel.createLayer().bakeRoot();
+        Assertions.assertNotNull(new JutsuVisualModels.ChakraScalpelModel(scalpelRoot),
+                "ChakraScalpelModel should instantiate cleanly");
+        Assertions.assertNotNull(scalpelRoot.getChild("scalpel_core"));
+        Assertions.assertNotNull(scalpelRoot.getChild("edge_aura"));
     }
 
     private static void assertHumanoidModel(Object instance, ModelPart root, String label) {

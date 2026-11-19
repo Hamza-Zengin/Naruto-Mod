@@ -79,10 +79,23 @@ public class ElementalInteractionHandler {
         if (!(event.getProjectile() instanceof FireballJutsuEntity fireball)) {
             return;
         }
-        if (fireball.level().isClientSide() || fireball.isWindBoosted()) {
+        if (fireball.level().isClientSide()) {
             return;
         }
         AABB checkBox = fireball.getBoundingBox().inflate(2.5D);
+        if (fireball.level() instanceof ServerLevel serverLevel) {
+            List<JutsuVisualEffectEntity> ashClouds = serverLevel.getEntitiesOfClass(
+                    JutsuVisualEffectEntity.class,
+                    checkBox.inflate(1.5D),
+                    e -> e.isAlive() && e.getVisualType() == JutsuVisualEffectEntity.TYPE_ASH_CLOUD
+            );
+            for (JutsuVisualEffectEntity ash : ashClouds) {
+                ash.detonateAshCloud(serverLevel);
+            }
+        }
+        if (fireball.isWindBoosted()) {
+            return;
+        }
         List<JutsuVisualEffectEntity> windEffects = fireball.level().getEntitiesOfClass(
                 JutsuVisualEffectEntity.class,
                 checkBox,
@@ -157,7 +170,12 @@ public class ElementalInteractionHandler {
             return true;
         }
         AABB checkBox = target.getBoundingBox().inflate(2.5D);
-        return !level.getEntitiesOfClass(WaterBulletEntity.class, checkBox, WaterBulletEntity::isAlive).isEmpty();
+        if (!level.getEntitiesOfClass(WaterBulletEntity.class, checkBox, WaterBulletEntity::isAlive).isEmpty()) {
+            return true;
+        }
+        return !level.getEntitiesOfClass(JutsuVisualEffectEntity.class, checkBox.inflate(1.0D),
+                e -> e.isAlive() && (e.getVisualType() == JutsuVisualEffectEntity.TYPE_WATER_WALL
+                        || e.getVisualType() == JutsuVisualEffectEntity.TYPE_WATER_VORTEX)).isEmpty();
     }
 
     private static boolean isShieldedByMudWall(ServerLevel level, Vec3 sourcePos, LivingEntity target) {

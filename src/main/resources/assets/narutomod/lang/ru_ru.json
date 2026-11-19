@@ -449,5 +449,15 @@
   "item.narutomod.wire_trap": "Ловушка с леской",
   "block.narutomod.weapon_rack": "Стойка для оружия шиноби",
   "item.narutomod.weapon_rack": "Стойка для оружия шиноби",
-  "block.narutomod.weapon_rack.empty": "Стойка пуста. Нажмите ПКМ с предметом в руке, чтобы разместить его."
+  "block.narutomod.weapon_rack.empty": "Стойка пуста. Нажмите ПКМ с предметом в руке, чтобы разместить его.",
+  "narutomod:ash_pile_burning": "Katon: Haisekisho",
+  "narutomod:water_encampment_wall": "Suiton: Suijinheki",
+  "narutomod:chakra_scalpel": "Chakura no Mesu",
+  "jutsu.chakra_scalpel.ready": "Чакра-скальпель готов — точные удары рассекают сухожилия и сбивают регенерацию чакры!",
+  "item.narutomod.gunbai_uchiwa": "Гунбай Учива",
+  "item.narutomod.gunbai_uchiwa.desc": "Легендарный боевой веер Учиха, отражающий техники и раздувающий пламя (+4 урона огнём по горящим врагам).",
+  "item.narutomod.gunbai_uchiwa.ability": "ПКМ: Учива Гаэси (14 чакры) — Отражает снаряды (1.6x), усиливает огненные шары и создаёт ударную волну ветра.",
+  "item.narutomod.medical_pouch": "Медицинская сумка шиноби",
+  "item.narutomod.medical_pouch.desc": "ПКМ (15 чакры, 16 исп.): Снимает Отравление, Иссушение, Замедление, Слабость и Слепоту, лечит 6 ОЗ и даёт Регенерацию II.",
+  "item.narutomod.medical_pouch.used": "Медицинская сумка применена — негативные эффекты сняты, раны обработаны!"
 }

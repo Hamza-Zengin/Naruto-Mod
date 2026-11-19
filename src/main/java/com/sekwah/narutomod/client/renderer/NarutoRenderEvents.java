@@ -178,6 +178,12 @@ public class NarutoRenderEvents {
             new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "adamantine_chains"), "main");
     public static final ModelLayerLocation EIGHT_GATES_AURA_LAYER =
             new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates_aura"), "main");
+    public static final ModelLayerLocation ASH_CLOUD_LAYER =
+            new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "ash_cloud"), "main");
+    public static final ModelLayerLocation WATER_WALL_LAYER =
+            new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "water_wall"), "main");
+    public static final ModelLayerLocation CHAKRA_SCALPEL_LAYER =
+            new ModelLayerLocation(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chakra_scalpel"), "main");
 
     @SubscribeEvent
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
@@ -258,6 +264,9 @@ public class NarutoRenderEvents {
         event.registerLayerDefinition(STONE_SPIKES_LAYER, JutsuVisualModels.StoneSpikesModel::createLayer);
         event.registerLayerDefinition(ADAMANTINE_CHAINS_LAYER, JutsuVisualModels.AdamantineChainsModel::createLayer);
         event.registerLayerDefinition(EIGHT_GATES_AURA_LAYER, JutsuVisualModels.EightGatesAuraModel::createLayer);
+        event.registerLayerDefinition(ASH_CLOUD_LAYER, JutsuVisualModels.AshCloudModel::createLayer);
+        event.registerLayerDefinition(WATER_WALL_LAYER, JutsuVisualModels.WaterWallModel::createLayer);
+        event.registerLayerDefinition(CHAKRA_SCALPEL_LAYER, JutsuVisualModels.ChakraScalpelModel::createLayer);
     }
 
     @SubscribeEvent

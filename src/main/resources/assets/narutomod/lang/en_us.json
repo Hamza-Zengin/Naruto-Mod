@@ -449,5 +449,15 @@
   "item.narutomod.wire_trap": "Wire Trap",
   "block.narutomod.weapon_rack": "Shinobi Weapon Rack",
   "item.narutomod.weapon_rack": "Shinobi Weapon Rack",
-  "block.narutomod.weapon_rack.empty": "Weapon Rack is empty. Right-click with an item to display it."
+  "block.narutomod.weapon_rack.empty": "Weapon Rack is empty. Right-click with an item to display it.",
+  "narutomod:ash_pile_burning": "Katon: Haisekisho",
+  "narutomod:water_encampment_wall": "Suiton: Suijinheki",
+  "narutomod:chakra_scalpel": "Chakura no Mesu",
+  "jutsu.chakra_scalpel.ready": "Chakra Scalpel Ready — Precision Strikes Sever Tendons & Disrupt Chakra!",
+  "item.narutomod.gunbai_uchiwa": "Gunbai Uchiwa",
+  "item.narutomod.gunbai_uchiwa.desc": "Legendary Uchiha war fan forged to deflect incoming jutsus and scatter flames (+4 Fire DMG vs burning foes).",
+  "item.narutomod.gunbai_uchiwa.ability": "Right-Click: Uchiwa Gaeshi (14 Chakra) — Reflects projectiles (1.6x), boosts Fireballs & unleashes a Wind shockwave.",
+  "item.narutomod.medical_pouch": "Medical Shinobi Pouch",
+  "item.narutomod.medical_pouch.desc": "Right-Click (15 Chakra, 16 Uses): Cleanses Poison, Wither, Slowness, Weakness & Blindness, heals 6 HP & grants Regeneration II.",
+  "item.narutomod.medical_pouch.used": "Medical Pouch Applied — Status Effects Cleansed & Wounds Stabilized!"
 }

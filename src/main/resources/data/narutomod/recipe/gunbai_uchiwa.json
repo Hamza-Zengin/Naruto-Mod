@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "NCN",
+    "CRC",
+    " S "
+  ],
+  "key": {
+    "N": "minecraft:netherite_ingot",
+    "C": "narutomod:chakra_metal",
+    "R": "minecraft:redstone",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "narutomod:gunbai_uchiwa",
+    "count": 1
+  }
+}

@@ -38,6 +38,9 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
     public static final Identifier TEX_EARTH = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/earth_wall.png");
     public static final Identifier TEX_STONE_SPIKES = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/stone_spikes.png");
     public static final Identifier TEX_ADAMANTINE_CHAINS = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/adamantine_chains.png");
+    public static final Identifier TEX_ASH_CLOUD = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/ash_cloud.png");
+    public static final Identifier TEX_WATER_WALL = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/water_wall.png");
+    public static final Identifier TEX_CHAKRA_SCALPEL = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/chakra_scalpel.png");
 
     private final KirinDragonModel kirinModel;
     private final WoodPrisonModel woodModel;
@@ -51,6 +54,8 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
     private final EarthWallModel earthModel;
     private final StoneSpikesModel stoneSpikesModel;
     private final AdamantineChainsModel adamantineChainsModel;
+    private final AshCloudModel ashCloudModel;
+    private final WaterWallModel waterWallModel;
 
     public static class VisualEffectRenderState extends EntityRenderState {
         public int visualType;
@@ -73,6 +78,8 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
         this.earthModel = new EarthWallModel(ctx.bakeLayer(NarutoRenderEvents.EARTH_WALL_LAYER));
         this.stoneSpikesModel = new StoneSpikesModel(ctx.bakeLayer(NarutoRenderEvents.STONE_SPIKES_LAYER));
         this.adamantineChainsModel = new AdamantineChainsModel(ctx.bakeLayer(NarutoRenderEvents.ADAMANTINE_CHAINS_LAYER));
+        this.ashCloudModel = new AshCloudModel(ctx.bakeLayer(NarutoRenderEvents.ASH_CLOUD_LAYER));
+        this.waterWallModel = new WaterWallModel(ctx.bakeLayer(NarutoRenderEvents.WATER_WALL_LAYER));
     }
 
     @Override
@@ -175,6 +182,16 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
                     int color = ColorUtil.argb(0.95F * fadeOut, 1.0F, 1.0F, 1.0F);
                     submitNodeCollector.submitModel(this.adamantineChainsModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
                 }
+                case JutsuVisualEffectEntity.TYPE_ASH_CLOUD -> {
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.40F + state.progress * 0.25F);
+                    int color = ColorUtil.argb(0.88F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.ashCloudModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
+                }
+                case JutsuVisualEffectEntity.TYPE_WATER_WALL -> {
+                    RenderMathUtil.scaleEntityModel(poseStack, 1.15F);
+                    int color = ColorUtil.argb(0.86F * fadeOut, 1.0F, 1.0F, 1.0F);
+                    submitNodeCollector.submitModel(this.waterWallModel, visualState, poseStack, renderType, fullBright, OverlayTexture.NO_OVERLAY, color, null, state.outlineColor);
+                }
             }
         } finally {
             poseStack.popPose();
@@ -190,7 +207,8 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
                 || type == JutsuVisualEffectEntity.TYPE_CHIDORI_BURST
                 || type == JutsuVisualEffectEntity.TYPE_AMATERASU_PILLAR
                 || type == JutsuVisualEffectEntity.TYPE_EARTH_WALL
-                || type == JutsuVisualEffectEntity.TYPE_ADAMANTINE_CHAINS) {
+                || type == JutsuVisualEffectEntity.TYPE_ADAMANTINE_CHAINS
+                || type == JutsuVisualEffectEntity.TYPE_ASH_CLOUD) {
             return 15;
         }
         return super.getBlockLightLevel(entity, pos);
@@ -210,6 +228,8 @@ public class JutsuVisualEffectRenderer extends EntityRenderer<JutsuVisualEffectE
             case JutsuVisualEffectEntity.TYPE_EARTH_WALL -> TEX_EARTH;
             case JutsuVisualEffectEntity.TYPE_STONE_SPIKES -> TEX_STONE_SPIKES;
             case JutsuVisualEffectEntity.TYPE_ADAMANTINE_CHAINS -> TEX_ADAMANTINE_CHAINS;
+            case JutsuVisualEffectEntity.TYPE_ASH_CLOUD -> TEX_ASH_CLOUD;
+            case JutsuVisualEffectEntity.TYPE_WATER_WALL -> TEX_WATER_WALL;
             default -> TEX_RASENGAN;
         };
     }

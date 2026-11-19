@@ -48,11 +48,15 @@ public class NarutoItems {
 
     public static final DeferredItem<Item> ANBU_TANTO = ITEMS.registerItem("anbu_tanto", AnbuTantoItem::new);
 
+    public static final DeferredItem<Item> GUNBAI_UCHIWA = ITEMS.registerItem("gunbai_uchiwa", GunbaiUchiwaItem::new);
+
     public static final DeferredItem<Item> SMOKE_BOMB = ITEMS.registerItem("smoke_bomb",
             props -> new SmokeBombItem(props.stacksTo(16)));
 
     public static final DeferredItem<Item> MILITARY_RATIONS_PILL = ITEMS.registerItem("military_rations_pill",
             props -> new MilitaryRationsPillItem(props.stacksTo(16)));
+
+    public static final DeferredItem<Item> MEDICAL_POUCH = ITEMS.registerItem("medical_pouch", MedicalPouchItem::new);
 
     public static final DeferredItem<Item> ICHIRAKU_RAMEN = ITEMS.registerItem("ichiraku_ramen", IchirakuRamenItem::new);
 
@@ -314,8 +318,10 @@ public class NarutoItems {
                         output.accept(BONE_SWORD.get());
                         output.accept(CHAKRA_BLADES.get());
                         output.accept(ANBU_TANTO.get());
+                        output.accept(GUNBAI_UCHIWA.get());
                         output.accept(SMOKE_BOMB.get());
                         output.accept(MILITARY_RATIONS_PILL.get());
+                        output.accept(MEDICAL_POUCH.get());
                         output.accept(ICHIRAKU_RAMEN.get());
                         output.accept(CHAKRA_METAL.get());
                         output.accept(RAW_CHAKRA_METAL.get());

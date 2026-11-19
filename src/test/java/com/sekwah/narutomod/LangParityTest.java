@@ -47,7 +47,7 @@ public class LangParityTest {
                 .filter(k -> k.startsWith("narutomod:"))
                 .sorted()
                 .toList();
-        Assertions.assertEquals(33, jutsuNameKeys.size(), "Expected 33 canonical jutsu name keys");
+        Assertions.assertEquals(36, jutsuNameKeys.size(), "Expected 36 canonical jutsu name keys");
         Assertions.assertEquals("Kongo Fusa", enKeys.get("narutomod:adamantine_chains"),
                 "adamantine_chains must have canonical name 'Kongo Fusa'");
 

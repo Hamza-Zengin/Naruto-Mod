@@ -392,6 +392,49 @@ public class NarutoModGameTests {
         helper.assertTrue(NarutoAbilities.RASENGAN.get().requiresScroll(), "Registered Rasengan must require scroll");
         helper.assertTrue("uchiha".equals(NarutoAbilities.SHARINGAN.get().getRequiredClanPath()), "Registered Sharingan must require uchiha clan");
 
+        // Phase 3 live registry, jutsu & item integration checks
+        helper.assertTrue(NarutoAbilities.ASH_PILE_BURNING.get() != null, "Ash Pile Burning ability must be registered");
+        helper.assertTrue(NarutoAbilities.WATER_ENCAMPMENT_WALL.get() != null, "Water Encampment Wall ability must be registered");
+        helper.assertTrue(NarutoAbilities.CHAKRA_SCALPEL.get() != null, "Chakra Scalpel ability must be registered");
+        helper.assertTrue(com.sekwah.narutomod.item.NarutoItems.GUNBAI_UCHIWA.get() != null, "Gunbai Uchiwa must be registered");
+        helper.assertTrue(com.sekwah.narutomod.item.NarutoItems.MEDICAL_POUCH.get() != null, "Medical Pouch must be registered");
+
+        NarutoAbilities.ASH_PILE_BURNING.get().performServer(caster, casterData, 0);
+        var ashClouds = helper.getLevel().getEntitiesOfClass(
+                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.class,
+                caster.getBoundingBox().inflate(14.0D),
+                fx -> fx.getVisualType() == com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_ASH_CLOUD);
+        helper.assertValueEqual(ashClouds.size(), 1, "Ash Pile Burning cloud entity count");
+        ashClouds.get(0).detonateAshCloud(helper.getLevel());
+        helper.assertFalse(ashClouds.get(0).isAlive(), "Detonated Ash Cloud must discard cleanly");
+
+        NarutoAbilities.WATER_ENCAMPMENT_WALL.get().performServer(caster, casterData, 0);
+        var waterWalls = helper.getLevel().getEntitiesOfClass(
+                com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.class,
+                caster.getBoundingBox().inflate(8.0D),
+                fx -> fx.getVisualType() == com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_WATER_WALL);
+        helper.assertValueEqual(waterWalls.size(), 1, "Water Encampment Wall barrier entity count");
+
+        NarutoAbilities.CHAKRA_SCALPEL.get().performServer(caster, casterData, 0);
+        helper.assertTrue("chakra_scalpel".equals(casterData.getActiveHandJutsu()), "Chakra Scalpel must set activeHandJutsu");
+        helper.assertTrue(casterData.getActiveHandJutsuTicks() >= 200, "Chakra Scalpel duration must be >= 200 ticks");
+        com.sekwah.narutomod.abilities.jutsus.ChakraScalpelAbility.executeStrike(caster, casterData, null);
+        helper.assertTrue("chakra_scalpel".equals(casterData.getActiveHandJutsu()), "Chakra Scalpel must remain active after strike");
+
+        caster.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.POISON, 100, 0));
+        caster.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SLOWNESS, 100, 1));
+        int cleansed = com.sekwah.narutomod.item.MedicalPouchItem.cleanseEffects(caster);
+        helper.assertValueEqual(cleansed, 2, "Medical Pouch cleansed debuff count");
+        helper.assertFalse(caster.hasEffect(net.minecraft.world.effect.MobEffects.POISON), "Poison must be cleansed");
+
+        net.minecraft.world.item.ItemStack pouchStack = new net.minecraft.world.item.ItemStack(
+                com.sekwah.narutomod.item.NarutoItems.MEDICAL_POUCH.get());
+        helper.assertValueEqual(pouchStack.getMaxDamage(), com.sekwah.narutomod.item.MedicalPouchItem.MAX_DURABILITY,
+                "Medical Pouch max durability");
+        net.minecraft.world.item.ItemStack gunbaiStack = new net.minecraft.world.item.ItemStack(
+                com.sekwah.narutomod.item.NarutoItems.GUNBAI_UCHIWA.get());
+        helper.assertFalse(gunbaiStack.isEmpty(), "Gunbai Uchiwa ItemStack must instantiate");
+
         helper.succeed();
     }
 }

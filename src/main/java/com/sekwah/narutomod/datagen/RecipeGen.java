@@ -322,5 +322,27 @@ public class RecipeGen extends RecipeProvider {
                 .pattern("PPP")
                 .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
                 .save(this.output);
+
+        this.shaped(RecipeCategory.COMBAT, NarutoItems.GUNBAI_UCHIWA.get())
+                .define('N', Items.NETHERITE_INGOT)
+                .define('C', NarutoItems.CHAKRA_METAL.get())
+                .define('R', Items.REDSTONE)
+                .define('S', Items.STICK)
+                .pattern("NCN")
+                .pattern("CRC")
+                .pattern(" S ")
+                .unlockedBy("has_chakra_metal", has(NarutoItems.CHAKRA_METAL.get()))
+                .save(this.output);
+
+        this.shaped(RecipeCategory.TOOLS, NarutoItems.MEDICAL_POUCH.get())
+                .define('S', Items.STRING)
+                .define('L', Items.LEATHER)
+                .define('G', Items.GLISTERING_MELON_SLICE)
+                .define('M', NarutoItems.MILITARY_RATIONS_PILL.get())
+                .pattern("SLS")
+                .pattern("LGL")
+                .pattern("LML")
+                .unlockedBy("has_glistering_melon", has(Items.GLISTERING_MELON_SLICE))
+                .save(this.output);
     }
 }
