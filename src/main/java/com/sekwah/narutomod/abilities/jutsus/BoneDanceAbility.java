@@ -45,6 +45,11 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public String getRequiredClanPath() {
+        return "kaguya";
+    }
+
+    @Override
     public int getDefaultCooldown() {
         return 15 * 20;
     }

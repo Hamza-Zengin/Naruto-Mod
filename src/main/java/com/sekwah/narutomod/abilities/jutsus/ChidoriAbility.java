@@ -44,6 +44,11 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public boolean requiresScroll() {
+        return true;
+    }
+
+    @Override
     public float getDefaultChakraCost() {
         return 35.0f;
     }

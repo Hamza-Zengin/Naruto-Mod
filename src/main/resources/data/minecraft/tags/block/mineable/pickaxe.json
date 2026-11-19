@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "narutomod:chakra_metal_ore",
+    "narutomod:deepslate_chakra_metal_ore",
+    "narutomod:chakra_metal_block",
+    "narutomod:makibishi",
+    "narutomod:wire_trap"
+  ]
+}

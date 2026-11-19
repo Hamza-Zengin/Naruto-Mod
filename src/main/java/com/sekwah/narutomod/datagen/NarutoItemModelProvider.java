@@ -42,6 +42,7 @@ public class NarutoItemModelProvider extends ModelProvider {
 
         // --- Basic Items & Weapons (2D items) ---
         simpleItemWithTexture(itemModels, NarutoItems.CHAKRA_METAL.get(), "item/weapons/chakra_metal");
+        simpleItemWithTexture(itemModels, NarutoItems.RAW_CHAKRA_METAL.get(), "item/weapons/raw_chakra_metal");
         simpleItemWithTexture(itemModels, NarutoItems.ICHIRAKU_RAMEN.get(), "item/weapons/ichiraku_ramen");
         simpleItemWithTexture(itemModels, NarutoItems.MILITARY_RATIONS_PILL.get(), "item/weapons/military_rations_pill");
         simpleItemWithTexture(itemModels, NarutoItems.SMOKE_BOMB.get(), "item/weapons/smoke_bomb");
@@ -74,6 +75,18 @@ public class NarutoItemModelProvider extends ModelProvider {
                 ItemModelUtils.plainModel(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/bonsai_tree")));
         itemModels.itemModelOutput.accept(NarutoBlocks.ITEM_TRAINING_DUMMY.get(),
                 ItemModelUtils.plainModel(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/training_dummy")));
+        itemModels.itemModelOutput.accept(NarutoBlocks.ITEM_CHAKRA_METAL_ORE.get(),
+                ItemModelUtils.plainModel(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/chakra_metal_ore")));
+        itemModels.itemModelOutput.accept(NarutoBlocks.ITEM_DEEPSLATE_CHAKRA_METAL_ORE.get(),
+                ItemModelUtils.plainModel(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/deepslate_chakra_metal_ore")));
+        itemModels.itemModelOutput.accept(NarutoBlocks.ITEM_CHAKRA_METAL_BLOCK.get(),
+                ItemModelUtils.plainModel(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/chakra_metal_block")));
+        itemModels.itemModelOutput.accept(NarutoBlocks.ITEM_MAKIBISHI.get(),
+                ItemModelUtils.plainModel(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/makibishi_4")));
+        itemModels.itemModelOutput.accept(NarutoBlocks.ITEM_WIRE_TRAP.get(),
+                ItemModelUtils.plainModel(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/wire_trap")));
+        itemModels.itemModelOutput.accept(NarutoBlocks.ITEM_WEAPON_RACK.get(),
+                ItemModelUtils.plainModel(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "block/weapon_rack")));
 
         // --- Headbands (Blank / Custom) ---
         simpleItemWithTexture(itemModels, NarutoItems.HEADBAND_BLACK.get(), "item/armor/headbands/headband_black_blank");

@@ -435,5 +435,19 @@
   "item.narutomod.training_dummy": "Mannequin d'Entraînement Shinobi",
   "block.narutomod.training_dummy.hit_melee": "Impact Mannequin : %s DGT (+EXP Endurance)",
   "block.narutomod.training_dummy.hit_jutsu": "Impact Jutsu : %1$s DGT [%2$s] (+EXP Chakra & Maîtrise)",
-  "block.narutomod.training_dummy.use": "Mannequin Shinobi : Frappez au corps à corps, avec des armes ou des Jutsu pour gagner de l'EXP et de la Maîtrise !"
+  "block.narutomod.training_dummy.use": "Mannequin Shinobi : Frappez au corps à corps, avec des armes ou des Jutsu pour gagner de l'EXP et de la Maîtrise !",
+  "block.narutomod.chakra_metal_ore": "Minerai de Métal de Chakra",
+  "item.narutomod.chakra_metal_ore": "Minerai de Métal de Chakra",
+  "block.narutomod.deepslate_chakra_metal_ore": "Minerai de Métal de Chakra des Abîmes",
+  "item.narutomod.deepslate_chakra_metal_ore": "Minerai de Métal de Chakra des Abîmes",
+  "block.narutomod.chakra_metal_block": "Bloc de Métal de Chakra",
+  "item.narutomod.chakra_metal_block": "Bloc de Métal de Chakra",
+  "item.narutomod.raw_chakra_metal": "Métal de Chakra Brut",
+  "block.narutomod.makibishi": "Chausse-trapes Makibishi",
+  "item.narutomod.makibishi": "Chausse-trapes Makibishi",
+  "block.narutomod.wire_trap": "Piège à Fil",
+  "item.narutomod.wire_trap": "Piège à Fil",
+  "block.narutomod.weapon_rack": "Râtelier d'Armes Shinobi",
+  "item.narutomod.weapon_rack": "Râtelier d'Armes Shinobi",
+  "block.narutomod.weapon_rack.empty": "Le râtelier est vide. Faites clic droit avec un objet pour l'exposer."
 }

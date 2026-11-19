@@ -34,6 +34,11 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public String getRequiredClanPath() {
+        return "hyuga";
+    }
+
+    @Override
     public float getDefaultChakraCost() {
         return 22.0f;
     }

@@ -91,6 +91,11 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
     }
 
     @Override
+    public boolean requiresScroll() {
+        return true;
+    }
+
+    @Override
     public boolean canActivate(Player player, INinjaData ninjaData) {
         if (player != null && player.isSpectator()) {
             return false;

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 0.8,
+  "group": "chakra_metal",
+  "ingredient": "narutomod:raw_chakra_metal",
+  "result": {
+    "id": "narutomod:chakra_metal"
+  }
+}

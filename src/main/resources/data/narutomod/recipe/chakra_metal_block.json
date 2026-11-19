@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "CCC",
+    "CCC",
+    "CCC"
+  ],
+  "key": {
+    "C": "narutomod:chakra_metal"
+  },
+  "result": {
+    "id": "narutomod:chakra_metal_block",
+    "count": 1
+  }
+}

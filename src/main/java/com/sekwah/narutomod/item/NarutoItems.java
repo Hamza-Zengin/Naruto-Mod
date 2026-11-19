@@ -59,6 +59,9 @@ public class NarutoItems {
     public static final DeferredItem<Item> CHAKRA_METAL = ITEMS.registerSimpleItem("chakra_metal",
             props -> props.rarity(Rarity.UNCOMMON));
 
+    public static final DeferredItem<Item> RAW_CHAKRA_METAL = ITEMS.registerSimpleItem("raw_chakra_metal",
+            props -> props.rarity(Rarity.UNCOMMON));
+
     // Jutsu Scrolls
     public static final DeferredItem<Item> SCROLL_RASENGAN = ITEMS.registerItem("scroll_rasengan",
             props -> new JutsuScrollItem(props.stacksTo(1), NarutoAbilities.RASENGAN.getId()));
@@ -315,6 +318,7 @@ public class NarutoItems {
                         output.accept(MILITARY_RATIONS_PILL.get());
                         output.accept(ICHIRAKU_RAMEN.get());
                         output.accept(CHAKRA_METAL.get());
+                        output.accept(RAW_CHAKRA_METAL.get());
                         output.accept(SCROLL_RASENGAN.get());
                         output.accept(SCROLL_CHIDORI.get());
                         output.accept(SCROLL_SHADOW_CLONE.get());
@@ -342,6 +346,12 @@ public class NarutoItems {
                         output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
                         output.accept(NarutoBlocks.ITEM_BONSAI_TREE.get());
                         output.accept(NarutoBlocks.ITEM_TRAINING_DUMMY.get());
+                        output.accept(NarutoBlocks.ITEM_CHAKRA_METAL_ORE.get());
+                        output.accept(NarutoBlocks.ITEM_DEEPSLATE_CHAKRA_METAL_ORE.get());
+                        output.accept(NarutoBlocks.ITEM_CHAKRA_METAL_BLOCK.get());
+                        output.accept(NarutoBlocks.ITEM_MAKIBISHI.get());
+                        output.accept(NarutoBlocks.ITEM_WIRE_TRAP.get());
+                        output.accept(NarutoBlocks.ITEM_WEAPON_RACK.get());
                     })
                     .build());
 

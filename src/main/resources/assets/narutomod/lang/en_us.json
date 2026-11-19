@@ -435,5 +435,19 @@
   "item.narutomod.training_dummy": "Shinobi Training Dummy",
   "block.narutomod.training_dummy.hit_melee": "Dummy Impact: %s DMG (+Stamina EXP)",
   "block.narutomod.training_dummy.hit_jutsu": "Dummy Jutsu Hit: %1$s DMG [%2$s] (+Chakra EXP & Mastery)",
-  "block.narutomod.training_dummy.use": "Shinobi Training Dummy: Strike with melee, weapons, or Jutsu to train EXP & Mastery!"
+  "block.narutomod.training_dummy.use": "Shinobi Training Dummy: Strike with melee, weapons, or Jutsu to train EXP & Mastery!",
+  "block.narutomod.chakra_metal_ore": "Chakra Metal Ore",
+  "item.narutomod.chakra_metal_ore": "Chakra Metal Ore",
+  "block.narutomod.deepslate_chakra_metal_ore": "Deepslate Chakra Metal Ore",
+  "item.narutomod.deepslate_chakra_metal_ore": "Deepslate Chakra Metal Ore",
+  "block.narutomod.chakra_metal_block": "Block of Chakra Metal",
+  "item.narutomod.chakra_metal_block": "Block of Chakra Metal",
+  "item.narutomod.raw_chakra_metal": "Raw Chakra Metal",
+  "block.narutomod.makibishi": "Makibishi Caltrops",
+  "item.narutomod.makibishi": "Makibishi Caltrops",
+  "block.narutomod.wire_trap": "Wire Trap",
+  "item.narutomod.wire_trap": "Wire Trap",
+  "block.narutomod.weapon_rack": "Shinobi Weapon Rack",
+  "item.narutomod.weapon_rack": "Shinobi Weapon Rack",
+  "block.narutomod.weapon_rack.empty": "Weapon Rack is empty. Right-click with an item to display it."
 }

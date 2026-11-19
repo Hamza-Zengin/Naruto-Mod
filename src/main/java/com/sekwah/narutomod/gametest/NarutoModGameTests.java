@@ -300,7 +300,7 @@ public class NarutoModGameTests {
         }
 
         // Verify Phoenix Flower spawns 4 mini fireballs and Chidori Stream spawns persistent field effect
-        ServerPlayer caster = helper.makeMockServerPlayerInLevel();
+        net.minecraft.world.entity.player.Player caster = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
         net.minecraft.core.BlockPos testOrigin = helper.absolutePos(new net.minecraft.core.BlockPos(1, 2, 1));
         caster.setPos(testOrigin.getX() + 0.5D, testOrigin.getY(), testOrigin.getZ() + 0.5D);
         NinjaData casterData = caster.getData(NinjaCapabilityHandler.NINJA_DATA);
@@ -331,6 +331,57 @@ public class NarutoModGameTests {
                     advancements.get(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, advPath)) != null,
                     "Advancement must load cleanly: " + advPath);
         }
+
+        // Phase 2 registry checks
+        helper.assertTrue(com.sekwah.narutomod.block.NarutoBlocks.CHAKRA_METAL_ORE.get() != null, "Chakra Metal Ore must be registered");
+        helper.assertTrue(com.sekwah.narutomod.block.NarutoBlocks.DEEPSLATE_CHAKRA_METAL_ORE.get() != null, "Deepslate Chakra Metal Ore must be registered");
+        helper.assertTrue(com.sekwah.narutomod.block.NarutoBlocks.CHAKRA_METAL_BLOCK.get() != null, "Chakra Metal Block must be registered");
+        helper.assertTrue(com.sekwah.narutomod.block.NarutoBlocks.MAKIBISHI.get() != null, "Makibishi must be registered");
+        helper.assertTrue(com.sekwah.narutomod.block.NarutoBlocks.WIRE_TRAP.get() != null, "Wire Trap must be registered");
+        helper.assertTrue(com.sekwah.narutomod.block.NarutoBlocks.WEAPON_RACK.get() != null, "Weapon Rack must be registered");
+        helper.assertTrue(com.sekwah.narutomod.item.NarutoItems.RAW_CHAKRA_METAL.get() != null, "Raw Chakra Metal must be registered");
+        helper.assertTrue(com.sekwah.narutomod.block.NarutoBlockEntities.WEAPON_RACK.get() != null, "Weapon Rack BlockEntity must be registered");
+
+        // Phase 2 live WeaponRackBlock + WeaponRackBlockEntity comparator & slot workflow
+        net.minecraft.core.BlockPos rackPos = new net.minecraft.core.BlockPos(2, 1, 2);
+        helper.setBlock(rackPos, com.sekwah.narutomod.block.NarutoBlocks.WEAPON_RACK.get().defaultBlockState());
+        com.sekwah.narutomod.block.WeaponRackBlockEntity rackEntity =
+                helper.getBlockEntity(rackPos, com.sekwah.narutomod.block.WeaponRackBlockEntity.class);
+        helper.assertValueEqual(rackEntity.getAnalogOutputSignal(), 0, "Empty weapon rack analog signal");
+
+        net.minecraft.world.item.ItemStack kunaiStack = new net.minecraft.world.item.ItemStack(
+                com.sekwah.narutomod.item.NarutoItems.KUNAI.get(), 2);
+        int slot1 = rackEntity.placeItem(com.sekwah.narutomod.block.WeaponRackBlockEntity.SLOT_UPPER, kunaiStack);
+        helper.assertValueEqual(slot1, com.sekwah.narutomod.block.WeaponRackBlockEntity.SLOT_UPPER, "Weapon rack upper slot placement");
+        helper.assertValueEqual(rackEntity.getAnalogOutputSignal(), 7, "1-slot weapon rack analog signal");
+
+        net.minecraft.world.item.ItemStack shurikenStack = new net.minecraft.world.item.ItemStack(
+                com.sekwah.narutomod.item.NarutoItems.SHURIKEN.get(), 1);
+        int slot2 = rackEntity.placeItem(com.sekwah.narutomod.block.WeaponRackBlockEntity.SLOT_LOWER, shurikenStack);
+        helper.assertValueEqual(slot2, com.sekwah.narutomod.block.WeaponRackBlockEntity.SLOT_LOWER, "Weapon rack lower slot placement");
+        helper.assertValueEqual(rackEntity.getAnalogOutputSignal(), 15, "Full weapon rack analog signal");
+
+        net.minecraft.world.item.ItemStack extracted = rackEntity.takeItem(com.sekwah.narutomod.block.WeaponRackBlockEntity.SLOT_UPPER);
+        helper.assertTrue(extracted.is(com.sekwah.narutomod.item.NarutoItems.KUNAI.get()), "Weapon rack should return Kunai");
+        helper.assertValueEqual(rackEntity.getAnalogOutputSignal(), 7, "Weapon rack analog signal after 1 extract");
+        rackEntity.takeItem(com.sekwah.narutomod.block.WeaponRackBlockEntity.SLOT_LOWER);
+        helper.assertValueEqual(rackEntity.getAnalogOutputSignal(), 0, "Weapon rack analog signal when emptied");
+
+        // Phase 2 live MakibishiBlock state & WireTrapBlock + PaperBombBlock synergy check
+        net.minecraft.core.BlockPos trapPos = new net.minecraft.core.BlockPos(3, 1, 2);
+        helper.setBlock(trapPos, com.sekwah.narutomod.block.NarutoBlocks.MAKIBISHI.get().defaultBlockState());
+        helper.assertValueEqual(
+                helper.getBlockState(trapPos).getValue(com.sekwah.narutomod.block.weapons.MakibishiBlock.CHARGES),
+                com.sekwah.narutomod.block.weapons.MakibishiBlock.MAX_CHARGES,
+                "Default Makibishi charge count");
+        helper.assertTrue(
+                com.sekwah.narutomod.block.weapons.WireTrapBlock.isPaperBombState(
+                        com.sekwah.narutomod.block.NarutoBlocks.PAPER_BOMB.get().defaultBlockState()),
+                "WireTrap must recognize PaperBombBlock state");
+
+        // Phase 2 live declarative JutsuUnlockRules check on registered abilities
+        helper.assertTrue(NarutoAbilities.RASENGAN.get().requiresScroll(), "Registered Rasengan must require scroll");
+        helper.assertTrue("uchiha".equals(NarutoAbilities.SHARINGAN.get().getRequiredClanPath()), "Registered Sharingan must require uchiha clan");
 
         helper.succeed();
     }

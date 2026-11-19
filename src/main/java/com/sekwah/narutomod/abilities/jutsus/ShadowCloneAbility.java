@@ -35,6 +35,11 @@ public class ShadowCloneAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public boolean requiresScroll() {
+        return true;
+    }
+
+    @Override
     public float getDefaultChakraCost() {
         return 30.0f;
     }

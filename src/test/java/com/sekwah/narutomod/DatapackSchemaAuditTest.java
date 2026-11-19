@@ -83,6 +83,9 @@ public class DatapackSchemaAuditTest {
                 for (int i = 0; i < ingredients.size(); i++) {
                     assertValid263Ingredient(fileName + " ingredients[" + i + "]", ingredients.get(i));
                 }
+            } else if ("minecraft:smelting".equals(type) || "minecraft:blasting".equals(type)) {
+                Assertions.assertTrue(root.has("ingredient"), fileName + " missing 'ingredient'");
+                assertValid263Ingredient(fileName + " ingredient", root.get("ingredient"));
             }
         }
     }
@@ -302,6 +305,38 @@ public class DatapackSchemaAuditTest {
                                     + res.error().map(DataResult.Error::message).orElse(""));
                 }
             }
+        }
+    }
+
+    @Test
+    public void testPhase2WorldgenAndBlockTagsValid() throws IOException {
+        Path configured = DATA_DIR.resolve("worldgen/configured_feature/ore_chakra_metal.json");
+        Assertions.assertTrue(Files.isRegularFile(configured), "ore_chakra_metal.json must exist!");
+        JsonObject confObj = JsonParser.parseString(Files.readString(configured)).getAsJsonObject();
+        Assertions.assertEquals("minecraft:ore", confObj.get("type").getAsString());
+        JsonObject config = confObj.getAsJsonObject("config");
+        Assertions.assertTrue(config.get("size").getAsInt() > 0);
+        Assertions.assertEquals(2, config.getAsJsonArray("targets").size());
+
+        Path placed = DATA_DIR.resolve("worldgen/placed_feature/ore_chakra_metal_placed.json");
+        Assertions.assertTrue(Files.isRegularFile(placed), "ore_chakra_metal_placed.json must exist!");
+        JsonObject placedObj = JsonParser.parseString(Files.readString(placed)).getAsJsonObject();
+        Assertions.assertEquals("narutomod:ore_chakra_metal", placedObj.get("feature").getAsString());
+        Assertions.assertFalse(placedObj.getAsJsonArray("placement").isEmpty());
+
+        Path modifier = DATA_DIR.resolve("neoforge/biome_modifier/add_chakra_metal_ore.json");
+        Assertions.assertTrue(Files.isRegularFile(modifier), "add_chakra_metal_ore.json must exist!");
+        JsonObject modObj = JsonParser.parseString(Files.readString(modifier)).getAsJsonObject();
+        Assertions.assertEquals("neoforge:add_features", modObj.get("type").getAsString());
+        Assertions.assertEquals("underground_ores", modObj.get("step").getAsString());
+
+        Path mcTagsDir = Paths.get("src/main/resources/data/minecraft/tags/block");
+        for (String tagRel : List.of("mineable/pickaxe.json", "needs_iron_tool.json", "mineable/axe.json")) {
+            Path tagPath = mcTagsDir.resolve(tagRel);
+            Assertions.assertTrue(Files.isRegularFile(tagPath), "Missing block tag: " + tagRel);
+            JsonObject tagObj = JsonParser.parseString(Files.readString(tagPath)).getAsJsonObject();
+            Assertions.assertTrue(tagObj.has("values") && !tagObj.getAsJsonArray("values").isEmpty(),
+                    tagRel + " must have non-empty values array");
         }
     }
 }

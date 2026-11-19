@@ -48,6 +48,11 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public String getRequiredClanPath() {
+        return "senju";
+    }
+
+    @Override
     public int getDefaultCooldown() {
         return 14 * 20;
     }

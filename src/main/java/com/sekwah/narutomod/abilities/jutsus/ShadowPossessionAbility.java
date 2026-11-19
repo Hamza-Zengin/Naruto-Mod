@@ -43,6 +43,11 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
     }
 
     @Override
+    public String getRequiredClanPath() {
+        return "nara";
+    }
+
+    @Override
     public int getDefaultCooldown() {
         return 12 * 20;
     }

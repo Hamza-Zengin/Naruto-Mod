@@ -112,6 +112,11 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
     }
 
     @Override
+    public String getRequiredClanPath() {
+        return "uchiha";
+    }
+
+    @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
             player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",

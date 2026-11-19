@@ -52,6 +52,11 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
+    public boolean requiresScroll() {
+        return true;
+    }
+
+    @Override
     public int getDefaultCooldown() {
         return 220; // 11 seconds cooldown
     }

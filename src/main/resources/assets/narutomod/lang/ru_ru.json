@@ -435,5 +435,19 @@
   "item.narutomod.training_dummy": "Тренировочный манекен шиноби",
   "block.narutomod.training_dummy.hit_melee": "Удар по манекену: %s урона (+опыт выносливости)",
   "block.narutomod.training_dummy.hit_jutsu": "Попадание дзюцу: %1$s урона [%2$s] (+опыт чакры и мастерство)",
-  "block.narutomod.training_dummy.use": "Тренировочный манекен шиноби: атакуйте оружием или дзюцу, чтобы повысить опыт и мастерство!"
+  "block.narutomod.training_dummy.use": "Тренировочный манекен шиноби: атакуйте оружием или дзюцу, чтобы повысить опыт и мастерство!",
+  "block.narutomod.chakra_metal_ore": "Руда чакра-металла",
+  "item.narutomod.chakra_metal_ore": "Руда чакра-металла",
+  "block.narutomod.deepslate_chakra_metal_ore": "Глубинносланцевая руда чакра-металла",
+  "item.narutomod.deepslate_chakra_metal_ore": "Глубинносланцевая руда чакра-металла",
+  "block.narutomod.chakra_metal_block": "Блок чакра-металла",
+  "item.narutomod.chakra_metal_block": "Блок чакра-металла",
+  "item.narutomod.raw_chakra_metal": "Рудный чакра-металл",
+  "block.narutomod.makibishi": "Шипы макибиси",
+  "item.narutomod.makibishi": "Шипы макибиси",
+  "block.narutomod.wire_trap": "Ловушка с леской",
+  "item.narutomod.wire_trap": "Ловушка с леской",
+  "block.narutomod.weapon_rack": "Стойка для оружия шиноби",
+  "item.narutomod.weapon_rack": "Стойка для оружия шиноби",
+  "block.narutomod.weapon_rack.empty": "Стойка пуста. Нажмите ПКМ с предметом в руке, чтобы разместить его."
 }

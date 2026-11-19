@@ -39,14 +39,33 @@ public final class JutsuUnlockRules {
                 || path.equals("adamantine_chains");
     }
 
+    @javax.annotation.Nullable
+    private static String legacyRequiredClanPath(Identifier id) {
+        if (id == null) return null;
+        return switch (id.getPath()) {
+            case "amaterasu", "susanoo_ribcage", "sharingan", "tsukuyomi" -> "uchiha";
+            case "byakugan", "hakke_kusho" -> "hyuga";
+            case "bone_dance" -> "kaguya";
+            case "wood_prison" -> "senju";
+            case "shadow_possession" -> "nara";
+            case "adamantine_chains" -> "uzumaki";
+            default -> null;
+        };
+    }
+
     public static boolean checkAbilityUnlocked(INinjaData data, Ability ability, Identifier abilityId) {
         if (ability == null || data == null) return false;
 
-        boolean isHybridScrollOrPrereq = abilityId != null
-                && (abilityId.getPath().equals("stone_spikes")
-                        || abilityId.getPath().equals("water_dragon")
-                        || abilityId.getPath().equals("chidori_stream"));
-        if (isHybridScrollOrPrereq && data.getUnlockedAbilities().contains(abilityId)) {
+        boolean requiresScroll = ability.requiresScroll() || isScrollRequiredJutsu(abilityId);
+        String requiredClanPath = ability.getRequiredClanPath();
+        if (requiredClanPath == null && abilityId != null) {
+            requiredClanPath = legacyRequiredClanPath(abilityId);
+        }
+
+        boolean isHybridScrollOrPrereq = requiresScroll && requiredClanPath == null
+                && !ability.getPrerequisites().isEmpty()
+                && (abilityId == null || !abilityId.getPath().equals("eight_gates_death"));
+        if (isHybridScrollOrPrereq && abilityId != null && data.getUnlockedAbilities().contains(abilityId)) {
             return true;
         }
 
@@ -62,45 +81,26 @@ public final class JutsuUnlockRules {
         String rankStr = data.getRank();
         NinjaRank playerRank = NinjaRank.fromString(rankStr);
 
-        if (abilityId != null) {
-            String path = abilityId.getPath();
-            if (path.equals("sharingan")) {
-                return clan != null && clan.getPath().equals("uchiha") && playerRank.getLevel() >= NinjaRank.GENIN.getLevel();
-            }
-            if (path.equals("byakugan")) {
-                return clan != null && clan.getPath().equals("hyuga") && playerRank.getLevel() >= NinjaRank.GENIN.getLevel();
-            }
-            if (path.equals("shadow_possession")) {
-                if (clan == null || !clan.getPath().equals("nara")) return false;
-            } else if (path.equals("tsukuyomi")) {
-                if (clan == null || !clan.getPath().equals("uchiha")) return false;
-            } else if (path.equals("hakke_kusho")) {
-                if (clan == null || !clan.getPath().equals("hyuga")) return false;
-            } else if (path.equals("bone_dance")) {
-                if (clan == null || !clan.getPath().equals("kaguya")) return false;
-            } else if (path.equals("wood_prison")) {
-                if (clan == null || !clan.getPath().equals("senju")) return false;
-            } else if (path.equals("adamantine_chains")) {
-                if (clan == null || !clan.getPath().equals("uzumaki")) return false;
-            }
-
-            if (isScrollRequiredJutsu(abilityId)) {
-                if (path.equals("amaterasu") || path.equals("susanoo_ribcage")) {
-                    if (clan == null || !clan.getPath().equals("uchiha")) {
-                        return false;
-                    }
-                }
-                if (path.equals("eight_gates") && playerRank.getLevel() < NinjaRank.JONIN.getLevel()) {
-                    return false;
-                }
-                if (data.getUnlockedAbilities().contains(abilityId)) {
-                    return true;
-                }
-                if (!ability.getPrerequisites().isEmpty() && playerRank.getLevel() >= ability.getRequiredRank().getLevel()) {
-                    return true;
-                }
+        if (requiredClanPath != null) {
+            if (clan == null || !clan.getPath().equals(requiredClanPath)) {
                 return false;
             }
+            if (abilityId != null && (abilityId.getPath().equals("sharingan") || abilityId.getPath().equals("byakugan"))) {
+                return playerRank.getLevel() >= NinjaRank.GENIN.getLevel();
+            }
+        }
+
+        if (requiresScroll) {
+            if (abilityId != null && abilityId.getPath().equals("eight_gates") && playerRank.getLevel() < NinjaRank.JONIN.getLevel()) {
+                return false;
+            }
+            if (abilityId != null && data.getUnlockedAbilities().contains(abilityId)) {
+                return true;
+            }
+            if (!ability.getPrerequisites().isEmpty() && playerRank.getLevel() >= ability.getRequiredRank().getLevel()) {
+                return true;
+            }
+            return false;
         }
 
         if (!ability.getPrerequisites().isEmpty()) {

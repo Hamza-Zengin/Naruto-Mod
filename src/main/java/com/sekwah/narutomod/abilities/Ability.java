@@ -50,6 +50,21 @@ public abstract class Ability {
         return 0;
     }
 
+    /**
+     * Whether this jutsu normally requires a scroll (or hybrid prerequisite mastery) to unlock.
+     */
+    public boolean requiresScroll() {
+        return false;
+    }
+
+    /**
+     * Clan path required to learn and use this jutsu (e.g. "uchiha", "hyuga"), or null if open to all clans.
+     */
+    @javax.annotation.Nullable
+    public String getRequiredClanPath() {
+        return null;
+    }
+
     public boolean meetsPrerequisites(INinjaData ninjaData) {
         if (ninjaData == null) return false;
         java.util.List<Identifier> prereqs = getPrerequisites();

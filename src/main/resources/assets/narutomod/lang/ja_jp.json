@@ -435,5 +435,19 @@
   "item.narutomod.training_dummy": "忍びの訓練人形",
   "block.narutomod.training_dummy.hit_melee": "訓練人形ヒット: %s ダメージ (+スタミナ経験値)",
   "block.narutomod.training_dummy.hit_jutsu": "術ヒット: %1$s ダメージ [%2$s] (+チャクラ経験値・熟練度)",
-  "block.narutomod.training_dummy.use": "忍びの訓練人形: 近接攻撃、忍具、または術を当てて経験値と熟練度を鍛えよう！"
+  "block.narutomod.training_dummy.use": "忍びの訓練人形: 近接攻撃、忍具、または術を当てて経験値と熟練度を鍛えよう！",
+  "block.narutomod.chakra_metal_ore": "チャクラ金属鉱石",
+  "item.narutomod.chakra_metal_ore": "チャクラ金属鉱石",
+  "block.narutomod.deepslate_chakra_metal_ore": "深層チャクラ金属鉱石",
+  "item.narutomod.deepslate_chakra_metal_ore": "深層チャクラ金属鉱石",
+  "block.narutomod.chakra_metal_block": "チャクラ金属ブロック",
+  "item.narutomod.chakra_metal_block": "チャクラ金属ブロック",
+  "item.narutomod.raw_chakra_metal": "チャクラ金属の原石",
+  "block.narutomod.makibishi": "撒菱（マキビシ）",
+  "item.narutomod.makibishi": "撒菱（マキビシ）",
+  "block.narutomod.wire_trap": "ワイヤートラップ",
+  "item.narutomod.wire_trap": "ワイヤートラップ",
+  "block.narutomod.weapon_rack": "忍具掛け",
+  "item.narutomod.weapon_rack": "忍具掛け",
+  "block.narutomod.weapon_rack.empty": "忍具掛けは空です。アイテムを持って右クリックで飾れます。"
 }
