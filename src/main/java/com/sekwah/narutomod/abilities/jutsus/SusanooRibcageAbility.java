@@ -4,11 +4,13 @@ import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -106,8 +108,8 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         // Godlike Defense: Resistance IV (80% damage reduction) + Fire immunity
-        player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 3, false, false, true));
-        player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 40, 0, false, false, false));
+        ensureSustainedEffect(player, MobEffects.RESISTANCE, 40, 3, true);
+        ensureSustainedEffect(player, MobEffects.FIRE_RESISTANCE, 40, 0, false);
 
         int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
         int tier = getMasteryTier(mastery);
@@ -153,6 +155,14 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
                 enemy.push(push.x, 0.45, push.z);
                 enemy.hurtServer(serverLevel, serverLevel.damageSources().playerAttack(player), damage);
             }
+        }
+    }
+
+    private static void ensureSustainedEffect(Player player, Holder<MobEffect> effect, int duration, int amplifier, boolean showIcon) {
+        MobEffectInstance existing = player.getEffect(effect);
+        if (existing == null || existing.getAmplifier() < amplifier
+                || existing.getDuration() <= 20 || player.tickCount % 10 == 0) {
+            player.addEffect(new MobEffectInstance(effect, duration, amplifier, false, false, showIcon));
         }
     }
 

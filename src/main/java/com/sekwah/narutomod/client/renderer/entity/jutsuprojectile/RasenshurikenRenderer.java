@@ -58,14 +58,12 @@ public class RasenshurikenRenderer extends EntityRenderer<RasenshurikenEntity, R
         poseStack.scale(state.scale, state.scale, state.scale);
 
         // Smooth procedural glowing Rasengan sphere core at the shuriken center
-        submitNodeCollector.submitCustomGeometry(poseStack, RENDER_TYPE, (pose, consumer) -> {
-            PoseStack local = new PoseStack();
-            local.last().set(pose);
-            RasenganSphereModel.renderSmoothSphere(
-                    local, consumer, 0.28F, 18, 28, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
-                    0.75F, 0.96F, 1.0F, 0.80F
-            );
-        });
+        submitNodeCollector.submitCustomGeometry(poseStack, RENDER_TYPE, (pose, consumer) ->
+                RasenganSphereModel.renderSmoothSphere(
+                        pose, consumer, 0.28F, 18, 28, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                        0.75F, 0.96F, 1.0F, 0.80F
+                )
+        );
 
         int color = ARGB.colorFromFloat(0.88F, 1.0F, 1.0F, 1.0F);
         submitNodeCollector.submitModel(

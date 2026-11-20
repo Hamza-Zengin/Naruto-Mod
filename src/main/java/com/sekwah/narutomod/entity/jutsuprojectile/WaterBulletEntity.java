@@ -47,6 +47,7 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
     private float motionYaw;
     private float motionPitch;
     private boolean hasMotionRot = false;
+    private int lockedTargetId = -1;
 
     public static float computeYawFromMotion(Vec3 motion) {
         return (float) (Mth.atan2(-motion.x, motion.z) * (180.0D / Math.PI));
@@ -270,23 +271,44 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
             return;
         }
         Vec3 forward = motion.scale(1.0D / speed);
-        AABB searchBox = this.getBoundingBox().inflate(12.0D);
-        List<LivingEntity> candidates = serverLevel.getEntitiesOfClass(LivingEntity.class, searchBox,
-                e -> e.isAlive() && this.canHitEntity(e));
+
         LivingEntity bestTarget = null;
-        double bestDistSq = Double.MAX_VALUE;
-        for (LivingEntity candidate : candidates) {
-            Vec3 toTarget = candidate.getEyePosition().subtract(this.position());
-            double distSq = toTarget.lengthSqr();
-            if (distSq < 1.0E-4D || distSq > 196.0D) {
-                continue;
+        if (this.lockedTargetId >= 0) {
+            Entity cached = serverLevel.getEntity(this.lockedTargetId);
+            if (cached instanceof LivingEntity living && living.isAlive() && this.canHitEntity(living)) {
+                Vec3 toTarget = living.getEyePosition().subtract(this.position());
+                double distSq = toTarget.lengthSqr();
+                if (distSq >= 1.0E-4D && distSq <= 196.0D
+                        && forward.dot(toTarget) > 0.35D * Math.sqrt(distSq)) {
+                    bestTarget = living;
+                }
             }
-            Vec3 dir = toTarget.normalize();
-            if (forward.dot(dir) > 0.35D && distSq < bestDistSq) {
-                bestDistSq = distSq;
-                bestTarget = candidate;
+            if (bestTarget == null) {
+                this.lockedTargetId = -1;
             }
         }
+
+        if (bestTarget == null || this.tickCount % 3 == 0) {
+            AABB searchBox = this.getBoundingBox().inflate(12.0D);
+            List<LivingEntity> candidates = serverLevel.getEntitiesOfClass(LivingEntity.class, searchBox,
+                    e -> e.isAlive() && this.canHitEntity(e));
+            LivingEntity scannedBest = null;
+            double bestDistSq = Double.MAX_VALUE;
+            for (LivingEntity candidate : candidates) {
+                Vec3 toTarget = candidate.getEyePosition().subtract(this.position());
+                double distSq = toTarget.lengthSqr();
+                if (distSq < 1.0E-4D || distSq > 196.0D) {
+                    continue;
+                }
+                if (forward.dot(toTarget) > 0.35D * Math.sqrt(distSq) && distSq < bestDistSq) {
+                    bestDistSq = distSq;
+                    scannedBest = candidate;
+                }
+            }
+            bestTarget = scannedBest;
+            this.lockedTargetId = bestTarget != null ? bestTarget.getId() : -1;
+        }
+
         if (bestTarget != null) {
             Vec3 desiredDir = bestTarget.getEyePosition().subtract(this.position()).normalize();
             Vec3 newDir = forward.scale(0.84D).add(desiredDir.scale(0.16D)).normalize();

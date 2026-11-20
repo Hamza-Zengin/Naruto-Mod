@@ -5,6 +5,7 @@ import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
@@ -12,6 +13,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -161,41 +163,41 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
         // Apply progressive buffs according to gate stage
         switch (stage) {
             case GATE_1 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 0, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 0, false, false, false));
+                ensureSustainedEffect(player, MobEffects.SPEED, 40, 0);
+                ensureSustainedEffect(player, MobEffects.STRENGTH, 40, 0);
             }
             case GATE_2 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 0, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 1, false, false, false));
+                ensureSustainedEffect(player, MobEffects.SPEED, 40, 0);
+                ensureSustainedEffect(player, MobEffects.STRENGTH, 40, 1);
             }
             case GATE_3 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 1, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 1, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 0, false, false, false));
+                ensureSustainedEffect(player, MobEffects.SPEED, 40, 1);
+                ensureSustainedEffect(player, MobEffects.STRENGTH, 40, 1);
+                ensureSustainedEffect(player, MobEffects.RESISTANCE, 40, 0);
             }
             case GATE_4 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 1, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 2, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 40, 0, false, false, false));
+                ensureSustainedEffect(player, MobEffects.SPEED, 40, 1);
+                ensureSustainedEffect(player, MobEffects.STRENGTH, 40, 2);
+                ensureSustainedEffect(player, MobEffects.JUMP_BOOST, 40, 0);
             }
             case GATE_5 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 2, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 3, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 1, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 40, 1, false, false, false));
+                ensureSustainedEffect(player, MobEffects.SPEED, 40, 2);
+                ensureSustainedEffect(player, MobEffects.STRENGTH, 40, 3);
+                ensureSustainedEffect(player, MobEffects.RESISTANCE, 40, 1);
+                ensureSustainedEffect(player, MobEffects.JUMP_BOOST, 40, 1);
             }
             case GATE_6 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 2, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 4, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 1, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.HASTE, 40, 1, false, false, false));
+                ensureSustainedEffect(player, MobEffects.SPEED, 40, 2);
+                ensureSustainedEffect(player, MobEffects.STRENGTH, 40, 4);
+                ensureSustainedEffect(player, MobEffects.RESISTANCE, 40, 1);
+                ensureSustainedEffect(player, MobEffects.HASTE, 40, 1);
             }
             case GATE_7 -> {
-                player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 3, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 5, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 2, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 40, 2, false, false, false));
-                player.addEffect(new MobEffectInstance(MobEffects.HASTE, 40, 2, false, false, false));
+                ensureSustainedEffect(player, MobEffects.SPEED, 40, 3);
+                ensureSustainedEffect(player, MobEffects.STRENGTH, 40, 5);
+                ensureSustainedEffect(player, MobEffects.RESISTANCE, 40, 2);
+                ensureSustainedEffect(player, MobEffects.JUMP_BOOST, 40, 2);
+                ensureSustainedEffect(player, MobEffects.HASTE, 40, 2);
             }
         }
 
@@ -224,6 +226,14 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
                             1, 0.2, 0.2, 0.2, 0.01, ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 }
             }
+        }
+    }
+
+    private static void ensureSustainedEffect(Player player, Holder<MobEffect> effect, int duration, int amplifier) {
+        MobEffectInstance existing = player.getEffect(effect);
+        if (existing == null || existing.getAmplifier() < amplifier
+                || existing.getDuration() <= 20 || player.tickCount % 10 == 0) {
+            player.addEffect(new MobEffectInstance(effect, duration, amplifier, false, false, false));
         }
     }
 

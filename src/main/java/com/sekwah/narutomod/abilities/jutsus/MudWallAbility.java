@@ -20,6 +20,10 @@ import net.minecraft.world.level.block.Blocks;
  */
 public class MudWallAbility extends Ability implements Ability.Cooldown {
 
+    private static final class Particles {
+        static final BlockParticleOption STONE = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState());
+    }
+
     @Override
     public ActivationType activationType() {
         return ActivationType.INSTANT;
@@ -61,11 +65,10 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
         serverLevel.playSound(null, basePos, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.8f, 0.6f);
 
         // Ground eruption particles
-        BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState());
         for (int i = 0; i < 16; i++) {
             double rx = basePos.getX() + 0.5 + (player.getRandom().nextDouble() - 0.5) * 2.5;
             double rz = basePos.getZ() + 0.5 + (player.getRandom().nextDouble() - 0.5) * 2.5;
-            serverLevel.sendParticles(rockParticle, rx, basePos.getY() + 0.2, rz, 4, 0.2, 0.3, 0.2, 0.08,
+            serverLevel.sendParticles(Particles.STONE, rx, basePos.getY() + 0.2, rz, 4, 0.2, 0.3, 0.2, 0.08,
                     net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         }
 

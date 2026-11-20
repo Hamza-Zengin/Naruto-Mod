@@ -22,6 +22,10 @@ import net.minecraft.world.phys.Vec3;
  */
 public class EarthDragonBulletAbility extends Ability implements Ability.Cooldown {
 
+    private static final class Particles {
+        static final BlockParticleOption COBBLESTONE = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
+    }
+
     @Override
     public ActivationType activationType() {
         return ActivationType.INSTANT;
@@ -79,8 +83,7 @@ public class EarthDragonBulletAbility extends Ability implements Ability.Cooldow
         bullet.setDeltaMovement(look.scale(1.15D * Math.min(1.35D, powerMult)));
         serverLevel.addFreshEntity(bullet);
 
-        BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
-        serverLevel.sendParticles(rockParticle, spawnPos.x, spawnPos.y, spawnPos.z, 18, 0.35D, 0.35D, 0.35D, 0.1D,
+        serverLevel.sendParticles(Particles.COBBLESTONE, spawnPos.x, spawnPos.y, spawnPos.z, 18, 0.35D, 0.35D, 0.35D, 0.1D,
                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
     }
 }

@@ -15,6 +15,7 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ public class NarutoAbilities {
     public static final DeferredRegister<Ability> ABILITY = DeferredRegister.create(NarutoRegistries.ABILITY_KEY, MOD_ID);
 
     public static final Map<Long, Identifier> COMBO_MAP = new HashMap<>();
+    private static volatile Map<Identifier, Ability> ABILITY_BY_ID = Collections.emptyMap();
 
     // Utility
     public static final DeferredHolder<Ability, LeapAbility> LEAP = ABILITY.register("leap", LeapAbility::new);
@@ -80,22 +82,31 @@ public class NarutoAbilities {
     }
 
     public static void registerKeyCombos() {
-        ABILITY.getEntries().forEach(abilityEntry -> {
+        var entries = ABILITY.getEntries();
+        Map<Identifier, Ability> byId = HashMap.newHashMap(entries.size());
+        entries.forEach(abilityEntry -> {
             Ability ability = abilityEntry.get();
-            ability.setRegistryName(abilityEntry.getId());
+            Identifier id = abilityEntry.getId();
+            ability.setRegistryName(id);
+            byId.put(id, ability);
             long combo = ability.defaultCombo();
             if (combo > 0) {
                 if (COMBO_MAP.containsKey(combo)) {
                     NarutoMod.LOGGER.error("Ability already registered with combo {}", combo);
                 } else {
-                    COMBO_MAP.put(combo, abilityEntry.getId());
+                    COMBO_MAP.put(combo, id);
                 }
             }
         });
+        ABILITY_BY_ID = Map.copyOf(byId);
     }
 
     public static Ability getAbility(Identifier id) {
         if (id == null) return null;
+        Map<Identifier, Ability> byId = ABILITY_BY_ID;
+        if (!byId.isEmpty()) {
+            return byId.get(id);
+        }
         for (DeferredHolder<Ability, ? extends Ability> entry : ABILITY.getEntries()) {
             if (entry.getId().equals(id)) {
                 return entry.get();

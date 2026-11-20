@@ -90,4 +90,10 @@ public class ServerJutsuCastingPacket implements CustomPacketPayload {
             ninjaData.addSeal((byte) msg.jutsuKey);
         });
     }
+
+    public static void clearPlayer(UUID playerId) {
+        if (playerId != null) {
+            LAST_SEAL_TIME.remove(playerId);
+        }
+    }
 }

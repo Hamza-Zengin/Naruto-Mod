@@ -58,16 +58,13 @@ public class SmokeBombEntity extends ThrowableItemProjectile {
             serverLevel.playSound(null, this.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 2.0f, 0.6f);
             serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 0.8f, 1.5f);
 
-            // Large billowing smoke cloud
-            for (int i = 0; i < 40; i++) {
-                double ox = (random.nextDouble() - 0.5) * 3.5;
-                double oy = random.nextDouble() * 2.5;
-                double oz = (random.nextDouble() - 0.5) * 3.5;
-                serverLevel.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, x + ox, y + oy, z + oz, 1, 0.02, 0.05, 0.02, 0.01,
-                        net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
-                serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, x + ox, y + oy, z + oz, 2, 0.05, 0.05, 0.05, 0.02,
-                        net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
-            }
+            // Large billowing smoke cloud (batched into 2 packets instead of 80)
+            serverLevel.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y + 1.25, z,
+                    40, 1.1, 0.8, 1.1, 0.01,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+            serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, x, y + 1.25, z,
+                    80, 1.1, 0.8, 1.1, 0.02,
+                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
             // Blinding effect on entities in 5 block radius
             AABB area = new AABB(x - 5.0, y - 2.0, z - 5.0, x + 5.0, y + 4.0, z + 5.0);

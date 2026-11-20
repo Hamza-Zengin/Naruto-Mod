@@ -65,35 +65,29 @@ public class EarthBulletRenderer extends EntityRenderer<EarthBulletEntity, Earth
             submitNodeCollector.submitCustomGeometry(
                     poseStack,
                     RenderTypes.entityCutout(JutsuVisualEffectRenderer.TEX_EARTH),
-                    (pose, consumer) -> {
-                        PoseStack localStack = new PoseStack();
-                        localStack.last().set(pose);
-                        // Faceted rocky boulder (low subdivision counts yield angular rock facets)
-                        RasenganSphereModel.renderSmoothSphere(
-                                localStack, consumer, 0.45F, 7, 10,
-                                molten ? RenderMathUtil.FULL_BRIGHT : solidLight,
-                                OverlayTexture.NO_OVERLAY,
-                                molten ? 0.92F : 0.72F,
-                                molten ? 0.48F : 0.62F,
-                                molten ? 0.22F : 0.50F,
-                                fadeOut
-                        );
-                    }
+                    (pose, consumer) ->
+                            // Faceted rocky boulder (low subdivision counts yield angular rock facets)
+                            RasenganSphereModel.renderSmoothSphere(
+                                    pose, consumer, 0.45F, 7, 10,
+                                    molten ? RenderMathUtil.FULL_BRIGHT : solidLight,
+                                    OverlayTexture.NO_OVERLAY,
+                                    molten ? 0.92F : 0.72F,
+                                    molten ? 0.48F : 0.62F,
+                                    molten ? 0.22F : 0.50F,
+                                    fadeOut
+                            )
             );
 
             if (molten) {
                 submitNodeCollector.submitCustomGeometry(
                         poseStack,
                         RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_AMATERASU),
-                        (pose, consumer) -> {
-                            PoseStack localStack = new PoseStack();
-                            localStack.last().set(pose);
-                            RasenganSphereModel.renderSmoothSphere(
-                                    localStack, consumer, 0.56F, 10, 14,
-                                    RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
-                                    1.0F, 0.38F, 0.08F, 0.55F * fadeOut
-                            );
-                        }
+                        (pose, consumer) ->
+                                RasenganSphereModel.renderSmoothSphere(
+                                        pose, consumer, 0.56F, 10, 14,
+                                        RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                                        1.0F, 0.38F, 0.08F, 0.55F * fadeOut
+                                )
                 );
             }
         } finally {

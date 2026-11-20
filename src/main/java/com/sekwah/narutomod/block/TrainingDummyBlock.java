@@ -64,6 +64,10 @@ public class TrainingDummyBlock extends RotatableDecorativeBlock {
             Block.box(4.5D, 12.0D, 4.5D, 11.5D, 16.0D, 11.5D)
     );
 
+    private static final class Particles {
+        static final BlockParticleOption HAY = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.HAY_BLOCK.defaultBlockState());
+    }
+
     public TrainingDummyBlock(BlockBehaviour.Properties properties) {
         super(properties, DUMMY_SHAPE);
     }
@@ -226,7 +230,7 @@ public class TrainingDummyBlock extends RotatableDecorativeBlock {
         double cy = pos.getY() + 0.65D;
         double cz = pos.getZ() + 0.5D;
         serverLevel.playSound(null, pos, SoundEvents.WOOD_HIT, SoundSource.BLOCKS, 1.0F, intense ? 0.9F : 1.15F);
-        serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.HAY_BLOCK.defaultBlockState()),
+        serverLevel.sendParticles(Particles.HAY,
                 cx, cy, cz, intense ? 14 : 7, 0.25D, 0.28D, 0.25D, 0.08D,
                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         if (intense) {

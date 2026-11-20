@@ -6,7 +6,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public enum NinjaRank {
@@ -227,19 +229,39 @@ public enum NinjaRank {
         return missing;
     }
 
+    private static final Map<String, NinjaRank> RANK_LOOKUP;
+
+    static {
+        Map<String, NinjaRank> lookup = new HashMap<>();
+        for (NinjaRank rank : values()) {
+            lookup.put(rank.name(), rank);
+            lookup.put(rank.englishName, rank);
+            lookup.put(rank.turkishName, rank);
+
+            String normName = normalizeRankKey(rank.name());
+            String normEn = normalizeRankKey(rank.englishName);
+            String normTr = normalizeRankKey(rank.turkishName);
+
+            lookup.put(normName, rank);
+            lookup.put(normEn, rank);
+            lookup.put(normEn.replace(' ', '_'), rank);
+            lookup.put(normTr, rank);
+            lookup.put(normTr.replace(' ', '_'), rank);
+        }
+        RANK_LOOKUP = Map.copyOf(lookup);
+    }
+
+    private static String normalizeRankKey(String value) {
+        return value.trim().replace('ı', 'i').replace('İ', 'I').toLowerCase(Locale.ROOT);
+    }
+
     public static NinjaRank parseExact(String name) {
         if (name == null) return null;
-        String clean = name.trim().replace('ı', 'i').replace('İ', 'I').toLowerCase(java.util.Locale.ROOT);
-        for (NinjaRank rank : values()) {
-            if (rank.name().toLowerCase(java.util.Locale.ROOT).equals(clean)
-                    || rank.englishName.toLowerCase(java.util.Locale.ROOT).replace(" ", "_").equals(clean)
-                    || rank.englishName.toLowerCase(java.util.Locale.ROOT).equals(clean)
-                    || rank.turkishName.toLowerCase(java.util.Locale.ROOT).replace('ı', 'i').replace('İ', 'I').replace(" ", "_").equals(clean)
-                    || rank.turkishName.toLowerCase(java.util.Locale.ROOT).replace('ı', 'i').replace('İ', 'I').equals(clean)) {
-                return rank;
-            }
+        NinjaRank direct = RANK_LOOKUP.get(name);
+        if (direct != null) {
+            return direct;
         }
-        return null;
+        return RANK_LOOKUP.get(normalizeRankKey(name));
     }
 
     public static NinjaRank fromString(String name) {

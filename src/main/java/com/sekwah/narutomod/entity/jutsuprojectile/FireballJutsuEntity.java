@@ -60,6 +60,15 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         this.explosionPower = 0.8f;
         this.jutsuPower = 25;
         this.lifeSpan = 45;
+        this.refreshDimensions();
+    }
+
+    @Override
+    public void onSyncedDataUpdated(net.minecraft.network.syncher.EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (DATA_PHOENIX_MINI.equals(key)) {
+            this.refreshDimensions();
+        }
     }
 
     public static final float INITIAL_SCALE = 0.25f;
@@ -180,7 +189,9 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
 
         super.tick();
         ++this.time;
-        this.refreshDimensions();
+        if (this.time <= (int) GROW_TIME) {
+            this.refreshDimensions();
+        }
 
         if (!this.level().isClientSide() && !this.isImpacted() && this.isAlive()) {
             AABB clashBox = this.getBoundingBox().inflate(this.isPhoenixMini() ? 0.15D : 0.35D);

@@ -8,6 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -55,7 +56,10 @@ public class ToggleAbilityData {
     }
 
     public List<Identifier> getAbilitiesSnapshot() {
-        return this.abilities != null ? new ArrayList<>(this.abilities) : new ArrayList<>();
+        if (this.abilities == null || this.abilities.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(this.abilities);
     }
 
     public boolean hasToggleAbility(Identifier ability) {

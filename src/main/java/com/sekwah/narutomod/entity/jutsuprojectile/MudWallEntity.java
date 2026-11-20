@@ -78,6 +78,11 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
     private static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_CASTER_UUID =
             SynchedEntityData.defineId(MudWallEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
+    private static final class Particles {
+        static final BlockParticleOption STONE = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState());
+        static final BlockParticleOption COBBLESTONE = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
+    }
+
     public MudWallEntity(EntityType<? extends MudWallEntity> type, Level level) {
         super(type, level);
         this.noPhysics = false;
@@ -176,8 +181,7 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
         float remaining = Math.max(0.0F, this.getHealth() - amount);
         this.setHealth(remaining);
         serverLevel.playSound(null, this.blockPosition(), SoundEvents.STONE_HIT, SoundSource.BLOCKS, 1.0F, 0.75F);
-        BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState());
-        serverLevel.sendParticles(rockParticle,
+        serverLevel.sendParticles(Particles.STONE,
                 this.getX(), this.getY() + 1.2D, this.getZ(),
                 10, 0.8D, 0.8D, 0.8D, 0.1D,
                 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
@@ -190,8 +194,7 @@ public class MudWallEntity extends Entity implements JutsuProjectile {
 
     private void crumbleAndDiscard(ServerLevel serverLevel) {
         serverLevel.playSound(null, this.blockPosition(), SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1.5F, 0.7F);
-        BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
-        serverLevel.sendParticles(rockParticle,
+        serverLevel.sendParticles(Particles.COBBLESTONE,
                 this.getX(), this.getY() + 1.0D, this.getZ(),
                 30, 1.2D, 1.0D, 1.2D, 0.15D,
                 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);

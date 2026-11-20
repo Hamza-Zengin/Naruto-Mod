@@ -5,6 +5,7 @@ import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
@@ -12,6 +13,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -103,11 +105,11 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
         }
 
         // Transcendent Taijutsu Buffs
-        player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, 4, false, false, false)); // Speed V
-        player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 7, false, false, false)); // Strength VIII
-        player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 2, false, false, false)); // Resistance III
-        player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 40, 3, false, false, false)); // Jump IV
-        player.addEffect(new MobEffectInstance(MobEffects.HASTE, 40, 3, false, false, false));
+        ensureSustainedEffect(player, MobEffects.SPEED, 40, 4); // Speed V
+        ensureSustainedEffect(player, MobEffects.STRENGTH, 40, 7); // Strength VIII
+        ensureSustainedEffect(player, MobEffects.RESISTANCE, 40, 2); // Resistance III
+        ensureSustainedEffect(player, MobEffects.JUMP_BOOST, 40, 3); // Jump IV
+        ensureSustainedEffect(player, MobEffects.HASTE, 40, 3);
 
         // Anti-AFK mastery progression for 8th gate
         if (player.tickCount % 200 == 0) {
@@ -148,6 +150,14 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
                     serverLevel.playSound(null, player.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1.0f, 0.5f);
                 }
             }
+        }
+    }
+
+    private static void ensureSustainedEffect(Player player, Holder<MobEffect> effect, int duration, int amplifier) {
+        MobEffectInstance existing = player.getEffect(effect);
+        if (existing == null || existing.getAmplifier() < amplifier
+                || existing.getDuration() <= 20 || player.tickCount % 10 == 0) {
+            player.addEffect(new MobEffectInstance(effect, duration, amplifier, false, false, false));
         }
     }
 

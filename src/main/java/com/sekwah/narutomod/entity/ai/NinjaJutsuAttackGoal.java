@@ -45,6 +45,11 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
     private static final Identifier HAND_SEAL_SPARK_ID =
             Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "hand_seal_spark");
 
+    private static final class Particles {
+        static final BlockParticleOption COBBLESTONE = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
+        static final BlockParticleOption STONE = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState());
+    }
+
     public enum State {
         IDLE,
         HAND_SEAL_WINDUP,
@@ -294,8 +299,7 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
             bullet.setDeltaMovement(dir.scale(profile.getEarthBulletSpeed()));
             serverLevel.addFreshEntity(bullet);
 
-            BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
-            serverLevel.sendParticles(rockParticle, spawnPos.x, spawnPos.y, spawnPos.z,
+            serverLevel.sendParticles(Particles.COBBLESTONE, spawnPos.x, spawnPos.y, spawnPos.z,
                     14, 0.3D, 0.3D, 0.3D, 0.08D,
                     ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
@@ -448,8 +452,7 @@ public class NinjaJutsuAttackGoal<T extends PathfinderMob & NinjaJutsuUser> exte
         serverLevel.playSound(null, basePos, NarutoSounds.MUD_WALL_RISE.get(), SoundSource.HOSTILE, 1.3F, 0.9F);
         serverLevel.playSound(null, basePos, SoundEvents.STONE_PLACE, SoundSource.HOSTILE, 1.5F, 0.75F);
 
-        BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.STONE.defaultBlockState());
-        serverLevel.sendParticles(rockParticle,
+        serverLevel.sendParticles(Particles.STONE,
                 wallPos.x, this.mob.getY() + 0.3D, wallPos.z,
                 20, 1.1D, 0.35D, 1.1D, 0.08D,
                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);

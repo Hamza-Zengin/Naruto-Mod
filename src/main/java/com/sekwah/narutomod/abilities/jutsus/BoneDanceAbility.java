@@ -29,6 +29,10 @@ import java.util.List;
  */
 public class BoneDanceAbility extends Ability implements Ability.Cooldown {
 
+    private static final class Particles {
+        static final BlockParticleOption BONE = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.defaultBlockState());
+    }
+
     @Override
     public ActivationType activationType() {
         return ActivationType.INSTANT;
@@ -90,7 +94,6 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
         }
 
         Vec3 origin = player.position();
-        BlockParticleOption boneParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.BONE_BLOCK.defaultBlockState());
 
         // Erupt 3D Calcified Bone Spire Forest in 3 concentric shockwave rings
         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity boneForest =
@@ -116,7 +119,7 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
                     double sx = origin.x + Math.cos(angle) * radius;
                     double sz = origin.z + Math.sin(angle) * radius;
                     for (double h = 0.0; h <= 2.2; h += 0.45) {
-                        sLevel.sendParticles(boneParticle, sx, origin.y + h, sz, 3, 0.08, 0.15, 0.08, 0.02,
+                        sLevel.sendParticles(Particles.BONE, sx, origin.y + h, sz, 3, 0.08, 0.15, 0.08, 0.02,
                                 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
                     sLevel.sendParticles(ParticleTypes.CRIT, sx, origin.y + 1.8, sz, 2, 0.05, 0.1, 0.05, 0.02,

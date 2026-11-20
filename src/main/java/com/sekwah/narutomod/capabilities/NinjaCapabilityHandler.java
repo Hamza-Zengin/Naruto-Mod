@@ -53,9 +53,11 @@ public class NinjaCapabilityHandler {
                 data.addStaminaExp(0.03f);
             }
             data.updateServerData(player);
+        } else {
+            data.updateClientData();
         }
         ToggleAbilityData toggleData = data.getToggleAbilityData();
-        if (toggleData != null) {
+        if (toggleData != null && toggleData.getAbilitiesHashSet() != null && !toggleData.getAbilitiesHashSet().isEmpty()) {
             for (Identifier abilityName : toggleData.getAbilitiesSnapshot()) {
                 if (!toggleData.hasToggleAbility(abilityName)) {
                     continue;
@@ -103,6 +105,7 @@ public class NinjaCapabilityHandler {
     public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
             com.sekwah.narutomod.network.ServerSecurityValidator.clearPlayer(serverPlayer.getUUID());
+            com.sekwah.narutomod.network.c2s.ServerJutsuCastingPacket.clearPlayer(serverPlayer.getUUID());
         }
     }
 

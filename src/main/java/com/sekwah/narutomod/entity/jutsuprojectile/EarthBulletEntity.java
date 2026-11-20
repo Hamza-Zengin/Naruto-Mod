@@ -49,6 +49,11 @@ public class EarthBulletEntity extends ThrowableItemProjectile implements JutsuP
     private static final EntityDataAccessor<Boolean> DATA_MOLTEN =
             SynchedEntityData.defineId(EarthBulletEntity.class, EntityDataSerializers.BOOLEAN);
 
+    private static final class Particles {
+        static final BlockParticleOption COBBLESTONE_PARTICLE =
+                new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
+    }
+
     private int jutsuPower = 55;
 
     public EarthBulletEntity(EntityType<? extends EarthBulletEntity> type, Level level) {
@@ -87,8 +92,7 @@ public class EarthBulletEntity extends ThrowableItemProjectile implements JutsuP
     public void explodeAndDiscard() {
         if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
             serverLevel.playSound(null, this.blockPosition(), SoundEvents.STONE_BREAK, SoundSource.PLAYERS, 1.5F, 0.8F);
-            BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
-            serverLevel.sendParticles(rockParticle,
+            serverLevel.sendParticles(Particles.COBBLESTONE_PARTICLE,
                     this.getX(), this.getY() + 0.4D, this.getZ(),
                     22, 0.5D, 0.5D, 0.5D, 0.14D,
                     ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
@@ -162,9 +166,8 @@ public class EarthBulletEntity extends ThrowableItemProjectile implements JutsuP
         super.tick();
 
         if (this.level().isClientSide()) {
-            BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
             for (int i = 0; i < 2; i++) {
-                this.level().addParticle(rockParticle,
+                this.level().addParticle(Particles.COBBLESTONE_PARTICLE,
                         this.getX() + (this.random.nextDouble() - 0.5D) * 0.5D,
                         this.getY() + 0.25D + (this.random.nextDouble() - 0.5D) * 0.5D,
                         this.getZ() + (this.random.nextDouble() - 0.5D) * 0.5D,
@@ -178,8 +181,7 @@ public class EarthBulletEntity extends ThrowableItemProjectile implements JutsuP
                         0.0D, 0.04D, 0.0D);
             }
         } else if (this.level() instanceof ServerLevel serverLevel) {
-            BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.COBBLESTONE.defaultBlockState());
-            serverLevel.sendParticles(rockParticle,
+            serverLevel.sendParticles(Particles.COBBLESTONE_PARTICLE,
                     this.getX(), this.getY() + 0.35D, this.getZ(),
                     4, 0.3D, 0.3D, 0.3D, 0.05D,
                     ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
@@ -190,27 +192,25 @@ public class EarthBulletEntity extends ThrowableItemProjectile implements JutsuP
                         ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             }
 
-            // Fire + Earth Molten synergy check with nearby allied FireballJutsuEntity
-            if (!this.isMolten() && this.isAlive()) {
-                AABB moltenCheck = this.getBoundingBox().inflate(2.2D);
-                List<FireballJutsuEntity> fireballs = this.level().getEntitiesOfClass(
-                        FireballJutsuEntity.class, moltenCheck,
-                        fb -> fb.isAlive() && ShadowCloneEntity.areAllies(this.getOwner(), fb.getOwner()));
-                if (!fireballs.isEmpty()) {
-                    ElementalInteractionHandler.igniteEarthWithFire(this, fireballs.get(0));
-                }
-            }
-
             if (this.isAlive()) {
+                boolean molten = this.isMolten();
                 AABB clashBox = this.getBoundingBox().inflate(0.35D);
-                List<Entity> others = this.level().getEntities(this, clashBox,
+                AABB scanBox = molten ? clashBox : this.getBoundingBox().inflate(2.2D);
+                List<Entity> others = this.level().getEntities(this, scanBox,
                         e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
+                Entity owner = this.getOwner();
                 for (Entity e : others) {
-                    if (e instanceof FireballJutsuEntity fb && ShadowCloneEntity.areAllies(this.getOwner(), fb.getOwner())) {
-                        ElementalInteractionHandler.igniteEarthWithFire(this, fb);
+                    if (e instanceof FireballJutsuEntity fb && ShadowCloneEntity.areAllies(owner, fb.getOwner())) {
+                        if (!molten) {
+                            ElementalInteractionHandler.igniteEarthWithFire(this, fb);
+                            molten = this.isMolten();
+                        }
                         continue;
                     }
-                    if (e instanceof Projectile p && ShadowCloneEntity.areAllies(this.getOwner(), p.getOwner())) {
+                    if (!clashBox.intersects(e.getBoundingBox())) {
+                        continue;
+                    }
+                    if (e instanceof Projectile p && ShadowCloneEntity.areAllies(owner, p.getOwner())) {
                         continue;
                     }
                     if (e instanceof JutsuProjectile other && this.isAlive() && e.isAlive()) {
