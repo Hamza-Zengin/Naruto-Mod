@@ -24,10 +24,10 @@ import java.util.List;
 /**
  * Sharingan (Mirror Wheel Eye)
  * Uchiha Clan Dōjutsu: Evolves through battle experience:
- * - 1 Tomoe (0 - 24 Mastery): Basic perception, Night Vision, Speed I, 6m Slowness I aura.
- * - 2 Tomoe (25 - 74 Mastery): Enhanced reflex, Speed I, 8m Slowness I + Weakness I aura.
- * - 3 Tomoe (75 - 149 Mastery): Superior prediction, Speed II, Strength I, 10m Slowness II aura.
- * - Mangekyō (150+ Mastery): Transcendent awakening, Speed II, Strength I, Resistance I, 12m Slowness II + Weakness I aura.
+ * - 1 Tomoe (0 - 999 Mastery): Basic perception, Night Vision, Speed I, 6m Slowness I aura.
+ * - 2 Tomoe (1000 - 2499 Mastery): Enhanced reflex, Speed I, 8m Slowness I + Weakness I aura.
+ * - 3 Tomoe (2500 - 4999 Mastery): Superior prediction, Speed II, Strength I, 10m Slowness II + Weakness I aura.
+ * - Mangekyō (5000+ Mastery): Transcendent awakening, Speed II, Strength I, Resistance I, 12m Slowness II + Weakness I aura.
  */
 public class SharinganAbility extends Ability implements Ability.Toggled, Ability.HandleEnded {
 
@@ -146,14 +146,27 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         SharinganStage stage = getStage(ninjaData);
 
-        // Passive battle experience / training: grant +1 mastery every 10 seconds of sustained focus (anti-AFK check)
-        if (player.tickCount % 200 == 0) {
-            boolean isMoving = player.getDeltaMovement().horizontalDistanceSqr() > 0.001;
-            boolean inCombat = player.getLastHurtByMob() != null && (player.tickCount - player.getLastHurtByMobTimestamp() < 100);
-            if (isMoving || inCombat) {
-                Identifier reg = this.getRegistryName();
-                if (reg != null) {
-                    ninjaData.addMastery(reg, 1);
+        // Passive battle experience / training while active & moving/in combat (0..5000 scale)
+        Identifier reg = this.getRegistryName();
+        if (reg != null && ninjaData != null) {
+            int mastery = ninjaData.getMastery(reg);
+            int interval;
+            int gain;
+            if (mastery < 1000) {
+                interval = 40;
+                gain = 3;
+            } else if (mastery < 2500) {
+                interval = 50;
+                gain = 2;
+            } else {
+                interval = 60;
+                gain = 1;
+            }
+            if (player.tickCount % interval == 0) {
+                boolean isMoving = player.getDeltaMovement().horizontalDistanceSqr() > 0.001;
+                boolean inCombat = player.getLastHurtByMob() != null && (player.tickCount - player.getLastHurtByMobTimestamp() < 100);
+                if (isMoving || inCombat) {
+                    ninjaData.addMastery(reg, gain);
                 }
             }
         }
@@ -248,10 +261,11 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
                 };
 
                 int slowAmp = (stage == SharinganStage.THREE_TOMOE || stage == SharinganStage.MANGEKYOU) ? 1 : 0;
-                boolean applyWeakness = (stage == SharinganStage.TWO_TOMOE || stage == SharinganStage.MANGEKYOU);
+                boolean applyWeakness = (stage != SharinganStage.ONE_TOMOE);
 
                 AABB field = player.getBoundingBox().inflate(radius);
-                List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, field, e -> e != player && e.isAlive());
+                List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, field,
+                        e -> e != player && e.isAlive() && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(player, e));
                 for (LivingEntity enemy : enemies) {
                     enemy.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, slowAmp, false, false));
                     if (applyWeakness) {
@@ -280,5 +294,29 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
         player.removeEffect(MobEffects.SPEED);
         player.removeEffect(MobEffects.STRENGTH);
         player.removeEffect(MobEffects.RESISTANCE);
+    }
+
+    @net.neoforged.fml.common.EventBusSubscriber(modid = NarutoMod.MOD_ID)
+    public static class SharinganCombatEvents {
+        private static final String LAST_COMBAT_MASTERY_TICK = "narutomod_sharingan_last_hit_tick";
+        private static final int COMBAT_MASTERY_COOLDOWN_TICKS = 20;
+        private static final int COMBAT_MASTERY_GAIN = 2;
+
+        @net.neoforged.bus.api.SubscribeEvent
+        public static void onLivingHurt(net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent event) {
+            if (event.getEntity().level().isClientSide()) return;
+            if (!(event.getSource().getEntity() instanceof Player attacker)) return;
+            if (!event.getSource().isDirect()) return; // Melee only
+            if (com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(attacker, event.getEntity())) return;
+
+            var ninjaData = attacker.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA);
+            if (ninjaData != null && ninjaData.isSharinganActive()) {
+                int lastTick = attacker.getPersistentData().getIntOr(LAST_COMBAT_MASTERY_TICK, -COMBAT_MASTERY_COOLDOWN_TICKS);
+                if (attacker.tickCount - lastTick >= COMBAT_MASTERY_COOLDOWN_TICKS || attacker.tickCount < lastTick) {
+                    attacker.getPersistentData().putInt(LAST_COMBAT_MASTERY_TICK, attacker.tickCount);
+                    ninjaData.addMastery(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan"), COMBAT_MASTERY_GAIN);
+                }
+            }
+        }
     }
 }

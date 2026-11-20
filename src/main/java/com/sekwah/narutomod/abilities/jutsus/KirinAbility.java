@@ -1,8 +1,10 @@
 package com.sekwah.narutomod.abilities.jutsus;
 
 import com.sekwah.narutomod.abilities.Ability;
+import com.sekwah.narutomod.abilities.JutsuCombatHelper;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
+import com.sekwah.narutomod.entity.ShadowCloneEntity;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -11,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -73,10 +76,10 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        boolean isStormy = player.level().isThundering() || player.level().isRaining();
+        boolean isStormy = player != null && (player.level().isThundering() || player.level().isRaining());
         float stormDiscount = isStormy ? 0.65f : 1.0f; // 35% natural lightning storm discount
-        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
-        float chakraCost = getChakraCost() * stormDiscount * getChakraCostMultiplier(mastery);
+        float finalChakraCost = getFinalChakraCost(player, ninjaData);
+        float chakraCost = finalChakraCost > 0.0f ? Math.max(1.0f, finalChakraCost * stormDiscount) : 0.0f;
         float staminaCost = getStaminaCost() * (isStormy ? 0.75f : 1.0f);
 
         return tryConsume(player, ninjaData, chakraCost, staminaCost, 45);
@@ -100,7 +103,8 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
 
         // 2. Raycast entities
         AABB searchBox = player.getBoundingBox().expandTowards(lookDir.scale(maxDist)).inflate(1.5D);
-        List<LivingEntity> possibleTargets = serverLevel.getEntitiesOfClass(LivingEntity.class, searchBox, e -> e != player && e.isAlive() && !e.isSpectator());
+        List<LivingEntity> possibleTargets = serverLevel.getEntitiesOfClass(LivingEntity.class, searchBox,
+                e -> e != player && e.isAlive() && !e.isSpectator() && !ShadowCloneEntity.areAllies(player, e));
 
         LivingEntity directEntity = null;
         double closestDist = maxDist;
@@ -193,9 +197,11 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
         float powerMult = getPowerMultiplier(mastery);
 
+        DamageSource kirinDamage = JutsuCombatHelper.lightningDamage(serverLevel, kirinDragon, player);
+
         // Direct damage if mob directly struck: 50.0f damage * powerMultiplier
         if (directEntity != null) {
-            directEntity.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), 50.0f * powerMult);
+            directEntity.hurtServer(serverLevel, kirinDamage, 50.0f * powerMult);
             directEntity.setRemainingFireTicks(140);
             directEntity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 80, 3)); // Slowness IV
         }
@@ -205,10 +211,11 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
         final LivingEntity finalDirectTarget = directEntity;
         AABB blastArea = new AABB(targetPos.x - blastRadius, targetPos.y - 3.0, targetPos.z - blastRadius,
                 targetPos.x + blastRadius, targetPos.y + 5.0, targetPos.z + blastRadius);
-        List<LivingEntity> victims = serverLevel.getEntitiesOfClass(LivingEntity.class, blastArea, e -> e != player && e != finalDirectTarget && e.isAlive());
+        List<LivingEntity> victims = serverLevel.getEntitiesOfClass(LivingEntity.class, blastArea,
+                e -> e != player && e != finalDirectTarget && e.isAlive() && !ShadowCloneEntity.areAllies(player, e));
 
         for (LivingEntity victim : victims) {
-            victim.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), 28.0f * powerMult);
+            victim.hurtServer(serverLevel, kirinDamage, 28.0f * powerMult);
             Vec3 knockback = victim.position().subtract(targetPos).normalize().scale(2.2);
             victim.push(knockback.x, 0.85, knockback.z);
             victim.setRemainingFireTicks(80);

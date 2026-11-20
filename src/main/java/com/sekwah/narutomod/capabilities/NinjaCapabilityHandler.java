@@ -66,7 +66,8 @@ public class NinjaCapabilityHandler {
                 if (ability == null) continue;
                 if (isServer) {
                     if (ability.handleCost(player, data)) {
-                        ability.performServer(player, data);
+                        int ticksActive = toggleData.incrementAbilityTicks(abilityName);
+                        ability.performServer(player, data, ticksActive);
                     } else {
                         toggleData.removeAbilityEnded(player, data, ability);
                     }
@@ -120,6 +121,10 @@ public class NinjaCapabilityHandler {
             }
             if (ninjaData.getCurrentlyChanneledAbility() != null) {
                 ninjaData.setCurrentlyChanneledAbility(player, null);
+            }
+            ToggleAbilityData toggleData = ninjaData.getToggleAbilityData();
+            if (toggleData != null) {
+                toggleData.clearActiveTicks();
             }
         }
         if (event.getSource().getEntity() instanceof Player killer) {

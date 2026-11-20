@@ -373,7 +373,8 @@ public class PlayerEvents {
         if (player.level().isClientSide()) return;
 
         var ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
-        if (ninjaData.isByakuganActive() && event.getTarget() instanceof LivingEntity livingTarget) {
+        if (ninjaData.isByakuganActive() && event.getTarget() instanceof LivingEntity livingTarget
+                && !ShadowCloneEntity.areAllies(player, livingTarget)) {
             com.sekwah.narutomod.abilities.jutsus.ByakuganAbility.applyChakraLockStrike(player, livingTarget);
         }
     }

@@ -55,6 +55,7 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public boolean canActivate(Player player, INinjaData ninjaData) {
+        if (!super.canActivate(player, ninjaData)) return false;
         if (ninjaData == null) return false;
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("hyuga")) {
             if (player != null) {

@@ -3,6 +3,7 @@ package com.sekwah.narutomod.abilities.jutsus;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.ChakraElement;
+import com.sekwah.narutomod.abilities.JutsuCombatHelper;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import com.sekwah.narutomod.entity.ShadowCloneEntity;
@@ -17,6 +18,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -115,9 +117,10 @@ public class ChidoriStreamAbility extends Ability implements Ability.Cooldown {
                 e -> e.isAlive() && e != player && !ShadowCloneEntity.areAllies(player, e)
                         && e.position().distanceToSqr(center) <= radiusSq);
 
+        DamageSource streamDamage = JutsuCombatHelper.lightningDamage(serverLevel, null, player);
         for (LivingEntity target : targets) {
             float hitDmg = target.isInWaterOrRain() ? burstDamage * 1.25F : burstDamage;
-            target.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), hitDmg);
+            target.hurtServer(serverLevel, streamDamage, hitDmg);
             target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 2));
             Vec3 away = target.position().subtract(center);
             double horizontalDist = Math.hypot(away.x, away.z);

@@ -595,6 +595,8 @@ public class NinjaDataLogicTest {
         susanoo.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "susanoo_ribcage"));
         Identifier sharingan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
 
+        ninjaData.setRank("JONIN");
+
         // 1. Non-Uchiha clan cannot activate Susanoo
         ninjaData.setClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "hyuga"));
         assertFalse(susanoo.canActivate(null, ninjaData));
@@ -618,12 +620,14 @@ public class NinjaDataLogicTest {
         assertTrue(susanoo.canActivate(null, ninjaData));
         assertTrue(susanoo.meetsPrerequisites(ninjaData));
 
-        // Still requires JONIN rank to unlock
+        // Still requires JONIN rank to unlock and activate
         ninjaData.setRank("GENIN");
+        assertFalse(susanoo.canActivate(null, ninjaData));
         assertFalse(ninjaData.isAbilityUnlocked(susanoo));
 
         // When reaching JONIN rank (and being Uchiha with Mangekyou), unlocks!
         ninjaData.setRank("JONIN");
+        assertTrue(susanoo.canActivate(null, ninjaData));
         assertTrue(ninjaData.isAbilityUnlocked(susanoo));
     }
 
@@ -812,6 +816,8 @@ public class NinjaDataLogicTest {
         amaterasu.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "amaterasu"));
         Identifier sharingan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
 
+        ninjaData.setRank("JONIN");
+
         // 1. Non-Uchiha clan cannot activate
         ninjaData.setClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "hyuga"));
         assertFalse(amaterasu.canActivate(null, ninjaData));
@@ -825,6 +831,7 @@ public class NinjaDataLogicTest {
         // 3. Sharingan active but mastery < 5000 (3-Tomoe)
         ninjaData.setJutsuActive(NinjaData.JUTSU_FLAG_SHARINGAN, true);
         NinjaData lowMasteryData = new NinjaData(true);
+        lowMasteryData.setRank("JONIN");
         lowMasteryData.forceSetClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "uchiha"));
         lowMasteryData.unlockAbility(sharingan);
         lowMasteryData.addMastery(sharingan, 2500); // 3-Tomoe
@@ -854,6 +861,7 @@ public class NinjaDataLogicTest {
         Identifier eightGates = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates");
 
         // Without mastery 5000 in eight_gates
+        ninjaData.setRank("JONIN");
         ninjaData.unlockAbility(eightGates);
         ninjaData.addMastery(eightGates, 4000);
         assertFalse(deathGate.meetsPrerequisites(ninjaData));
@@ -1106,6 +1114,8 @@ public class NinjaDataLogicTest {
                 new com.sekwah.narutomod.abilities.jutsus.ShadowPossessionAbility();
         shadowPossession.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shadow_possession"));
 
+        ninjaData.setRank("GENIN");
+
         // Non-Nara cannot activate
         ninjaData.setClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shinobi"));
         assertFalse(shadowPossession.canActivate(null, ninjaData));
@@ -1227,5 +1237,97 @@ public class NinjaDataLogicTest {
         assertTrue(chidori.canActivate(null, ninjaData), "Jonin can use Chidori");
         assertEquals(NinjaRank.JONIN, tsukuyomi.getRequiredRank());
         assertTrue(NinjaRank.fromString(ninjaData.getRank()).isAtLeast(tsukuyomi.getRequiredRank()), "Jonin meets Tsukuyomi rank requirement");
+    }
+
+    @Test
+    @DisplayName("Verify ToggleAbilityData activeTicks increments, equals/hashCode invariance, and cleanup")
+    public void testToggleAbilityDataTicksAndCleanup() {
+        var toggleA = new com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData();
+        var toggleB = new com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData();
+        Identifier sharinganId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
+
+        assertEquals(0, toggleA.getActiveTicks(sharinganId));
+        assertEquals(0, toggleA.getActiveTicks(null));
+        assertEquals(0, toggleA.incrementAbilityTicks(null));
+
+        assertTrue(toggleA.addAbility(sharinganId));
+        assertTrue(toggleB.addAbility(sharinganId));
+        assertEquals(0, toggleA.getActiveTicks(sharinganId));
+        assertEquals(toggleA, toggleB);
+        assertEquals(toggleA.hashCode(), toggleB.hashCode());
+
+        assertEquals(1, toggleA.incrementAbilityTicks(sharinganId));
+        assertEquals(2, toggleA.incrementAbilityTicks(sharinganId));
+        assertEquals(3, toggleA.incrementAbilityTicks(sharinganId));
+        assertEquals(3, toggleA.getActiveTicks(sharinganId));
+
+        // Changing transient activeTicks must NEVER dirty equals/hashCode
+        assertEquals(toggleA, toggleB);
+        assertEquals(toggleB, toggleA);
+        assertEquals(toggleA.hashCode(), toggleB.hashCode());
+
+        // removeAbility clears activeTicks
+        assertTrue(toggleA.removeAbility(sharinganId));
+        assertFalse(toggleA.hasToggleAbility(sharinganId));
+        assertEquals(0, toggleA.getActiveTicks(sharinganId));
+
+        // removeAbilityEnded passes finalTicks to HandleEnded and resets state
+        final int[] capturedFinalTicks = {-1};
+        class DummyToggleEnded extends Ability implements Ability.HandleEnded {
+            DummyToggleEnded(Identifier id) {
+                this.setRegistryName(id);
+            }
+
+            @Override
+            public ActivationType activationType() {
+                return ActivationType.TOGGLE;
+            }
+
+            @Override
+            public boolean logInChat() {
+                return false;
+            }
+
+            @Override
+            public void performServer(net.minecraft.world.entity.player.Player player, INinjaData data, int ticksActive) {
+            }
+
+            @Override
+            public void handleAbilityEnded(net.minecraft.world.entity.player.Player player, INinjaData data, int ticksActive) {
+                capturedFinalTicks[0] = ticksActive;
+            }
+        }
+
+        Identifier dummyId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "dummy_toggle");
+        DummyToggleEnded dummyAbility = new DummyToggleEnded(dummyId);
+        assertTrue(toggleA.addAbilityStarted(null, ninjaData, dummyAbility));
+        for (int i = 1; i <= 5; i++) {
+            assertEquals(i, toggleA.incrementAbilityTicks(dummyId));
+        }
+        assertTrue(toggleA.removeAbilityEnded(null, ninjaData, dummyAbility));
+        assertEquals(5, capturedFinalTicks[0]);
+        assertFalse(toggleA.hasToggleAbility(dummyId));
+        assertEquals(0, toggleA.getActiveTicks(dummyId));
+
+        // clear() wipes both abilities and activeTicks
+        toggleA.addAbilityStarted(null, ninjaData, dummyAbility);
+        assertEquals(1, toggleA.incrementAbilityTicks(dummyId));
+        toggleA.clear();
+        assertTrue(toggleA.getAbilitiesHashSet().isEmpty());
+        assertEquals(0, toggleA.getActiveTicks(dummyId));
+
+        // NinjaData resetData & applyDeathPenalty clear ToggleAbilityData completely
+        ninjaData.getToggleAbilityData().addAbility(sharinganId);
+        ninjaData.getToggleAbilityData().incrementAbilityTicks(sharinganId);
+        ninjaData.resetData();
+        assertFalse(ninjaData.getToggleAbilityData().hasToggleAbility(sharinganId));
+        assertEquals(0, ninjaData.getToggleAbilityData().getActiveTicks(sharinganId));
+
+        NinjaData future = new NinjaData(true);
+        future.getToggleAbilityData().addAbility(sharinganId);
+        future.getToggleAbilityData().incrementAbilityTicks(sharinganId);
+        NinjaData.applyDeathPenalty(ninjaData, future, false);
+        assertFalse(future.getToggleAbilityData().hasToggleAbility(sharinganId));
+        assertEquals(0, future.getToggleAbilityData().getActiveTicks(sharinganId));
     }
 }

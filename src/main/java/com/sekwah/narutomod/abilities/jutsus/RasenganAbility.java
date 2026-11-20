@@ -99,7 +99,8 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
         } else {
             AABB hitBox = new AABB(strikePos.x - 2.0, strikePos.y - 1.5, strikePos.z - 2.0,
                     strikePos.x + 2.0, strikePos.y + 1.5, strikePos.z + 2.0);
-            hitTargets.addAll(serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox, e -> e != player && e.isAlive()));
+            hitTargets.addAll(serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox,
+                    e -> e != player && e.isAlive() && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(player, e)));
         }
 
         int mastery = ninjaData != null ? ninjaData.getMastery(com.sekwah.narutomod.abilities.NarutoAbilities.RASENGAN.getId()) : 0;

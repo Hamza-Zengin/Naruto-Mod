@@ -8,6 +8,7 @@ import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import com.sekwah.narutomod.config.NarutoConfig;
 import com.sekwah.narutomod.damagesource.NarutoDamageSource;
+import com.sekwah.narutomod.entity.ShadowCloneEntity;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import com.sekwah.narutomod.util.WorldProtectionHelper;
 import net.minecraft.ChatFormatting;
@@ -101,6 +102,7 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public boolean canActivate(Player player, INinjaData ninjaData) {
+        if (!super.canActivate(player, ninjaData)) return false;
         if (ninjaData == null) return false;
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
             if (player != null) {
@@ -126,7 +128,7 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         }
 
         int castCooldown = Math.round(getExtraParam("cast_cooldown_ticks", 45.0f));
-        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), castCooldown);
+        return tryConsume(player, ninjaData, getFinalChakraCost(player, ninjaData), getStaminaCost(), castCooldown);
     }
 
     @Override
@@ -144,7 +146,8 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
 
         // 2. Raycast for entities along the line of sight
         AABB searchBox = player.getBoundingBox().expandTowards(lookDir.scale(maxDist)).inflate(1.5D);
-        List<LivingEntity> possibleTargets = serverLevel.getEntitiesOfClass(LivingEntity.class, searchBox, e -> e != player && e.isAlive() && !e.isSpectator());
+        List<LivingEntity> possibleTargets = serverLevel.getEntitiesOfClass(LivingEntity.class, searchBox,
+                e -> e != player && e.isAlive() && !e.isSpectator() && !ShadowCloneEntity.areAllies(player, e));
 
         LivingEntity directEntity = null;
         double closestDist = maxDist;
@@ -223,7 +226,8 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
         final LivingEntity finalDirectTarget = directEntity;
         AABB hitBox = new AABB(targetPos.x - 4.0, targetPos.y - 2.5, targetPos.z - 4.0,
                 targetPos.x + 4.0, targetPos.y + 3.0, targetPos.z + 4.0);
-        List<LivingEntity> splashTargets = serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox, e -> e != player && e != finalDirectTarget && e.isAlive());
+        List<LivingEntity> splashTargets = serverLevel.getEntitiesOfClass(LivingEntity.class, hitBox,
+                e -> e != player && e != finalDirectTarget && e.isAlive() && !ShadowCloneEntity.areAllies(player, e));
 
         for (LivingEntity splash : splashTargets) {
             splash.hurtServer(serverLevel, NarutoDamageSource.amaterasu(serverLevel, player, player), directDamage * 0.47f);

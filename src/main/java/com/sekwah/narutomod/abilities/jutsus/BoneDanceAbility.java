@@ -70,12 +70,14 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("kaguya")) {
-            player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
-                    Component.literal("Kaguya").withStyle(ChatFormatting.WHITE)));
+        if (ninjaData == null || ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("kaguya")) {
+            if (player != null) {
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
+                        Component.literal("Kaguya").withStyle(ChatFormatting.WHITE)));
+            }
             return false;
         }
-        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 45);
+        return tryConsume(player, ninjaData, getFinalChakraCost(player, ninjaData), 0, 45);
     }
 
     @Override

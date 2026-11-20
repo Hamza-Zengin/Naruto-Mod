@@ -58,11 +58,12 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
 
     @Override
     public int getRequiredMastery() {
-        return SharinganAbility.SharinganStage.MANGEKYOU.getMinMastery(); // 150
+        return SharinganAbility.SharinganStage.MANGEKYOU.getMinMastery(); // 5000
     }
 
     @Override
     public boolean canActivate(Player player, INinjaData ninjaData) {
+        if (!super.canActivate(player, ninjaData)) return false;
         if (ninjaData == null) return false;
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
             if (player != null) {
@@ -90,7 +91,10 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
         int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
         float costMult = getChakraCostMultiplier(mastery);
 
-        boolean isInitial = !ninjaData.getToggleAbilityData().hasToggleAbility(this.getRegistryName());
+        boolean isInitial = ninjaData == null
+                || ninjaData.getToggleAbilityData() == null
+                || ninjaData.getToggleAbilityData().getActiveTicks(this.getRegistryName()) == 0
+                || !ninjaData.getToggleAbilityData().hasToggleAbility(this.getRegistryName());
         if (isInitial) {
             float initCost = Math.max(10.0f, 40.0f * costMult);
             return tryConsume(player, ninjaData, initCost, 0, 30);

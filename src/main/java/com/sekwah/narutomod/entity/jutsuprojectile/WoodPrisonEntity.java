@@ -1,6 +1,7 @@
 package com.sekwah.narutomod.entity.jutsuprojectile;
 
 import com.sekwah.narutomod.entity.NarutoEntities;
+import com.sekwah.narutomod.entity.ShadowCloneEntity;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -107,7 +108,7 @@ public class WoodPrisonEntity extends Entity {
             Player caster = this.getCasterPlayer();
             AABB cageBox = this.getCageTrapBox();
             List<LivingEntity> trappedTargets = serverLevel.getEntitiesOfClass(LivingEntity.class, cageBox,
-                    e -> e.isAlive() && (caster == null || e != caster));
+                    e -> e.isAlive() && (caster == null || (e != caster && !ShadowCloneEntity.areAllies(caster, e))));
 
             // Every tick: strictly lock movement and block jumping inside the cage
             for (LivingEntity target : trappedTargets) {

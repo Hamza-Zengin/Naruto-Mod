@@ -46,7 +46,7 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 30);
+        return tryConsume(player, ninjaData, getFinalChakraCost(player, ninjaData), 0, 30);
     }
 
     @Override

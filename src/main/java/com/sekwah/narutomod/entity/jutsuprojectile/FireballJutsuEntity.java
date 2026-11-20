@@ -286,7 +286,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
             final int effectiveRadius = flameRadius;
             final Entity directTarget = (hitResult instanceof EntityHitResult ehr) ? ehr.getEntity() : null;
             this.level().getEntities(this, this.getBoundingBox().inflate(flameRadius, flameRadius, flameRadius)).forEach(entity -> {
-                if (mini && (entity == owner || com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(owner, entity))) {
+                if (entity == owner || com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(owner, entity)) {
                     return;
                 }
                 double distance = this.distanceToSqr(entity);

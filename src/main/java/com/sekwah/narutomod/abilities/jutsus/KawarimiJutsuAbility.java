@@ -77,7 +77,7 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), 0, 20);
+        return tryConsume(player, ninjaData, getFinalChakraCost(player, ninjaData), 0, 20);
     }
 
     /**
@@ -201,7 +201,7 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
         if (safePos == null) {
             // Cancel teleport and refund chakra so player is NEVER placed inside a wall
             if (ninjaData != null) {
-                ninjaData.addChakra(getScaledChakraCost(ninjaData));
+                ninjaData.addChakra(getFinalChakraCost(player, ninjaData));
             }
             player.sendOverlayMessage(Component.translatable("jutsu.fail.notonground",
                     Component.translatable(this.getTranslationKey())).withStyle(ChatFormatting.GRAY));

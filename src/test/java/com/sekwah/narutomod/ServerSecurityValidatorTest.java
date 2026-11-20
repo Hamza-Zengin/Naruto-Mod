@@ -1,6 +1,7 @@
 package com.sekwah.narutomod;
 
 import com.sekwah.narutomod.abilities.Ability;
+import com.sekwah.narutomod.abilities.ChakraElement;
 import com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility;
 import com.sekwah.narutomod.abilities.jutsus.RasenganAbility;
 import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
@@ -162,5 +163,76 @@ public class ServerSecurityValidatorTest {
         ninjaData.setBaseMaxChakra(120.0f);
         ninjaData.setJutsusCastCount(8);
         assertTrue(ServerSecurityValidator.canRankUp(ninjaData));
+    }
+
+    @Test
+    @DisplayName("Verify toggle cast-count anti-spam cooldown (100 ticks) and cleanup")
+    public void testToggleCastCountCooldown() {
+        UUID playerA = UUID.randomUUID();
+        UUID playerB = UUID.randomUUID();
+        Identifier sharingan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
+        Identifier byakugan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "byakugan");
+
+        assertFalse(ServerSecurityValidator.shouldCountToggleCast((UUID) null, sharingan, 10L));
+        assertFalse(ServerSecurityValidator.shouldCountToggleCast(playerA, null, 10L));
+
+        // First activation counts
+        assertTrue(ServerSecurityValidator.shouldCountToggleCast(playerA, sharingan, 100L));
+
+        // Immediate re-toggles within 100 ticks are blocked
+        assertFalse(ServerSecurityValidator.shouldCountToggleCast(playerA, sharingan, 101L));
+        assertFalse(ServerSecurityValidator.shouldCountToggleCast(playerA, sharingan, 199L));
+
+        // Different ability and different player are unaffected
+        assertTrue(ServerSecurityValidator.shouldCountToggleCast(playerA, byakugan, 101L));
+        assertTrue(ServerSecurityValidator.shouldCountToggleCast(playerB, sharingan, 101L));
+
+        // After 100 ticks elapse, activation counts again and restarts the cooldown
+        assertTrue(ServerSecurityValidator.shouldCountToggleCast(playerA, sharingan, 200L));
+        assertFalse(ServerSecurityValidator.shouldCountToggleCast(playerA, sharingan, 250L));
+
+        // Tick rollback / restart resets safely
+        assertTrue(ServerSecurityValidator.shouldCountToggleCast(playerA, sharingan, 10L));
+        assertFalse(ServerSecurityValidator.shouldCountToggleCast(playerA, sharingan, 50L));
+
+        // clearPlayer resets only that player
+        ServerSecurityValidator.clearPlayer(playerA);
+        assertTrue(ServerSecurityValidator.shouldCountToggleCast(playerA, sharingan, 51L));
+        assertFalse(ServerSecurityValidator.shouldCountToggleCast(playerB, sharingan, 150L));
+
+        // resetRateLimits clears all players
+        ServerSecurityValidator.resetRateLimits();
+        assertTrue(ServerSecurityValidator.shouldCountToggleCast(playerB, sharingan, 151L));
+    }
+
+    @Test
+    @DisplayName("Verify zero-cost clamp guard and Kage Hat -15% discount consistency")
+    public void testZeroCostGuardAndHatDiscountConsistency() {
+        ChakraChargeAbility chakraCharge = new ChakraChargeAbility();
+        chakraCharge.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chakra_charge"));
+
+        assertEquals(0.0f, chakraCharge.getScaledChakraCost(ninjaData), 0.001f);
+        assertEquals(0.0f, chakraCharge.getFinalChakraCost(null, ninjaData), 0.001f);
+        assertEquals(0.0f, Ability.applyElementalHatDiscount(ChakraElement.FIRE, ChakraElement.FIRE, 0.0f), 0.001f);
+
+        // Positive cost gets -15% on matching element, clamped to >= 1.0f only when positive
+        assertEquals(25.5f, Ability.applyElementalHatDiscount(ChakraElement.FIRE, ChakraElement.FIRE, 30.0f), 0.001f);
+        assertEquals(30.0f, Ability.applyElementalHatDiscount(ChakraElement.WATER, ChakraElement.FIRE, 30.0f), 0.001f);
+        assertEquals(1.0f, Ability.applyElementalHatDiscount(ChakraElement.FIRE, ChakraElement.FIRE, 1.0f), 0.001f);
+
+        FireballJutsuAbility fireball = new FireballJutsuAbility();
+        fireball.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball"));
+        float expectedCost = fireball.getScaledChakraCost(ninjaData);
+        assertEquals(expectedCost, fireball.getFinalChakraCost(null, ninjaData), 0.001f);
+
+        ninjaData.setChakra(expectedCost - 0.1f);
+        assertFalse(ServerSecurityValidator.hasSufficientChakra(null, ninjaData, fireball, false));
+
+        ninjaData.setChakra(expectedCost);
+        assertTrue(ServerSecurityValidator.hasSufficientChakra(null, ninjaData, fireball, false));
+        assertTrue(fireball.tryConsume(null, ninjaData, expectedCost, 0f, 30));
+        assertEquals(0.0f, ninjaData.getChakra(), 0.001f);
+        assertFalse(fireball.tryConsume(null, ninjaData, 1.0f, 0f, 30));
+        assertFalse(fireball.tryConsume(null, null, 1.0f, 0f, 30));
     }
 }

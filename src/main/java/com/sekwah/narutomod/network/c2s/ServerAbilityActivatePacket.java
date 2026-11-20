@@ -144,9 +144,11 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                     }
                     // Toggle ability on
                     abilityTracker.addAbilityStarted(player, ninjaData, ability);
-                    ninjaData.addJutsuCast();
-                    NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
-                            .trigger(player, NinjaProgressTrigger.Action.USE_JUTSU, msg.abilityId.getPath());
+                    if (ServerSecurityValidator.shouldCountToggleCast(player, ability.getRegistryName())) {
+                        ninjaData.addJutsuCast();
+                        NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
+                                .trigger(player, NinjaProgressTrigger.Action.USE_JUTSU, msg.abilityId.getPath());
+                    }
                 }
             }
         });
