@@ -2,6 +2,7 @@ package com.sekwah.narutomod;
 
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.ChakraElement;
+import com.sekwah.narutomod.abilities.jutsus.ByakuganAbility;
 import com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility;
 import com.sekwah.narutomod.abilities.jutsus.RasenganAbility;
 import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
@@ -111,17 +112,54 @@ public class ServerSecurityValidatorTest {
     }
 
     @Test
-    @DisplayName("Verify toggle ability chakra pre-checks (Sharingan & Susanoo)")
+    @DisplayName("Verify toggle ability chakra pre-checks (Sharingan, Byakugan & Susanoo)")
     public void testToggleChakraPreChecks() {
         SharinganAbility sharingan = new SharinganAbility();
         sharingan.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan"));
+
+        ByakuganAbility byakugan = new ByakuganAbility();
+        byakugan.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "byakugan"));
 
         SusanooRibcageAbility susanoo = new SusanooRibcageAbility();
         susanoo.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "susanoo_ribcage"));
 
         ninjaData.setChakra(0f);
         assertFalse(ServerSecurityValidator.hasSufficientChakra(ninjaData, sharingan, false));
+        assertFalse(ServerSecurityValidator.hasSufficientChakra(ninjaData, byakugan, false));
         assertFalse(ServerSecurityValidator.hasSufficientChakra(ninjaData, susanoo, false));
+
+        // 0.01f is insufficient for Sharingan & Byakugan (tick cost = 0.25f at 0 mastery)
+        ninjaData.setChakra(0.01f);
+        assertFalse(ServerSecurityValidator.hasSufficientChakra(ninjaData, sharingan, false));
+        assertFalse(ServerSecurityValidator.hasSufficientChakra(ninjaData, byakugan, false));
+
+        // Exact tick chakra cost passes
+        float sharinganCost0 = sharingan.getTickChakraCost(ninjaData);
+        assertEquals(0.25f, sharinganCost0, 0.001f);
+        ninjaData.setChakra(sharinganCost0);
+        assertTrue(ServerSecurityValidator.hasSufficientChakra(ninjaData, sharingan, false));
+
+        float byakuganCost0 = byakugan.getTickChakraCost(ninjaData);
+        assertEquals(0.25f, byakuganCost0, 0.001f);
+        ninjaData.setChakra(byakuganCost0);
+        assertTrue(ServerSecurityValidator.hasSufficientChakra(ninjaData, byakugan, false));
+
+        // Mastery reduction lowers required chakra for Sharingan & Byakugan
+        ninjaData.addMastery(sharingan.getRegistryName(), 1000);
+        float sharinganCost1000 = sharingan.getTickChakraCost(ninjaData);
+        assertEquals(0.15f, sharinganCost1000, 0.001f);
+        ninjaData.setChakra(sharinganCost1000 - 0.01f);
+        assertFalse(ServerSecurityValidator.hasSufficientChakra(ninjaData, sharingan, false));
+        ninjaData.setChakra(sharinganCost1000);
+        assertTrue(ServerSecurityValidator.hasSufficientChakra(ninjaData, sharingan, false));
+
+        ninjaData.addMastery(byakugan.getRegistryName(), 700);
+        float byakuganCost700 = byakugan.getTickChakraCost(ninjaData);
+        assertEquals(0.15f, byakuganCost700, 0.001f);
+        ninjaData.setChakra(byakuganCost700 - 0.01f);
+        assertFalse(ServerSecurityValidator.hasSufficientChakra(ninjaData, byakugan, false));
+        ninjaData.setChakra(byakuganCost700);
+        assertTrue(ServerSecurityValidator.hasSufficientChakra(ninjaData, byakugan, false));
 
         ninjaData.setChakra(20f);
         assertTrue(ServerSecurityValidator.hasSufficientChakra(ninjaData, sharingan, false));

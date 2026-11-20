@@ -442,6 +442,10 @@ public abstract class Ability {
         return scaledCost;
     }
 
+    public float getActivationChakraRequirement(@javax.annotation.Nullable Player player, INinjaData ninjaData) {
+        return getChakraCost() > 0f ? getFinalChakraCost(player, ninjaData) : 0f;
+    }
+
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         float finalCost = getFinalChakraCost(player, ninjaData);
         return tryConsume(player, ninjaData, finalCost, getStaminaCost(), 30);

@@ -82,25 +82,37 @@ public class SusanooRibcageAbility extends Ability implements Ability.Toggled, A
         return true;
     }
 
+    public float getInitialChakraCost(INinjaData ninjaData) {
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        return Math.max(10.0f, 40.0f * getChakraCostMultiplier(mastery));
+    }
+
+    public float getSustainedChakraCost(INinjaData ninjaData) {
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        return Math.max(0.4f, 1.0f * getChakraCostMultiplier(mastery));
+    }
+
+    @Override
+    public float getActivationChakraRequirement(@javax.annotation.Nullable Player player, INinjaData ninjaData) {
+        return getInitialChakraCost(ninjaData);
+    }
+
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         if (!canActivate(player, ninjaData)) {
             return false;
         }
 
-        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
-        float costMult = getChakraCostMultiplier(mastery);
-
         boolean isInitial = ninjaData == null
                 || ninjaData.getToggleAbilityData() == null
                 || ninjaData.getToggleAbilityData().getActiveTicks(this.getRegistryName()) == 0
                 || !ninjaData.getToggleAbilityData().hasToggleAbility(this.getRegistryName());
         if (isInitial) {
-            float initCost = Math.max(10.0f, 40.0f * costMult);
+            float initCost = getInitialChakraCost(ninjaData);
             return tryConsume(player, ninjaData, initCost, 0, 30);
         } else {
             // Sustained ethereal skeleton drain: scales down with mastery
-            float sustainedCost = Math.max(0.4f, 1.0f * costMult);
+            float sustainedCost = getSustainedChakraCost(ninjaData);
             if (ninjaData.getChakra() < sustainedCost) {
                 return false;
             }

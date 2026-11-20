@@ -227,4 +227,56 @@ public class JutsuEntitiesPhysicsTest {
         assertEquals(200.0f - kirin.getFinalChakraCost(null, data), data.getChakra(), 0.01f);
         assertEquals(200.0f - kirin.getStaminaCost(), data.getStamina(), 0.01f);
     }
+
+    @Test
+    @DisplayName("Verify JutsuCombatHelper.awardMeleeCombatMastery cooldown, initial hit, respawn reset, and EightGates ally guard")
+    public void testMeleeCombatMasteryAndEightGatesAllyContract() throws IOException {
+        var ninjaData = new com.sekwah.narutomod.capabilities.NinjaData(true);
+        var persistentData = new net.minecraft.nbt.CompoundTag();
+        var abilityId = net.minecraft.resources.Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates");
+        String tickKey = "narutomod_eight_gates_last_hit_tick";
+
+        // Null safety checks
+        assertFalse(com.sekwah.narutomod.abilities.JutsuCombatHelper.awardMeleeCombatMastery(
+                null, persistentData, tickKey, abilityId, 5, 20, 2));
+        assertFalse(com.sekwah.narutomod.abilities.JutsuCombatHelper.awardMeleeCombatMastery(
+                ninjaData, null, tickKey, abilityId, 5, 20, 2));
+        assertFalse(com.sekwah.narutomod.abilities.JutsuCombatHelper.awardMeleeCombatMastery(
+                ninjaData, persistentData, null, abilityId, 5, 20, 2));
+        assertFalse(com.sekwah.narutomod.abilities.JutsuCombatHelper.awardMeleeCombatMastery(
+                ninjaData, persistentData, tickKey, null, 5, 20, 2));
+
+        // Initial hit at tickCount = 5 must succeed
+        assertTrue(com.sekwah.narutomod.abilities.JutsuCombatHelper.awardMeleeCombatMastery(
+                ninjaData, persistentData, tickKey, abilityId, 5, 20, 2));
+        assertEquals(2, ninjaData.getMastery(abilityId));
+
+        // Hit within 20-tick cooldown (tickCount = 24) must be ignored
+        assertFalse(com.sekwah.narutomod.abilities.JutsuCombatHelper.awardMeleeCombatMastery(
+                ninjaData, persistentData, tickKey, abilityId, 24, 20, 2));
+        assertEquals(2, ninjaData.getMastery(abilityId));
+
+        // Hit at exact 20-tick boundary (tickCount = 25) must succeed
+        assertTrue(com.sekwah.narutomod.abilities.JutsuCombatHelper.awardMeleeCombatMastery(
+                ninjaData, persistentData, tickKey, abilityId, 25, 20, 2));
+        assertEquals(4, ninjaData.getMastery(abilityId));
+
+        // Respawn / tick reset (currentTick < lastTick, e.g., tickCount = 3) must reset and succeed
+        assertTrue(com.sekwah.narutomod.abilities.JutsuCombatHelper.awardMeleeCombatMastery(
+                ninjaData, persistentData, tickKey, abilityId, 3, 20, 2));
+        assertEquals(6, ninjaData.getMastery(abilityId));
+
+        // Verify EightGatesCombatEvents and SharinganCombatEvents ally-clone protection & shared helper contract
+        String eightGatesSrc = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/abilities/jutsus/EightGatesAbility.java"));
+        assertTrue(eightGatesSrc.contains("ShadowCloneEntity.areAllies(attacker, event.getEntity())"),
+                "EightGatesCombatEvents.onLivingHurt must guard against allied shadow clones");
+        assertTrue(eightGatesSrc.contains("JutsuCombatHelper.awardMeleeCombatMastery("),
+                "EightGatesCombatEvents.onLivingHurt must delegate to JutsuCombatHelper.awardMeleeCombatMastery");
+
+        String sharinganSrc = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/abilities/jutsus/SharinganAbility.java"));
+        assertTrue(sharinganSrc.contains("ShadowCloneEntity.areAllies(attacker, event.getEntity())"),
+                "SharinganCombatEvents.onLivingHurt must guard against allied shadow clones");
+        assertTrue(sharinganSrc.contains("JutsuCombatHelper.awardMeleeCombatMastery("),
+                "SharinganCombatEvents.onLivingHurt must delegate to JutsuCombatHelper.awardMeleeCombatMastery");
+    }
 }

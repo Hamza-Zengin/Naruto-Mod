@@ -51,20 +51,36 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
         return "hyuga";
     }
 
+    public float getTickChakraCost(INinjaData ninjaData) {
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        return getExtraParam("drain_per_tick", 0.25f) * getChakraCostMultiplier(mastery);
+    }
+
+    @Override
+    public float getActivationChakraRequirement(@javax.annotation.Nullable Player player, INinjaData ninjaData) {
+        return getTickChakraCost(ninjaData);
+    }
+
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
+        if (ninjaData == null) {
+            return false;
+        }
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("hyuga")) {
-            player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
-                    Component.literal("Hyūga").withStyle(ChatFormatting.AQUA)));
+            if (player != null) {
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
+                        Component.literal("Hyūga").withStyle(ChatFormatting.AQUA)));
+            }
             return false;
         }
 
-        int mastery = ninjaData.getAbilityMastery(this);
-        float drain = getExtraParam("drain_per_tick", 0.25f) * getChakraCostMultiplier(mastery);
+        float drain = getTickChakraCost(ninjaData);
 
         if (ninjaData.getChakra() < drain) {
-            player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
+            if (player != null) {
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra",
+                        Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
+            }
             return false;
         }
 

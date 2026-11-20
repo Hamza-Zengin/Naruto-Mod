@@ -2,6 +2,7 @@ package com.sekwah.narutomod.abilities.jutsus;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
+import com.sekwah.narutomod.abilities.JutsuCombatHelper;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import net.minecraft.ChatFormatting;
@@ -272,14 +273,18 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
             if (event.getEntity().level().isClientSide()) return;
             if (!(event.getSource().getEntity() instanceof Player attacker)) return;
             if (!event.getSource().isDirect()) return; // Melee only
+            if (com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(attacker, event.getEntity())) return;
 
             var ninjaData = attacker.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA);
-            if (ninjaData.isEightGatesActive()) {
-                int lastTick = attacker.getPersistentData().getIntOr(LAST_COMBAT_MASTERY_TICK, 0);
-                if (attacker.tickCount - lastTick >= COMBAT_MASTERY_COOLDOWN_TICKS) {
-                    attacker.getPersistentData().putInt(LAST_COMBAT_MASTERY_TICK, attacker.tickCount);
-                    ninjaData.addMastery(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates"), COMBAT_MASTERY_GAIN);
-                }
+            if (ninjaData != null && ninjaData.isEightGatesActive()) {
+                JutsuCombatHelper.awardMeleeCombatMastery(
+                        ninjaData,
+                        attacker.getPersistentData(),
+                        LAST_COMBAT_MASTERY_TICK,
+                        Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates"),
+                        attacker.tickCount,
+                        COMBAT_MASTERY_COOLDOWN_TICKS,
+                        COMBAT_MASTERY_GAIN);
             }
         }
     }

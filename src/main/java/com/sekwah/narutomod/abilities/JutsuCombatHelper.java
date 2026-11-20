@@ -1,9 +1,12 @@
 package com.sekwah.narutomod.abilities;
 
+import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.entity.ShadowCloneEntity;
 import com.sekwah.sekclib.util.PlayerUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -92,5 +95,22 @@ public final class JutsuCombatHelper {
                 .lookupOrThrow(Registries.DAMAGE_TYPE)
                 .getOrThrow(DamageTypes.LIGHTNING_BOLT);
         return new DamageSource(type, directEntity != null ? directEntity : caster, caster);
+    }
+
+    /**
+     * Awards melee combat mastery with a per-entity cooldown and respawn/tick-reset safety.
+     */
+    public static boolean awardMeleeCombatMastery(INinjaData ninjaData, CompoundTag persistentData, String tickKey,
+                                                  Identifier abilityId, int currentTick, int cooldownTicks, int gain) {
+        if (ninjaData == null || persistentData == null || tickKey == null || abilityId == null) {
+            return false;
+        }
+        int lastTick = persistentData.getIntOr(tickKey, -cooldownTicks);
+        if (currentTick - lastTick >= cooldownTicks || currentTick < lastTick) {
+            persistentData.putInt(tickKey, currentTick);
+            ninjaData.addMastery(abilityId, gain);
+            return true;
+        }
+        return false;
     }
 }

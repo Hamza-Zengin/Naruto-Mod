@@ -2,9 +2,6 @@ package com.sekwah.narutomod.network;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
-import com.sekwah.narutomod.abilities.jutsus.ByakuganAbility;
-import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
-import com.sekwah.narutomod.abilities.jutsus.SusanooRibcageAbility;
 import com.sekwah.narutomod.capabilities.CooldownTickEvent;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
@@ -190,19 +187,8 @@ public final class ServerSecurityValidator {
         if (isCreative) {
             return true;
         }
-        float baseChakraCost = ability.getChakraCost();
-        if (baseChakraCost > 0f) {
-            return ninjaData.getChakra() >= ability.getFinalChakraCost(player, ninjaData);
-        }
-        if (ability instanceof SusanooRibcageAbility) {
-            float costMult = Ability.getChakraCostMultiplier(ninjaData.getAbilityMastery(ability));
-            float initCost = Math.max(10.0f, 40.0f * costMult);
-            return ninjaData.getChakra() >= initCost;
-        }
-        if (ability instanceof SharinganAbility || ability instanceof ByakuganAbility) {
-            return ninjaData.getChakra() > 0f;
-        }
-        return true;
+        float requiredChakra = ability.getActivationChakraRequirement(player, ninjaData);
+        return requiredChakra <= 0f || ninjaData.getChakra() >= requiredChakra;
     }
 
     /**
