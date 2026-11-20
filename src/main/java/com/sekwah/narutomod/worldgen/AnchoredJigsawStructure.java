@@ -188,19 +188,19 @@ public class AnchoredJigsawStructure extends Structure {
         int worldMaxY = level.getMaxY();
 
         for (StructurePiece piece : pieces.pieces()) {
+            BoundingBox pieceBox = piece.getBoundingBox();
+            if (!pieceBox.intersects(chunkBox)) {
+                continue;
+            }
             if (piece instanceof PoolElementStructurePiece poolPiece
                     && poolPiece.getElement().toString().contains("sky_bridge")) {
                 continue;
             }
 
-            BoundingBox pieceBox = piece.getBoundingBox();
             int x0 = Math.max(chunkBox.minX(), pieceBox.minX());
             int x1 = Math.min(chunkBox.maxX(), pieceBox.maxX());
             int z0 = Math.max(chunkBox.minZ(), pieceBox.minZ());
             int z1 = Math.min(chunkBox.maxZ(), pieceBox.maxZ());
-            if (x0 > x1 || z0 > z1) {
-                continue;
-            }
 
             int scanLow = Math.max(worldMinY, pieceBox.minY());
             int scanHigh = Math.min(worldMaxY, pieceBox.minY() + 4);
@@ -236,21 +236,21 @@ public class AnchoredJigsawStructure extends Structure {
         }
     }
 
-    private static boolean isStructuralBase(BlockState state) {
+    static boolean isStructuralBase(BlockState state) {
         if (state.isAir() || !state.getFluidState().isEmpty() || state.is(BlockTags.LEAVES)) {
             return false;
         }
         return state.isSolidRender() || !state.canBeReplaced();
     }
 
-    private static boolean isFoundationReplaceable(BlockState state) {
+    static boolean isFoundationReplaceable(BlockState state) {
         return state.isAir()
                 || !state.getFluidState().isEmpty()
                 || state.canBeReplaced()
                 || state.is(BlockTags.LEAVES);
     }
 
-    private static BlockState pickFoundationBlock(BlockState baseState, int x, int y, int z, int depth) {
+    static BlockState pickFoundationBlock(BlockState baseState, int x, int y, int z, int depth) {
         if (baseState.is(Blocks.SANDSTONE) || baseState.is(Blocks.CUT_SANDSTONE)
                 || baseState.is(Blocks.SMOOTH_SANDSTONE) || baseState.is(Blocks.CHISELED_SANDSTONE)
                 || baseState.is(Blocks.SAND)) {

@@ -4,6 +4,10 @@ Bu dosya `Naruto-Mod` projesinin sürüm geçmişini ve öne çıkan değişikli
 
 ## [Unreleased]
 
+### Bakım, Performans & Testler
+- **Performans (`AnchoredJigsawStructure.afterPlace`):** `chunkBox` ile kesişmeyen yapı parçaları `sky_bridge` string kontrolünden önce `pieceBox.intersects(chunkBox)` ile elenerek gereksiz string tahsisi ve blok taraması önlendi.
+- **Test Kapsamı:** `AnchoredJigsawStructureTest` birim testleri (taban blok sınıflandırması ve materyal seçimi) ile `NarutoModGameTests` içinde `narutomod:anchored_jigsaw` canlı kayıt doğrulaması eklendi.
+
 ### Yapı Zemin Sabitleme & Temel Sistemi (Polish Pass 3)
 - **Özel `narutomod:anchored_jigsaw` Yapı Türü:** Tüm `10` mod yapısı (`valley_of_the_end`, `5` büyük köy, `chunin_arena`, `myobokuzan_shrine`, `uchiha_shrine`, `akatsuki_hideout`) için `AnchoredJigsawStructure` eklendi. `17` noktalı radyal yükseklik/su derinliği taramasıyla aşırı dik uçurumlar elenir; başlangıç yüksekliği küçük tepe çıkıntıları yerine çevre arazi medyanına çekilir ve `afterPlace` aşamasında her parçanın tabanından doğal sağlam zemine kadar dinamik taş/deepslate/kumtaşı/toprak temel sütunları indirilir.
 - **Son Vadi Gömülü Temel Eteği & `beard_box`:** `scripts/gen_valley.py` tüm `6` Son Vadi parçasına `4` blok derinliğinde gömülü kaya temeli (`start_height: -4`, `jig_y: 6`) ekledi; `valley_of_the_end.json` `terrain_adaptation: "beard_box"` olarak güncellendi.
