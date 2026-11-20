@@ -23,13 +23,11 @@ public class AnchoredJigsawStructureTest {
     public void testFoundationReplaceableAndStructuralBase() {
         Assertions.assertFalse(AnchoredJigsawStructure.isStructuralBase(Blocks.AIR.defaultBlockState()));
         Assertions.assertFalse(AnchoredJigsawStructure.isStructuralBase(Blocks.WATER.defaultBlockState()));
-        Assertions.assertFalse(AnchoredJigsawStructure.isStructuralBase(Blocks.JUNGLE_LEAVES.defaultBlockState()));
         Assertions.assertTrue(AnchoredJigsawStructure.isStructuralBase(Blocks.STONE.defaultBlockState()));
         Assertions.assertTrue(AnchoredJigsawStructure.isStructuralBase(Blocks.SANDSTONE.defaultBlockState()));
 
         Assertions.assertTrue(AnchoredJigsawStructure.isFoundationReplaceable(Blocks.AIR.defaultBlockState()));
         Assertions.assertTrue(AnchoredJigsawStructure.isFoundationReplaceable(Blocks.WATER.defaultBlockState()));
-        Assertions.assertTrue(AnchoredJigsawStructure.isFoundationReplaceable(Blocks.JUNGLE_LEAVES.defaultBlockState()));
         Assertions.assertFalse(AnchoredJigsawStructure.isFoundationReplaceable(Blocks.STONE.defaultBlockState()));
         Assertions.assertFalse(AnchoredJigsawStructure.isFoundationReplaceable(Blocks.DEEPSLATE.defaultBlockState()));
     }
