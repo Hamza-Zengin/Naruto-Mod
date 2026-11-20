@@ -43,6 +43,7 @@ public class FirstPersonWorldRenderer {
 
     private static SusanooRibcageModel susanooModel;
     private static EightGatesAuraModel gatesAuraModel;
+    private static final HumanoidRenderState SUSANOO_RENDER_STATE = new HumanoidRenderState();
 
     public static void resetModels() {
         susanooModel = null;
@@ -112,13 +113,12 @@ public class FirstPersonWorldRenderer {
                 poseStack.translate(0.0D, -1.501D - 0.06D, 0.0D);
                 RenderMathUtil.scaleUniform(poseStack, 1.22F);
 
-                HumanoidRenderState susanooState = new HumanoidRenderState();
-                susanooState.isCrouching = player.isCrouching();
+                SUSANOO_RENDER_STATE.isCrouching = player.isCrouching();
                 susanooModel.setFirstPersonView(true);
                 int color = ColorUtil.argb(0.50F, 1.0F, 0.55F, 0.25F);
                 submitNodeCollector.submitModel(
                         susanooModel,
-                        susanooState,
+                        SUSANOO_RENDER_STATE,
                         poseStack,
                         RenderTypes.entityTranslucent(SUSANOO_TEXTURE),
                         RenderMathUtil.FULL_BRIGHT,

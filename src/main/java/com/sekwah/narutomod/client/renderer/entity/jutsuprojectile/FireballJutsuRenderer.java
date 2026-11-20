@@ -65,14 +65,12 @@ public class FireballJutsuRenderer extends EntityRenderer<FireballJutsuEntity, F
       poseStack.scale(state.scale, state.scale, state.scale);
 
       // Smooth spherical inner fire glow for silhouette continuity
-      submitNodeCollector.submitCustomGeometry(poseStack, RENDER_TYPE, (pose, consumer) -> {
-         PoseStack local = new PoseStack();
-         local.last().set(pose);
-         RasenganSphereModel.renderSmoothSphere(
-                 local, consumer, 0.42F, 18, 26, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
-                 1.0F, 0.72F, 0.25F, state.alpha * 0.55F
-         );
-      });
+      submitNodeCollector.submitCustomGeometry(poseStack, RENDER_TYPE, (pose, consumer) ->
+              RasenganSphereModel.renderSmoothSphere(
+                      pose, consumer, 0.42F, 18, 26, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                      1.0F, 0.72F, 0.25F, state.alpha * 0.55F
+              )
+      );
 
       int color = ARGB.colorFromFloat(state.alpha, 1.0F, 1.0F, 1.0F);
       submitNodeCollector.submitModel(

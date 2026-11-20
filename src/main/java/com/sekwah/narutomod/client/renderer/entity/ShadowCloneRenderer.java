@@ -34,6 +34,8 @@ import java.util.UUID;
  */
 public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, AvatarRenderState, PlayerModel> {
 
+    private static final SharinganAbility.SharinganStage[] SHARINGAN_STAGES = SharinganAbility.SharinganStage.values();
+
     private final PlayerModel defaultModel;
     private final PlayerModel slimModel;
 
@@ -79,9 +81,8 @@ public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, 
         boolean byakugan = entity.hasActiveAbility("byakugan");
         Identifier eyeTexture = null;
         if (sharingan) {
-            SharinganAbility.SharinganStage[] stages = SharinganAbility.SharinganStage.values();
-            int stageIdx = Math.max(0, Math.min(stages.length - 1, entity.getSharinganStage() - 1));
-            eyeTexture = stages[stageIdx].getTexture();
+            int stageIdx = Math.max(0, Math.min(SHARINGAN_STAGES.length - 1, entity.getSharinganStage() - 1));
+            eyeTexture = SHARINGAN_STAGES[stageIdx].getTexture();
         }
         boolean susanoo = entity.hasActiveAbility("susanoo_ribcage");
         String activeHandJutsu = entity.getActiveHandJutsu();

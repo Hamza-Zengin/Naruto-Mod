@@ -84,14 +84,12 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
                     poseStack,
                     RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_WATER),
                     (pose, consumer) -> {
-                        PoseStack localStack = new PoseStack();
-                        localStack.last().set(pose);
                         RasenganSphereModel.renderSmoothSphere(
-                                localStack, consumer, 0.42F * dragonSizeMult, 20, 28, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                                pose, consumer, 0.42F * dragonSizeMult, 20, 28, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
                                 0.10F, 0.54F, 0.98F, sphereAlpha
                         );
                         RasenganSphereModel.renderSmoothSphere(
-                                localStack, consumer, 0.52F * dragonSizeMult, 18, 24, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                                pose, consumer, 0.52F * dragonSizeMult, 18, 24, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
                                 0.35F, 0.78F, 1.0F, sphereAlpha * 0.42F
                         );
                     }

@@ -68,6 +68,10 @@ public class JutsuVisualEffectEntity extends Entity {
     private static final EntityDataAccessor<Optional<net.minecraft.world.entity.EntityReference<LivingEntity>>> DATA_CASTER_UUID =
             SynchedEntityData.defineId(JutsuVisualEffectEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
+    private static final class Particles {
+        static final BlockParticleOption DRIPSTONE = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.POINTED_DRIPSTONE.defaultBlockState());
+    }
+
     public JutsuVisualEffectEntity(EntityType<? extends JutsuVisualEffectEntity> type, Level level) {
         super(type, level);
         this.noPhysics = true;
@@ -121,8 +125,9 @@ public class JutsuVisualEffectEntity extends Entity {
         int targetId = this.getTargetId();
 
         // 1. Position tracking or movement velocity
+        Entity tracked = null;
         if (targetId >= 0) {
-            Entity tracked = this.level().getEntity(targetId);
+            tracked = this.level().getEntity(targetId);
             if (tracked != null && tracked.isAlive()) {
                 this.setPos(tracked.getX(), tracked.getY(), tracked.getZ());
             }
@@ -135,11 +140,10 @@ public class JutsuVisualEffectEntity extends Entity {
 
         // 2. Server-side Jutsu Combat & Physical Functionality (Modularized entities handled in their own classes)
         if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
-            Player caster = this.getCasterPlayer();
-
             switch (type) {
                 // --- FŪTON: 3D WIND SHOCKWAVE FUNNEL (Piercing Gust & Deflection) ---
                 case TYPE_WIND_SHOCKWAVE -> {
+                    Player caster = this.getCasterPlayer();
                     float progress = (float) this.tickCount / (float) Math.max(1, this.getMaxLife());
                     double radius = 1.2D + progress * 1.8D;
                     AABB gustBox = this.getBoundingBox().inflate(radius, 1.2D, radius);
@@ -160,6 +164,7 @@ public class JutsuVisualEffectEntity extends Entity {
                 // --- SHIKOTSUMYAKU: 3D BONE FOREST (Expanding Spire Trap) ---
                 case TYPE_BONE_FOREST -> {
                     if (this.tickCount <= 22 && this.tickCount % 7 == 0) {
+                        Player caster = this.getCasterPlayer();
                         double currentRadius = (this.tickCount / 7) * 2.2D + 1.2D;
                         AABB ringBox = this.getBoundingBox().inflate(currentRadius, 1.5D, currentRadius);
                         List<LivingEntity> victims = serverLevel.getEntitiesOfClass(LivingEntity.class, ringBox,
@@ -176,6 +181,7 @@ public class JutsuVisualEffectEntity extends Entity {
                 // --- AMATERASU: 3D BLACK FLAME PILLAR (Inextinguishable Inferno Zone) ---
                 case TYPE_AMATERASU_PILLAR -> {
                     if (this.tickCount % 10 == 0) {
+                        Player caster = this.getCasterPlayer();
                         AABB flameBox = this.getBoundingBox().inflate(1.8D, 1.2D, 1.8D);
                         List<LivingEntity> burning = serverLevel.getEntitiesOfClass(LivingEntity.class, flameBox,
                                 e -> e.isAlive() && (caster == null || e != caster));
@@ -190,6 +196,7 @@ public class JutsuVisualEffectEntity extends Entity {
                 // --- RAITON: 3D KIRIN LIGHTNING DRAGON (Timed Thunderous Ground Slam) ---
                 case TYPE_KIRIN_DRAGON -> {
                     if (this.tickCount == 6) {
+                        Player caster = this.getCasterPlayer();
                         // Ground slam moment
                         serverLevel.playSound(null, this.blockPosition(), NarutoSounds.KIRIN_STRIKE.get(), SoundSource.WEATHER, 3.5F, 0.85F);
                         serverLevel.playSound(null, this.blockPosition(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 3.5F, 0.75F);
@@ -222,8 +229,7 @@ public class JutsuVisualEffectEntity extends Entity {
                                 NarutoSounds.CHIDORI_LOOP.get(), SoundSource.PLAYERS, 0.8f, 1.2f);
                     }
                     if (targetId >= 0 && this.getEffectDamage() > 0.0F) {
-                        Entity trackedEntity = serverLevel.getEntity(targetId);
-                        if (!(trackedEntity instanceof LivingEntity fieldOwner) || !fieldOwner.isAlive()) {
+                        if (!(tracked instanceof LivingEntity fieldOwner) || !fieldOwner.isAlive()) {
                             this.discard();
                             return;
                         }
@@ -302,13 +308,13 @@ public class JutsuVisualEffectEntity extends Entity {
                     if (this.tickCount == 2) {
                         serverLevel.playSound(null, this.blockPosition(), NarutoSounds.MUD_WALL_RISE.get(), SoundSource.PLAYERS, 1.5F, 0.85F);
                         serverLevel.playSound(null, this.blockPosition(), SoundEvents.STONE_BREAK, SoundSource.PLAYERS, 1.8F, 0.7F);
-                        BlockParticleOption rockParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.POINTED_DRIPSTONE.defaultBlockState());
-                        serverLevel.sendParticles(rockParticle,
+                        serverLevel.sendParticles(Particles.DRIPSTONE,
                                 this.getX(), this.getY() + 0.6D, this.getZ(),
                                 36, 1.6D, 0.8D, 1.6D, 0.16D,
                                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
                     if (this.tickCount == 3 || this.tickCount == 12) {
+                        Player caster = this.getCasterPlayer();
                         float baseDmg = Math.max(4.0F, this.getEffectDamage());
                         float hitDmg = this.tickCount == 3 ? baseDmg * 0.70F : baseDmg * 0.35F;
                         AABB spikeBox = this.getBoundingBox().inflate(3.0D, 2.2D, 3.0D);
@@ -337,7 +343,10 @@ public class JutsuVisualEffectEntity extends Entity {
                                 18, 1.4D, 0.4D, 1.4D, 0.08D,
                                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
-                    if (this.tickCount % 2 == 0 && this.tickCount <= 52) {
+                    boolean doPin = this.tickCount % 2 == 0 && this.tickCount <= 52;
+                    boolean doPulse = this.tickCount == 3 || this.tickCount == 18 || this.tickCount == 33 || this.tickCount == 48;
+                    Player caster = (doPin || doPulse) ? this.getCasterPlayer() : null;
+                    if (doPin) {
                         List<LivingEntity> pinned = JutsuCombatHelper.findHostileTargetsInRadius(
                                 serverLevel, caster, this.position(), sealRadius, sealHalfHeight);
                         for (LivingEntity victim : pinned) {
@@ -413,6 +422,7 @@ public class JutsuVisualEffectEntity extends Entity {
 
                     // Periodic searing ash tick damage + Blindness + Slowness II
                     if (!this.ashDetonated && this.tickCount % 10 == 0) {
+                        Player caster = this.getCasterPlayer();
                         float baseDmg = Math.max(6.0F, this.getEffectDamage());
                         float dotDmg = baseDmg * 0.12F;
                         List<LivingEntity> victims = JutsuCombatHelper.findHostileTargetsInRadius(
@@ -434,6 +444,7 @@ public class JutsuVisualEffectEntity extends Entity {
 
                 // --- SUITON: SUIJINHEKI (Water Encampment Wall & Projectile Dampening) ---
                 case TYPE_WATER_WALL -> {
+                    Player caster = this.getCasterPlayer();
                     final double wallRadius = 2.6D;
                     if (this.tickCount % 3 == 0) {
                         serverLevel.sendParticles(ParticleTypes.SPLASH,

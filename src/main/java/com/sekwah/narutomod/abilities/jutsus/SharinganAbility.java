@@ -5,11 +5,13 @@ import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -157,17 +159,17 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
         }
 
         // 1. Self Buffs scaling with Sharingan evolution
-        player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 220, 0, false, false, false));
+        ensureSustainedEffect(player, MobEffects.NIGHT_VISION, 220, 0, 205);
 
         int speedAmp = (stage == SharinganStage.THREE_TOMOE || stage == SharinganStage.MANGEKYOU) ? 1 : 0;
-        player.addEffect(new MobEffectInstance(MobEffects.SPEED, 40, speedAmp, false, false, false));
+        ensureSustainedEffect(player, MobEffects.SPEED, 40, speedAmp, 20);
 
         if (stage == SharinganStage.THREE_TOMOE || stage == SharinganStage.MANGEKYOU) {
-            player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 0, false, false, false));
+            ensureSustainedEffect(player, MobEffects.STRENGTH, 40, 0, 20);
         }
 
         if (stage == SharinganStage.MANGEKYOU) {
-            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 40, 0, false, false, false));
+            ensureSustainedEffect(player, MobEffects.RESISTANCE, 40, 0, 20);
         }
 
         if (player.level() instanceof ServerLevel serverLevel) {
@@ -262,6 +264,14 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
 
     @Override
     public void performToggleClient(Player player, INinjaData ninjaData) {
+    }
+
+    private static void ensureSustainedEffect(Player player, Holder<MobEffect> effect, int duration, int amplifier, int minRefreshDuration) {
+        MobEffectInstance existing = player.getEffect(effect);
+        if (existing == null || existing.getAmplifier() < amplifier
+                || existing.getDuration() <= minRefreshDuration || player.tickCount % 10 == 0) {
+            player.addEffect(new MobEffectInstance(effect, duration, amplifier, false, false, false));
+        }
     }
 
     @Override

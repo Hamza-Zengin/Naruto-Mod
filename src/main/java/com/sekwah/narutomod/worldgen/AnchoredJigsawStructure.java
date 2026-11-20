@@ -23,10 +23,12 @@ import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
+import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Wrapper around {@link JigsawStructure} that prevents large mod structures from floating
@@ -54,6 +56,7 @@ public class AnchoredJigsawStructure extends Structure {
             {1, 0}, {1, 1}, {0, 1}, {-1, 1},
             {-1, 0}, {-1, -1}, {0, -1}, {1, -1}
     };
+    private static final ConcurrentHashMap<StructurePoolElement, Boolean> SKY_BRIDGE_CACHE = new ConcurrentHashMap<>();
 
     private final JigsawStructure delegate;
     private final int maxHeightVariance;
@@ -193,7 +196,7 @@ public class AnchoredJigsawStructure extends Structure {
                 continue;
             }
             if (piece instanceof PoolElementStructurePiece poolPiece
-                    && poolPiece.getElement().toString().contains("sky_bridge")) {
+                    && isSkyBridgeElement(poolPiece.getElement())) {
                 continue;
             }
 
@@ -234,6 +237,19 @@ public class AnchoredJigsawStructure extends Structure {
                 }
             }
         }
+    }
+
+    private static boolean isSkyBridgeElement(StructurePoolElement element) {
+        Boolean cached = SKY_BRIDGE_CACHE.get(element);
+        if (cached != null) {
+            return cached;
+        }
+        if (SKY_BRIDGE_CACHE.size() > 2048) {
+            SKY_BRIDGE_CACHE.clear();
+        }
+        boolean isSkyBridge = element.toString().contains("sky_bridge");
+        SKY_BRIDGE_CACHE.putIfAbsent(element, isSkyBridge);
+        return isSkyBridge;
     }
 
     static boolean isStructuralBase(BlockState state) {

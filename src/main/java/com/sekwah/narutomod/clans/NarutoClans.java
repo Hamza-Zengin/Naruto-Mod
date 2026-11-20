@@ -7,15 +7,16 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.sekwah.narutomod.NarutoMod.MOD_ID;
 
 public class NarutoClans {
 
     public static final DeferredRegister<Clan> CLANS = DeferredRegister.create(NarutoRegistries.CLANS_KEY, MOD_ID);
-    public static final Map<Identifier, Clan> CLAN_MAP = new HashMap<>();
+    public static final Map<Identifier, Clan> CLAN_MAP = new ConcurrentHashMap<>();
+    private static volatile boolean clansCached = false;
 
     public static final DeferredHolder<Clan, Clan> SHINOBI = registerClan("shinobi",
             () -> new Clan(Component.translatable("clan.narutomod.shinobi"), Component.translatable("clan.narutomod.shinobi.desc")));
@@ -48,9 +49,36 @@ public class NarutoClans {
 
     public static Clan getClan(Identifier location) {
         if (location == null) return null;
-        for (DeferredHolder<Clan, ? extends Clan> entry : CLANS.getEntries()) {
+        Clan cached = CLAN_MAP.get(location);
+        if (cached != null) {
+            return cached;
+        }
+        if (clansCached) {
+            return null;
+        }
+        var entries = CLANS.getEntries();
+        boolean allBound = !entries.isEmpty();
+        for (DeferredHolder<Clan, ? extends Clan> entry : entries) {
+            if (entry.isBound()) {
+                CLAN_MAP.putIfAbsent(entry.getId(), entry.get());
+            } else {
+                allBound = false;
+            }
+        }
+        if (allBound) {
+            clansCached = true;
+        }
+        cached = CLAN_MAP.get(location);
+        if (cached != null || clansCached) {
+            return cached;
+        }
+        for (DeferredHolder<Clan, ? extends Clan> entry : entries) {
             if (entry.getId().equals(location)) {
-                return entry.get();
+                Clan clan = entry.get();
+                if (clan != null) {
+                    CLAN_MAP.putIfAbsent(location, clan);
+                }
+                return clan;
             }
         }
         return null;

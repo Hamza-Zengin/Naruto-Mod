@@ -90,9 +90,15 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
         }
         try {
             INinjaData data = player.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA);
-            return data != null && data.getToggleAbilityData() != null
-                    && data.getToggleAbilityData().hasToggleAbility(
-                    com.sekwah.narutomod.abilities.NarutoAbilities.WATER_WALK.getId());
+            if (data == null) {
+                return false;
+            }
+            if (data.isWaterWalkActive()) {
+                return true;
+            }
+            var toggleData = data.getToggleAbilityData();
+            return toggleData != null
+                    && toggleData.hasToggleAbility(com.sekwah.narutomod.abilities.NarutoAbilities.WATER_WALK.getId());
         } catch (Throwable ignored) {
             return false;
         }
@@ -109,7 +115,7 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
         return fluidState.is(Fluids.WATER) || fluidState.is(Fluids.FLOWING_WATER);
     }
 
-    private void updatePlayerMovement(Player player, INinjaData ninjaData) {
+    private WaterChecks updatePlayerMovement(Player player, INinjaData ninjaData) {
         WaterChecks checks = this.checkSteadyNormalFastPush(player);
 
         Vec3 vec = player.getDeltaMovement();
@@ -139,6 +145,7 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
         double masteryBonus = 1.0 + (getPowerMultiplier(mastery) - 1.0) * 0.25;
         double speedMult = ((checks.steadyCheck && NarutoConfig.waterWalkSpeed > 0) ? NarutoConfig.waterWalkSpeed : 1.0D) * masteryBonus;
         player.setDeltaMovement(vec.x() * speedMult, resultingYSpeed, vec.z() * speedMult);
+        return checks;
     }
 
     public boolean triggerWaterWalk(Level level, BlockPos blockPos) {
@@ -148,9 +155,8 @@ public class WaterWalkAbility extends Ability implements Ability.Toggled {
 
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
-        updatePlayerMovement(player, ninjaData);
+        WaterChecks checks = updatePlayerMovement(player, ninjaData);
         if (ninjaData != null && player.tickCount % 180 == 0) {
-            WaterChecks checks = this.checkSteadyNormalFastPush(player);
             if ((checks.steadyCheck || checks.pushUpFast || checks.pushUpNormal)
                     && player.getDeltaMovement().horizontalDistanceSqr() > 0.001) {
                 net.minecraft.resources.Identifier reg = this.getRegistryName();

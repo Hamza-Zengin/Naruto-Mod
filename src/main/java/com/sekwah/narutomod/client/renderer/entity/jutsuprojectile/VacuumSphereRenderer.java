@@ -66,14 +66,11 @@ public class VacuumSphereRenderer extends EntityRenderer<VacuumSphereEntity, Vac
             submitNodeCollector.submitCustomGeometry(
                     poseStack,
                     RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_WIND),
-                    (pose, consumer) -> {
-                        PoseStack localStack = new PoseStack();
-                        localStack.last().set(pose);
-                        RasenganSphereModel.renderSmoothSphere(
-                                localStack, consumer, 0.28F, 14, 20, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
-                                0.85F, 0.98F, 0.94F, sphereAlpha
-                        );
-                    }
+                    (pose, consumer) ->
+                            RasenganSphereModel.renderSmoothSphere(
+                                    pose, consumer, 0.28F, 14, 20, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                                    0.85F, 0.98F, 0.94F, sphereAlpha
+                            )
             );
 
             // Compact Spinning Wind Blade Rings

@@ -20,14 +20,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class NinjaData implements INinjaData {
 
-    @Sync(minTicks = 1)
+    @Sync(minTicks = 2)
     private float chakra;
 
-    @Sync(minTicks = 1)
+    @Sync(minTicks = 2)
     private float stamina;
 
     @Sync
@@ -95,7 +96,7 @@ public class NinjaData implements INinjaData {
     @Sync(minTicks = 1, syncGlobally = true)
     private String activeHandJutsu = "";
 
-    @Sync(minTicks = 1, syncGlobally = true)
+    @Sync(minTicks = 5)
     private int activeHandJutsuTicks = 0;
 
     @Sync(minTicks = 1, syncGlobally = true)
@@ -112,6 +113,15 @@ public class NinjaData implements INinjaData {
 
     private ArrayList<DelayedPlayerTickEvent> delayedTickEvents = new ArrayList<>();
     private HashMap<String, CooldownTickEvent> cooldownTickEvents = new HashMap<>();
+
+    private static final Identifier SHARINGAN_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
+    private static final Identifier BYAKUGAN_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "byakugan");
+    private static final Identifier EIGHT_GATES_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates");
+    private static final Identifier EIGHT_GATES_DEATH_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates_death");
+    private static final Identifier WATER_WALK_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "water_walk");
+
+    private transient Set<Identifier> cachedUnlockedAbilities;
+    private transient String cachedUnlockedJutsusSource;
 
     public NinjaData() {
         this(true);
@@ -315,8 +325,13 @@ public class NinjaData implements INinjaData {
     }
 
     @Override
-    public java.util.Set<Identifier> getUnlockedAbilities() {
-        return JutsuUnlockRules.parseUnlockedAbilities(this.unlockedJutsus);
+    public Set<Identifier> getUnlockedAbilities() {
+        String source = this.unlockedJutsus != null ? this.unlockedJutsus : "";
+        if (this.cachedUnlockedAbilities == null || !source.equals(this.cachedUnlockedJutsusSource)) {
+            this.cachedUnlockedAbilities = Collections.unmodifiableSet(JutsuUnlockRules.parseUnlockedAbilities(source));
+            this.cachedUnlockedJutsusSource = source;
+        }
+        return this.cachedUnlockedAbilities;
     }
 
     @Override
@@ -665,27 +680,32 @@ public class NinjaData implements INinjaData {
 
         // Sync active abilities bitmask with ToggleAbilityData
         if (this.toggleAbilityData != null) {
-            boolean hasSharingan = false;
-            boolean hasByakugan = false;
-            boolean hasEightGates = false;
-            boolean hasWaterWalk = false;
-            boolean hasEightGatesDeath = false;
-            for (Identifier id : this.toggleAbilityData.getAbilitiesHashSet()) {
-                String path = id.getPath();
-                if ("sharingan".equals(path)) hasSharingan = true;
-                else if ("byakugan".equals(path)) hasByakugan = true;
-                else if ("eight_gates".equals(path)) hasEightGates = true;
-                else if ("eight_gates_death".equals(path)) {
-                    hasEightGates = true;
-                    hasEightGatesDeath = true;
+            var activeToggleAbilities = this.toggleAbilityData.getAbilitiesHashSet();
+            if (activeToggleAbilities == null || activeToggleAbilities.isEmpty()) {
+                this.activeJutsusFlag = 0;
+            } else {
+                int flags = 0;
+                for (Identifier id : activeToggleAbilities) {
+                    if (SHARINGAN_ID.equals(id)) {
+                        flags |= JUTSU_FLAG_SHARINGAN;
+                    } else if (BYAKUGAN_ID.equals(id)) {
+                        flags |= JUTSU_FLAG_BYAKUGAN;
+                    } else if (EIGHT_GATES_ID.equals(id)) {
+                        flags |= JUTSU_FLAG_EIGHT_GATES;
+                    } else if (EIGHT_GATES_DEATH_ID.equals(id)) {
+                        flags |= JUTSU_FLAG_EIGHT_GATES | JUTSU_FLAG_EIGHT_GATES_DEATH;
+                    } else if (WATER_WALK_ID.equals(id)) {
+                        flags |= JUTSU_FLAG_WATER_WALK;
+                    }
                 }
-                else if ("water_walk".equals(path)) hasWaterWalk = true;
+                this.activeJutsusFlag = flags;
             }
-            setJutsuActive(JUTSU_FLAG_SHARINGAN, hasSharingan);
-            setJutsuActive(JUTSU_FLAG_BYAKUGAN, hasByakugan);
-            setJutsuActive(JUTSU_FLAG_EIGHT_GATES, hasEightGates);
-            setJutsuActive(JUTSU_FLAG_WATER_WALK, hasWaterWalk);
-            setJutsuActive(JUTSU_FLAG_EIGHT_GATES_DEATH, hasEightGatesDeath);
+        }
+    }
+
+    public void updateClientData() {
+        if (this.activeHandJutsuTicks > 0) {
+            this.activeHandJutsuTicks--;
         }
     }
 

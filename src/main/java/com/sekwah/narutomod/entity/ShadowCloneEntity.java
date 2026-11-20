@@ -115,6 +115,9 @@ public class ShadowCloneEntity extends PathfinderMob {
             SynchedEntityData.defineId(ShadowCloneEntity.class, EntityDataSerializers.STRING);
 
     private int activeHandJutsuTicks = 0;
+    private java.util.Set<String> cachedActiveAbilities = java.util.Collections.emptySet();
+    private String lastParsedAbilitiesData = "";
+    private final net.minecraft.core.BlockPos.MutableBlockPos waterWalkCheckPos = new net.minecraft.core.BlockPos.MutableBlockPos();
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
@@ -128,6 +131,14 @@ public class ShadowCloneEntity extends PathfinderMob {
         builder.define(DATA_SHARINGAN_STAGE, 0);
         builder.define(DATA_HACHIMON_GATE, 0);
         builder.define(DATA_ACTIVE_HAND_JUTSU, "");
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (DATA_ACTIVE_ABILITIES.equals(key)) {
+            this.refreshActiveAbilitiesCache(this.entityData.get(DATA_ACTIVE_ABILITIES));
+        }
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -313,7 +324,7 @@ public class ShadowCloneEntity extends PathfinderMob {
     private void updateWaterWalkMovement() {
         int blockX = (int) Math.floor(this.getX());
         int blockZ = (int) Math.floor(this.getZ());
-        net.minecraft.core.BlockPos.MutableBlockPos mutablePos = new net.minecraft.core.BlockPos.MutableBlockPos();
+        net.minecraft.core.BlockPos.MutableBlockPos mutablePos = this.waterWalkCheckPos;
 
         boolean steadyCheck = isWaterBlock(mutablePos.set(blockX, (int) Math.round(this.getY() - 0.56f), blockZ));
         boolean pushUpFast = isWaterBlock(mutablePos.set(blockX, (int) Math.round(this.getY()), blockZ));
@@ -447,20 +458,32 @@ public class ShadowCloneEntity extends PathfinderMob {
     }
 
     private static java.util.Set<String> collectActiveAbilityIds(com.sekwah.narutomod.capabilities.INinjaData ninjaData) {
-        java.util.Set<String> activeIds = new java.util.LinkedHashSet<>();
         com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData toggleData = ninjaData.getToggleAbilityData();
-        if (toggleData != null) {
-            for (Identifier id : toggleData.getAbilitiesSnapshot()) {
+        java.util.HashSet<Identifier> toggleAbilities = toggleData != null ? toggleData.getAbilitiesHashSet() : null;
+        boolean hasToggle = toggleAbilities != null && !toggleAbilities.isEmpty();
+        boolean sharingan = ninjaData.isSharinganActive();
+        boolean byakugan = ninjaData.isByakuganActive();
+        boolean eightGates = ninjaData.isEightGatesActive();
+        boolean eighthGate = ninjaData.isEighthGateActive();
+        boolean waterWalk = ninjaData.isWaterWalkActive();
+
+        if (!hasToggle && !sharingan && !byakugan && !eightGates && !eighthGate && !waterWalk) {
+            return java.util.Collections.emptySet();
+        }
+
+        java.util.Set<String> activeIds = new java.util.LinkedHashSet<>();
+        if (hasToggle) {
+            for (Identifier id : toggleAbilities) {
                 if (id != null) {
                     activeIds.add(id.toString());
                 }
             }
         }
-        if (ninjaData.isSharinganActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":sharingan");
-        if (ninjaData.isByakuganActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":byakugan");
-        if (ninjaData.isEightGatesActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":eight_gates");
-        if (ninjaData.isEighthGateActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":eight_gates_death");
-        if (ninjaData.isWaterWalkActive()) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":water_walk");
+        if (sharingan) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":sharingan");
+        if (byakugan) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":byakugan");
+        if (eightGates) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":eight_gates");
+        if (eighthGate) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":eight_gates_death");
+        if (waterWalk) activeIds.add(com.sekwah.narutomod.NarutoMod.MOD_ID + ":water_walk");
         return activeIds;
     }
 
@@ -470,7 +493,7 @@ public class ShadowCloneEntity extends PathfinderMob {
         com.sekwah.narutomod.capabilities.INinjaData ninjaData = owner.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA);
         if (ninjaData == null) return;
         java.util.Set<String> activeIds = collectActiveAbilityIds(ninjaData);
-        String joined = String.join(",", activeIds);
+        String joined = activeIds.isEmpty() ? "" : String.join(",", activeIds);
         if (!joined.equals(this.entityData.get(DATA_ACTIVE_ABILITIES))) {
             this.entityData.set(DATA_ACTIVE_ABILITIES, joined);
             if (hasActiveAbility("water_walk")) {
@@ -498,7 +521,7 @@ public class ShadowCloneEntity extends PathfinderMob {
         if (ninjaData == null) return;
         java.util.Set<String> activeIds = collectActiveAbilityIds(ninjaData);
 
-        this.entityData.set(DATA_ACTIVE_ABILITIES, String.join(",", activeIds));
+        this.entityData.set(DATA_ACTIVE_ABILITIES, activeIds.isEmpty() ? "" : String.join(",", activeIds));
 
         if (ninjaData.getActiveHandJutsuTicks() > 0 && ninjaData.getActiveHandJutsu() != null && !ninjaData.getActiveHandJutsu().isEmpty()) {
             this.setActiveHandJutsu(ninjaData.getActiveHandJutsu(), ninjaData.getActiveHandJutsuTicks());
@@ -553,16 +576,45 @@ public class ShadowCloneEntity extends PathfinderMob {
         }
     }
 
+    private java.util.Set<String> getOrRefreshActiveAbilitiesCache() {
+        String data = this.entityData.get(DATA_ACTIVE_ABILITIES);
+        String normalized = data != null ? data : "";
+        if (!normalized.equals(this.lastParsedAbilitiesData)) {
+            this.refreshActiveAbilitiesCache(normalized);
+        }
+        return this.cachedActiveAbilities;
+    }
+
+    private void refreshActiveAbilitiesCache(@Nullable String data) {
+        String normalized = data != null ? data : "";
+        this.lastParsedAbilitiesData = normalized;
+        if (normalized.isEmpty()) {
+            this.cachedActiveAbilities = java.util.Collections.emptySet();
+            return;
+        }
+        java.util.Set<String> parsed = new java.util.HashSet<>();
+        int start = 0;
+        int len = normalized.length();
+        while (start < len) {
+            int comma = normalized.indexOf(',', start);
+            int end = (comma >= 0) ? comma : len;
+            if (end > start) {
+                String token = normalized.substring(start, end);
+                parsed.add(token);
+                int colon = token.indexOf(':');
+                if (colon >= 0 && colon + 1 < token.length()) {
+                    parsed.add(token.substring(colon + 1));
+                }
+            }
+            start = end + 1;
+        }
+        this.cachedActiveAbilities = parsed;
+    }
+
     public boolean hasActiveAbility(String abilityPath) {
         if (abilityPath == null || abilityPath.isEmpty()) return false;
-        String data = this.entityData.get(DATA_ACTIVE_ABILITIES);
-        if (data == null || data.isEmpty()) return false;
-        for (String token : data.split(",")) {
-            if (token.equals(abilityPath) || token.endsWith(":" + abilityPath)) {
-                return true;
-            }
-        }
-        return false;
+        java.util.Set<String> abilities = this.getOrRefreshActiveAbilitiesCache();
+        return !abilities.isEmpty() && abilities.contains(abilityPath);
     }
 
     public int getSharinganStage() {

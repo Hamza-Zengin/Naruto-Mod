@@ -22,6 +22,13 @@ public class NarutoArmorItem extends Item implements IShouldHideNameplate {
 
     public static final float ANBU_BOOTS_BACKSTAB_SYNERGY_BONUS = 0.15F;
 
+    private static final EquipmentSlot[] ALL_ARMOR_SLOTS = {
+            EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET
+    };
+    private static final EquipmentSlot[] ACCESSORY_ARMOR_SLOTS = {
+            EquipmentSlot.HEAD, EquipmentSlot.LEGS, EquipmentSlot.FEET
+    };
+
     @Nullable
     private Object armorModel = null;
     @Nullable
@@ -154,7 +161,7 @@ public class NarutoArmorItem extends Item implements IShouldHideNameplate {
     public static float getAccessoryStaminaRegenBonus(Player player) {
         if (player == null) return 0.0F;
         float total = 0.0F;
-        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+        for (EquipmentSlot slot : ACCESSORY_ARMOR_SLOTS) {
             if (player.getItemBySlot(slot).getItem() instanceof NarutoArmorItem armor) {
                 total += armor.getStaminaRegenBonus();
             }
@@ -165,7 +172,7 @@ public class NarutoArmorItem extends Item implements IShouldHideNameplate {
     public static float getAccessoryChakraRegenBonus(Player player) {
         if (player == null) return 0.0F;
         float total = 0.0F;
-        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+        for (EquipmentSlot slot : ACCESSORY_ARMOR_SLOTS) {
             if (player.getItemBySlot(slot).getItem() instanceof NarutoArmorItem armor) {
                 total += armor.getChakraRegenBonus();
             }
@@ -176,7 +183,7 @@ public class NarutoArmorItem extends Item implements IShouldHideNameplate {
     public static float getTotalFallDamageReduction(Player player) {
         if (player == null) return 0.0F;
         float total = 0.0F;
-        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+        for (EquipmentSlot slot : ALL_ARMOR_SLOTS) {
             if (player.getItemBySlot(slot).getItem() instanceof NarutoArmorItem armor) {
                 total += armor.getFallDamageReduction();
             }
@@ -187,7 +194,7 @@ public class NarutoArmorItem extends Item implements IShouldHideNameplate {
     public static float getTotalKnockbackResistance(Player player) {
         if (player == null) return 0.0F;
         float total = 0.0F;
-        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+        for (EquipmentSlot slot : ALL_ARMOR_SLOTS) {
             if (player.getItemBySlot(slot).getItem() instanceof NarutoArmorItem armor) {
                 total += armor.getKnockbackResistanceBonus();
             }
@@ -198,7 +205,7 @@ public class NarutoArmorItem extends Item implements IShouldHideNameplate {
     public static float getTotalJutsuDamageReduction(Player player) {
         if (player == null) return 0.0F;
         float total = 0.0F;
-        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+        for (EquipmentSlot slot : ALL_ARMOR_SLOTS) {
             if (player.getItemBySlot(slot).getItem() instanceof NarutoArmorItem armor) {
                 total += armor.getJutsuDamageReduction();
             }
@@ -209,7 +216,7 @@ public class NarutoArmorItem extends Item implements IShouldHideNameplate {
     public static float getTotalMovementSpeedBonus(Player player) {
         if (player == null) return 0.0F;
         float total = 0.0F;
-        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+        for (EquipmentSlot slot : ALL_ARMOR_SLOTS) {
             if (player.getItemBySlot(slot).getItem() instanceof NarutoArmorItem armor) {
                 total += armor.getMovementSpeedBonus();
             }
@@ -220,7 +227,7 @@ public class NarutoArmorItem extends Item implements IShouldHideNameplate {
     public static float getTotalStealthSpeedBonus(Player player) {
         if (player == null) return 0.0F;
         float total = 0.0F;
-        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+        for (EquipmentSlot slot : ALL_ARMOR_SLOTS) {
             if (player.getItemBySlot(slot).getItem() instanceof NarutoArmorItem armor) {
                 total += armor.getStealthSpeedBonus();
             }
@@ -230,7 +237,7 @@ public class NarutoArmorItem extends Item implements IShouldHideNameplate {
 
     public static boolean hasAnbuStealthSynergy(Player player) {
         if (player == null) return false;
-        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+        for (EquipmentSlot slot : ALL_ARMOR_SLOTS) {
             if (player.getItemBySlot(slot).getItem() instanceof NarutoArmorItem armor && armor.hasAnbuStealthSynergy()) {
                 return true;
             }

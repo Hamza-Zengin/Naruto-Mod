@@ -47,6 +47,11 @@ public class WoodPrisonEntity extends Entity {
     private static final EntityDataAccessor<Optional<net.minecraft.world.entity.EntityReference<LivingEntity>>> DATA_CASTER_UUID =
             SynchedEntityData.defineId(WoodPrisonEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
+    private static final class Particles {
+        static final BlockParticleOption WOOD = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.MANGROVE_WOOD.defaultBlockState());
+        static final BlockParticleOption LEAF = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.AZALEA_LEAVES.defaultBlockState());
+    }
+
     public WoodPrisonEntity(EntityType<? extends WoodPrisonEntity> type, Level level) {
         super(type, level);
         this.noPhysics = false;
@@ -107,22 +112,23 @@ public class WoodPrisonEntity extends Entity {
             // Every tick: strictly lock movement and block jumping inside the cage
             for (LivingEntity target : trappedTargets) {
                 this.restrainTarget(target);
-                target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 25, 6, false, false));
+                MobEffectInstance existingSlow = target.getEffect(MobEffects.SLOWNESS);
+                if (existingSlow == null || existingSlow.getAmplifier() < 6
+                        || existingSlow.getDuration() <= 10 || this.tickCount % 10 == 0) {
+                    target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 25, 6, false, false));
+                }
             }
 
             // Periodic constriction wave: crushing nature damage, life siphon, and root particles
             if (this.tickCount % 14 == 0) {
-                BlockParticleOption woodParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.MANGROVE_WOOD.defaultBlockState());
-                BlockParticleOption leafParticle = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.AZALEA_LEAVES.defaultBlockState());
-
                 for (int i = 0; i < 12; i++) {
                     double angle = (i * Math.PI / 6.0D) + (this.tickCount * 0.15D);
                     double r = 2.0D;
                     double px = this.getX() + Math.cos(angle) * r;
                     double pz = this.getZ() + Math.sin(angle) * r;
-                    serverLevel.sendParticles(woodParticle, px, this.getY() + 1.2D, pz, 3, 0.2D, 0.5D, 0.2D, 0.05D,
+                    serverLevel.sendParticles(Particles.WOOD, px, this.getY() + 1.2D, pz, 3, 0.2D, 0.5D, 0.2D, 0.05D,
                             net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
-                    serverLevel.sendParticles(leafParticle, px, this.getY() + 1.8D, pz, 1, 0.2D, 0.2D, 0.2D, 0.02D,
+                    serverLevel.sendParticles(Particles.LEAF, px, this.getY() + 1.8D, pz, 1, 0.2D, 0.2D, 0.2D, 0.02D,
                             net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                 }
 

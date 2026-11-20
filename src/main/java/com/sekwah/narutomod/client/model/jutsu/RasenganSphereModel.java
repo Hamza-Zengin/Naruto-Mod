@@ -10,7 +10,10 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 4. RASENGAN — Procedural 3D Multi-Layered Swirling Chakra Sphere.
@@ -116,12 +119,57 @@ public class RasenganSphereModel extends Model<JutsuVisualModels.VisualState> {
         poseStack.popPose();
     }
 
-    public static void renderSmoothSphere(PoseStack poseStack, VertexConsumer buffer, float radius,
-                                          int stacks, int slices, int light, int overlay,
-                                          float r, float g, float b, float a) {
-        PoseStack.Pose pose = poseStack.last();
-        org.joml.Matrix4f mat = pose.pose();
+    public static final class UnitSphereGrid {
+        public static final UnitSphereGrid EMPTY = new UnitSphereGrid(0, 0, new float[0], new float[0], new float[0], new float[0], new float[0]);
 
+        public final int stacks;
+        public final int slices;
+        public final int vertexCount;
+        public final float[] nx;
+        public final float[] ny;
+        public final float[] nz;
+        public final float[] u;
+        public final float[] v;
+
+        private UnitSphereGrid(int stacks, int slices, float[] nx, float[] ny, float[] nz, float[] u, float[] v) {
+            this.stacks = stacks;
+            this.slices = slices;
+            this.vertexCount = nx.length;
+            this.nx = nx;
+            this.ny = ny;
+            this.nz = nz;
+            this.u = u;
+            this.v = v;
+        }
+    }
+
+    private static final ConcurrentHashMap<Long, UnitSphereGrid> SPHERE_GRID_CACHE = new ConcurrentHashMap<>();
+
+    public static UnitSphereGrid getUnitSphereGrid(int stacks, int slices) {
+        if (stacks <= 0 || slices <= 0) {
+            return UnitSphereGrid.EMPTY;
+        }
+        long key = (((long) stacks) << 32) | (slices & 0xFFFFFFFFL);
+        UnitSphereGrid grid = SPHERE_GRID_CACHE.get(key);
+        if (grid == null) {
+            grid = buildUnitSphereGrid(stacks, slices);
+            UnitSphereGrid existing = SPHERE_GRID_CACHE.putIfAbsent(key, grid);
+            if (existing != null) {
+                grid = existing;
+            }
+        }
+        return grid;
+    }
+
+    private static UnitSphereGrid buildUnitSphereGrid(int stacks, int slices) {
+        int vertexCount = stacks * slices * 4;
+        float[] nx = new float[vertexCount];
+        float[] ny = new float[vertexCount];
+        float[] nz = new float[vertexCount];
+        float[] u = new float[vertexCount];
+        float[] v = new float[vertexCount];
+
+        int idx = 0;
         for (int i = 0; i < stacks; i++) {
             float phi1 = (float) (Math.PI * i / stacks);
             float phi2 = (float) (Math.PI * (i + 1) / stacks);
@@ -144,24 +192,91 @@ public class RasenganSphereModel extends Model<JutsuVisualModels.VisualState> {
                 float cosT2 = Mth.cos(theta2);
                 float sinT2 = Mth.sin(theta2);
 
-                float nx1 = sinPhi1 * cosT1, ny1 = cosPhi1, nz1 = sinPhi1 * sinT1;
-                float nx2 = sinPhi2 * cosT1, ny2 = cosPhi2, nz2 = sinPhi2 * sinT1;
-                float nx3 = sinPhi2 * cosT2, ny3 = cosPhi2, nz3 = sinPhi2 * sinT2;
-                float nx4 = sinPhi1 * cosT2, ny4 = cosPhi1, nz4 = sinPhi1 * sinT2;
+                nx[idx] = sinPhi1 * cosT1;
+                ny[idx] = cosPhi1;
+                nz[idx] = sinPhi1 * sinT1;
+                u[idx] = u1;
+                v[idx] = v1;
+                idx++;
 
-                buffer.addVertex(mat, nx1 * radius, ny1 * radius, nz1 * radius)
-                        .setColor(r, g, b, a).setUv(u1, v1).setOverlay(overlay).setLight(light)
-                        .setNormal(pose, nx1, ny1, nz1);
-                buffer.addVertex(mat, nx2 * radius, ny2 * radius, nz2 * radius)
-                        .setColor(r, g, b, a).setUv(u1, v2).setOverlay(overlay).setLight(light)
-                        .setNormal(pose, nx2, ny2, nz2);
-                buffer.addVertex(mat, nx3 * radius, ny3 * radius, nz3 * radius)
-                        .setColor(r, g, b, a).setUv(u2, v2).setOverlay(overlay).setLight(light)
-                        .setNormal(pose, nx3, ny3, nz3);
-                buffer.addVertex(mat, nx4 * radius, ny4 * radius, nz4 * radius)
-                        .setColor(r, g, b, a).setUv(u2, v1).setOverlay(overlay).setLight(light)
-                        .setNormal(pose, nx4, ny4, nz4);
+                nx[idx] = sinPhi2 * cosT1;
+                ny[idx] = cosPhi2;
+                nz[idx] = sinPhi2 * sinT1;
+                u[idx] = u1;
+                v[idx] = v2;
+                idx++;
+
+                nx[idx] = sinPhi2 * cosT2;
+                ny[idx] = cosPhi2;
+                nz[idx] = sinPhi2 * sinT2;
+                u[idx] = u2;
+                v[idx] = v2;
+                idx++;
+
+                nx[idx] = sinPhi1 * cosT2;
+                ny[idx] = cosPhi1;
+                nz[idx] = sinPhi1 * sinT2;
+                u[idx] = u2;
+                v[idx] = v1;
+                idx++;
             }
+        }
+        return new UnitSphereGrid(stacks, slices, nx, ny, nz, u, v);
+    }
+
+    public static void renderSmoothSphere(PoseStack poseStack, VertexConsumer buffer, float radius,
+                                          int stacks, int slices, int light, int overlay,
+                                          float r, float g, float b, float a) {
+        renderSmoothSphere(poseStack.last(), buffer, radius, stacks, slices, light, overlay, r, g, b, a);
+    }
+
+    public static void renderSmoothSphere(PoseStack.Pose pose, VertexConsumer buffer, float radius,
+                                          int stacks, int slices, int light, int overlay,
+                                          float r, float g, float b, float a) {
+        if (stacks <= 0 || slices <= 0) {
+            return;
+        }
+        UnitSphereGrid grid = getUnitSphereGrid(stacks, slices);
+        org.joml.Matrix4f mat = pose.pose();
+        int count = grid.vertexCount;
+        float[] nx = grid.nx;
+        float[] ny = grid.ny;
+        float[] nz = grid.nz;
+        float[] u = grid.u;
+        float[] v = grid.v;
+
+        for (int k = 0; k < count; k++) {
+            float vx = nx[k];
+            float vy = ny[k];
+            float vz = nz[k];
+            buffer.addVertex(mat, vx * radius, vy * radius, vz * radius)
+                    .setColor(r, g, b, a).setUv(u[k], v[k]).setOverlay(overlay).setLight(light)
+                    .setNormal(pose, vx, vy, vz);
+        }
+    }
+
+    public static void renderSmoothSphere(PoseStack.Pose pose, VertexConsumer buffer, float radius,
+                                          int stacks, int slices, int r, int g, int b, int a, int packedLight) {
+        if (stacks <= 0 || slices <= 0) {
+            return;
+        }
+        UnitSphereGrid grid = getUnitSphereGrid(stacks, slices);
+        org.joml.Matrix4f mat = pose.pose();
+        int count = grid.vertexCount;
+        float[] nx = grid.nx;
+        float[] ny = grid.ny;
+        float[] nz = grid.nz;
+        float[] u = grid.u;
+        float[] v = grid.v;
+        int overlay = OverlayTexture.NO_OVERLAY;
+
+        for (int k = 0; k < count; k++) {
+            float vx = nx[k];
+            float vy = ny[k];
+            float vz = nz[k];
+            buffer.addVertex(mat, vx * radius, vy * radius, vz * radius)
+                    .setColor(r, g, b, a).setUv(u[k], v[k]).setOverlay(overlay).setLight(packedLight)
+                    .setNormal(pose, vx, vy, vz);
         }
     }
 }
