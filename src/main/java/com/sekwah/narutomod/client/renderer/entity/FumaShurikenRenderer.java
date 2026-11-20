@@ -54,7 +54,7 @@ public class FumaShurikenRenderer extends EntityRenderer<FumaShurikenEntity, Fum
     public void submit(FumaRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector,
                        CameraRenderState cameraRenderState) {
         poseStack.pushPose();
-        poseStack.translate(0.0D, 0.15D, 0.0D);
+        poseStack.translate(0.0D, 0.22D, 0.0D);
         poseStack.rotateDegrees(Axis.YP, state.yRot - 90.0F);
         poseStack.rotateDegrees(Axis.ZP, state.xRot);
         poseStack.rotateDegrees(Axis.XP, 90.0F);

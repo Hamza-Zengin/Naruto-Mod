@@ -21,6 +21,7 @@ import net.minecraft.util.ARGB;
 public class FireballJutsuRenderer extends EntityRenderer<FireballJutsuEntity, FireballJutsuRenderer.FireballRenderState> {
    public static final Identifier FIREBALL_TEX = Identifier.fromNamespaceAndPath("narutomod", "textures/entity/jutsu/projectiles/fireball.png");
    private static final RenderType RENDER_TYPE = RenderTypes.entityTranslucent(FIREBALL_TEX);
+   private static final RenderType EYES_RENDER_TYPE = RenderTypes.eyes(FIREBALL_TEX);
    private final FireballJutsuModel model;
 
    public static class FireballRenderState extends EntityRenderState {
@@ -64,11 +65,19 @@ public class FireballJutsuRenderer extends EntityRenderer<FireballJutsuEntity, F
       poseStack.translate(0.0F, state.boundingBoxHeight / 2.0F, 0.0F);
       poseStack.scale(state.scale, state.scale, state.scale);
 
+      float fadeOut = state.alpha / 0.92F;
+
       // Smooth spherical inner fire glow for silhouette continuity
       submitNodeCollector.submitCustomGeometry(poseStack, RENDER_TYPE, (pose, consumer) ->
               RasenganSphereModel.renderSmoothSphere(
                       pose, consumer, 0.42F, 18, 26, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
                       1.0F, 0.72F, 0.25F, state.alpha * 0.55F
+              )
+      );
+      submitNodeCollector.submitCustomGeometry(poseStack, EYES_RENDER_TYPE, (pose, consumer) ->
+              RasenganSphereModel.renderSmoothSphere(
+                      pose, consumer, 0.42F, 18, 26, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                      1.0F, 0.55F, 0.15F, 0.45F * fadeOut
               )
       );
 
@@ -81,6 +90,18 @@ public class FireballJutsuRenderer extends EntityRenderer<FireballJutsuEntity, F
               15728880,
               OverlayTexture.NO_OVERLAY,
               color,
+              null,
+              state.outlineColor
+      );
+      int glowColor = ARGB.colorFromFloat(0.55F * fadeOut, 1.0F, 0.62F, 0.18F);
+      submitNodeCollector.submitModel(
+              this.model,
+              state,
+              poseStack,
+              EYES_RENDER_TYPE,
+              RenderMathUtil.FULL_BRIGHT,
+              OverlayTexture.NO_OVERLAY,
+              glowColor,
               null,
               state.outlineColor
       );

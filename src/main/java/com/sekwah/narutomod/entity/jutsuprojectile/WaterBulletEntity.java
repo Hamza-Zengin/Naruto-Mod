@@ -260,6 +260,14 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
 
             if (this.tickCount >= this.getMaxLife()) {
                 this.discard();
+                return;
+            }
+            if (this.isAlive()) {
+                int lightLevel = com.sekwah.narutomod.events.JutsuLightManager.resolveLightLevelForEntityClass(this.getClass());
+                if (lightLevel > 0) {
+                    com.sekwah.narutomod.events.JutsuLightManager.updateLight(
+                            serverLevel, this, this.blockPosition(), lightLevel);
+                }
             }
         }
     }

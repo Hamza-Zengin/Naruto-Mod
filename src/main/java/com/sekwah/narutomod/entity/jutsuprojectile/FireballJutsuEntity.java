@@ -147,6 +147,9 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
             if (!this.level().isClientSide()) {
                 this.entityData.set(DATA_IMPACT_TICKS, it);
                 if (this.level() instanceof ServerLevel serverLevel) {
+                    com.sekwah.narutomod.events.JutsuLightManager.updateLight(
+                            serverLevel, this, this.blockPosition(),
+                            com.sekwah.narutomod.events.JutsuLightManager.LIGHT_FIRE_LIGHTNING);
                     boolean mini = this.isPhoenixMini();
                     int count = mini ? 2 : 8;
                     for (int i = 0; i < count; i++) {
@@ -221,11 +224,20 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
             }
         }
 
-        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel && this.time % 2 == 0) {
-            boolean mini = this.isPhoenixMini();
-            serverLevel.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + (mini ? 0.25 : 0.5), this.getZ(),
-                    mini ? 2 : 5, mini ? 0.14 : 0.35, mini ? 0.14 : 0.35, mini ? 0.14 : 0.35, 0.03,
-                    net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
+            if (this.isAlive()) {
+                int lightLevel = com.sekwah.narutomod.events.JutsuLightManager.resolveLightLevelForEntityClass(this.getClass());
+                if (lightLevel > 0) {
+                    com.sekwah.narutomod.events.JutsuLightManager.updateLight(
+                            serverLevel, this, this.blockPosition(), lightLevel);
+                }
+            }
+            if (this.time % 2 == 0) {
+                boolean mini = this.isPhoenixMini();
+                serverLevel.sendParticles(ParticleTypes.FLAME, this.getX(), this.getY() + (mini ? 0.25 : 0.5), this.getZ(),
+                        mini ? 2 : 5, mini ? 0.14 : 0.35, mini ? 0.14 : 0.35, mini ? 0.14 : 0.35, 0.03,
+                        net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+            }
         }
 
         if (this.isInWaterOrRain()) {

@@ -52,7 +52,7 @@ public class SharinganEyesLayer extends RenderLayer<AvatarRenderState, PlayerMod
         poseStack.pushPose();
         parentModel.head.translateAndRotate(poseStack);
 
-        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(texture), (pose, consumer) -> {
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.eyes(texture), (pose, consumer) -> {
             Matrix4f matrix = pose.pose();
             float z = -4.003F / 16.0F;
             float yTop = -4.0F / 16.0F;

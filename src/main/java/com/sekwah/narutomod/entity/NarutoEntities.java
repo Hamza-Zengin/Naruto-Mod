@@ -47,8 +47,11 @@ public class NarutoEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<ShurikenEntity>> SHURIKEN = register("shuriken",
             ShurikenEntity::new, MobCategory.MISC, builder -> builder.sized(0.5F, 0.5F).clientTrackingRange(8));
 
+    public static final float FUMA_SHURIKEN_WIDTH = 1.35F;
+    public static final float FUMA_SHURIKEN_HEIGHT = 0.6F;
+
     public static final DeferredHolder<EntityType<?>, EntityType<FumaShurikenEntity>> FUMA_SHURIKEN = register("fuma_shuriken",
-            FumaShurikenEntity::new, MobCategory.MISC, builder -> builder.sized(0.9F, 0.4F).clientTrackingRange(10));
+            FumaShurikenEntity::new, MobCategory.MISC, builder -> builder.sized(FUMA_SHURIKEN_WIDTH, FUMA_SHURIKEN_HEIGHT).clientTrackingRange(10));
 
     public static final DeferredHolder<EntityType<?>, EntityType<PaperBombEntity>> PAPER_BOMB = register("paper_bomb",
             PaperBombEntity::new, MobCategory.MISC, builder -> builder.fireImmune().sized(0.5F, 0.5F).clientTrackingRange(10));

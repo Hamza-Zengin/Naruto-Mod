@@ -5,9 +5,11 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
@@ -35,11 +37,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * on small hilltop spikes or steep cliffs:
  * <ol>
  *   <li>Samples terrain height across a 17-point radial grid around the candidate chunk center
- *       and rejects locations whose elevation spread or deep-water coverage exceeds configured limits.</li>
+ *       and rejects locations with lava pools, excessive elevation spread, or water exceeding limits.</li>
  *   <li>Anchors the jigsaw start elevation toward the surrounding terrain median/lower-quartile
  *       instead of an isolated peak spike.</li>
- *   <li>During {@link #afterPlace}, dynamically extends solid foundation columns downward from
- *       each piece's bottom footprint until reaching natural solid ground.</li>
+ *   <li>During {@link #afterPlace}, applies a two-tier foundation system (perimeter/node skirts for
+ *       1-10 block voids and globally grid-aligned spaced columns for >10 block voids) and seals
+ *       adjacent lava pools.</li>
  * </ol>
  */
 public class AnchoredJigsawStructure extends Structure {
@@ -51,6 +54,13 @@ public class AnchoredJigsawStructure extends Structure {
             Codec.INT.optionalFieldOf("max_foundation_depth", 36).forGetter(s -> s.maxFoundationDepth),
             Codec.BOOL.optionalFieldOf("allow_shallow_water", false).forGetter(s -> s.allowShallowWater)
     ).apply(instance, AnchoredJigsawStructure::new));
+
+    static final int TIER1_MAX_GAP = 10;
+    static final int TIER1_EMBED_DEPTH = 2;
+    static final int TIER2_MIN_EMBED_DEPTH = 3;
+    static final int TIER2_MAX_EMBED_DEPTH = 4;
+    static final int MIN_COLUMN_CLEAR_GAP = 5;
+    static final int LAVA_SCAN_PADDING = 2;
 
     private static final int[][] DIRECTIONS = {
             {1, 0}, {1, 1}, {0, 1}, {-1, 1},
@@ -95,14 +105,18 @@ public class AnchoredJigsawStructure extends Structure {
         int cz = context.chunkPos().getMiddleBlockZ();
 
         int[] surfaceSamples = new int[17];
-        int deepWaterLimit = allowShallowWater ? 6 : 3;
+        int deepWaterLimit = allowShallowWater ? 6 : 1;
+        int maxWaterSamples = allowShallowWater ? 8 : 1;
         int deepWaterSamples = 0;
 
         int centerSurfaceY = generator.getFirstOccupiedHeight(
                 cx, cz, Heightmap.Types.WORLD_SURFACE_WG, heightAccessor, randomState);
         int centerFloorY = generator.getFirstOccupiedHeight(
                 cx, cz, Heightmap.Types.OCEAN_FLOOR_WG, heightAccessor, randomState);
-        if ((centerSurfaceY - centerFloorY) > deepWaterLimit) {
+        if (shouldRejectCenterWater(allowShallowWater, centerSurfaceY, centerFloorY)) {
+            return Optional.empty();
+        }
+        if (hasLavaInSampleColumn(generator, cx, cz, centerSurfaceY, centerFloorY, heightAccessor, randomState)) {
             return Optional.empty();
         }
         surfaceSamples[0] = centerSurfaceY;
@@ -122,14 +136,17 @@ public class AnchoredJigsawStructure extends Structure {
                         sx, sz, Heightmap.Types.WORLD_SURFACE_WG, heightAccessor, randomState);
                 int fY = generator.getFirstOccupiedHeight(
                         sx, sz, Heightmap.Types.OCEAN_FLOOR_WG, heightAccessor, randomState);
-                if ((sY - fY) > deepWaterLimit) {
+                if (hasLavaInSampleColumn(generator, sx, sz, sY, fY, heightAccessor, randomState)) {
+                    return Optional.empty();
+                }
+                if (shouldRejectWaterSample(sY, fY, deepWaterLimit)) {
                     deepWaterSamples++;
                 }
                 surfaceSamples[idx++] = sY;
             }
         }
 
-        if (deepWaterSamples > (allowShallowWater ? 8 : 5)) {
+        if (deepWaterSamples > maxWaterSamples) {
             return Optional.empty();
         }
 
@@ -207,9 +224,22 @@ public class AnchoredJigsawStructure extends Structure {
 
             int scanLow = Math.max(worldMinY, pieceBox.minY());
             int scanHigh = Math.min(worldMaxY, pieceBox.minY() + 4);
+            int pieceWidth = Math.max(pieceBox.getXSpan(), pieceBox.getZSpan());
+
+            BlockState dominantBaseState = null;
+            int minBaseY = Integer.MAX_VALUE;
+            int maxBaseY = Integer.MIN_VALUE;
+
+            int width = (x1 - x0) + 1;
+            int depthSpan = (z1 - z0) + 1;
+            int[][] baseYs = new int[width][depthSpan];
+            int[][] gapDepths = new int[width][depthSpan];
+            BlockState[][] baseStates = new BlockState[width][depthSpan];
 
             for (int x = x0; x <= x1; x++) {
+                int xi = x - x0;
                 for (int z = z0; z <= z1; z++) {
+                    int zi = z - z0;
                     int baseY = -1;
                     BlockState baseState = null;
                     for (int y = scanLow; y <= scanHigh; y++) {
@@ -220,23 +250,228 @@ public class AnchoredJigsawStructure extends Structure {
                             break;
                         }
                     }
+                    baseYs[xi][zi] = baseY;
+                    baseStates[xi][zi] = baseState;
                     if (baseY < 0) {
                         continue;
                     }
 
-                    int stopY = Math.max(worldMinY, baseY - maxFoundationDepth);
-                    for (int y = baseY - 1; y >= stopY; y--) {
+                    if (dominantBaseState == null) {
+                        dominantBaseState = baseState;
+                    }
+                    if (baseY < minBaseY) {
+                        minBaseY = baseY;
+                    }
+                    if (baseY > maxBaseY) {
+                        maxBaseY = baseY;
+                    }
+
+                    int gap = 0;
+                    int maxMeasureY = Math.max(worldMinY, baseY - maxFoundationDepth);
+                    for (int y = baseY - 1; y >= maxMeasureY; y--) {
                         BlockState existing = level.getBlockState(cursor.set(x, y, z));
                         if (!isFoundationReplaceable(existing)) {
                             break;
                         }
-                        int depth = (baseY - 1) - y;
-                        BlockState fillState = pickFoundationBlock(baseState, x, y, z, depth);
+                        gap++;
+                    }
+                    gapDepths[xi][zi] = gap;
+                }
+            }
+
+            if (dominantBaseState == null) {
+                dominantBaseState = Blocks.COBBLESTONE.defaultBlockState();
+            }
+            if (minBaseY == Integer.MAX_VALUE) {
+                minBaseY = scanLow;
+                maxBaseY = scanHigh;
+            }
+
+            clearLavaAroundPiece(level, cursor, chunkBox, pieceBox, minBaseY, maxBaseY, worldMinY, worldMaxY, dominantBaseState);
+
+            for (int x = x0; x <= x1; x++) {
+                int xi = x - x0;
+                for (int z = z0; z <= z1; z++) {
+                    int zi = z - z0;
+                    int baseY = baseYs[xi][zi];
+                    BlockState baseState = baseStates[xi][zi];
+                    if (baseY < 0 || baseState == null) {
+                        continue;
+                    }
+
+                    int gap = gapDepths[xi][zi];
+                    if (gap <= 0) {
+                        continue;
+                    }
+
+                    if (gap <= TIER1_MAX_GAP) {
+                        // Seal 1-block fluid layer directly under baseY on water-edge overhangs
+                        BlockState immediatelyBelow = level.getBlockState(cursor.set(x, baseY - 1, z));
+                        boolean hasFluidBelow = !immediatelyBelow.getFluidState().isEmpty();
+                        boolean isSupport = isTier1SupportPoint(x, z, pieceBox);
+                        if (!isSupport && !hasFluidBelow) {
+                            continue;
+                        }
+
+                        if (isSupport) {
+                            int embedDepth = TIER1_EMBED_DEPTH;
+                            int stopY = Math.max(worldMinY, baseY - Math.min(maxFoundationDepth, gap + embedDepth));
+                            fillFoundationColumn(level, cursor, baseState, x, z, baseY, stopY);
+                        } else {
+                            // Water-edge lip seal: seal 1 block below baseY so water does not bleed under walls/floors
+                            int sealY = baseY - 1;
+                            if (sealY >= worldMinY) {
+                                BlockState fillState = pickFoundationBlock(baseState, x, sealY, z, 0);
+                                level.setBlock(cursor.set(x, sealY, z), fillState, 2);
+                            }
+                        }
+                    } else {
+                        int pillarSize = selectPillarSize(gap, pieceWidth);
+                        int stride = computePillarStride(pillarSize);
+                        if (!isOnGlobalPillarGrid(x, z, pillarSize, stride)) {
+                            continue;
+                        }
+
+                        int embedDepth = computeTier2EmbedDepth(x, z);
+                        int stopY = Math.max(worldMinY, baseY - Math.min(maxFoundationDepth, gap + embedDepth));
+                        fillFoundationColumn(level, cursor, baseState, x, z, baseY, stopY);
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean hasLavaInSampleColumn(ChunkGenerator generator,
+                                                 int x,
+                                                 int z,
+                                                 int surfaceY,
+                                                 int floorY,
+                                                 LevelHeightAccessor heightAccessor,
+                                                 RandomState randomState) {
+        NoiseColumn column = generator.getBaseColumn(x, z, heightAccessor, randomState);
+        int minCheckY = Math.max(heightAccessor.getMinY(), Math.min(surfaceY, floorY) - 4);
+        int maxCheckY = Math.min(heightAccessor.getMaxY() - 1, Math.max(surfaceY, floorY) + 2);
+        for (int y = maxCheckY; y >= minCheckY; y--) {
+            if (isLavaBlock(column.getBlock(y))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void clearLavaAroundPiece(WorldGenLevel level,
+                                             BlockPos.MutableBlockPos cursor,
+                                             BoundingBox chunkBox,
+                                             BoundingBox pieceBox,
+                                             int minBaseY,
+                                             int maxBaseY,
+                                             int worldMinY,
+                                             int worldMaxY,
+                                             BlockState themeState) {
+        int lx0 = Math.max(chunkBox.minX(), pieceBox.minX() - LAVA_SCAN_PADDING);
+        int lx1 = Math.min(chunkBox.maxX(), pieceBox.maxX() + LAVA_SCAN_PADDING);
+        int lz0 = Math.max(chunkBox.minZ(), pieceBox.minZ() - LAVA_SCAN_PADDING);
+        int lz1 = Math.min(chunkBox.maxZ(), pieceBox.maxZ() + LAVA_SCAN_PADDING);
+        int ly0 = Math.max(worldMinY, minBaseY - 4);
+        int ly1 = Math.min(worldMaxY - 1, maxBaseY + 3);
+
+        for (int x = lx0; x <= lx1; x++) {
+            for (int z = lz0; z <= lz1; z++) {
+                for (int y = ly1; y >= ly0; y--) {
+                    BlockState state = level.getBlockState(cursor.set(x, y, z));
+                    if (isLavaBlock(state)) {
+                        int depth = Math.max(0, minBaseY - y);
+                        BlockState fillState = pickFoundationBlock(themeState, x, y, z, depth);
                         level.setBlock(cursor, fillState, 2);
                     }
                 }
             }
         }
+    }
+
+    private static void fillFoundationColumn(WorldGenLevel level,
+                                             BlockPos.MutableBlockPos cursor,
+                                             BlockState baseState,
+                                             int x,
+                                             int z,
+                                             int baseY,
+                                             int stopY) {
+        boolean reachedNaturalSolid = false;
+        for (int y = baseY - 1; y >= stopY; y--) {
+            BlockState existing = level.getBlockState(cursor.set(x, y, z));
+            if (isFoundationReplaceable(existing)) {
+                if (reachedNaturalSolid) {
+                    // Do not punch across caves below an already-hit solid floor
+                    break;
+                }
+                int depth = (baseY - 1) - y;
+                BlockState fillState = pickFoundationBlock(baseState, x, y, z, depth);
+                level.setBlock(cursor, fillState, 2);
+            } else {
+                reachedNaturalSolid = true;
+                // Embed 2 (Tier 1) or 3-4 (Tier 2) blocks into natural solid ground
+                int depth = (baseY - 1) - y;
+                BlockState fillState = pickFoundationBlock(baseState, x, y, z, depth);
+                level.setBlock(cursor, fillState, 2);
+            }
+        }
+    }
+
+    static boolean isLavaBlock(BlockState state) {
+        return state.is(Blocks.LAVA) || state.getFluidState().is(FluidTags.LAVA);
+    }
+
+    static boolean shouldRejectCenterWater(boolean allowShallowWater, int centerSurfaceY, int centerFloorY) {
+        if (!allowShallowWater) {
+            return centerSurfaceY > centerFloorY;
+        }
+        return (centerSurfaceY - centerFloorY) > 6;
+    }
+
+    static boolean shouldRejectWaterSample(int surfaceY, int floorY, int deepWaterLimit) {
+        return (surfaceY - floorY) > deepWaterLimit;
+    }
+
+    static int selectPillarSize(int gapDepth, int pieceWidth) {
+        if (gapDepth > 28 && pieceWidth >= 26) {
+            return 4;
+        }
+        if (gapDepth > 20 || pieceWidth >= 20) {
+            return 3;
+        }
+        return 2;
+    }
+
+    static int computePillarStride(int pillarSize) {
+        int clampedSize = Math.max(2, Math.min(4, pillarSize));
+        // Ensures clear gap between adjacent pillars is always >= 6 blocks (>= MIN_COLUMN_CLEAR_GAP = 5)
+        return clampedSize + 6;
+    }
+
+    static boolean isOnGlobalPillarGrid(int x, int z, int pillarSize, int stride) {
+        if (stride <= 0 || pillarSize <= 0) {
+            return false;
+        }
+        return Math.floorMod(x, stride) < pillarSize && Math.floorMod(z, stride) < pillarSize;
+    }
+
+    static boolean isTier1SupportPoint(int x, int z, BoundingBox pieceBox) {
+        boolean onPerimeter = x == pieceBox.minX()
+                || x == pieceBox.maxX()
+                || z == pieceBox.minZ()
+                || z == pieceBox.maxZ();
+        if (onPerimeter) {
+            return true;
+        }
+        int midX = (pieceBox.minX() + pieceBox.maxX()) / 2;
+        int midZ = (pieceBox.minZ() + pieceBox.maxZ()) / 2;
+        boolean nearMidX = Math.abs(x - midX) <= 1;
+        boolean nearMidZ = Math.abs(z - midZ) <= 1;
+        return nearMidX && nearMidZ;
+    }
+
+    static int computeTier2EmbedDepth(int x, int z) {
+        return ((x + z) & 1) == 0 ? TIER2_MIN_EMBED_DEPTH : TIER2_MAX_EMBED_DEPTH;
     }
 
     private static boolean isSkyBridgeElement(StructurePoolElement element) {

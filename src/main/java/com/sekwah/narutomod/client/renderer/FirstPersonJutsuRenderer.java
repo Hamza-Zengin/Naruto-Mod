@@ -5,17 +5,19 @@ import com.mojang.math.Axis;
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
+import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.ChakraScalpelModel;
 import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.ChidoriBurstModel;
 import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.RasenganSphereModel;
 import com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.VisualState;
 import com.sekwah.narutomod.client.renderer.entity.jutsuprojectile.JutsuVisualEffectRenderer;
+import com.sekwah.sekclib.util.ColorUtil;
+import com.sekwah.sekclib.util.RenderMathUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import com.sekwah.sekclib.util.RenderMathUtil;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -29,24 +31,28 @@ import net.neoforged.neoforge.client.event.RenderHandEvent;
  * Renders 3D Jutsu Models directly onto the player's hand in first-person view:
  * - 3D Crackling Chidori Lightning Blade
  * - 3D Swirling Chakra / Rasengan Sphere
+ * - 3D Teal Medical Chakra Scalpel Blade
  */
 @EventBusSubscriber(value = Dist.CLIENT, modid = NarutoMod.MOD_ID)
 public class FirstPersonJutsuRenderer {
 
     private static RasenganSphereModel rasenganModel;
     private static ChidoriBurstModel chidoriModel;
+    private static ChakraScalpelModel scalpelModel;
 
     public static void resetModels() {
         rasenganModel = null;
         chidoriModel = null;
+        scalpelModel = null;
     }
 
     private static void initModelsIfNeeded() {
-        if (rasenganModel == null || chidoriModel == null) {
+        if (rasenganModel == null || chidoriModel == null || scalpelModel == null) {
             EntityModelSet modelSet = Minecraft.getInstance().getEntityModels();
             if (modelSet != null) {
                 rasenganModel = new RasenganSphereModel(modelSet.bakeLayer(NarutoRenderEvents.RASENGAN_SPHERE_LAYER));
                 chidoriModel = new ChidoriBurstModel(modelSet.bakeLayer(NarutoRenderEvents.CHIDORI_BURST_LAYER));
+                scalpelModel = new ChakraScalpelModel(modelSet.bakeLayer(NarutoRenderEvents.CHAKRA_SCALPEL_LAYER));
             }
         }
     }
@@ -64,7 +70,7 @@ public class FirstPersonJutsuRenderer {
 
         INinjaData ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
         initModelsIfNeeded();
-        if (rasenganModel == null || chidoriModel == null) {
+        if (rasenganModel == null || chidoriModel == null || scalpelModel == null) {
             return;
         }
 
@@ -77,22 +83,35 @@ public class FirstPersonJutsuRenderer {
 
         boolean isMainHand = hand == InteractionHand.MAIN_HAND;
         HumanoidArm arm = isMainHand ? player.getMainArm() : player.getMainArm().getOpposite();
+        String activeHandJutsu = ninjaData.getActiveHandJutsu();
 
         // 1. Chidori 3D Lightning Blade on main hand (floating in front of palm)
-        if (isMainHand && "chidori".equalsIgnoreCase(ninjaData.getActiveHandJutsu())) {
+        if (isMainHand && "chidori".equalsIgnoreCase(activeHandJutsu)) {
             poseStack.pushPose();
             try {
                 applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
                 poseStack.translate(arm == HumanoidArm.RIGHT ? -0.08D : 0.08D, 0.24D, -0.28D);
                 RenderMathUtil.scaleUniform(poseStack, 0.34F);
+                VisualState chidoriState = new VisualState(ageInTicks, 0.0F);
                 submitNodeCollector.submitModel(
                         chidoriModel,
-                        new VisualState(ageInTicks, 0.0F),
+                        chidoriState,
                         poseStack,
                         RenderTypes.entityTranslucent(JutsuVisualEffectRenderer.TEX_CHIDORI),
                         fullBright,
                         OverlayTexture.NO_OVERLAY,
                         -1,
+                        null,
+                        EntityRenderState.NO_OUTLINE
+                );
+                submitNodeCollector.submitModel(
+                        chidoriModel,
+                        chidoriState,
+                        poseStack,
+                        RenderTypes.eyes(JutsuVisualEffectRenderer.TEX_CHIDORI),
+                        fullBright,
+                        OverlayTexture.NO_OVERLAY,
+                        ColorUtil.argb(0.55F, 0.45F, 0.85F, 1.0F),
                         null,
                         EntityRenderState.NO_OUTLINE
                 );
@@ -102,7 +121,7 @@ public class FirstPersonJutsuRenderer {
         }
 
         // 2. Swirling Rasengan Sphere on main hand (floating above palm)
-        boolean hasRasengan = "rasengan".equalsIgnoreCase(ninjaData.getActiveHandJutsu());
+        boolean hasRasengan = "rasengan".equalsIgnoreCase(activeHandJutsu);
         if (isMainHand && hasRasengan) {
             poseStack.pushPose();
             try {
@@ -115,6 +134,48 @@ public class FirstPersonJutsuRenderer {
                         (pose, vc) -> rasenganModel.renderProcedural(
                                 pose, vc, ageInTicks, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.90F
                         )
+                );
+                submitNodeCollector.submitCustomGeometry(
+                        poseStack,
+                        RenderTypes.eyes(JutsuVisualEffectRenderer.TEX_RASENGAN),
+                        (pose, vc) -> rasenganModel.renderProcedural(
+                                pose, vc, ageInTicks, fullBright, OverlayTexture.NO_OVERLAY, 0.45F, 0.85F, 1.0F, 0.50F
+                        )
+                );
+            } finally {
+                poseStack.popPose();
+            }
+        }
+
+        // 3. Surgical Chakra Scalpel on main hand
+        if (isMainHand && "chakra_scalpel".equalsIgnoreCase(activeHandJutsu)) {
+            poseStack.pushPose();
+            try {
+                applyFirstPersonArmTransform(poseStack, arm, event.getEquipProgress(), event.getSwingProgress());
+                poseStack.translate(arm == HumanoidArm.RIGHT ? -0.06D : 0.06D, 0.16D, -0.14D);
+                RenderMathUtil.scaleUniform(poseStack, 0.48F);
+                VisualState scalpelState = new VisualState(ageInTicks, 0.0F);
+                submitNodeCollector.submitModel(
+                        scalpelModel,
+                        scalpelState,
+                        poseStack,
+                        RenderTypes.entityTranslucent(JutsuVisualEffectRenderer.TEX_CHAKRA_SCALPEL),
+                        fullBright,
+                        OverlayTexture.NO_OVERLAY,
+                        ColorUtil.argb(0.92F, 1.0F, 1.0F, 1.0F),
+                        null,
+                        EntityRenderState.NO_OUTLINE
+                );
+                submitNodeCollector.submitModel(
+                        scalpelModel,
+                        scalpelState,
+                        poseStack,
+                        RenderTypes.eyes(JutsuVisualEffectRenderer.TEX_CHAKRA_SCALPEL),
+                        fullBright,
+                        OverlayTexture.NO_OVERLAY,
+                        ColorUtil.argb(0.55F, 0.25F, 0.95F, 0.85F),
+                        null,
+                        EntityRenderState.NO_OUTLINE
                 );
             } finally {
                 poseStack.popPose();

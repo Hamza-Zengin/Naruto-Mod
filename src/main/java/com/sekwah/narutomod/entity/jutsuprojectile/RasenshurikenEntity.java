@@ -118,6 +118,9 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
                 this.entityData.set(DATA_VORTEX_TICKS, vt);
             }
             if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
+                com.sekwah.narutomod.events.JutsuLightManager.updateLight(
+                        serverLevel, this, this.blockPosition(),
+                        com.sekwah.narutomod.events.JutsuLightManager.LIGHT_CHAKRA);
                 Entity owner = this.getOwner();
                 double radius = 5.5D;
                 float baseDmg;
@@ -234,6 +237,13 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
         }
 
         if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
+            if (this.isAlive()) {
+                int lightLevel = com.sekwah.narutomod.events.JutsuLightManager.resolveLightLevelForEntityClass(this.getClass());
+                if (lightLevel > 0) {
+                    com.sekwah.narutomod.events.JutsuLightManager.updateLight(
+                            serverLevel, this, this.blockPosition(), lightLevel);
+                }
+            }
             if (this.time % 2 == 0) {
                 serverLevel.sendParticles(ParticleTypes.CLOUD, this.getX(), this.getY() + 0.3, this.getZ(), 3, 0.4, 0.1, 0.4, 0.02,
                         net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
