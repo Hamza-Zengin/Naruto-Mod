@@ -435,6 +435,11 @@ public class NarutoModGameTests {
                 com.sekwah.narutomod.item.NarutoItems.GUNBAI_UCHIWA.get());
         helper.assertFalse(gunbaiStack.isEmpty(), "Gunbai Uchiwa ItemStack must instantiate");
 
+        helper.assertTrue(
+                helper.getLevel().registryAccess().lookupOrThrow(Registries.STRUCTURE_TYPE)
+                        .get(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "anchored_jigsaw")).isPresent(),
+                "Custom narutomod:anchored_jigsaw StructureType must be registered");
+
         helper.succeed();
     }
 }
