@@ -72,7 +72,7 @@ public class RasenshurikenAbility extends Ability implements Ability.Cooldown {
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
         int castCooldown = Math.round(getExtraParam("cast_cooldown_ticks", 60.0f));
-        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), castCooldown);
+        return tryConsume(player, ninjaData, getFinalChakraCost(player, ninjaData), getStaminaCost(), castCooldown);
     }
 
     @Override

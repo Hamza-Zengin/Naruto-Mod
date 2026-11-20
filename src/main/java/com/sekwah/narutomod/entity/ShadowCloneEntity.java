@@ -391,7 +391,7 @@ public class ShadowCloneEntity extends PathfinderMob {
         if (this.hasActiveAbility("sharingan") && sharinganStage > 0) {
             double radius = 6.0D + Math.max(0, sharinganStage - 1) * 2.0D;
             int slowAmp = sharinganStage >= 3 ? 1 : 0;
-            boolean applyWeakness = sharinganStage == 2 || sharinganStage >= 4;
+            boolean applyWeakness = sharinganStage >= 2;
             net.minecraft.world.phys.AABB field = this.getBoundingBox().inflate(radius);
             java.util.List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(LivingEntity.class, field,
                     e -> e != this && e.isAlive() && !areAllies(this, e));

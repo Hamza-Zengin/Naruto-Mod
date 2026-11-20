@@ -74,20 +74,36 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
 
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
-        // Passive battle experience / training: grant +1 mastery every 10 seconds of sustained focus
-        if (ticksActive > 0 && ticksActive % 200 == 0) {
+        // Passive battle experience / training while active (preserving ticksActive > 0)
+        if (ticksActive > 0 && ninjaData != null) {
             Identifier reg = this.getRegistryName();
             if (reg != null) {
-                ninjaData.addMastery(reg, 1);
+                int mastery = ninjaData.getMastery(reg);
+                int interval;
+                int gain;
+                if (mastery < 100) {
+                    interval = 40;
+                    gain = 3;
+                } else if (mastery < 500) {
+                    interval = 50;
+                    gain = 2;
+                } else {
+                    interval = 60;
+                    gain = 1;
+                }
+                if (ticksActive % interval == 0) {
+                    ninjaData.addMastery(reg, gain);
+                }
             }
         }
 
-        // Ping all entities in mastery-scaled radius (30 - 48 blocks) with GLOWING effect every second
+        // Ping all non-ally entities in mastery-scaled radius (30 - 48 blocks) with GLOWING effect every second
         if (ticksActive % 20 == 0 && player.level() instanceof ServerLevel serverLevel) {
             int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
             double range = 30.0 * getPowerMultiplier(mastery);
             AABB field = player.getBoundingBox().inflate(range);
-            List<LivingEntity> entities = serverLevel.getEntitiesOfClass(LivingEntity.class, field, e -> e != player && e.isAlive());
+            List<LivingEntity> entities = serverLevel.getEntitiesOfClass(LivingEntity.class, field,
+                    e -> e != player && e.isAlive() && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(player, e));
             for (LivingEntity entity : entities) {
                 entity.addEffect(new MobEffectInstance(MobEffects.GLOWING, 30, 0, false, false, false));
             }

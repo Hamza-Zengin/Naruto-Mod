@@ -64,10 +64,10 @@ final class NinjaMenuJutsuTab {
             String masteryText;
             if (id != null && "sharingan".equals(id.getPath())) {
                 SharinganAbility.SharinganStage stage = SharinganAbility.getStage(mastery);
-                masteryText = "§eUstalık: §a" + mastery + " §7(" + stage.getDisplayName() + ")";
+                masteryText = "§eUstalık: §a" + mastery + " §7(" + Component.translatable(stage.getTranslationKey()).getString() + ")";
             } else if (id != null && "eight_gates".equals(id.getPath())) {
                 EightGatesAbility.GateStage gstage = EightGatesAbility.getStage(mastery);
-                masteryText = "§eUstalık: §a" + mastery + " §7(" + gstage.getDisplayName() + ")";
+                masteryText = "§eUstalık: §a" + mastery + " §7(" + Component.translatable(gstage.getTranslationKey()).getString() + ")";
             } else {
                 masteryText = "§eUstalık: §a" + mastery + " §7(Lv." + Ability.getMasteryTier(mastery) + ")";
             }

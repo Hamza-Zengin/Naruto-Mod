@@ -506,6 +506,9 @@ public class NinjaData implements INinjaData {
         this.unlockedJutsus = "";
         this.jutsuMastery.clear();
         this.activeJutsusFlag = 0;
+        if (this.toggleAbilityData != null) {
+            this.toggleAbilityData.clear();
+        }
         this.clearSeals();
         this.chakra = this.getMaxChakra();
         this.stamina = this.getMaxStamina();
@@ -918,7 +921,7 @@ public class NinjaData implements INinjaData {
         future.setEightGatesActive(false);
         future.clearActiveHandJutsu();
         if (future.getToggleAbilityData() != null) {
-            future.getToggleAbilityData().getAbilitiesHashSet().clear();
+            future.getToggleAbilityData().clear();
         }
     }
 

@@ -59,6 +59,7 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
 
     @Override
     public boolean canActivate(Player player, INinjaData ninjaData) {
+        if (!super.canActivate(player, ninjaData)) return false;
         if (ninjaData == null || ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("nara")) {
             if (player != null) {
                 player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
@@ -74,7 +75,7 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
         if (!canActivate(player, ninjaData)) {
             return false;
         }
-        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), 40);
+        return tryConsume(player, ninjaData, getFinalChakraCost(player, ninjaData), getStaminaCost(), 40);
     }
 
     public static int getScaledHoldDuration(int mastery) {

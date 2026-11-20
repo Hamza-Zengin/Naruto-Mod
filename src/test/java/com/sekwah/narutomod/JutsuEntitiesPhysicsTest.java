@@ -130,4 +130,101 @@ public class JutsuEntitiesPhysicsTest {
         assertEquals(45.0F, WaterBulletEntity.computePitchFromMotion(new net.minecraft.world.phys.Vec3(0, 1, 1)), 0.01F);
         assertEquals(-45.0F, WaterBulletEntity.computePitchFromMotion(new net.minecraft.world.phys.Vec3(0, -1, 1)), 0.01F);
     }
+
+    @Test
+    @DisplayName("Verify JutsuCombatHelper.lightningDamage signature and ShadowCloneEntity.areAllies null safety")
+    public void testLightningDamageHelperAndAllyNullSafety() throws NoSuchMethodException {
+        var method = com.sekwah.narutomod.abilities.JutsuCombatHelper.class.getMethod(
+                "lightningDamage",
+                net.minecraft.server.level.ServerLevel.class,
+                net.minecraft.world.entity.Entity.class,
+                net.minecraft.world.entity.LivingEntity.class);
+        assertEquals(net.minecraft.world.damagesource.DamageSource.class, method.getReturnType());
+
+        assertFalse(com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(null, null),
+                "areAllies(null, null) must safely return false");
+        assertNull(com.sekwah.narutomod.entity.ShadowCloneEntity.resolveRootOwnerUUID(null),
+                "resolveRootOwnerUUID(null) must safely return null");
+    }
+
+    @Test
+    @DisplayName("Verify ally-clone filtering and lightning damage attribution across visual/sibling jutsu classes")
+    public void testAllyCloneFilteringAndLightningAttributionInSource() throws IOException {
+        String visualEffect = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/entity/jutsuprojectile/JutsuVisualEffectEntity.java"));
+        assertTrue(visualEffect.contains("JutsuCombatHelper.lightningDamage(serverLevel, this, caster)"),
+                "TYPE_KIRIN_DRAGON must attribute lightning damage via JutsuCombatHelper.lightningDamage");
+        assertTrue(visualEffect.contains("JutsuCombatHelper.lightningDamage(serverLevel, this, fieldOwner)"),
+                "TYPE_CHIDORI_BURST must attribute lightning damage via JutsuCombatHelper.lightningDamage");
+        assertTrue(visualEffect.contains("ElementalInteractionHandler.boostFireballWithWind(fireball)"),
+                "TYPE_WIND_SHOCKWAVE must boost allied FireballJutsuEntity via ElementalInteractionHandler");
+
+        String woodPrison = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/entity/jutsuprojectile/WoodPrisonEntity.java"));
+        assertTrue(woodPrison.contains("ShadowCloneEntity.areAllies(caster, e)"),
+                "WoodPrisonEntity.tick must exclude allied shadow clones");
+
+        String fireball = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/entity/jutsuprojectile/FireballJutsuEntity.java"));
+        assertTrue(fireball.contains("if (entity == owner || com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(owner, entity))"),
+                "FireballJutsuEntity.onHit must exclude owner and allied shadow clones for both normal and mini fireballs");
+
+        String playerEvents = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/events/PlayerEvents.java"));
+        assertTrue(playerEvents.contains("!ShadowCloneEntity.areAllies(player, livingTarget)"),
+                "PlayerEvents.onAttackEntity must guard Byakugan chakra-lock strike against allied shadow clones");
+
+        String rasengan = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/abilities/jutsus/RasenganAbility.java"));
+        assertTrue(rasengan.contains("ShadowCloneEntity.areAllies(player, e)"),
+                "RasenganAbility.executeStrike fallback box must exclude allied shadow clones");
+
+        String chidori = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/abilities/jutsus/ChidoriAbility.java"));
+        assertTrue(chidori.contains("ShadowCloneEntity.areAllies(player, e)")
+                        && chidori.contains("JutsuCombatHelper.lightningDamage(serverLevel, chidori3D, player)"),
+                "ChidoriAbility.executeStrike must exclude allies and use JutsuCombatHelper.lightningDamage");
+
+        String chidoriStream = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/abilities/jutsus/ChidoriStreamAbility.java"));
+        assertTrue(chidoriStream.contains("JutsuCombatHelper.lightningDamage(serverLevel, null, player)"),
+                "ChidoriStreamAbility must use JutsuCombatHelper.lightningDamage");
+
+        String kirin = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/abilities/jutsus/KirinAbility.java"));
+        assertTrue(kirin.contains("JutsuCombatHelper.lightningDamage(serverLevel, kirinDragon, player)"),
+                "KirinAbility must attribute lightning damage via JutsuCombatHelper.lightningDamage");
+        assertTrue(kirin.contains("ShadowCloneEntity.areAllies(player, e)"),
+                "KirinAbility must exclude allied shadow clones in target raycast and blast area");
+    }
+
+    @Test
+    @DisplayName("Verify assigned Ability subclasses adopt getFinalChakraCost in handleCost")
+    public void testAssignedAbilitiesAdoptFinalChakraCost() throws IOException {
+        java.util.List<String> assignedAbilities = java.util.List.of(
+                "AdamantineChainsAbility",
+                "BoneDanceAbility",
+                "KawarimiJutsuAbility",
+                "KirinAbility",
+                "MudWallAbility",
+                "MysticalPalmAbility",
+                "RasenshurikenAbility",
+                "WindBreakerAbility",
+                "WoodPrisonAbility"
+        );
+        for (String name : assignedAbilities) {
+            String src = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/abilities/jutsus/" + name + ".java"));
+            assertTrue(src.contains("getFinalChakraCost(player, ninjaData)"),
+                    name + ".handleCost must call getFinalChakraCost(player, ninjaData)");
+        }
+
+        // Verify handleCost executes cleanly with NinjaData and consumes getFinalChakraCost
+        com.sekwah.narutomod.capabilities.NinjaData data = new com.sekwah.narutomod.capabilities.NinjaData(true);
+        data.setMaxChakra(200.0f);
+        data.setChakra(200.0f);
+        data.setMaxStamina(200.0f);
+        data.setStamina(200.0f);
+
+        var mudWall = new com.sekwah.narutomod.abilities.jutsus.MudWallAbility();
+        assertTrue(mudWall.handleCost(null, data, 0));
+        assertEquals(200.0f - mudWall.getFinalChakraCost(null, data), data.getChakra(), 0.01f);
+
+        data.setChakra(200.0f);
+        var kirin = new com.sekwah.narutomod.abilities.jutsus.KirinAbility();
+        assertTrue(kirin.handleCost(null, data, 0));
+        assertEquals(200.0f - kirin.getFinalChakraCost(null, data), data.getChakra(), 0.01f);
+        assertEquals(200.0f - kirin.getStaminaCost(), data.getStamina(), 0.01f);
+    }
 }

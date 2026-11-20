@@ -76,7 +76,8 @@ public class MysticalPalmAbility extends Ability implements Ability.Channeled, A
         if (chargeAmount % PULSE_INTERVAL_TICKS != 0) {
             return true;
         }
-        float pulseCost = Math.max(1.0f, getScaledChakraCost(ninjaData) * 0.5f);
+        float finalCost = getFinalChakraCost(player, ninjaData);
+        float pulseCost = finalCost > 0.0f ? Math.max(1.0f, finalCost * 0.5f) : 0.0f;
         return tryConsume(player, ninjaData, pulseCost, 0.0f, 30);
     }
 

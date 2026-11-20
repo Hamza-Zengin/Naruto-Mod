@@ -118,13 +118,16 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
         } else {
             AABB box = new AABB(strikePos.x - 1.8, strikePos.y - 1.2, strikePos.z - 1.8,
                     strikePos.x + 1.8, strikePos.y + 2.0, strikePos.z + 1.8);
-            hitEnemies.addAll(serverLevel.getEntitiesOfClass(LivingEntity.class, box, e -> e != player && e.isAlive()));
+            hitEnemies.addAll(serverLevel.getEntitiesOfClass(LivingEntity.class, box,
+                    e -> e != player && e.isAlive() && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(player, e)));
         }
         serverLevel.addFreshEntity(chidori3D);
 
         float strikeDamage = com.sekwah.narutomod.abilities.NarutoAbilities.CHIDORI.get().getDamage(ninjaData);
+        net.minecraft.world.damagesource.DamageSource chidoriDamage =
+                com.sekwah.narutomod.abilities.JutsuCombatHelper.lightningDamage(serverLevel, chidori3D, player);
         for (LivingEntity enemy : hitEnemies) {
-            enemy.hurtServer(serverLevel, player.damageSources().lightningBolt(), strikeDamage);
+            enemy.hurtServer(serverLevel, chidoriDamage, strikeDamage);
             serverLevel.sendParticles(net.minecraft.core.particles.ColorParticleOption.create(ParticleTypes.FLASH, 0xFF88DDFF),
                     enemy.getX(), enemy.getY() + 1.0, enemy.getZ(), 1, 0, 0, 0, 0,
                     net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);

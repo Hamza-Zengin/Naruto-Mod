@@ -2,10 +2,16 @@ package com.sekwah.narutomod;
 
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.ChakraElement;
+import com.sekwah.narutomod.abilities.jutsus.AmaterasuAbility;
 import com.sekwah.narutomod.abilities.jutsus.ChidoriAbility;
+import com.sekwah.narutomod.abilities.jutsus.EightGatesAbility;
 import com.sekwah.narutomod.abilities.jutsus.RasenganAbility;
 import com.sekwah.narutomod.abilities.jutsus.ShadowCloneAbility;
+import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
+import com.sekwah.narutomod.abilities.jutsus.SusanooRibcageAbility;
+import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -68,5 +74,92 @@ public class CoreJutsuAbilitiesTest {
         assertEquals(600, ShadowCloneAbility.getCloneLifespan(100));
         assertEquals(900, ShadowCloneAbility.getCloneLifespan(300));
         assertEquals(1200, ShadowCloneAbility.getCloneLifespan(700));
+    }
+
+    @Test
+    @DisplayName("EightGatesAbility.canActivate enforces JONIN rank requirement")
+    void testEightGatesCanActivateEnforcesRank() {
+        EightGatesAbility eightGates = new EightGatesAbility();
+        eightGates.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates"));
+
+        NinjaData ninjaData = new NinjaData(true);
+        ninjaData.setRank("ACADEMY_STUDENT");
+        assertFalse(eightGates.canActivate(null, ninjaData), "ACADEMY_STUDENT must not activate Eight Gates");
+
+        ninjaData.setRank("GENIN");
+        assertFalse(eightGates.canActivate(null, ninjaData), "GENIN must not activate Eight Gates");
+
+        ninjaData.setRank("CHUNIN");
+        assertFalse(eightGates.canActivate(null, ninjaData), "CHUNIN must not activate Eight Gates");
+
+        ninjaData.setRank("JONIN");
+        assertTrue(eightGates.canActivate(null, ninjaData), "JONIN must be allowed to activate Eight Gates");
+    }
+
+    @Test
+    @DisplayName("SharinganStage and GateStage translation keys are properly formatted and non-empty")
+    void testStageTranslationKeys() {
+        for (SharinganAbility.SharinganStage stage : SharinganAbility.SharinganStage.values()) {
+            assertNotNull(stage.getId());
+            assertFalse(stage.getId().isBlank());
+            assertNotNull(stage.getDisplayName());
+            assertFalse(stage.getDisplayName().isBlank());
+            String key = stage.getTranslationKey();
+            assertNotNull(key);
+            assertFalse(key.isBlank());
+            assertTrue(key.startsWith("jutsu.sharingan.stage."));
+            assertEquals("jutsu.sharingan.stage." + stage.getId(), key);
+        }
+
+        for (EightGatesAbility.GateStage stage : EightGatesAbility.GateStage.values()) {
+            assertNotNull(stage.getId());
+            assertFalse(stage.getId().isBlank());
+            assertNotNull(stage.getDisplayName());
+            assertFalse(stage.getDisplayName().isBlank());
+            assertFalse(stage.getDisplayName().contains("Kapı"), "GateStage fallback label should not use hardcoded Turkish");
+            String key = stage.getTranslationKey();
+            assertNotNull(key);
+            assertFalse(key.isBlank());
+            assertTrue(key.startsWith("jutsu.eight_gates.stage."));
+            assertEquals("jutsu.eight_gates.stage." + stage.getId(), key);
+        }
+    }
+
+    @Test
+    @DisplayName("SusanooRibcageAbility initial vs sustained cost and elemental hat / getFinalChakraCost compatibility")
+    void testSusanooInitialVsSustainedCostAndHatDiscount() {
+        Identifier susanooId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "susanoo_ribcage");
+        Identifier sharinganId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
+        SusanooRibcageAbility susanoo = new SusanooRibcageAbility();
+        susanoo.setRegistryName(susanooId);
+
+        NinjaData ninjaData = new NinjaData(true);
+        ninjaData.setRank("JONIN");
+        ninjaData.forceSetClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "uchiha"));
+        ninjaData.unlockAbility(sharinganId);
+        ninjaData.addMastery(sharinganId, 5000);
+        ninjaData.setBaseMaxChakra(200.0f);
+        ninjaData.setChakra(200.0f);
+
+        // Simulate toggle-on: ability is added to ToggleAbilityData with activeTicks == 0 before tick 1 handleCost
+        ninjaData.getToggleAbilityData().addAbilityStarted(null, ninjaData, susanoo);
+        assertEquals(0, ninjaData.getToggleAbilityData().getActiveTicks(susanooId));
+        assertTrue(susanoo.handleCost(null, ninjaData, 0));
+        assertEquals(160.0f, ninjaData.getChakra(), 0.001f, "First tick must deduct 40f initial activation cost");
+
+        // After tick 1 increments activeTicks, subsequent ticks must deduct sustained 1.0f cost
+        assertEquals(1, ninjaData.getToggleAbilityData().incrementAbilityTicks(susanooId));
+        assertTrue(susanoo.handleCost(null, ninjaData, 0));
+        assertEquals(159.0f, ninjaData.getChakra(), 0.001f, "Sustained tick must deduct 1.0f chakra");
+
+        // Elemental hat discount & getFinalChakraCost compatibility
+        assertEquals(0.0f, Ability.applyElementalHatDiscount(ChakraElement.FIRE, ChakraElement.FIRE, 0.0f), 0.001f);
+        assertEquals(85.0f, Ability.applyElementalHatDiscount(ChakraElement.FIRE, ChakraElement.FIRE, 100.0f), 0.001f);
+        assertEquals(100.0f, Ability.applyElementalHatDiscount(ChakraElement.WATER, ChakraElement.FIRE, 100.0f), 0.001f);
+
+        AmaterasuAbility amaterasu = new AmaterasuAbility();
+        amaterasu.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "amaterasu"));
+        assertEquals(amaterasu.getScaledChakraCost(ninjaData), amaterasu.getFinalChakraCost(null, ninjaData), 0.001f);
+        assertEquals(0.0f, susanoo.getFinalChakraCost(null, ninjaData), 0.001f);
     }
 }

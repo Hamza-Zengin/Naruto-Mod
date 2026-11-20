@@ -31,13 +31,13 @@ import net.minecraft.world.entity.player.Player;
 public class EightGatesAbility extends Ability implements Ability.Toggled, Ability.HandleEnded {
 
     public enum GateStage {
-        GATE_1("kaimon", 0, 39, "1. Kapı: Açılış Kapısı (Kaimon)", 0.05f),
-        GATE_2("kyumon", 40, 119, "2. Kapı: Dinlenme Kapısı (Kyūmon)", 0.03f),
-        GATE_3("seimon", 120, 249, "3. Kapı: Yaşam Kapısı (Seimon)", 0.08f),
-        GATE_4("shomon", 250, 449, "4. Kapı: Acı Kapısı (Shōmon)", 0.12f),
-        GATE_5("tomon", 450, 699, "5. Kapı: Kapanış Kapısı (Tomon)", 0.16f),
-        GATE_6("keimon", 700, 999, "6. Kapı: Neşe Kapısı (Keimon)", 0.20f),
-        GATE_7("kyumon_wonder", 1000, Integer.MAX_VALUE, "7. Kapı: Şok Kapısı (Kyōmon)", 0.25f);
+        GATE_1("kaimon", 0, 39, "1st Gate: Gate of Opening (Kaimon)", 0.05f),
+        GATE_2("kyumon", 40, 119, "2nd Gate: Gate of Healing (Ky\u016bmon)", 0.03f),
+        GATE_3("seimon", 120, 249, "3rd Gate: Gate of Life (Seimon)", 0.08f),
+        GATE_4("shomon", 250, 449, "4th Gate: Gate of Pain (Sh\u014dmon)", 0.12f),
+        GATE_5("tomon", 450, 699, "5th Gate: Gate of Limit (Tomon)", 0.16f),
+        GATE_6("keimon", 700, 999, "6th Gate: Gate of View (Keimon)", 0.20f),
+        GATE_7("kyumon_wonder", 1000, Integer.MAX_VALUE, "7th Gate: Gate of Wonder (Ky\u014dmon)", 0.25f);
 
         private final String id;
         private final int minMastery;
@@ -99,6 +99,9 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
 
     @Override
     public boolean canActivate(Player player, INinjaData ninjaData) {
+        if (!super.canActivate(player, ninjaData)) {
+            return false;
+        }
         if (player != null && player.isSpectator()) {
             return false;
         }
@@ -135,9 +138,6 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
         }
 
         GateStage stage = getStage(ninjaData);
-        if (stage.name().equals("SHIMON")) {
-            ninjaData.setShimonPenaltyActive(true);
-        }
 
         // Fast periodic mastery gain while active
         Identifier reg = this.getRegistryName();

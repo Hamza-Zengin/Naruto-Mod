@@ -66,6 +66,7 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
 
     @Override
     public boolean canActivate(Player player, INinjaData ninjaData) {
+        if (!super.canActivate(player, ninjaData)) return false;
         if (player != null && player.isSpectator()) {
             return false;
         }

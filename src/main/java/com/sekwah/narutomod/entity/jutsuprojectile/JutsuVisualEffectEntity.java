@@ -148,16 +148,25 @@ public class JutsuVisualEffectEntity extends Entity {
                     double radius = 1.2D + progress * 1.8D;
                     AABB gustBox = this.getBoundingBox().inflate(radius, 1.2D, radius);
 
-                    List<Entity> entities = serverLevel.getEntities(this, gustBox);
-                    for (Entity e : entities) {
-                        if (e instanceof LivingEntity living && living.isAlive() && (caster == null || living != caster)) {
-                            living.hurtServer(serverLevel, caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().generic(), 10.0F);
-                            Vec3 push = this.getDeltaMovement().normalize().scale(2.2D).add(0, 0.45D, 0);
-                            living.setDeltaMovement(push);
-                            living.needsSync = true;
-                        } else if (e instanceof Projectile projectile) {
-                            projectile.setDeltaMovement(this.getDeltaMovement().scale(1.8D));
+                    DamageSource gustDamage = caster != null
+                            ? serverLevel.damageSources().playerAttack(caster)
+                            : serverLevel.damageSources().generic();
+                    Vec3 push = this.getDeltaMovement().normalize().scale(2.2D).add(0, 0.45D, 0);
+                    for (LivingEntity living : JutsuCombatHelper.findHostileTargetsInBox(serverLevel, caster, gustBox)) {
+                        living.hurtServer(serverLevel, gustDamage, 10.0F);
+                        JutsuCombatHelper.applyVelocity(living, push, true);
+                    }
+
+                    List<Projectile> projectiles = serverLevel.getEntitiesOfClass(Projectile.class, gustBox, Projectile::isAlive);
+                    for (Projectile projectile : projectiles) {
+                        if (caster != null && (projectile.getOwner() == caster || ShadowCloneEntity.areAllies(caster, projectile.getOwner()))) {
+                            if (projectile instanceof FireballJutsuEntity fireball) {
+                                com.sekwah.narutomod.events.ElementalInteractionHandler.boostFireballWithWind(fireball);
+                            }
+                            continue;
                         }
+                        projectile.setDeltaMovement(this.getDeltaMovement().scale(1.8D));
+                        projectile.needsSync = true;
                     }
                 }
 
@@ -168,7 +177,7 @@ public class JutsuVisualEffectEntity extends Entity {
                         double currentRadius = (this.tickCount / 7) * 2.2D + 1.2D;
                         AABB ringBox = this.getBoundingBox().inflate(currentRadius, 1.5D, currentRadius);
                         List<LivingEntity> victims = serverLevel.getEntitiesOfClass(LivingEntity.class, ringBox,
-                                e -> e.isAlive() && (caster == null || e != caster));
+                                e -> e.isAlive() && (caster == null || (e != caster && !ShadowCloneEntity.areAllies(caster, e))));
                         for (LivingEntity v : victims) {
                             v.hurtServer(serverLevel, caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().generic(), 7.0F);
                             v.setDeltaMovement(v.getDeltaMovement().x, 0.48D, v.getDeltaMovement().z);
@@ -184,7 +193,7 @@ public class JutsuVisualEffectEntity extends Entity {
                         Player caster = this.getCasterPlayer();
                         AABB flameBox = this.getBoundingBox().inflate(1.8D, 1.2D, 1.8D);
                         List<LivingEntity> burning = serverLevel.getEntitiesOfClass(LivingEntity.class, flameBox,
-                                e -> e.isAlive() && (caster == null || e != caster));
+                                e -> e.isAlive() && (caster == null || (e != caster && !ShadowCloneEntity.areAllies(caster, e))));
                         for (LivingEntity b : burning) {
                             b.hurtServer(serverLevel, caster != null ? serverLevel.damageSources().playerAttack(caster) : serverLevel.damageSources().inFire(), 5.0F);
                             b.setRemainingFireTicks(240);
@@ -204,9 +213,10 @@ public class JutsuVisualEffectEntity extends Entity {
 
                         AABB slamBox = this.getBoundingBox().inflate(6.5D, 3.0D, 6.5D);
                         List<LivingEntity> struck = serverLevel.getEntitiesOfClass(LivingEntity.class, slamBox,
-                                e -> e.isAlive() && (caster == null || e != caster));
+                                e -> e.isAlive() && (caster == null || (e != caster && !ShadowCloneEntity.areAllies(caster, e))));
+                        DamageSource kirinDamage = JutsuCombatHelper.lightningDamage(serverLevel, this, caster);
                         for (LivingEntity s : struck) {
-                            s.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), 32.0F);
+                            s.hurtServer(serverLevel, kirinDamage, 32.0F);
                             double dx = s.getX() - this.getX();
                             double dz = s.getZ() - this.getZ();
                             double distSq = dx * dx + dz * dz;
@@ -267,9 +277,10 @@ public class JutsuVisualEffectEntity extends Entity {
                                     e -> e.isAlive() && e != fieldOwner
                                             && !ShadowCloneEntity.areAllies(fieldOwner, e)
                                             && e.position().distanceToSqr(center) <= radiusSq);
+                            DamageSource chidoriDamage = JutsuCombatHelper.lightningDamage(serverLevel, this, fieldOwner);
                             for (LivingEntity victim : shocked) {
                                 float finalDmg = victim.isInWaterOrRain() ? pulseDmg * 1.25F : pulseDmg;
-                                victim.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), finalDmg);
+                                victim.hurtServer(serverLevel, chidoriDamage, finalDmg);
                                 victim.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 35, 2));
                                 Vec3 away = victim.position().subtract(center);
                                 double horiz = Math.hypot(away.x, away.z);

@@ -79,7 +79,7 @@ public class AdamantineChainsAbility extends Ability implements Ability.Cooldown
         if (!canActivate(player, ninjaData)) {
             return false;
         }
-        return tryConsume(player, ninjaData, getScaledChakraCost(ninjaData), getStaminaCost(), 45);
+        return tryConsume(player, ninjaData, getFinalChakraCost(player, ninjaData), getStaminaCost(), 45);
     }
 
     @Override

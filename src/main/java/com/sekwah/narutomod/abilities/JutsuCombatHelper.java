@@ -2,8 +2,13 @@ package com.sekwah.narutomod.abilities;
 
 import com.sekwah.narutomod.entity.ShadowCloneEntity;
 import com.sekwah.sekclib.util.PlayerUtil;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
@@ -74,5 +79,18 @@ public final class JutsuCombatHelper {
             return level.damageSources().mobAttack(caster);
         }
         return level.damageSources().magic();
+    }
+
+    /**
+     * Resolves a {@link DamageTypes#LIGHTNING_BOLT} damage source with proper direct and causing entity attribution.
+     */
+    public static DamageSource lightningDamage(ServerLevel level, @Nullable Entity directEntity, @Nullable LivingEntity caster) {
+        if (directEntity == null && caster == null) {
+            return level.damageSources().lightningBolt();
+        }
+        Holder<DamageType> type = level.registryAccess()
+                .lookupOrThrow(Registries.DAMAGE_TYPE)
+                .getOrThrow(DamageTypes.LIGHTNING_BOLT);
+        return new DamageSource(type, directEntity != null ? directEntity : caster, caster);
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
 import java.util.UUID;
@@ -28,10 +29,12 @@ public final class ServerSecurityValidator {
 
     public static final int RATE_LIMIT_WINDOW_TICKS = 20;
     public static final int MAX_PACKETS_PER_WINDOW = 20;
+    public static final int TOGGLE_CAST_COUNT_COOLDOWN_TICKS = 100;
     private static final int STALE_ENTRY_TICKS = 1200;
     private static final int MAX_TRACKED_PLAYERS = 500;
 
     private static final Map<UUID, RateLimitState> RATE_LIMITS = new ConcurrentHashMap<>();
+    private static final Map<UUID, Map<Identifier, Long>> TOGGLE_CAST_TIMESTAMPS = new ConcurrentHashMap<>();
 
     private ServerSecurityValidator() {
     }
@@ -111,14 +114,43 @@ public final class ServerSecurityValidator {
         return allowed[0];
     }
 
+    public static boolean shouldCountToggleCast(ServerPlayer player, Identifier abilityId) {
+        if (player == null || abilityId == null) {
+            return false;
+        }
+        long currentTick = (player.level() instanceof ServerLevel serverLevel && serverLevel.getServer() != null)
+                ? serverLevel.getServer().getTickCount()
+                : player.tickCount;
+        return shouldCountToggleCast(player.getUUID(), abilityId, currentTick);
+    }
+
+    public static boolean shouldCountToggleCast(UUID playerId, Identifier abilityId, long currentTick) {
+        if (playerId == null || abilityId == null) {
+            return false;
+        }
+        long tick = Math.max(0L, currentTick);
+        Map<Identifier, Long> perAbility = TOGGLE_CAST_TIMESTAMPS.computeIfAbsent(playerId, id -> new ConcurrentHashMap<>());
+        final boolean[] shouldCount = {false};
+        perAbility.compute(abilityId, (id, lastTick) -> {
+            if (lastTick == null || tick < lastTick || (tick - lastTick) >= TOGGLE_CAST_COUNT_COOLDOWN_TICKS) {
+                shouldCount[0] = true;
+                return tick;
+            }
+            return lastTick;
+        });
+        return shouldCount[0];
+    }
+
     public static void clearPlayer(UUID playerId) {
         if (playerId != null) {
             RATE_LIMITS.remove(playerId);
+            TOGGLE_CAST_TIMESTAMPS.remove(playerId);
         }
     }
 
     public static void resetRateLimits() {
         RATE_LIMITS.clear();
+        TOGGLE_CAST_TIMESTAMPS.clear();
     }
 
     /**
@@ -148,6 +180,10 @@ public final class ServerSecurityValidator {
     }
 
     public static boolean hasSufficientChakra(INinjaData ninjaData, Ability ability, boolean isCreative) {
+        return hasSufficientChakra(null, ninjaData, ability, isCreative);
+    }
+
+    public static boolean hasSufficientChakra(@javax.annotation.Nullable Player player, INinjaData ninjaData, Ability ability, boolean isCreative) {
         if (ninjaData == null || ability == null) {
             return false;
         }
@@ -156,7 +192,7 @@ public final class ServerSecurityValidator {
         }
         float baseChakraCost = ability.getChakraCost();
         if (baseChakraCost > 0f) {
-            return ninjaData.getChakra() >= ability.getScaledChakraCost(ninjaData);
+            return ninjaData.getChakra() >= ability.getFinalChakraCost(player, ninjaData);
         }
         if (ability instanceof SusanooRibcageAbility) {
             float costMult = Ability.getChakraCostMultiplier(ninjaData.getAbilityMastery(ability));
@@ -190,7 +226,7 @@ public final class ServerSecurityValidator {
             }
             return false;
         }
-        if (!hasSufficientChakra(ninjaData, ability, player.isCreative())) {
+        if (!hasSufficientChakra(player, ninjaData, ability, player.isCreative())) {
             player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra",
                     Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
             return false;

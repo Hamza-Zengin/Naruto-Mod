@@ -358,6 +358,7 @@ public abstract class Ability {
 
     public float getScaledChakraCost(INinjaData ninjaData) {
         float baseCost = getEffectiveChakraCost(ninjaData);
+        if (baseCost <= 0f) return 0f;
         if (ninjaData == null) return baseCost;
         Identifier reg = getRegistryName();
         int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
@@ -419,20 +420,31 @@ public abstract class Ability {
     }
 
     public static float applyElementalHatDiscount(ChakraElement hatAffinity, ChakraElement abilityElement, float chakraCost) {
+        if (chakraCost <= 0f) {
+            return 0f;
+        }
         if (hatAffinity != null && hatAffinity != ChakraElement.NONE && hatAffinity == abilityElement) {
             return Math.max(1.0f, chakraCost * 0.85f);
         }
         return chakraCost;
     }
 
-    public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
+    public float getFinalChakraCost(@javax.annotation.Nullable Player player, INinjaData ninjaData) {
         float scaledCost = getScaledChakraCost(ninjaData);
+        if (scaledCost <= 0f) {
+            return 0f;
+        }
         if (player != null) {
             ChakraElement hatAffinity = com.sekwah.narutomod.events.PlayerEvents.getKageHatElement(
                     player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).getItem());
             scaledCost = applyElementalHatDiscount(hatAffinity, this.getChakraElement(), scaledCost);
         }
-        return tryConsume(player, ninjaData, scaledCost, getStaminaCost(), 30);
+        return scaledCost;
+    }
+
+    public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
+        float finalCost = getFinalChakraCost(player, ninjaData);
+        return tryConsume(player, ninjaData, finalCost, getStaminaCost(), 30);
     }
 
     public boolean handleCost(Player player, INinjaData ninjaData) {
@@ -443,14 +455,21 @@ public abstract class Ability {
      * Reusable helper to check and consume chakra and stamina with standard user notifications.
      */
     public boolean tryConsume(Player player, INinjaData ninjaData, float chakraCost, float staminaCost, int regenDelay) {
+        if (ninjaData == null) {
+            return false;
+        }
         if (ninjaData.getChakra() < chakraCost) {
-            player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
+            if (player != null) {
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra",
+                        Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
+            }
             return false;
         }
         if (ninjaData.getStamina() < staminaCost) {
-            player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughstamina",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
+            if (player != null) {
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughstamina",
+                        Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
+            }
             return false;
         }
 
