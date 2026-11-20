@@ -2,6 +2,7 @@ package com.sekwah.narutomod.abilities.jutsus;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
+import com.sekwah.narutomod.abilities.JutsuCombatHelper;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
@@ -118,23 +119,37 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
         return "uchiha";
     }
 
+    public float getTickChakraCost(INinjaData ninjaData) {
+        int mastery = ninjaData != null ? ninjaData.getAbilityMastery(this) : 0;
+        float reduction = Math.min(0.40f, (mastery / 1000.0f) * 0.40f);
+        return Math.max(0.05f, 0.25f * (1.0f - reduction));
+    }
+
+    @Override
+    public float getActivationChakraRequirement(@javax.annotation.Nullable Player player, INinjaData ninjaData) {
+        return getTickChakraCost(ninjaData);
+    }
+
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
+        if (ninjaData == null) {
+            return false;
+        }
         if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
-            player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
-                    Component.literal("Uchiha").withStyle(ChatFormatting.RED)));
+            if (player != null) {
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
+                        Component.literal("Uchiha").withStyle(ChatFormatting.RED)));
+            }
             return false;
         }
 
-        float baseCost = 0.25f;
-        if (ninjaData != null) {
-            float reduction = Math.min(0.40f, (ninjaData.getMastery(this.getRegistryName()) / 1000.0f) * 0.40f);
-            baseCost = Math.max(0.05f, baseCost * (1.0f - reduction));
-        }
+        float baseCost = getTickChakraCost(ninjaData);
 
         if (ninjaData.getChakra() < baseCost) {
-            player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra",
-                    Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
+            if (player != null) {
+                player.sendOverlayMessage(Component.translatable("jutsu.fail.notenoughchakra",
+                        Component.translatable(this.getTranslationKey()).withStyle(ChatFormatting.YELLOW)));
+            }
             return false;
         }
 
@@ -311,11 +326,14 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
 
             var ninjaData = attacker.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA);
             if (ninjaData != null && ninjaData.isSharinganActive()) {
-                int lastTick = attacker.getPersistentData().getIntOr(LAST_COMBAT_MASTERY_TICK, -COMBAT_MASTERY_COOLDOWN_TICKS);
-                if (attacker.tickCount - lastTick >= COMBAT_MASTERY_COOLDOWN_TICKS || attacker.tickCount < lastTick) {
-                    attacker.getPersistentData().putInt(LAST_COMBAT_MASTERY_TICK, attacker.tickCount);
-                    ninjaData.addMastery(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan"), COMBAT_MASTERY_GAIN);
-                }
+                JutsuCombatHelper.awardMeleeCombatMastery(
+                        ninjaData,
+                        attacker.getPersistentData(),
+                        LAST_COMBAT_MASTERY_TICK,
+                        Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan"),
+                        attacker.tickCount,
+                        COMBAT_MASTERY_COOLDOWN_TICKS,
+                        COMBAT_MASTERY_GAIN);
             }
         }
     }
