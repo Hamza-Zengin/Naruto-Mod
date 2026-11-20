@@ -140,6 +140,11 @@ public class JutsuVisualEffectEntity extends Entity {
 
         // 2. Server-side Jutsu Combat & Physical Functionality (Modularized entities handled in their own classes)
         if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
+            int lightLevel = com.sekwah.narutomod.events.JutsuLightManager.resolveLightLevelForVisualType(type);
+            if (lightLevel > 0) {
+                com.sekwah.narutomod.events.JutsuLightManager.updateLight(
+                        serverLevel, this, this.blockPosition().above(), lightLevel);
+            }
             switch (type) {
                 // --- FŪTON: 3D WIND SHOCKWAVE FUNNEL (Piercing Gust & Deflection) ---
                 case TYPE_WIND_SHOCKWAVE -> {

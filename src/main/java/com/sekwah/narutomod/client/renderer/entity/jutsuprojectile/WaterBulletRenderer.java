@@ -80,9 +80,11 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
             // 1. High-resolution Dual-Layer 3D Fluid Water Core Sphere
             float dragonSizeMult = state.isDragon ? 1.65F : 1.0F;
             float sphereAlpha = 0.90F * fadeOut;
+            var waterBaseType = RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_WATER);
+            var waterEyesType = RenderTypes.eyes(JutsuVisualEffectRenderer.TEX_WATER);
             submitNodeCollector.submitCustomGeometry(
                     poseStack,
-                    RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_WATER),
+                    waterBaseType,
                     (pose, consumer) -> {
                         RasenganSphereModel.renderSmoothSphere(
                                 pose, consumer, 0.42F * dragonSizeMult, 20, 28, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
@@ -94,6 +96,14 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
                         );
                     }
             );
+            submitNodeCollector.submitCustomGeometry(
+                    poseStack,
+                    waterEyesType,
+                    (pose, consumer) -> RasenganSphereModel.renderSmoothSphere(
+                            pose, consumer, 0.42F * dragonSizeMult, 20, 28, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                            0.25F, 0.72F, 1.0F, 0.40F * fadeOut
+                    )
+            );
 
             // 2. Surrounding Swirling Water Vortex Rings
             float scale = (state.isDragon ? 1.55F : 0.85F) + (state.progress > 0.7F ? (state.progress - 0.7F) * 1.5F : 0.0F);
@@ -101,28 +111,52 @@ public class WaterBulletRenderer extends EntityRenderer<WaterBulletEntity, Water
             int vortexColor = state.isDragon
                     ? ColorUtil.argb(0.88F * fadeOut, 0.14F, 0.58F, 1.0F)
                     : ColorUtil.argb(0.80F * fadeOut, 0.20F, 0.65F, 1.0F);
+            VisualState waterState = new VisualState(state.age, state.progress);
             submitNodeCollector.submitModel(
                     this.waterModel,
-                    new VisualState(state.age, state.progress),
+                    waterState,
                     poseStack,
-                    RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_WATER),
+                    waterBaseType,
                     RenderMathUtil.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY,
                     vortexColor,
                     null,
                     state.outlineColor
             );
+            submitNodeCollector.submitModel(
+                    this.waterModel,
+                    waterState,
+                    poseStack,
+                    waterEyesType,
+                    RenderMathUtil.FULL_BRIGHT,
+                    OverlayTexture.NO_OVERLAY,
+                    ColorUtil.argb(0.40F * fadeOut, 0.25F, 0.72F, 1.0F),
+                    null,
+                    state.outlineColor
+            );
 
             if (state.isDragon) {
                 poseStack.translate(0.0D, 0.0D, 0.65D);
+                VisualState dragonTailState = new VisualState(state.age + 4.0F, state.progress);
                 submitNodeCollector.submitModel(
                         this.waterModel,
-                        new VisualState(state.age + 4.0F, state.progress),
+                        dragonTailState,
                         poseStack,
-                        RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_WATER),
+                        waterBaseType,
                         RenderMathUtil.FULL_BRIGHT,
                         OverlayTexture.NO_OVERLAY,
                         ColorUtil.argb(0.70F * fadeOut, 0.30F, 0.80F, 1.0F),
+                        null,
+                        state.outlineColor
+                );
+                submitNodeCollector.submitModel(
+                        this.waterModel,
+                        dragonTailState,
+                        poseStack,
+                        waterEyesType,
+                        RenderMathUtil.FULL_BRIGHT,
+                        OverlayTexture.NO_OVERLAY,
+                        ColorUtil.argb(0.38F * fadeOut, 0.30F, 0.80F, 1.0F),
                         null,
                         state.outlineColor
                 );

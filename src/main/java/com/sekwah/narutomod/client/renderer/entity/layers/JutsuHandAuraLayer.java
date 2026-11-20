@@ -76,14 +76,26 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
             this.getParentModel().rightArm.translateAndRotate(poseStack);
             poseStack.translate(-0.06D, 0.74D, -0.25D);
             RenderMathUtil.scaleUniform(poseStack, 0.32F);
+            VisualState chidoriState = new VisualState(ageInTicks, 0.0F);
             submitNodeCollector.submitModel(
                     this.chidoriHandModel,
-                    new VisualState(ageInTicks, 0.0F),
+                    chidoriState,
                     poseStack,
                     RenderTypes.entityTranslucent(JutsuVisualEffectRenderer.TEX_CHIDORI),
                     fullBright,
                     OverlayTexture.NO_OVERLAY,
                     -1,
+                    null,
+                    state.outlineColor
+            );
+            submitNodeCollector.submitModel(
+                    this.chidoriHandModel,
+                    chidoriState,
+                    poseStack,
+                    RenderTypes.eyes(JutsuVisualEffectRenderer.TEX_CHIDORI),
+                    fullBright,
+                    OverlayTexture.NO_OVERLAY,
+                    ColorUtil.argb(0.55F, 0.45F, 0.85F, 1.0F),
                     null,
                     state.outlineColor
             );
@@ -103,6 +115,13 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
                             pose, vc, ageInTicks, fullBright, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 0.85F
                     )
             );
+            submitNodeCollector.submitCustomGeometry(
+                    poseStack,
+                    RenderTypes.eyes(JutsuVisualEffectRenderer.TEX_RASENGAN),
+                    (pose, vc) -> this.rasenganHandModel.renderProcedural(
+                            pose, vc, ageInTicks, fullBright, OverlayTexture.NO_OVERLAY, 0.45F, 0.85F, 1.0F, 0.50F
+                    )
+            );
             poseStack.popPose();
         }
 
@@ -113,14 +132,26 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
             poseStack.translate(-0.06D, 0.64D, -0.10D);
             RenderMathUtil.scaleUniform(poseStack, 0.52F);
             int scalpelColor = ColorUtil.argb(0.92F, 1.0F, 1.0F, 1.0F);
+            VisualState scalpelState = new VisualState(ageInTicks, 0.0F);
             submitNodeCollector.submitModel(
                     this.scalpelHandModel,
-                    new VisualState(ageInTicks, 0.0F),
+                    scalpelState,
                     poseStack,
                     RenderTypes.entityTranslucent(JutsuVisualEffectRenderer.TEX_CHAKRA_SCALPEL),
                     fullBright,
                     OverlayTexture.NO_OVERLAY,
                     scalpelColor,
+                    null,
+                    state.outlineColor
+            );
+            submitNodeCollector.submitModel(
+                    this.scalpelHandModel,
+                    scalpelState,
+                    poseStack,
+                    RenderTypes.eyes(JutsuVisualEffectRenderer.TEX_CHAKRA_SCALPEL),
+                    fullBright,
+                    OverlayTexture.NO_OVERLAY,
+                    ColorUtil.argb(0.55F, 0.25F, 0.95F, 0.85F),
                     null,
                     state.outlineColor
             );
@@ -135,14 +166,29 @@ public class JutsuHandAuraLayer extends RenderLayer<AvatarRenderState, PlayerMod
             int gatesColor = hasEightGatesDeath
                     ? ColorUtil.argb(0.85F, 0.95F, 0.10F, 0.15F)
                     : ColorUtil.argb(0.80F, 0.35F, 0.80F, 1.0F);
+            int gatesGlowColor = hasEightGatesDeath
+                    ? ColorUtil.argb(0.55F, 1.0F, 0.18F, 0.20F)
+                    : ColorUtil.argb(0.45F, 0.35F, 0.85F, 1.0F);
+            VisualState gatesState = new VisualState(ageInTicks, 0.0F);
             submitNodeCollector.submitModel(
                     this.gatesAuraModel,
-                    new VisualState(ageInTicks, 0.0F),
+                    gatesState,
                     poseStack,
                     RenderTypes.entityTranslucent(JutsuVisualEffectRenderer.TEX_WIND),
                     fullBright,
                     OverlayTexture.NO_OVERLAY,
                     gatesColor,
+                    null,
+                    state.outlineColor
+            );
+            submitNodeCollector.submitModel(
+                    this.gatesAuraModel,
+                    gatesState,
+                    poseStack,
+                    RenderTypes.eyes(JutsuVisualEffectRenderer.TEX_WIND),
+                    fullBright,
+                    OverlayTexture.NO_OVERLAY,
+                    gatesGlowColor,
                     null,
                     state.outlineColor
             );

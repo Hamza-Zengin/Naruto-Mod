@@ -364,6 +364,17 @@ public class ShadowCloneEntity extends PathfinderMob {
                     this.entityData.set(DATA_ACTIVE_HAND_JUTSU, "");
                 }
             }
+            if (this.level() instanceof ServerLevel serverLevel) {
+                int handLightLevel = this.activeHandJutsuTicks > 0
+                        ? com.sekwah.narutomod.events.JutsuLightManager.resolveLightLevelForHandJutsu(this.getActiveHandJutsu())
+                        : com.sekwah.narutomod.events.JutsuLightManager.LIGHT_NONE;
+                if (handLightLevel > 0) {
+                    com.sekwah.narutomod.events.JutsuLightManager.updateLight(
+                            serverLevel, this, this.blockPosition().above(), handLightLevel);
+                } else if (com.sekwah.narutomod.events.JutsuLightManager.hasActiveLights()) {
+                    com.sekwah.narutomod.events.JutsuLightManager.removeLight(serverLevel, this.getUUID());
+                }
+            }
             if (this.tickCount % 10 == 0) {
                 this.syncActiveAbilitiesFromOwner();
             }

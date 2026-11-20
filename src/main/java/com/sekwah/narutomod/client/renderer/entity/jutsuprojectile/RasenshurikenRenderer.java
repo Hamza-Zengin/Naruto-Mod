@@ -24,6 +24,7 @@ public class RasenshurikenRenderer extends EntityRenderer<RasenshurikenEntity, R
     public static final Identifier RASENSHURIKEN_TEX =
             Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/jutsu/projectiles/rasenshuriken.png");
     private static final RenderType RENDER_TYPE = RenderTypes.entityTranslucent(RASENSHURIKEN_TEX);
+    private static final RenderType EYES_RENDER_TYPE = RenderTypes.eyes(RASENSHURIKEN_TEX);
     private final RasenshurikenModel model;
 
     public static class RasenshurikenRenderState extends EntityRenderState {
@@ -64,16 +65,35 @@ public class RasenshurikenRenderer extends EntityRenderer<RasenshurikenEntity, R
                         0.75F, 0.96F, 1.0F, 0.80F
                 )
         );
+        submitNodeCollector.submitCustomGeometry(poseStack, EYES_RENDER_TYPE, (pose, consumer) ->
+                RasenganSphereModel.renderSmoothSphere(
+                        pose, consumer, 0.28F, 18, 28, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                        0.55F, 0.92F, 1.0F, 0.55F
+                )
+        );
 
+        RasenshurikenModel.SpinState spinState = new RasenshurikenModel.SpinState(state.age * 0.45F, state.age * 0.85F);
         int color = ARGB.colorFromFloat(0.88F, 1.0F, 1.0F, 1.0F);
         submitNodeCollector.submitModel(
                 this.model,
-                new RasenshurikenModel.SpinState(state.age * 0.45F, state.age * 0.85F),
+                spinState,
                 poseStack,
                 RENDER_TYPE,
                 15728880,
                 OverlayTexture.NO_OVERLAY,
                 color,
+                null,
+                state.outlineColor
+        );
+        int glowColor = ARGB.colorFromFloat(0.55F, 0.55F, 0.92F, 1.0F);
+        submitNodeCollector.submitModel(
+                this.model,
+                spinState,
+                poseStack,
+                EYES_RENDER_TYPE,
+                RenderMathUtil.FULL_BRIGHT,
+                OverlayTexture.NO_OVERLAY,
+                glowColor,
                 null,
                 state.outlineColor
         );

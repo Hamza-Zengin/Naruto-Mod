@@ -63,27 +63,50 @@ public class VacuumSphereRenderer extends EntityRenderer<VacuumSphereEntity, Vac
 
             // Compressed Vacuum Air Core
             float sphereAlpha = 0.82F * fadeOut;
+            var windBaseType = RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_WIND);
+            var windEyesType = RenderTypes.eyes(JutsuVisualEffectRenderer.TEX_WIND);
             submitNodeCollector.submitCustomGeometry(
                     poseStack,
-                    RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_WIND),
+                    windBaseType,
                     (pose, consumer) ->
                             RasenganSphereModel.renderSmoothSphere(
                                     pose, consumer, 0.28F, 14, 20, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
                                     0.85F, 0.98F, 0.94F, sphereAlpha
                             )
             );
+            submitNodeCollector.submitCustomGeometry(
+                    poseStack,
+                    windEyesType,
+                    (pose, consumer) ->
+                            RasenganSphereModel.renderSmoothSphere(
+                                    pose, consumer, 0.28F, 14, 20, RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                                    0.75F, 1.0F, 0.92F, 0.38F * fadeOut
+                            )
+            );
 
             // Compact Spinning Wind Blade Rings
             RenderMathUtil.scaleEntityModel(poseStack, 0.42F);
             int ringColor = ColorUtil.argb(0.76F * fadeOut, 0.78F, 1.0F, 0.92F);
+            VisualState windState = new VisualState(state.age, state.progress);
             submitNodeCollector.submitModel(
                     this.windModel,
-                    new VisualState(state.age, state.progress),
+                    windState,
                     poseStack,
-                    RenderTypes.entityTranslucentCull(JutsuVisualEffectRenderer.TEX_WIND),
+                    windBaseType,
                     RenderMathUtil.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY,
                     ringColor,
+                    null,
+                    state.outlineColor
+            );
+            submitNodeCollector.submitModel(
+                    this.windModel,
+                    windState,
+                    poseStack,
+                    windEyesType,
+                    RenderMathUtil.FULL_BRIGHT,
+                    OverlayTexture.NO_OVERLAY,
+                    ColorUtil.argb(0.38F * fadeOut, 0.75F, 1.0F, 0.92F),
                     null,
                     state.outlineColor
             );

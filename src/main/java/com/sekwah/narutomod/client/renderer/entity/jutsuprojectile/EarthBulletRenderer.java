@@ -89,6 +89,16 @@ public class EarthBulletRenderer extends EntityRenderer<EarthBulletEntity, Earth
                                         1.0F, 0.38F, 0.08F, 0.55F * fadeOut
                                 )
                 );
+                submitNodeCollector.submitCustomGeometry(
+                        poseStack,
+                        RenderTypes.eyes(JutsuVisualEffectRenderer.TEX_AMATERASU),
+                        (pose, consumer) ->
+                                RasenganSphereModel.renderSmoothSphere(
+                                        pose, consumer, 0.56F, 10, 14,
+                                        RenderMathUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
+                                        1.0F, 0.45F, 0.12F, 0.50F * fadeOut
+                                )
+                );
             }
         } finally {
             poseStack.popPose();

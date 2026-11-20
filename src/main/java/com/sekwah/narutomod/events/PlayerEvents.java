@@ -184,6 +184,16 @@ public class PlayerEvents {
                 syncTransientSpeedModifier(speedAttr, ARMOR_STEALTH_AGILITY_MODIFIER_ID, stealthDelta);
             }
 
+            var handNinjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            int handLightLevel = handNinjaData.getActiveHandJutsuTicks() > 0
+                    ? JutsuLightManager.resolveLightLevelForHandJutsu(handNinjaData.getActiveHandJutsu())
+                    : JutsuLightManager.LIGHT_NONE;
+            if (handLightLevel > 0) {
+                JutsuLightManager.updateLight(serverLevel, player, player.blockPosition().above(), handLightLevel);
+            } else if (JutsuLightManager.hasActiveLights()) {
+                JutsuLightManager.removeLight(serverLevel, player.getUUID());
+            }
+
             // Check every 30 seconds at night in the Overworld for natural Shinobi encounters
             if (player.tickCount % 600 == 0 && serverLevel.dimension() == Level.OVERWORLD && serverLevel.isDarkOutside() && !player.isCreative() && !player.isSpectator()) {
                 if (serverLevel.getRandom().nextFloat() < 0.22f) {

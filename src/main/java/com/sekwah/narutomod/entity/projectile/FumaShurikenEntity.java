@@ -8,7 +8,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Giant 4-Bladed Fūma Shuriken Projectile Entity
@@ -19,12 +23,44 @@ public class FumaShurikenEntity extends AbstractArrow {
     private int prevRotateTicks = 0;
     private int rotateTicks = 0;
 
+    public static final double SAFE_SPAWN_FORWARD_OFFSET = 0.75D;
+
     public FumaShurikenEntity(EntityType<? extends FumaShurikenEntity> type, Level level) {
         super(type, level);
     }
 
     public FumaShurikenEntity(Level level, LivingEntity shooter) {
         super(NarutoEntities.FUMA_SHURIKEN.get(), shooter, level, new ItemStack(NarutoItems.FUMA_SHURIKEN.get()), null);
+        Vec3 eyePos = new Vec3(shooter.getX(), shooter.getEyeY() - 0.1D, shooter.getZ());
+        Vec3 spawnPos = computeSafeSpawnPosition(
+                eyePos.x,
+                eyePos.y,
+                eyePos.z,
+                shooter.getLookAngle(),
+                SAFE_SPAWN_FORWARD_OFFSET
+        );
+        // Only move forward if the path up to the offset position is unobstructed so we don't spawn past thin walls
+        BlockHitResult hit = level.clip(new ClipContext(
+                eyePos, spawnPos, ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE, shooter));
+        if (hit.getType() == HitResult.Type.MISS) {
+            this.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+        }
+    }
+
+    public static Vec3 computeSafeSpawnPosition(double originX, double originY, double originZ,
+                                                Vec3 lookDir,
+                                                double forwardOffset) {
+        double lengthSq = lookDir.lengthSqr();
+        if (lengthSq < 1.0E-8D) {
+            return new Vec3(originX, originY, originZ);
+        }
+        Vec3 normalized = lookDir.scale(1.0D / Math.sqrt(lengthSq));
+        return new Vec3(
+                originX + normalized.x * forwardOffset,
+                originY + normalized.y * forwardOffset,
+                originZ + normalized.z * forwardOffset
+        );
     }
 
     @Override
