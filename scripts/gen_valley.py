@@ -11,9 +11,11 @@ Pieces generated:
   - valley_canyon_walls.nbt     (49x46x41) Terraced canyon walls with moss, vines & stone arch
   - valley_shore.nbt            (49x22x37) Riverside pebble/moss shore with torii arch & lanterns
 """
+import argparse
 import math
 import os
 import random
+import sys
 import nbtlib
 from nbtlib.tag import Compound, Int, List, String
 
@@ -22,6 +24,19 @@ STRUCT_DIR = os.path.join(
     "src", "main", "resources", "data", "narutomod", "structure",
 )
 DATA_VERSION = 3465
+
+NON_SOLID_BLOCKS = {
+    "minecraft:air",
+    "minecraft:cave_air",
+    "minecraft:void_air",
+    "minecraft:water",
+    "minecraft:vine",
+    "minecraft:lantern",
+    "minecraft:soul_lantern",
+    "minecraft:jigsaw",
+    "minecraft:oak_leaves",
+    "minecraft:jungle_leaves",
+}
 
 
 class StructureBuilder:
@@ -201,6 +216,68 @@ def organic_noise(x: int, z: int) -> float:
     return 0.5 + 0.3 * math.sin(x * 0.29 + z * 0.17) + 0.2 * math.cos(x * 0.13 - z * 0.34)
 
 
+def containment_stone(x: int, y: int, z: int) -> str:
+    h = (x * 7 + y * 13 + z * 19) % 7
+    if h < 2:
+        return "minecraft:cobblestone"
+    if h < 4:
+        return "minecraft:andesite"
+    return "minecraft:stone"
+
+
+def apply_water_containment_pass(sb: StructureBuilder, open_mouths=None, is_waterfall_drop=None):
+    """
+    Ensures every water block has solid or water blocks on all 4 horizontal neighbors (±x, ±z)
+    and below (-y), except for intentional waterfall drop faces and real Jigsaw river mouths.
+    """
+    for _ in range(6):
+        changed = False
+        water_coords = [pos for pos, val in sb.blocks.items() if val[0] == "minecraft:water"]
+        for x, y, z in water_coords:
+            if sb.blocks.get((x, y, z), (None,))[0] != "minecraft:water":
+                continue
+
+            # 1. Check bottom (-y)
+            if y == 0:
+                sb.set(x, 0, z, containment_stone(x, 0, z))
+                changed = True
+                continue
+            below = sb.blocks.get((x, y - 1, z))
+            if below is None or (below[0] != "minecraft:water" and below[0] in NON_SOLID_BLOCKS):
+                if below is None or below[0] != "minecraft:jigsaw":
+                    sb.set(x, y - 1, z, containment_stone(x, y - 1, z))
+                    changed = True
+
+            # 2. Check 4 horizontal neighbors (±x, ±z)
+            for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                if is_waterfall_drop is not None and is_waterfall_drop(x, y, z, dx, dz):
+                    continue
+                nx, nz = x + dx, z + dz
+                if not sb.in_bounds(nx, y, nz):
+                    if open_mouths is not None and open_mouths(x, y, z, dx, dz):
+                        continue
+                    # Boundary water not at a real Jigsaw mouth: seal the boundary cell itself
+                    sb.set(x, y, z, containment_stone(x, y, z))
+                    changed = True
+                    break
+                nb = sb.blocks.get((nx, y, nz))
+                if nb is not None and nb[0] == "minecraft:jigsaw":
+                    continue
+                if nb is None or (nb[0] != "minecraft:water" and nb[0] in NON_SOLID_BLOCKS):
+                    sb.set(nx, y, nz, containment_stone(nx, y, nz))
+                    # Support containment block down to y=0 or existing solid
+                    for sy_fill in range(y - 1, -1, -1):
+                        sub = sb.blocks.get((nx, sy_fill, nz))
+                        if sub is not None and sub[0] not in NON_SOLID_BLOCKS:
+                            break
+                        if sub is not None and sub[0] in ("minecraft:water", "minecraft:jigsaw"):
+                            break
+                        sb.set(nx, sy_fill, nz, containment_stone(nx, sy_fill, nz))
+                    changed = True
+        if not changed:
+            break
+
+
 def decorate_cliff_foliage(sb: StructureBuilder, x: int, top_y: int, z: int, rng: random.Random, is_outer: bool = False):
     if is_outer or top_y <= 3:
         sb.set(x, top_y, z, "minecraft:moss_block" if (x + z) % 3 == 0 else "minecraft:grass_block")
@@ -254,28 +331,34 @@ def build_valley_waterfall():
         sb.set(22, 0, z, "minecraft:sea_lantern")
         sb.set(36, 0, z, "minecraft:sea_lantern")
 
-    # Flanking & rear canyon cliffs with smooth exterior slope (no sheer cutoff walls at x=0, x=58, z=58)
+    # Organic flanking & rear canyon cliffs (smoothed with organic_noise & terraced transitions)
     for x in range(sx):
         for z in range(sz):
             if (x, 0, z) not in sb.blocks:
                 continue
-            in_west_wing = x < 11 and (z > 33 or z < 19)
-            in_east_wing = x > 47 and (z > 33 or z < 19)
-            in_south_cliff = z >= 39
+            noise = organic_noise(x, z)
+            shore_z = 39 if 21 <= x <= 37 else 39 + int((organic_noise(x, 39) - 0.5) * 4.5)
+            west_edge = 11 + int((organic_noise(11, z) - 0.5) * 3.5)
+            east_edge = 47 + int((organic_noise(47, z) - 0.5) * 3.5)
+
+            in_west_wing = x < west_edge and (z > 34 or z < 18)
+            in_east_wing = x > east_edge and (z > 34 or z < 18)
+            in_south_cliff = z >= shore_z
             if not (in_south_cliff or in_west_wing or in_east_wing):
                 continue
 
-            noise = organic_noise(x, z)
             # Outer slope factor tapers height smoothly down to 1..3 near exterior boundary
             t_west = smoothstep(0.0, 9.0, x) if x < 12 else 1.0
             t_east = smoothstep(0.0, 9.0, sx - 1 - x) if x > sx - 13 else 1.0
-            t_north = smoothstep(0.0, 8.0, z) if (z < 10 and (x < 11 or x > 47)) else 1.0
+            t_north = smoothstep(0.0, 8.0, z) if (z < 10 and (x < 12 or x > 46)) else 1.0
             t_south = smoothstep(0.0, 9.0, sz - 1 - z) if z > 48 else 1.0
             outer_taper = min(t_west, t_east, t_north, t_south)
 
             if in_south_cliff:
-                depth = z - 39
-                base_h = 18 + min(38, depth * 2 + int(4 * math.sin(x * 0.22)))
+                depth = max(0, z - shore_z)
+                # Stepped canyon terrace + organic undulation
+                terrace = (depth // 3) * 5 + int(smoothstep(0.0, 14.0, depth) * 14)
+                base_h = 14 + min(42, terrace + int((noise - 0.5) * 8.0))
                 if 21 <= x <= 37:
                     if z <= 42:
                         base_h = 4
@@ -287,17 +370,22 @@ def build_valley_waterfall():
                         base_h = 48
                     else:
                         base_h = 56
-                # Preserve upper reservoir channel while tapering outside ridge
+                else:
+                    # Smooth transition between flanking cliffs and waterfall chute
+                    chute_dist = min(abs(x - 21), abs(x - 37))
+                    blend = smoothstep(0.0, 5.0, chute_dist)
+                    chute_h = 4 if z <= 42 else (18 if z <= 46 else (34 if z <= 50 else (48 if z <= 53 else 56)))
+                    base_h = int(chute_h * (1.0 - blend) + base_h * blend)
+
                 if not (22 <= x <= 36 and 46 <= z <= 55):
                     base_h = int(2 + (base_h - 2) * outer_taper + noise * 2.5)
                 else:
-                    # Rear lip behind reservoir still slopes down at z=56..58
                     rear_t = smoothstep(0.0, 4.0, sz - 1 - z) if z >= 55 else 1.0
                     base_h = int(4 + (base_h - 4) * rear_t)
             else:
-                edge_dist = (10 - x) if x < 11 else (x - 48)
-                raw_h = 8 + min(24, edge_dist * 3 + (z // 5))
-                base_h = int(2 + (raw_h - 2) * outer_taper + noise * 2.0)
+                edge_dist = (west_edge - x) if x < west_edge else (x - east_edge)
+                raw_h = 6 + min(26, edge_dist * 3 + int(3 * math.sin(z * 0.2)) + (z // 6))
+                base_h = int(2 + (raw_h - 2) * outer_taper + noise * 2.5)
 
             top_y = min(sy - 2, max(1, base_h))
             for y in range(1, top_y + 1):
@@ -322,8 +410,23 @@ def build_valley_waterfall():
     for side_x in (11, 47):
         sb.fill(side_x - 2, 1, 32, side_x + 2, 4, 37, "minecraft:stone_bricks")
         sb.add_lantern_post(side_x, 5, 34, "minecraft:stone_brick_wall", "minecraft:soul_lantern")
-    sb.add_lantern_post(11, 5, 16, "minecraft:stone_brick_wall", "minecraft:lantern")
-    sb.add_lantern_post(47, 5, 16, "minecraft:stone_brick_wall", "minecraft:lantern")
+        sb.fill(side_x - 1, 1, 15, side_x + 1, 4, 17, "minecraft:stone_bricks")
+        sb.add_lantern_post(side_x, 5, 16, "minecraft:stone_brick_wall", "minecraft:lantern")
+
+    # Leak-free water containment pass (preserving waterfall drop face & 3 Jigsaw river mouths)
+    def waterfall_open_mouths(x, y, z, dx, dz):
+        if x == 0 and dx == -1 and 20 <= z <= 32 and 1 <= y <= 2:
+            return True
+        if x == sx - 1 and dx == 1 and 20 <= z <= 32 and 1 <= y <= 2:
+            return True
+        if z == 0 and dz == -1 and 18 <= x <= 40 and 1 <= y <= 2:
+            return True
+        return False
+
+    def waterfall_drop_face(x, y, z, dx, dz):
+        return dx == 0 and dz == -1 and 23 <= x <= 35 and y >= 3 and 39 <= z <= 52
+
+    apply_water_containment_pass(sb, open_mouths=waterfall_open_mouths, is_waterfall_drop=waterfall_drop_face)
 
     # 3 Outgoing Jigsaws (aligned at y=2)
     sb.add_jigsaw(0, 2, 26, "west_up", "narutomod:out", "narutomod:entry", "narutomod:valley_hashirama_pool")
@@ -334,7 +437,7 @@ def build_valley_waterfall():
 
 
 def build_valley_hashirama_monument():
-    """Light-stone Senju Obelisk with Senju crest, wood/leaf motifs, organic jungle slope."""
+    """Senju Obelisk with Warring States armor/wood/stone palette & large 3D Senju Clan crest (y=40..56)."""
     sx, sy, sz = 49, 58, 49
     sb = StructureBuilder(sx, sy, sz)
     rng = random.Random(202)
@@ -357,9 +460,7 @@ def build_valley_hashirama_monument():
                 sb.fill(x, 1, z, x, 2, z, "minecraft:stone_bricks")
             else:
                 sb.fill(x, 1, z, x, 2, z, "minecraft:stone")
-                if x >= 11 and z >= 10 and z <= 38:
-                    pass
-                else:
+                if not (x >= 11 and 10 <= z <= 38):
                     sb.set(x, 2, z, "minecraft:moss_block" if (x + z) % 3 == 0 else "minecraft:grass_block")
 
     # Quay walkway (x=34..37)
@@ -377,78 +478,133 @@ def build_valley_hashirama_monument():
         sb.fill(sx_pos, y_pos + 1, 18, sx_pos, y_pos + 1, 18, "minecraft:polished_andesite")
         sb.fill(sx_pos, y_pos + 1, 30, sx_pos, y_pos + 1, 30, "minecraft:polished_andesite")
 
-    # Grand Stepped Pedestal / Plinth
+    # Grand Stepped Pedestal / Plinth (y=3..11, symmetric with Madara)
     sb.fill(11, 3, 15, 29, 7, 33, "minecraft:stone_bricks")
     sb.fill(12, 8, 16, 28, 10, 32, "minecraft:polished_andesite")
-    sb.fill(13, 11, 17, 27, 11, 31, "minecraft:chiseled_stone_bricks")
+    sb.fill(13, 11, 17, 27, 11, 31, "minecraft:smooth_stone")
     for lx in (12, 28):
         for lz in (16, 32):
-            sb.add_lantern_post(lx, 12, lz, "minecraft:stone_brick_wall", "minecraft:soul_lantern")
+            sb.add_lantern_post(lx, 12, lz, "minecraft:stone_brick_wall", "minecraft:lantern")
 
     # Ceremonial Archway & leaf garlands
-    sb.add_arch_z(31, 33, 4, 24, 6, 8, "minecraft:oak_log", "minecraft:polished_andesite", "minecraft:lantern")
+    sb.add_arch_z(31, 33, 4, 24, 6, 8, "minecraft:dark_oak_wood", "minecraft:polished_andesite", "minecraft:lantern")
     for z in range(18, 31):
         sb.set(32, 13, z, "minecraft:oak_leaves", {"persistent": "true"})
         if z % 3 == 0:
             sb.set(31, 12, z, "minecraft:jungle_leaves", {"persistent": "true"})
 
-    # Light-Stone Senju Obelisk Shaft
-    tiers = [(12, 20, 5), (21, 30, 4), (31, 40, 3), (41, 48, 2), (49, 53, 1)]
+    # Warring States Senju Obelisk Shaft (y=12..40, exact tier symmetry with Madara)
     cx, cz = 20, 24
+    tiers = [(12, 20, 5), (21, 29, 4), (30, 36, 3), (37, 40, 2)]
     for y0, y1, r in tiers:
         for y in range(y0, y1 + 1):
             for dx in range(-r, r + 1):
                 for dz in range(-r, r + 1):
                     is_corner = abs(dx) == r and abs(dz) == r
-                    if is_corner and r >= 3:
-                        mat = "minecraft:oak_log"
+                    if is_corner:
+                        mat = "minecraft:gold_block" if y % 4 == 0 else "minecraft:dark_oak_wood"
                     elif y == y0 or y == y1:
-                        mat = "minecraft:polished_andesite"
-                    elif (dx + dz + y) % 4 == 0:
-                        mat = "minecraft:calcite"
+                        mat = "minecraft:copper_block" if (abs(dx) + abs(dz)) % 2 == 0 else "minecraft:polished_andesite"
+                    elif y in (16, 25, 33):
+                        mat = "minecraft:gold_block" if (abs(dx) == r or abs(dz) == r) else "minecraft:smooth_stone"
+                    elif (dx + dz + y) % 5 == 0:
+                        mat = "minecraft:mossy_stone_bricks"
+                    elif (dx * 3 + y) % 4 == 0:
+                        mat = "minecraft:stripped_dark_oak_log" if abs(dx) == r or abs(dz) == r else "minecraft:smooth_stone"
+                    elif (dx + dz) % 3 == 0:
+                        mat = "minecraft:stone_bricks"
                     else:
-                        mat = "minecraft:smooth_quartz"
+                        mat = "minecraft:stone"
                     sb.set(cx + dx, y, cz + dz, mat)
+
+        # Tier ledge foliage & Warring States timber trim
         if r >= 2:
             for dx in range(-r - 1, r + 2):
                 for dz in (-r - 1, r + 1):
-                    if rng.random() < 0.72:
-                        sb.set(cx + dx, y0, cz + dz, "minecraft:jungle_leaves" if (dx + dz) % 2 == 0 else "minecraft:moss_block",
-                               {"persistent": "true"} if (dx + dz) % 2 == 0 else None)
-    sb.set(cx, 54, cz, "minecraft:gold_block")
-    sb.set(cx, 55, cz, "minecraft:soul_lantern", {"hanging": "false"})
+                    if (dx + dz) % 2 == 0 and rng.random() < 0.65:
+                        sb.set(cx + dx, y0, cz + dz, "minecraft:moss_block")
 
-    # Inlaid Senju Clan Emblem
-    crest_offsets = [
-        (0, 0, "minecraft:gold_block"), (1, 0, "minecraft:gold_block"), (2, 0, "minecraft:gold_block"),
-        (3, 0, "minecraft:copper_block"), (4, 0, "minecraft:copper_block"), (5, 0, "minecraft:gold_block"),
-        (6, 0, "minecraft:gold_block"), (7, 0, "minecraft:gold_block"), (8, 0, "minecraft:gold_block"),
-        (2, -1, "minecraft:copper_block"), (2, 1, "minecraft:copper_block"),
-        (3, -2, "minecraft:gold_block"), (3, 2, "minecraft:gold_block"),
-        (4, -2, "minecraft:gold_block"), (4, 2, "minecraft:gold_block"),
-        (5, -2, "minecraft:copper_block"), (5, 2, "minecraft:copper_block"),
-        (6, -1, "minecraft:copper_block"), (6, 1, "minecraft:copper_block"),
-        (7, -2, "minecraft:dark_oak_planks"), (7, 2, "minecraft:dark_oak_planks"),
-        (8, -2, "minecraft:gold_block"), (8, 2, "minecraft:gold_block"),
-    ]
-    for dy, off, mat in crest_offsets:
-        y = 22 + dy
-        face_r = 4 if y <= 30 else 3
-        if abs(off) <= face_r:
-            sb.set(cx + face_r, y, cz + off, mat)
-            sb.set(cx + off, y, cz - face_r, mat)
+    # Warring States armor breastplate & Senju inlay on East face (+x, facing river/Madara)
+    for dy in range(-3, 4):
+        for dz in range(-3, 4):
+            if abs(dy) + abs(dz) <= 4:
+                if abs(dz) == 0:
+                    mat = "minecraft:gold_block"
+                elif abs(dy) + abs(dz) == 4:
+                    mat = "minecraft:dark_oak_wood"
+                elif abs(dy) <= 1 and abs(dz) <= 1:
+                    mat = "minecraft:emerald_block"
+                else:
+                    mat = "minecraft:copper_block"
+                sb.set(cx + 4, 25 + dy, cz + dz, mat)
 
-    # Organic backing ridge along x=0..10 (peaks inside around x=7..9, slopes smoothly to x=0 & north/south edges)
-    for x in range(0, 11):
-        for z in range(sz):
+    # Large 3D Senju Clan Logo Crown (y=40..56, symmetric scale with Madara's Uchiha Fan)
+    sb.fill(cx - 1, 40, cz - 1, cx + 1, 40, cz + 1, "minecraft:gold_block")
+    sb.fill(cx - 1, 41, cz - 1, cx + 1, 42, cz + 1, "minecraft:stripped_dark_oak_log")
+    sb.set(cx + 1, 42, cz, "minecraft:copper_block")
+    sb.set(cx - 1, 42, cz, "minecraft:copper_block")
+
+    # Symmetrical 3-winged diamond-centered Senju Crest (y=43..55, dz=-5..+5)
+    senju_crest_rows = {
+        55: [(0, "minecraft:gold_block")],
+        54: [(-3, "minecraft:dark_oak_wood"), (0, "minecraft:gold_block"), (3, "minecraft:dark_oak_wood")],
+        53: [(-4, "minecraft:dark_oak_wood"), (-3, "minecraft:gold_block"), (-2, "minecraft:dark_oak_wood"),
+             (0, "minecraft:gold_block"),
+             (2, "minecraft:dark_oak_wood"), (3, "minecraft:gold_block"), (4, "minecraft:dark_oak_wood")],
+        52: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:copper_block"), (-3, "minecraft:dark_oak_wood"),
+             (-1, "minecraft:dark_oak_wood"), (0, "minecraft:gold_block"), (1, "minecraft:dark_oak_wood"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:copper_block"), (5, "minecraft:dark_oak_wood")],
+        51: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:copper_block"), (-3, "minecraft:dark_oak_wood"),
+             (-1, "minecraft:gold_block"), (0, "minecraft:emerald_block"), (1, "minecraft:gold_block"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:copper_block"), (5, "minecraft:dark_oak_wood")],
+        50: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:gold_block"), (-3, "minecraft:dark_oak_wood"),
+             (-2, "minecraft:dark_oak_wood"), (-1, "minecraft:gold_block"), (0, "minecraft:emerald_block"),
+             (1, "minecraft:gold_block"), (2, "minecraft:dark_oak_wood"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:gold_block"), (5, "minecraft:dark_oak_wood")],
+        49: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:gold_block"), (-3, "minecraft:dark_oak_wood"),
+             (-2, "minecraft:gold_block"), (-1, "minecraft:emerald_block"), (0, "minecraft:moss_block"),
+             (1, "minecraft:emerald_block"), (2, "minecraft:gold_block"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:gold_block"), (5, "minecraft:dark_oak_wood")],
+        48: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:copper_block"), (-3, "minecraft:dark_oak_wood"),
+             (-2, "minecraft:dark_oak_wood"), (-1, "minecraft:gold_block"), (0, "minecraft:emerald_block"),
+             (1, "minecraft:gold_block"), (2, "minecraft:dark_oak_wood"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:copper_block"), (5, "minecraft:dark_oak_wood")],
+        47: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:copper_block"), (-3, "minecraft:dark_oak_wood"),
+             (-1, "minecraft:gold_block"), (0, "minecraft:gold_block"), (1, "minecraft:gold_block"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:copper_block"), (5, "minecraft:dark_oak_wood")],
+        46: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:gold_block"), (-3, "minecraft:copper_block"),
+             (-2, "minecraft:dark_oak_wood"), (0, "minecraft:gold_block"), (2, "minecraft:dark_oak_wood"),
+             (3, "minecraft:copper_block"), (4, "minecraft:gold_block"), (5, "minecraft:dark_oak_wood")],
+        45: [(-4, "minecraft:dark_oak_wood"), (-3, "minecraft:gold_block"), (-2, "minecraft:copper_block"),
+             (-1, "minecraft:gold_block"), (0, "minecraft:gold_block"), (1, "minecraft:gold_block"),
+             (2, "minecraft:copper_block"), (3, "minecraft:gold_block"), (4, "minecraft:dark_oak_wood")],
+        44: [(-3, "minecraft:dark_oak_wood"), (-2, "minecraft:dark_oak_wood"), (-1, "minecraft:copper_block"),
+             (0, "minecraft:gold_block"), (1, "minecraft:copper_block"),
+             (2, "minecraft:dark_oak_wood"), (3, "minecraft:dark_oak_wood")],
+        43: [(-2, "minecraft:dark_oak_wood"), (-1, "minecraft:dark_oak_wood"), (0, "minecraft:gold_block"),
+             (1, "minecraft:dark_oak_wood"), (2, "minecraft:dark_oak_wood")],
+    }
+    for y, cells in senju_crest_rows.items():
+        for dz, mat in cells:
+            sb.fill(cx - 1, y, cz + dz, cx + 1, y, cz + dz, mat)
+
+    sb.set(cx, 56, cz, "minecraft:lantern", {"hanging": "false"})
+
+    # Organic backing ridge along x=0..11 (smoothed edge with organic_noise & terraced slope)
+    for z in range(sz):
+        ridge_max_x = 10 + int((organic_noise(10, z) - 0.5) * 3.0)
+        if 14 <= z <= 34:
+            ridge_max_x = min(ridge_max_x, 10)
+        for x in range(0, ridge_max_x + 1):
             if (x, 0, z) not in sb.blocks:
                 continue
             noise = organic_noise(x, z)
             t_west = smoothstep(0.0, 6.0, x)
             t_z = min(smoothstep(0.0, 9.0, z), smoothstep(0.0, 9.0, sz - 1 - z))
+            t_inner = smoothstep(0.0, 3.5, ridge_max_x - x + 1)
             taper = min(t_west, t_z)
-            peak_h = 28 - abs(x - 8) * 2 + int(3 * math.cos(z * 0.25))
-            h = int(2 + (peak_h - 2) * taper + noise * 2.0)
+            peak_h = 28 - abs(x - 7) * 2 + int(3 * math.cos(z * 0.25))
+            h = int(2 + (peak_h - 2) * taper * (0.35 + 0.65 * t_inner) + noise * 2.0)
             top_y = min(sy - 3, max(2, h))
             for y in range(1, top_y + 1):
                 sb.set(x, y, z, stratified_rock(y, rng))
@@ -456,6 +612,12 @@ def build_valley_hashirama_monument():
 
     # North approach path
     sb.fill(21, 3, 0, 27, 3, 14, "minecraft:mossy_stone_bricks")
+
+    # Leak-free water containment pass (only East Jigsaw river mouth at x=48, z=18..30 stays open)
+    def hashirama_open_mouths(x, y, z, dx, dz):
+        return x == sx - 1 and dx == 1 and 18 <= z <= 30 and 1 <= y <= 2
+
+    apply_water_containment_pass(sb, open_mouths=hashirama_open_mouths)
 
     # Jigsaws
     sb.add_jigsaw(48, 2, 24, "east_up", "narutomod:entry", "narutomod:entry", "minecraft:empty")
@@ -573,6 +735,12 @@ def build_valley_madara_monument():
 
     sb.fill(21, 3, 0, 27, 3, 14, "minecraft:deepslate_tiles")
 
+    # Leak-free water containment pass (only West Jigsaw river mouth at x=0, z=18..30 stays open)
+    def madara_open_mouths(x, y, z, dx, dz):
+        return x == 0 and dx == -1 and 18 <= z <= 30 and 1 <= y <= 2
+
+    apply_water_containment_pass(sb, open_mouths=madara_open_mouths)
+
     sb.add_jigsaw(0, 2, 24, "west_up", "narutomod:entry", "narutomod:entry", "minecraft:empty")
     sb.add_jigsaw(24, 2, 0, "north_up", "narutomod:out", "narutomod:entry", "narutomod:valley_of_the_end_addons")
 
@@ -588,7 +756,10 @@ def build_valley_lower_river():
         for z in range(sz):
             noise = organic_noise(x, z)
             meander = int(2.5 * math.sin(z * 0.14))
-            river_half = 11
+            # Keep south jigsaw mouth (z=44) aligned at river_half=11; vary organically inside
+            mouth_blend = smoothstep(0.0, 5.0, min(z, sz - 1 - z))
+            river_half = 11.0 + (noise - 0.5) * 2.4 * mouth_blend
+            bank_width = 3.0 + (organic_noise(x + 7, z + 11) - 0.5) * 1.6
             dist_from_center = abs(x - (26 + meander))
 
             # Feather extreme outer x margins organically
@@ -599,23 +770,33 @@ def build_valley_lower_river():
             sb.set(x, 0, z, "minecraft:cobblestone" if (x + z) % 3 == 0 else "minecraft:stone")
             if dist_from_center <= river_half:
                 sb.fill(x, 1, z, x, 2, z, "minecraft:water")
-            elif dist_from_center <= river_half + 3:
-                sb.set(x, 1, z, "minecraft:stone_bricks")
+            elif dist_from_center <= river_half + bank_width:
+                sb.set(x, 1, z, "minecraft:stone_bricks" if (x + z) % 2 == 0 else "minecraft:cobblestone")
                 sb.set(x, 2, z, "minecraft:moss_block" if rng.random() < 0.5 else "minecraft:grass_block")
             else:
-                cliff_d = dist_from_center - (river_half + 3)
-                raw_h = 4 + min(20, cliff_d * 2 + int(2 * math.cos(z * 0.3)))
-                h = int(2 + (raw_h - 2) * outer_taper + noise * 1.5)
+                cliff_d = dist_from_center - (river_half + bank_width)
+                terrace = (int(cliff_d) // 2) * 3 + int(smoothstep(0.0, 10.0, cliff_d) * 10)
+                raw_h = 3 + min(21, terrace + int(2 * math.cos(z * 0.3)))
+                h = int(2 + (raw_h - 2) * outer_taper + noise * 2.0)
                 top_y = min(sy - 2, max(2, h))
                 for y in range(1, top_y + 1):
                     sb.set(x, y, z, stratified_rock(y, rng))
                 decorate_cliff_foliage(sb, x, top_y, z, rng, is_outer=(outer_taper < 0.55))
 
+    # West quay & supported riverside lantern posts
     sb.fill(11, 1, 18, 15, 3, 26, "minecraft:stone_bricks")
     sb.add_lantern_post(14, 4, 19, "minecraft:stone_brick_wall", "minecraft:lantern")
     sb.add_lantern_post(14, 4, 25, "minecraft:stone_brick_wall", "minecraft:lantern")
-    sb.add_lantern_post(39, 4, 14, "minecraft:stone_brick_wall", "minecraft:soul_lantern")
-    sb.add_lantern_post(39, 4, 30, "minecraft:stone_brick_wall", "minecraft:soul_lantern")
+    for lz in (14, 30):
+        sb.fill(38, 1, lz - 1, 40, 3, lz + 1, "minecraft:stone_bricks")
+        sb.fill_air(38, 4, lz - 1, 40, 8, lz + 1)
+        sb.add_lantern_post(39, 4, lz, "minecraft:stone_brick_wall", "minecraft:soul_lantern")
+
+    # Leak-free water containment pass (only South Jigsaw river mouth at z=44, x=15..37 stays open)
+    def lower_river_open_mouths(x, y, z, dx, dz):
+        return z == sz - 1 and dz == 1 and 15 <= x <= 37 and 1 <= y <= 2
+
+    apply_water_containment_pass(sb, open_mouths=lower_river_open_mouths)
 
     sb.add_jigsaw(26, 2, 44, "south_up", "narutomod:entry", "narutomod:entry", "minecraft:empty")
     sb.add_jigsaw(26, 2, 0, "north_up", "narutomod:out", "narutomod:entry", "narutomod:valley_of_the_end_addons")
@@ -643,11 +824,11 @@ def build_valley_canyon_walls():
             outer_taper = min(t_x, t_z)
 
             if z > 32 and 18 <= x <= 30:
-                top_y = 2
                 sb.fill(x, 1, z, x, 2, z, "minecraft:stone_bricks")
             else:
-                dist_edge = max(0, 14 - z) + max(0, abs(x - 24) - 10)
-                raw_h = 5 + min(34, dist_edge * 2 + int(3 * math.sin(x * 0.25)))
+                radial_edge = math.sqrt(max(0, 16 - z) ** 2 + max(0, abs(x - 24) - 9) ** 2)
+                terrace = (int(radial_edge) // 3) * 4 + int(smoothstep(0.0, 16.0, radial_edge) * 18)
+                raw_h = 4 + min(35, terrace + int((noise - 0.5) * 6.0))
                 h = int(2 + (raw_h - 2) * outer_taper + noise * 2.0)
                 top_y = min(sy - 3, max(2, h))
                 for y in range(1, top_y + 1):
@@ -686,8 +867,9 @@ def build_valley_shore():
                     sb.set(x, 2, z, "minecraft:moss_block" if (x + z) % 2 == 0 else "minecraft:grass_block")
             else:
                 t_edge = min(smoothstep(0.0, 8.0, x), smoothstep(0.0, 8.0, sx - 1 - x), smoothstep(0.0, 8.0, z))
-                slope = max(0, (25 - z) // 5)
-                raw_h = 2 + min(6, slope + (1 if rng.random() < 0.25 else 0))
+                radial = math.sqrt(((x - 24) * 0.5) ** 2 + max(0, 25 - z) ** 2)
+                slope = smoothstep(0.0, 22.0, radial) * 5.5
+                raw_h = 2 + min(6, int(slope + (noise - 0.5) * 2.0 + (1 if rng.random() < 0.2 else 0)))
                 h = int(1 + (raw_h - 1) * t_edge + noise * 1.2)
                 for y in range(1, max(2, h)):
                     sb.set(x, y, z, "minecraft:stone" if y < h - 1 else "minecraft:cobblestone")
@@ -706,7 +888,140 @@ def build_valley_shore():
     sb.save("valley_shore.nbt")
 
 
+def verify_all() -> int:
+    """
+    Verifies all generated valley_*.nbt files:
+      1. No open-edged or unsupported water blocks (excluding intentional waterfall drop & Jigsaw river mouths).
+      2. All expected Jigsaw blocks are preserved with valid NBT.
+      3. All lanterns / soul_lanterns are properly supported.
+    Returns total error count.
+    """
+    expected_jigsaws = {
+        "valley_waterfall.nbt": 3,
+        "valley_hashirama_statue.nbt": 2,
+        "valley_madara_statue.nbt": 2,
+        "valley_lower_river.nbt": 2,
+        "valley_canyon_walls.nbt": 1,
+        "valley_shore.nbt": 1,
+    }
+    depth = 4  # buried foundation offset applied in save()
+    total_errors = 0
+
+    for filename, exp_jigsaw_count in expected_jigsaws.items():
+        path = os.path.join(STRUCT_DIR, filename)
+        if not os.path.exists(path):
+            print(f"[FAIL] {filename}: file not found at {path}")
+            total_errors += 1
+            continue
+
+        nbt_file = nbtlib.load(path)
+        sx, sy, sz = [int(v) for v in nbt_file["size"]]
+        palette = nbt_file["palette"]
+        blocks = {}
+        jigsaws = []
+        lanterns = []
+
+        for b in nbt_file["blocks"]:
+            x, y, z = [int(v) for v in b["pos"]]
+            state_idx = int(b["state"])
+            entry = palette[state_idx]
+            name = str(entry["Name"])
+            props = {str(k): str(v) for k, v in entry.get("Properties", {}).items()}
+            blocks[(x, y, z)] = (name, props)
+            if name == "minecraft:jigsaw":
+                jigsaws.append((x, y, z, b.get("nbt")))
+            elif name in ("minecraft:lantern", "minecraft:soul_lantern"):
+                lanterns.append((x, y, z, name, props))
+
+        file_errors = []
+
+        # 1. Verify Jigsaws
+        if len(jigsaws) != exp_jigsaw_count:
+            file_errors.append(f"Expected {exp_jigsaw_count} jigsaws, found {len(jigsaws)}")
+        for jx, jy, jz, jnbt in jigsaws:
+            if not jnbt or str(jnbt.get("id", "")) != "minecraft:jigsaw":
+                file_errors.append(f"Jigsaw at ({jx},{jy},{jz}) missing valid jigsaw NBT")
+
+        # 2. Verify Lanterns
+        for lx, ly, lz, lname, lprops in lanterns:
+            hanging = lprops.get("hanging", "false") == "true"
+            sup_pos = (lx, ly + 1, lz) if hanging else (lx, ly - 1, lz)
+            sup = blocks.get(sup_pos)
+            if sup is None or sup[0] in NON_SOLID_BLOCKS:
+                file_errors.append(f"Unsupported {lname} (hanging={hanging}) at ({lx},{ly},{lz})")
+
+        # 3. Verify Water Containment
+        def is_allowed_mouth(x, y, z, dx, dz):
+            orig_y = y - depth
+            if filename == "valley_waterfall.nbt":
+                if x == 0 and dx == -1 and 20 <= z <= 32 and 1 <= orig_y <= 2:
+                    return True
+                if x == sx - 1 and dx == 1 and 20 <= z <= 32 and 1 <= orig_y <= 2:
+                    return True
+                if z == 0 and dz == -1 and 18 <= x <= 40 and 1 <= orig_y <= 2:
+                    return True
+            elif filename == "valley_hashirama_statue.nbt":
+                if x == sx - 1 and dx == 1 and 18 <= z <= 30 and 1 <= orig_y <= 2:
+                    return True
+            elif filename == "valley_madara_statue.nbt":
+                if x == 0 and dx == -1 and 18 <= z <= 30 and 1 <= orig_y <= 2:
+                    return True
+            elif filename == "valley_lower_river.nbt":
+                if z == sz - 1 and dz == 1 and 15 <= x <= 37 and 1 <= orig_y <= 2:
+                    return True
+            return False
+
+        def is_allowed_drop(x, y, z, dx, dz):
+            orig_y = y - depth
+            return (
+                filename == "valley_waterfall.nbt"
+                and dx == 0 and dz == -1
+                and 23 <= x <= 35 and orig_y >= 3 and 39 <= z <= 52
+            )
+
+        for (x, y, z), (name, _) in blocks.items():
+            if name != "minecraft:water":
+                continue
+            below = blocks.get((x, y - 1, z))
+            if below is None or (below[0] != "minecraft:water" and below[0] in NON_SOLID_BLOCKS):
+                file_errors.append(f"Unsupported water bottom at ({x},{y},{z})")
+            for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                if is_allowed_drop(x, y, z, dx, dz):
+                    continue
+                nx, nz = x + dx, z + dz
+                if not (0 <= nx < sx and 0 <= nz < sz):
+                    if is_allowed_mouth(x, y, z, dx, dz):
+                        continue
+                    file_errors.append(f"Water leaks out of bounds at ({x},{y},{z}) dir=({dx},{dz})")
+                    continue
+                nb = blocks.get((nx, y, nz))
+                if nb is not None and nb[0] == "minecraft:jigsaw":
+                    continue
+                if nb is None or (nb[0] != "minecraft:water" and nb[0] in NON_SOLID_BLOCKS):
+                    file_errors.append(f"Open-edged water at ({x},{y},{z}) toward ({nx},{y},{nz}) [{nb[0] if nb else 'air'}]")
+
+        if file_errors:
+            print(f"[FAIL] {filename}: {len(file_errors)} error(s)")
+            for err in file_errors[:10]:
+                print(f"  - {err}")
+            if len(file_errors) > 10:
+                print(f"  ... and {len(file_errors) - 10} more")
+            total_errors += len(file_errors)
+        else:
+            print(f"[PASS] {filename}: size=[{sx},{sy},{sz}] jigsaws={len(jigsaws)} lanterns={len(lanterns)} errors=0")
+
+    return total_errors
+
+
 def main():
+    parser = argparse.ArgumentParser(description="Generate and verify Valley of the End NBT structures.")
+    parser.add_argument("--verify", action="store_true", help="Verify generated valley_*.nbt files without regenerating.")
+    args = parser.parse_args()
+
+    if args.verify:
+        errors = verify_all()
+        sys.exit(1 if errors > 0 else 0)
+
     build_valley_waterfall()
     build_valley_hashirama_monument()
     build_valley_madara_monument()
