@@ -81,6 +81,10 @@ public class MysticalPalmAbility extends Ability implements Ability.Channeled, A
         return tryConsume(player, ninjaData, pulseCost, 0.0f, 30);
     }
 
+    public static double getScaledHealRange(int mastery) {
+        return HEAL_RANGE * (1.0D + 0.60D * Ability.getMasteryProgress(mastery));
+    }
+
     @Override
     public void handleChannelling(Player player, INinjaData ninjaData, int ticksChanneled) {
         if (ticksChanneled % PULSE_INTERVAL_TICKS != 0) {
@@ -90,7 +94,8 @@ public class MysticalPalmAbility extends Ability implements Ability.Channeled, A
             return;
         }
 
-        LivingEntity target = findHealTarget(player, serverLevel);
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        LivingEntity target = findHealTarget(player, serverLevel, getScaledHealRange(mastery));
         float healAmount = this.getDamage(ninjaData);
         if (target.getHealth() < target.getMaxHealth()) {
             target.heal(healAmount);
@@ -122,10 +127,10 @@ public class MysticalPalmAbility extends Ability implements Ability.Channeled, A
         this.registerCooldown(ninjaData, this.getTranslationKey());
     }
 
-    private static LivingEntity findHealTarget(Player caster, ServerLevel level) {
+    private static LivingEntity findHealTarget(Player caster, ServerLevel level, double healRange) {
         Vec3 eye = caster.getEyePosition();
         Vec3 look = caster.getLookAngle().normalize();
-        Vec3 end = eye.add(look.scale(HEAL_RANGE));
+        Vec3 end = eye.add(look.scale(healRange));
         AABB searchBox = new AABB(eye, end).inflate(1.25D);
 
         List<LivingEntity> candidates = level.getEntitiesOfClass(LivingEntity.class, searchBox,
@@ -136,7 +141,7 @@ public class MysticalPalmAbility extends Ability implements Ability.Channeled, A
         for (LivingEntity candidate : candidates) {
             Vec3 toTarget = candidate.getEyePosition().subtract(eye);
             double dist = toTarget.length();
-            if (dist > HEAL_RANGE || dist < 1.0E-4D) {
+            if (dist > healRange || dist < 1.0E-4D) {
                 continue;
             }
             double dot = look.dot(toTarget.scale(1.0D / dist));

@@ -59,7 +59,7 @@ public class RasenganAbility extends Ability implements Ability.Cooldown {
     }
 
     public static int getScaledHoldDuration(int mastery) {
-        return (int) Math.round(100.0 * (1.0 + 0.20 * (Math.max(0, mastery) / 100.0)));
+        return Ability.getScaledDurationTicks(100, mastery, 0.60D);
     }
 
     @Override

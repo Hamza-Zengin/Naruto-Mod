@@ -91,7 +91,7 @@ public class WaterDragonAbility extends Ability implements Ability.Cooldown {
         dragon.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
         dragon.setDragon(true);
         dragon.setDamage(dragonDamage);
-        dragon.setMaxLife(65);
+        dragon.setMaxLife(Ability.getScaledDurationTicks(65, mastery, 0.31D));
         dragon.setDeltaMovement(look.scale(1.35D * Math.min(1.3D, powerMult)));
         dragon.alignRotationToMovement();
         serverLevel.addFreshEntity(dragon);

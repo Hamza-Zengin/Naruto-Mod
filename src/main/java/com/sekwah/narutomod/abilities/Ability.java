@@ -403,6 +403,14 @@ public abstract class Ability {
         return getScaledActivationDelay(mastery);
     }
 
+    public static double getMasteryProgress(int mastery) {
+        return Math.min(1.0D, Math.max(0, mastery) / 700.0D);
+    }
+
+    public static int getScaledDurationTicks(int baseTicks, int mastery, double maxBonusRatio) {
+        return (int) Math.round(baseTicks * (1.0D + Math.max(0.0D, maxBonusRatio) * getMasteryProgress(mastery)));
+    }
+
     /**
      * Scales client hand-seal completion timeout ticks downward as jutsu mastery grows
      * (from {@code baseTimeoutTicks} at mastery 0 down to 20% / minimum 4 ticks at 700+ mastery).
@@ -411,7 +419,7 @@ public abstract class Ability {
         if (mastery <= 0) {
             return Math.max(4, baseTimeoutTicks);
         }
-        double progress = Math.min(1.0D, Math.max(0, mastery) / 700.0D);
+        double progress = getMasteryProgress(mastery);
         return Math.max(4, (int) Math.round(baseTimeoutTicks * (1.0D - 0.80D * progress)));
     }
 

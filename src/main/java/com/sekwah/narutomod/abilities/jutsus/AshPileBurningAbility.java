@@ -61,7 +61,7 @@ public class AshPileBurningAbility extends Ability implements Ability.Cooldown {
     }
 
     public static int getScaledDuration(int mastery) {
-        return (int) Math.round(CLOUD_DURATION_TICKS * (1.0D + 0.15D * (Math.max(0, mastery) / 100.0D)));
+        return Ability.getScaledDurationTicks(CLOUD_DURATION_TICKS, mastery, 0.60D);
     }
 
     public static double getScaledRange(int mastery) {

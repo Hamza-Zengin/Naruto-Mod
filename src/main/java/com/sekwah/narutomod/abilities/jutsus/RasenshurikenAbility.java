@@ -85,7 +85,12 @@ public class RasenshurikenAbility extends Ability implements Ability.Cooldown {
                 12, 0.3, 0.2, 0.3, 0.05,
                 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
-        RasenshurikenEntity projectile = new RasenshurikenEntity(player, look.x, look.y, look.z);
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        double progress = Ability.getMasteryProgress(mastery);
+        Vec3 shootVel = look.scale(1.0D + 0.25D * progress);
+
+        RasenshurikenEntity projectile = new RasenshurikenEntity(player, shootVel.x, shootVel.y, shootVel.z);
+        projectile.lifeSpan = 80 + (int) Math.round(25.0D * progress);
         serverLevel.addFreshEntity(projectile);
     }
 }

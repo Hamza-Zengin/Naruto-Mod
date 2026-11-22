@@ -99,7 +99,7 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                                 p.level().playSound(null,
                                         p.getX(), p.getY(), p.getZ(), ability.castingSound(), SoundSource.PLAYERS, 0.5f, 1.0f);
                             }
-                            ability.performServer(p, ninjaData);
+                            ability.perform(p, ninjaData);
                             if (p instanceof ServerPlayer sp) {
                                 sendHandSealSpark(sp, ability);
                             }
@@ -109,7 +109,7 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                             player.level().playSound(null,
                                     player.getX(), player.getY(), player.getZ(), ability.castingSound(), SoundSource.PLAYERS, 0.5f, 1.0f);
                         }
-                        ability.performServer(player, ninjaData);
+                        ability.perform(player, ninjaData);
                         sendHandSealSpark(player, ability);
                     }
                     ninjaData.addJutsuCast();

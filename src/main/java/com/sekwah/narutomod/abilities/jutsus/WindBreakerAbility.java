@@ -60,7 +60,7 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
         float powerMult = getPowerMultiplier(mastery);
         float damage = this.getDamage(ninjaData);
-        int maxRange = 16 + (getMasteryTier(mastery) >= 4 ? 4 : 0);
+        int maxRange = 16 + (int) Math.round(6.0D * Ability.getMasteryProgress(mastery));
 
         Vec3 look = player.getLookAngle();
         serverLevel.playSound(null, player.blockPosition(), SoundEvents.PHANTOM_FLAP, SoundSource.PLAYERS, 2.0f, 0.7f);

@@ -119,7 +119,8 @@ public class EightGatesAbility extends Ability implements Ability.Toggled, Abili
         }
 
         GateStage stage = getStage(ninjaData);
-        float cost = stage.getStaminaCost();
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        float cost = Math.max(0.02f, stage.getStaminaCost() * (float) (1.0D - 0.25D * Ability.getMasteryProgress(mastery)));
 
         if (ninjaData.getStamina() < cost) {
             // Stamina exhausted: deactivate technique safely without death penalty

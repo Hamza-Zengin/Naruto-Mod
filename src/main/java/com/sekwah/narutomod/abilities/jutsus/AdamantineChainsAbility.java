@@ -100,7 +100,8 @@ public class AdamantineChainsAbility extends Ability implements Ability.Cooldown
 
         JutsuVisualEffectEntity chains = JutsuVisualEffectEntity.create(
                 serverLevel, targetPos.x, targetPos.y, targetPos.z,
-                JutsuVisualEffectEntity.TYPE_ADAMANTINE_CHAINS, 60, player.getYRot());
+                JutsuVisualEffectEntity.TYPE_ADAMANTINE_CHAINS,
+                Ability.getScaledDurationTicks(60, mastery, 0.60D), player.getYRot());
         chains.setCasterUUID(player.getUUID());
         chains.setEffectDamage(damage);
         serverLevel.addFreshEntity(chains);

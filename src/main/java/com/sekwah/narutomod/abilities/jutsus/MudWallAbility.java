@@ -55,7 +55,7 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
 
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
         float powerMult = getPowerMultiplier(mastery);
-        int maxLife = (int) (160 * powerMult);
+        int maxLife = Ability.getScaledDurationTicks(160, mastery, 0.60D);
         float maxHealth = MudWallEntity.DEFAULT_MAX_HEALTH * powerMult;
 
         Direction direction = player.getDirection();

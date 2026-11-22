@@ -102,7 +102,7 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
                 com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
                         serverLevel, origin.x, origin.y, origin.z,
                         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_BONE_FOREST,
-                        65, player.getYRot());
+                        Ability.getScaledDurationTicks(65, mastery, 0.60D), player.getYRot());
         boneForest.setCasterUUID(player.getUUID());
         serverLevel.addFreshEntity(boneForest);
 

@@ -283,8 +283,8 @@ public class JutsuEntitiesPhysicsTest {
     @Test
     @DisplayName("Verify Water Wall dimensions (3.6F x 2.8F), pickability, barrier geometry, and Fireball extinguishing")
     public void testWaterWallDimensionsPickabilityAndFireballExtinguish() throws IOException {
-        assertEquals(3.6F, com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.WATER_WALL_WIDTH, 0.001F);
-        assertEquals(2.8F, com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.WATER_WALL_HEIGHT, 0.001F);
+        assertEquals(5.2F, com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.WATER_WALL_WIDTH, 0.001F);
+        assertEquals(3.2F, com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.WATER_WALL_HEIGHT, 0.001F);
 
         net.minecraft.world.phys.Vec3 wallOrigin = new net.minecraft.world.phys.Vec3(10.0D, 64.0D, 10.0D);
         assertTrue(com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.isBlockedByWaterWall(
@@ -305,5 +305,31 @@ public class JutsuEntitiesPhysicsTest {
         assertTrue(fireballSrc.contains("extinguishByWaterWall(serverLevel)"));
         assertTrue(fireballSrc.contains("getWaterWallBarrierBox().intersects(sweptBox)"));
         assertTrue(fireballSrc.contains("this.lifeSpan = 65;"));
+    }
+
+    @Test
+    @DisplayName("Verify WaterWallModel emergence finishes by tick 6 regardless of maxLife and WaterBullet implements JutsuProjectile")
+    public void testWaterWallModelEmergenceAndWaterProjectileElement() throws IOException {
+        net.minecraft.client.model.geom.ModelPart root =
+                com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.WaterWallModel.createLayer().bakeRoot();
+        com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.WaterWallModel model =
+                new com.sekwah.narutomod.client.model.jutsu.JutsuVisualModels.WaterWallModel(root);
+        net.minecraft.client.model.geom.ModelPart waveBase = root.getChild("wave_base");
+
+        for (int maxLife : new int[]{100, 180, 1000}) {
+            model.setupAnim(6.0F, 6.0F / maxLife);
+            assertEquals(0.0F, waveBase.y, 0.001F,
+                    "WaterWallModel emergence must be 0.0F by tick 6 for maxLife=" + maxLife);
+        }
+
+        assertTrue(com.sekwah.narutomod.entity.jutsuprojectile.JutsuProjectile.class.isAssignableFrom(WaterBulletEntity.class),
+                "WaterBulletEntity must implement JutsuProjectile");
+        String waterBulletSrc = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/entity/jutsuprojectile/WaterBulletEntity.java"));
+        assertTrue(waterBulletSrc.contains("return ChakraElement.WATER;"),
+                "WaterBulletEntity must report ChakraElement.WATER");
+
+        String visualSrc = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/entity/jutsuprojectile/JutsuVisualEffectEntity.java"));
+        assertTrue(visualSrc.contains("fireball.extinguishByWaterWall(serverLevel);"),
+                "TYPE_WATER_WALL must extinguish FireballJutsuEntity regardless of owner");
     }
 }
