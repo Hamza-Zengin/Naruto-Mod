@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/rank_chunin",
+  "display": {
+    "icon": {
+      "id": "narutomod:chakra_blades"
+    },
+    "title": {
+      "translate": "advancements.narutomod.arena_champion.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.arena_champion.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "chunin_champion": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "defeat_boss",
+        "target": "chunin_champion"
+      }
+    }
+  }
+}

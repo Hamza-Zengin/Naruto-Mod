@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/rank_jonin",
+  "display": {
+    "icon": {
+      "id": "narutomod:red_anbu_mask"
+    },
+    "title": {
+      "translate": "advancements.narutomod.rank_anbu.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.rank_anbu.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "anbu": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "rank_up",
+        "target": "ANBU"
+      }
+    }
+  }
+}

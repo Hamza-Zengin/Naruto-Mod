@@ -1,8 +1,11 @@
 package com.sekwah.narutomod.entity.projectile;
 
+import com.sekwah.narutomod.advancements.NinjaProgressTrigger;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.item.NarutoItems;
+import com.sekwah.narutomod.registries.NarutoRegistries;
 import com.sekwah.narutomod.sounds.NarutoSounds;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -22,6 +26,7 @@ public class FumaShurikenEntity extends AbstractArrow {
 
     private int prevRotateTicks = 0;
     private int rotateTicks = 0;
+    private int piercedCount = 0;
 
     public static final double SAFE_SPAWN_FORWARD_OFFSET = 1.25D;
 
@@ -66,6 +71,18 @@ public class FumaShurikenEntity extends AbstractArrow {
     @Override
     public byte getPierceLevel() {
         return (byte) 2;
+    }
+
+    @Override
+    protected void onHitEntity(EntityHitResult result) {
+        super.onHitEntity(result);
+        if (!this.level().isClientSide()) {
+            this.piercedCount++;
+            if (this.piercedCount >= 2 && this.getOwner() instanceof ServerPlayer serverPlayer) {
+                NarutoRegistries.NINJA_PROGRESS_TRIGGER.get().trigger(
+                        serverPlayer, NinjaProgressTrigger.Action.PIERCE_HIT, "fuma_shuriken");
+            }
+        }
     }
 
     @Override

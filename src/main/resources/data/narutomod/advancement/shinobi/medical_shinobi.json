@@ -1,0 +1,34 @@
+{
+  "parent": "narutomod:shinobi/chakra_control",
+  "display": {
+    "icon": {
+      "id": "narutomod:medical_pouch"
+    },
+    "title": {
+      "translate": "advancements.narutomod.medical_shinobi.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.medical_shinobi.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "mystical_palm": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "use_jutsu",
+        "target": "mystical_palm"
+      }
+    },
+    "chakra_scalpel": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "use_jutsu",
+        "target": "chakra_scalpel"
+      }
+    }
+  }
+}

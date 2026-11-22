@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/elemental_master",
+  "display": {
+    "icon": {
+      "id": "narutomod:fuma_shuriken"
+    },
+    "title": {
+      "translate": "advancements.narutomod.wind_demon_fuma.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.wind_demon_fuma.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "fuma_pierce": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "pierce_hit",
+        "target": "fuma_shuriken"
+      }
+    }
+  }
+}

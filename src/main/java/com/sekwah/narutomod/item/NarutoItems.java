@@ -108,6 +108,9 @@ public class NarutoItems {
     public static final DeferredItem<Item> AKATSUKI_NINJA_SPAWN_EGG = ITEMS.registerItem("akatsuki_ninja_spawn_egg",
             props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.AKATSUKI_NINJA.get())));
 
+    public static final DeferredItem<Item> CHUNIN_CHAMPION_SPAWN_EGG = ITEMS.registerItem("chunin_champion_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.CHUNIN_CHAMPION.get())));
+
     public static final DeferredItem<Item> VILLAGE_NINJA_SPAWN_EGG = ITEMS.registerItem("village_ninja_spawn_egg",
             props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.VILLAGE_NINJA.get())));
 
@@ -423,6 +426,7 @@ public class NarutoItems {
         if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(ROGUE_NINJA_SPAWN_EGG.get());
             event.accept(AKATSUKI_NINJA_SPAWN_EGG.get());
+            event.accept(CHUNIN_CHAMPION_SPAWN_EGG.get());
             event.accept(VILLAGE_NINJA_SPAWN_EGG.get());
             event.accept(KONOHA_NINJA_SPAWN_EGG.get());
             event.accept(SUNA_NINJA_SPAWN_EGG.get());

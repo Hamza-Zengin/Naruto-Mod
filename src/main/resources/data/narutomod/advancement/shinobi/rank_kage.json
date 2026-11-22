@@ -1,5 +1,5 @@
 {
-  "parent": "narutomod:shinobi/rank_chunin",
+  "parent": "narutomod:shinobi/rank_anbu",
   "display": {
     "icon": {
       "id": "narutomod:kusanagi_sword"
