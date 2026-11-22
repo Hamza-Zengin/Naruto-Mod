@@ -23,7 +23,7 @@ public class FumaShurikenEntity extends AbstractArrow {
     private int prevRotateTicks = 0;
     private int rotateTicks = 0;
 
-    public static final double SAFE_SPAWN_FORWARD_OFFSET = 0.75D;
+    public static final double SAFE_SPAWN_FORWARD_OFFSET = 1.25D;
 
     public FumaShurikenEntity(EntityType<? extends FumaShurikenEntity> type, Level level) {
         super(type, level);

@@ -1,17 +1,24 @@
 package com.sekwah.narutomod.worldgen;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Stream;
+
 /**
- * Unit tests for {@link AnchoredJigsawStructure} foundation classification, two-tier pillar grid,
- * water/lava filtering, and material selection.
+ * Unit tests for {@link AnchoredJigsawStructure} foundation classification, direct spaced pillar grid,
+ * corner pillar detection, water/lava filtering, material selection, and structure JSON terrain adaptation.
  */
 public class AnchoredJigsawStructureTest {
 
@@ -116,26 +123,56 @@ public class AnchoredJigsawStructureTest {
     }
 
     @Test
-    public void testTier1VsTier2SupportGeometryAndEmbedDepth() {
-        BoundingBox box = new BoundingBox(100, 60, 200, 116, 75, 216);
+    public void testCornerPillarPointAndDirectPillarEmbedDepth() {
+        int minX = 100;
+        int maxX = 116;
+        int minZ = 200;
+        int maxZ = 216;
+        int pillarSize = AnchoredJigsawStructure.selectPillarSize(1, 16);
+        Assertions.assertEquals(2, pillarSize);
 
-        // Perimeter and central node must be Tier 1 support points
-        Assertions.assertTrue(AnchoredJigsawStructure.isTier1SupportPoint(100, 200, box));
-        Assertions.assertTrue(AnchoredJigsawStructure.isTier1SupportPoint(116, 216, box));
-        Assertions.assertTrue(AnchoredJigsawStructure.isTier1SupportPoint(100, 208, box));
-        Assertions.assertTrue(AnchoredJigsawStructure.isTier1SupportPoint(108, 208, box));
+        // All four 2x2 outer footprint corners must be corner pillars
+        Assertions.assertTrue(AnchoredJigsawStructure.isCornerPillarPoint(100, 200, minX, maxX, minZ, maxZ, pillarSize));
+        Assertions.assertTrue(AnchoredJigsawStructure.isCornerPillarPoint(101, 201, minX, maxX, minZ, maxZ, pillarSize));
+        Assertions.assertTrue(AnchoredJigsawStructure.isCornerPillarPoint(115, 200, minX, maxX, minZ, maxZ, pillarSize));
+        Assertions.assertTrue(AnchoredJigsawStructure.isCornerPillarPoint(116, 201, minX, maxX, minZ, maxZ, pillarSize));
+        Assertions.assertTrue(AnchoredJigsawStructure.isCornerPillarPoint(100, 215, minX, maxX, minZ, maxZ, pillarSize));
+        Assertions.assertTrue(AnchoredJigsawStructure.isCornerPillarPoint(101, 216, minX, maxX, minZ, maxZ, pillarSize));
+        Assertions.assertTrue(AnchoredJigsawStructure.isCornerPillarPoint(115, 215, minX, maxX, minZ, maxZ, pillarSize));
+        Assertions.assertTrue(AnchoredJigsawStructure.isCornerPillarPoint(116, 216, minX, maxX, minZ, maxZ, pillarSize));
 
-        // Interior points away from perimeter and central node are not Tier 1 supports
-        Assertions.assertFalse(AnchoredJigsawStructure.isTier1SupportPoint(104, 204, box));
-        Assertions.assertFalse(AnchoredJigsawStructure.isTier1SupportPoint(112, 212, box));
+        // Mid-edge, interior, out-of-bounds, and invalid pillarSize are not corner pillars
+        Assertions.assertFalse(AnchoredJigsawStructure.isCornerPillarPoint(108, 200, minX, maxX, minZ, maxZ, pillarSize));
+        Assertions.assertFalse(AnchoredJigsawStructure.isCornerPillarPoint(100, 208, minX, maxX, minZ, maxZ, pillarSize));
+        Assertions.assertFalse(AnchoredJigsawStructure.isCornerPillarPoint(104, 204, minX, maxX, minZ, maxZ, pillarSize));
+        Assertions.assertFalse(AnchoredJigsawStructure.isCornerPillarPoint(99, 200, minX, maxX, minZ, maxZ, pillarSize));
+        Assertions.assertFalse(AnchoredJigsawStructure.isCornerPillarPoint(100, 200, minX, maxX, minZ, maxZ, 0));
 
-        // Tier separation constant and Tier 2 embed depth (3-4 blocks)
-        Assertions.assertEquals(10, AnchoredJigsawStructure.TIER1_MAX_GAP);
-        Assertions.assertEquals(2, AnchoredJigsawStructure.TIER1_EMBED_DEPTH);
+        // Direct pillar embed depth (3-4 blocks) applies to all pillars (including gap >= 1)
         int embedEven = AnchoredJigsawStructure.computeTier2EmbedDepth(10, 20);
         int embedOdd = AnchoredJigsawStructure.computeTier2EmbedDepth(10, 21);
         Assertions.assertTrue(embedEven >= 3 && embedEven <= 4);
         Assertions.assertTrue(embedOdd >= 3 && embedOdd <= 4);
+    }
+
+    @Test
+    public void testAllStructureJsonsUseBeardThin() throws IOException {
+        Path structureDir = Path.of("src/main/resources/data/narutomod/worldgen/structure");
+        Assertions.assertTrue(Files.isDirectory(structureDir), "Expected structure directory at " + structureDir);
+
+        List<Path> jsonFiles;
+        try (Stream<Path> paths = Files.list(structureDir)) {
+            jsonFiles = paths.filter(p -> p.toString().endsWith(".json")).sorted().toList();
+        }
+
+        Assertions.assertEquals(10, jsonFiles.size(), "Expected 10 structure JSON files");
+        for (Path jsonFile : jsonFiles) {
+            String content = Files.readString(jsonFile);
+            JsonObject obj = JsonParser.parseString(content).getAsJsonObject();
+            Assertions.assertTrue(obj.has("terrain_adaptation"), "Missing terrain_adaptation in " + jsonFile.getFileName());
+            Assertions.assertEquals("beard_thin", obj.get("terrain_adaptation").getAsString(),
+                    "Expected beard_thin in " + jsonFile.getFileName());
+        }
     }
 
     @Test

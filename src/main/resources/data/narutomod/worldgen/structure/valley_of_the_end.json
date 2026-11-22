@@ -3,7 +3,7 @@
   "biomes": "#minecraft:is_jungle",
   "step": "surface_structures",
   "spawn_overrides": {},
-  "terrain_adaptation": "beard_box",
+  "terrain_adaptation": "beard_thin",
   "start_pool": "narutomod:valley_of_the_end",
   "size": 4,
   "start_height": {

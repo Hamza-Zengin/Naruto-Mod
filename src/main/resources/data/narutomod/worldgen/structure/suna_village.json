@@ -7,7 +7,7 @@
   ],
   "step": "surface_structures",
   "spawn_overrides": {},
-  "terrain_adaptation": "beard_box",
+  "terrain_adaptation": "beard_thin",
   "start_pool": "narutomod:suna_village",
   "size": 5,
   "start_height": {

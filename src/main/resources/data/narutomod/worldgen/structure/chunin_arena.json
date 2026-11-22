@@ -7,7 +7,7 @@
   ],
   "step": "surface_structures",
   "spawn_overrides": {},
-  "terrain_adaptation": "beard_box",
+  "terrain_adaptation": "beard_thin",
   "start_pool": "narutomod:chunin_arena",
   "size": 3,
   "start_height": {

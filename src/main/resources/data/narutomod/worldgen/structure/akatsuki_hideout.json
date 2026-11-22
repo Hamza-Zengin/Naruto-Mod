@@ -3,7 +3,7 @@
   "biomes": "#minecraft:is_mountain",
   "step": "surface_structures",
   "spawn_overrides": {},
-  "terrain_adaptation": "beard_box",
+  "terrain_adaptation": "beard_thin",
   "start_pool": "narutomod:akatsuki_hideout",
   "size": 3,
   "start_height": {

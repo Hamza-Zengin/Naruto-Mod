@@ -40,9 +40,9 @@ import java.util.concurrent.ConcurrentHashMap;
  *       and rejects locations with lava pools, excessive elevation spread, or water exceeding limits.</li>
  *   <li>Anchors the jigsaw start elevation toward the surrounding terrain median/lower-quartile
  *       instead of an isolated peak spike.</li>
- *   <li>During {@link #afterPlace}, applies a two-tier foundation system (perimeter/node skirts for
- *       1-10 block voids and globally grid-aligned spaced columns for >10 block voids) and seals
- *       adjacent lava pools.</li>
+ *   <li>During {@link #afterPlace}, places globally grid-aligned spaced stone columns and outer
+ *       footprint corner pillars for any {@code gap >= 1} overhang, seals 1-block fluid lips on
+ *       non-pillar water-edge points, and clears adjacent lava pools.</li>
  * </ol>
  */
 public class AnchoredJigsawStructure extends Structure {
@@ -55,8 +55,6 @@ public class AnchoredJigsawStructure extends Structure {
             Codec.BOOL.optionalFieldOf("allow_shallow_water", false).forGetter(s -> s.allowShallowWater)
     ).apply(instance, AnchoredJigsawStructure::new));
 
-    static final int TIER1_MAX_GAP = 10;
-    static final int TIER1_EMBED_DEPTH = 2;
     static final int TIER2_MIN_EMBED_DEPTH = 3;
     static final int TIER2_MAX_EMBED_DEPTH = 4;
     static final int MIN_COLUMN_CLEAR_GAP = 5;
@@ -223,12 +221,16 @@ public class AnchoredJigsawStructure extends Structure {
             int z1 = Math.min(chunkBox.maxZ(), pieceBox.maxZ());
 
             int scanLow = Math.max(worldMinY, pieceBox.minY());
-            int scanHigh = Math.min(worldMaxY, pieceBox.minY() + 4);
+            int scanHigh = Math.min(worldMaxY, pieceBox.minY() + Math.min(12, Math.max(4, pieceBox.getYSpan() / 2)));
             int pieceWidth = Math.max(pieceBox.getXSpan(), pieceBox.getZSpan());
 
             BlockState dominantBaseState = null;
             int minBaseY = Integer.MAX_VALUE;
             int maxBaseY = Integer.MIN_VALUE;
+            int footprintMinX = Integer.MAX_VALUE;
+            int footprintMaxX = Integer.MIN_VALUE;
+            int footprintMinZ = Integer.MAX_VALUE;
+            int footprintMaxZ = Integer.MIN_VALUE;
 
             int width = (x1 - x0) + 1;
             int depthSpan = (z1 - z0) + 1;
@@ -254,6 +256,19 @@ public class AnchoredJigsawStructure extends Structure {
                     baseStates[xi][zi] = baseState;
                     if (baseY < 0) {
                         continue;
+                    }
+
+                    if (x < footprintMinX) {
+                        footprintMinX = x;
+                    }
+                    if (x > footprintMaxX) {
+                        footprintMaxX = x;
+                    }
+                    if (z < footprintMinZ) {
+                        footprintMinZ = z;
+                    }
+                    if (z > footprintMaxZ) {
+                        footprintMaxZ = z;
                     }
 
                     if (dominantBaseState == null) {
@@ -286,6 +301,12 @@ public class AnchoredJigsawStructure extends Structure {
                 minBaseY = scanLow;
                 maxBaseY = scanHigh;
             }
+            if (footprintMinX == Integer.MAX_VALUE) {
+                footprintMinX = x0;
+                footprintMaxX = x1;
+                footprintMinZ = z0;
+                footprintMaxZ = z1;
+            }
 
             clearLavaAroundPiece(level, cursor, chunkBox, pieceBox, minBaseY, maxBaseY, worldMinY, worldMaxY, dominantBaseState);
 
@@ -304,37 +325,25 @@ public class AnchoredJigsawStructure extends Structure {
                         continue;
                     }
 
-                    if (gap <= TIER1_MAX_GAP) {
-                        // Seal 1-block fluid layer directly under baseY on water-edge overhangs
-                        BlockState immediatelyBelow = level.getBlockState(cursor.set(x, baseY - 1, z));
-                        boolean hasFluidBelow = !immediatelyBelow.getFluidState().isEmpty();
-                        boolean isSupport = isTier1SupportPoint(x, z, pieceBox);
-                        if (!isSupport && !hasFluidBelow) {
-                            continue;
-                        }
+                    int pillarSize = selectPillarSize(gap, pieceWidth);
+                    int stride = computePillarStride(pillarSize);
+                    boolean isPillar = isOnGlobalPillarGrid(x, z, pillarSize, stride)
+                            || isCornerPillarPoint(x, z, footprintMinX, footprintMaxX, footprintMinZ, footprintMaxZ, pillarSize);
 
-                        if (isSupport) {
-                            int embedDepth = TIER1_EMBED_DEPTH;
-                            int stopY = Math.max(worldMinY, baseY - Math.min(maxFoundationDepth, gap + embedDepth));
-                            fillFoundationColumn(level, cursor, baseState, x, z, baseY, stopY);
-                        } else {
-                            // Water-edge lip seal: seal 1 block below baseY so water does not bleed under walls/floors
+                    if (isPillar) {
+                        int embedDepth = computeTier2EmbedDepth(x, z);
+                        int stopY = Math.max(worldMinY, baseY - Math.min(maxFoundationDepth, gap + embedDepth));
+                        fillFoundationColumn(level, cursor, baseState, x, z, baseY, stopY);
+                    } else {
+                        // Water-edge lip seal: seal 1 block below baseY so water does not bleed under walls/floors
+                        BlockState immediatelyBelow = level.getBlockState(cursor.set(x, baseY - 1, z));
+                        if (!immediatelyBelow.getFluidState().isEmpty()) {
                             int sealY = baseY - 1;
                             if (sealY >= worldMinY) {
                                 BlockState fillState = pickFoundationBlock(baseState, x, sealY, z, 0);
                                 level.setBlock(cursor.set(x, sealY, z), fillState, 2);
                             }
                         }
-                    } else {
-                        int pillarSize = selectPillarSize(gap, pieceWidth);
-                        int stride = computePillarStride(pillarSize);
-                        if (!isOnGlobalPillarGrid(x, z, pillarSize, stride)) {
-                            continue;
-                        }
-
-                        int embedDepth = computeTier2EmbedDepth(x, z);
-                        int stopY = Math.max(worldMinY, baseY - Math.min(maxFoundationDepth, gap + embedDepth));
-                        fillFoundationColumn(level, cursor, baseState, x, z, baseY, stopY);
                     }
                 }
             }
@@ -409,7 +418,7 @@ public class AnchoredJigsawStructure extends Structure {
                 level.setBlock(cursor, fillState, 2);
             } else {
                 reachedNaturalSolid = true;
-                // Embed 2 (Tier 1) or 3-4 (Tier 2) blocks into natural solid ground
+                // Embed 3-4 blocks into natural solid ground
                 int depth = (baseY - 1) - y;
                 BlockState fillState = pickFoundationBlock(baseState, x, y, z, depth);
                 level.setBlock(cursor, fillState, 2);
@@ -455,19 +464,15 @@ public class AnchoredJigsawStructure extends Structure {
         return Math.floorMod(x, stride) < pillarSize && Math.floorMod(z, stride) < pillarSize;
     }
 
-    static boolean isTier1SupportPoint(int x, int z, BoundingBox pieceBox) {
-        boolean onPerimeter = x == pieceBox.minX()
-                || x == pieceBox.maxX()
-                || z == pieceBox.minZ()
-                || z == pieceBox.maxZ();
-        if (onPerimeter) {
-            return true;
+    static boolean isCornerPillarPoint(int x, int z, int minX, int maxX, int minZ, int maxZ, int pillarSize) {
+        if (pillarSize <= 0 || minX > maxX || minZ > maxZ) {
+            return false;
         }
-        int midX = (pieceBox.minX() + pieceBox.maxX()) / 2;
-        int midZ = (pieceBox.minZ() + pieceBox.maxZ()) / 2;
-        boolean nearMidX = Math.abs(x - midX) <= 1;
-        boolean nearMidZ = Math.abs(z - midZ) <= 1;
-        return nearMidX && nearMidZ;
+        boolean nearMinX = x >= minX && x < minX + pillarSize;
+        boolean nearMaxX = x <= maxX && x > maxX - pillarSize;
+        boolean nearMinZ = z >= minZ && z < minZ + pillarSize;
+        boolean nearMaxZ = z <= maxZ && z > maxZ - pillarSize;
+        return (nearMinX || nearMaxX) && (nearMinZ || nearMaxZ);
     }
 
     static int computeTier2EmbedDepth(int x, int z) {
