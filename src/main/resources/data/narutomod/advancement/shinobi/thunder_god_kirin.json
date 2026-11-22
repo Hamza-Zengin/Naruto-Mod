@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/elemental_master",
+  "display": {
+    "icon": {
+      "id": "narutomod:scroll_kirin"
+    },
+    "title": {
+      "translate": "advancements.narutomod.thunder_god_kirin.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.thunder_god_kirin.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "kirin": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "use_jutsu",
+        "target": "kirin"
+      }
+    }
+  }
+}

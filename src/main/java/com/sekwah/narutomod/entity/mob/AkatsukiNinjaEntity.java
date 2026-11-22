@@ -1,5 +1,6 @@
 package com.sekwah.narutomod.entity.mob;
 
+import com.sekwah.narutomod.advancements.NinjaProgressTrigger;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.entity.ai.NinjaJutsuAttackGoal;
@@ -7,6 +8,7 @@ import com.sekwah.narutomod.entity.ai.NinjaJutsuCooldowns;
 import com.sekwah.narutomod.entity.ai.NinjaJutsuProfile;
 import com.sekwah.narutomod.entity.ai.NinjaJutsuUser;
 import com.sekwah.narutomod.item.NarutoItems;
+import com.sekwah.narutomod.registries.NarutoRegistries;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -160,6 +162,10 @@ public class AkatsukiNinjaEntity extends Monster implements NinjaJutsuUser {
             var data = killer.getData(NinjaCapabilityHandler.NINJA_DATA);
             for (int i = 0; i < 4; i++) {
                 data.addEnemyDefeated();
+            }
+            if (killer instanceof ServerPlayer serverPlayer) {
+                NarutoRegistries.NINJA_PROGRESS_TRIGGER.get().trigger(
+                        serverPlayer, NinjaProgressTrigger.Action.DEFEAT_BOSS, "akatsuki_ninja");
             }
         }
     }

@@ -326,7 +326,12 @@ public class NarutoModGameTests {
 
         var advancements = helper.getLevel().getServer().getAdvancements();
         for (String advPath : new String[]{
-                "shinobi/five_great_nations", "shinobi/sage_of_myobokuzan", "shinobi/seven_swordsmen"}) {
+                "shinobi/five_great_nations", "shinobi/sage_of_myobokuzan", "shinobi/seven_swordsmen",
+                "shinobi/rank_jonin", "shinobi/rank_anbu", "shinobi/clan_uchiha", "shinobi/clan_hyuga",
+                "shinobi/clan_uzumaki", "shinobi/clan_senju", "shinobi/clan_kaguya", "shinobi/clan_nara",
+                "shinobi/medical_shinobi", "shinobi/eight_gates_master", "shinobi/master_rasenshuriken",
+                "shinobi/thunder_god_kirin", "shinobi/wind_demon_fuma", "shinobi/arena_champion",
+                "shinobi/akatsuki_hunter", "shinobi/valley_of_the_end"}) {
             helper.assertTrue(
                     advancements.get(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, advPath)) != null,
                     "Advancement must load cleanly: " + advPath);

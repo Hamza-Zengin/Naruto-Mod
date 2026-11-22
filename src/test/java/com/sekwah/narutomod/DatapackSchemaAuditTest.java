@@ -296,7 +296,7 @@ public class DatapackSchemaAuditTest {
         try (Stream<Path> walk = Files.walk(advDir)) {
             files = walk.filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".json")).sorted().toList();
         }
-        Assertions.assertEquals(11, files.size(), "Expected 11 Shinobi advancement JSONs!");
+        Assertions.assertEquals(27, files.size(), "Expected 27 Shinobi advancement JSONs!");
 
         for (Path file : files) {
             JsonObject root = JsonParser.parseString(Files.readString(file)).getAsJsonObject();

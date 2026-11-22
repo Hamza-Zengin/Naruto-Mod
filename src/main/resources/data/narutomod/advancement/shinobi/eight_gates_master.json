@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/chakra_control",
+  "display": {
+    "icon": {
+      "id": "narutomod:warring_states_armor"
+    },
+    "title": {
+      "translate": "advancements.narutomod.eight_gates_master.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.eight_gates_master.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "eight_gates_death": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "use_jutsu",
+        "target": "eight_gates_death"
+      }
+    }
+  }
+}

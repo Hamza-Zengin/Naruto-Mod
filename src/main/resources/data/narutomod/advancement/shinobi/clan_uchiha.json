@@ -1,0 +1,40 @@
+{
+  "parent": "narutomod:shinobi/select_clan",
+  "display": {
+    "icon": {
+      "id": "narutomod:gunbai_uchiwa"
+    },
+    "title": {
+      "translate": "advancements.narutomod.clan_uchiha.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.clan_uchiha.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "amaterasu": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "use_jutsu",
+        "target": "amaterasu"
+      }
+    },
+    "susanoo_ribcage": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "use_jutsu",
+        "target": "susanoo_ribcage"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "amaterasu",
+      "susanoo_ribcage"
+    ]
+  ]
+}

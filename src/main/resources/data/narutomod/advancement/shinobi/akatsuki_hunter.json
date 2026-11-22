@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/rank_chunin",
+  "display": {
+    "icon": {
+      "id": "narutomod:akatsuki_cloak"
+    },
+    "title": {
+      "translate": "advancements.narutomod.akatsuki_hunter.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.akatsuki_hunter.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "akatsuki_ninja": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "defeat_boss",
+        "target": "akatsuki_ninja"
+      }
+    }
+  }
+}

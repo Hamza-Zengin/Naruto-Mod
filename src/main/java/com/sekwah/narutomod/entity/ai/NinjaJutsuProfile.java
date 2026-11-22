@@ -136,6 +136,25 @@ public final class NinjaJutsuProfile {
     }
 
     /**
+     * Chūnin Arena Champion Boss preset: fast cooldowns, Fireball, Vacuum Spheres,
+     * close-range Chidori Spark, and defensive Kawarimi & Mud Wall reflexes.
+     */
+    public static NinjaJutsuProfile chuninChampionPreset() {
+        return new Builder()
+                .rangedDistances(7.0D, 22.0D)
+                .closeThreatDistance(6.0D)
+                .criticalHealthRatio(0.35F)
+                .globalCooldownTicks(28)
+                .handSealWindupTicks(8)
+                .fireball(true, 65, 20)
+                .vacuumSpheres(true, 70, 20, 6.0F, 30, 1.55D)
+                .chidoriSpark(true, 85, 11.0F)
+                .kawarimi(true, 130, 5.5D, 70, 1)
+                .mudWall(true, 150, 120, 45.0F)
+                .build();
+    }
+
+    /**
      * Evasive Rogue Ninja preset: longer cooldowns, basic Water Bullet projectile at range,
      * and Kawarimi smoke evasion at critical health.
      */

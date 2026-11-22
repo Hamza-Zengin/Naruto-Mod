@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/select_clan",
+  "display": {
+    "icon": {
+      "id": "narutomod:blank_jutsu_scroll"
+    },
+    "title": {
+      "translate": "advancements.narutomod.clan_nara.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.clan_nara.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "shadow_possession": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "use_jutsu",
+        "target": "shadow_possession"
+      }
+    }
+  }
+}

@@ -37,7 +37,9 @@ public class NinjaProgressTrigger extends SimpleCriterionTrigger<NinjaProgressTr
         SELECT_CLAN("select_clan"),
         USE_JUTSU("use_jutsu"),
         ELEMENTAL_COMBO("elemental_combo"),
-        RANK_UP("rank_up");
+        RANK_UP("rank_up"),
+        DEFEAT_BOSS("defeat_boss"),
+        PIERCE_HIT("pierce_hit");
 
         public static final Codec<Action> CODEC = StringRepresentable.fromEnum(Action::values);
 

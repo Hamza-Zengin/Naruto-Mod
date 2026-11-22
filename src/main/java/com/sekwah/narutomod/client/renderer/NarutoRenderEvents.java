@@ -207,6 +207,7 @@ public class NarutoRenderEvents {
 
         event.registerEntityRenderer(NarutoEntities.ROGUE_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "rogue_ninja"));
         event.registerEntityRenderer(NarutoEntities.AKATSUKI_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "akatsuki_ninja"));
+        event.registerEntityRenderer(NarutoEntities.CHUNIN_CHAMPION.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "konoha_ninja"));
         event.registerEntityRenderer(NarutoEntities.VILLAGE_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "village_ninja"));
         event.registerEntityRenderer(NarutoEntities.KONOHA_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "konoha_ninja"));
         event.registerEntityRenderer(NarutoEntities.SUNA_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "suna_ninja"));

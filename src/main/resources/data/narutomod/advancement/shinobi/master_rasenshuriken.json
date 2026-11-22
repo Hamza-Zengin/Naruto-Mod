@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/elemental_master",
+  "display": {
+    "icon": {
+      "id": "narutomod:scroll_rasenshuriken"
+    },
+    "title": {
+      "translate": "advancements.narutomod.master_rasenshuriken.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.master_rasenshuriken.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "rasenshuriken": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "use_jutsu",
+        "target": "rasenshuriken"
+      }
+    }
+  }
+}

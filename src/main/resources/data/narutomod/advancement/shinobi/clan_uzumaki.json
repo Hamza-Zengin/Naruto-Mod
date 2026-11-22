@@ -1,0 +1,27 @@
+{
+  "parent": "narutomod:shinobi/select_clan",
+  "display": {
+    "icon": {
+      "id": "narutomod:sealed_ammo_scroll"
+    },
+    "title": {
+      "translate": "advancements.narutomod.clan_uzumaki.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.clan_uzumaki.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "adamantine_chains": {
+      "trigger": "narutomod:ninja_progress",
+      "conditions": {
+        "action": "use_jutsu",
+        "target": "adamantine_chains"
+      }
+    }
+  }
+}

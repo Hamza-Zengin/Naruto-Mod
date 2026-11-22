@@ -1,0 +1,34 @@
+{
+  "parent": "narutomod:shinobi/five_great_nations",
+  "display": {
+    "icon": {
+      "id": "narutomod:headband_leaf_scratched"
+    },
+    "title": {
+      "translate": "advancements.narutomod.valley_of_the_end.title"
+    },
+    "description": {
+      "translate": "advancements.narutomod.valley_of_the_end.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "visit_valley": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "location": {
+              "structures": "narutomod:valley_of_the_end"
+            }
+          }
+        }
+      }
+    }
+  }
+}
