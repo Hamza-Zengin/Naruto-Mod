@@ -6,6 +6,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * Unit tests for {@link AnchoredJigsawStructure} foundation classification, direct spaced pillar grid,
- * corner pillar detection, water/lava filtering, material selection, and structure JSON terrain adaptation.
+ * Unit tests for {@link AnchoredJigsawStructure} foundation classification, proportional 2x2 corner-first
+ * pillar grid, convex overhang corner detection, overhang clearing classification, water edge framing,
+ * water/lava filtering, material selection, and structure JSON terrain adaptation.
  */
 public class AnchoredJigsawStructureTest {
 
@@ -62,64 +64,159 @@ public class AnchoredJigsawStructureTest {
     }
 
     @Test
-    public void testPillarScalingAndClearGapAtLeastFiveBlocks() {
-        // Default 2x2: gap <= 20 and width < 20
-        int size2 = AnchoredJigsawStructure.selectPillarSize(12, 16);
-        Assertions.assertEquals(2, size2);
-        int stride2 = AnchoredJigsawStructure.computePillarStride(size2);
-        Assertions.assertEquals(8, stride2);
-        Assertions.assertTrue(stride2 - size2 >= AnchoredJigsawStructure.MIN_COLUMN_CLEAR_GAP);
+    public void testProportionalTwoByTwoPillarSizeAndAxisGridSpacing() {
+        // Always proportional 2x2 regardless of gap depth or piece width
+        Assertions.assertEquals(2, AnchoredJigsawStructure.selectPillarSize(1, 13));
+        Assertions.assertEquals(2, AnchoredJigsawStructure.selectPillarSize(21, 20));
+        Assertions.assertEquals(2, AnchoredJigsawStructure.selectPillarSize(34, 48));
 
-        // Medium 3x3: gap > 20 or width >= 20
-        Assertions.assertEquals(3, AnchoredJigsawStructure.selectPillarSize(21, 16));
-        Assertions.assertEquals(3, AnchoredJigsawStructure.selectPillarSize(14, 20));
-        int stride3 = AnchoredJigsawStructure.computePillarStride(3);
-        Assertions.assertEquals(9, stride3);
-        Assertions.assertTrue(stride3 - 3 >= AnchoredJigsawStructure.MIN_COLUMN_CLEAR_GAP);
+        int stride = AnchoredJigsawStructure.computePillarStride(AnchoredJigsawStructure.PILLAR_SIZE);
+        Assertions.assertEquals(8, stride);
+        Assertions.assertTrue(stride - AnchoredJigsawStructure.PILLAR_SIZE >= AnchoredJigsawStructure.MIN_COLUMN_CLEAR_GAP);
 
-        // Large 4x4: gap > 28 and width >= 26
-        int size4 = AnchoredJigsawStructure.selectPillarSize(29, 26);
-        Assertions.assertEquals(4, size4);
-        int stride4 = AnchoredJigsawStructure.computePillarStride(size4);
-        Assertions.assertEquals(10, stride4);
-        Assertions.assertTrue(stride4 - size4 >= AnchoredJigsawStructure.MIN_COLUMN_CLEAR_GAP);
+        // Verify computeAxisPillarStarts across typical and negative ranges
+        int[][] ranges = {
+                {0, 12},     // 13 wide
+                {0, 14},     // 15 wide
+                {0, 15},     // 16 wide
+                {0, 18},     // 19 wide
+                {-100, -42}, // 59 wide negative coordinates
+                {-15, 20}    // 36 wide spanning zero
+        };
+        for (int[] range : ranges) {
+            int min = range[0];
+            int max = range[1];
+            int[] starts = AnchoredJigsawStructure.computeAxisPillarStarts(
+                    min, max, AnchoredJigsawStructure.PILLAR_SIZE, AnchoredJigsawStructure.MIN_COLUMN_CLEAR_GAP);
+            Assertions.assertTrue(starts.length >= 2, "Expected corner starts for [" + min + ".." + max + "]");
+            Assertions.assertEquals(min, starts[0]);
+            Assertions.assertEquals(max - AnchoredJigsawStructure.PILLAR_SIZE + 1, starts[starts.length - 1]);
+
+            for (int i = 1; i < starts.length; i++) {
+                int clearGap = starts[i] - (starts[i - 1] + AnchoredJigsawStructure.PILLAR_SIZE);
+                Assertions.assertTrue(clearGap >= AnchoredJigsawStructure.MIN_COLUMN_CLEAR_GAP,
+                        "Expected >= 5 blocks clear gap in [" + min + ".." + max + "], got " + clearGap);
+            }
+        }
+
+        // Exact check for 19-wide piece: corners at 0..1 and 17..18, center at 9..10
+        int[] starts19 = AnchoredJigsawStructure.computeAxisPillarStarts(0, 18, 2, 5);
+        Assertions.assertArrayEquals(new int[]{0, 9, 17}, starts19);
+        Assertions.assertTrue(AnchoredJigsawStructure.isOnPiecePillarGrid(0, 17, starts19, starts19, 2));
+        Assertions.assertTrue(AnchoredJigsawStructure.isOnPiecePillarGrid(9, 10, starts19, starts19, 2));
+        Assertions.assertFalse(AnchoredJigsawStructure.isOnPiecePillarGrid(4, 0, starts19, starts19, 2));
     }
 
     @Test
-    public void testGlobalPillarGridFloorModAlignmentAcrossNegativeCoordinates() {
-        for (int size : new int[]{2, 3, 4}) {
-            int stride = AnchoredJigsawStructure.computePillarStride(size);
-            int minClearGap = Integer.MAX_VALUE;
-            int currentGap = 0;
-            boolean sawFirstPillar = false;
-
-            // Scan across negative and positive world coordinates at z = -stride (inside pillar band)
-            for (int x = -32; x <= 32; x++) {
-                boolean onGrid = AnchoredJigsawStructure.isOnGlobalPillarGrid(x, -stride, size, stride);
-                if (onGrid) {
-                    if (sawFirstPillar && currentGap > 0) {
-                        minClearGap = Math.min(minClearGap, currentGap);
-                    }
-                    sawFirstPillar = true;
-                    currentGap = 0;
-                } else if (sawFirstPillar) {
-                    currentGap++;
-                }
+    public void testPlanPiecePillarsCornerFirstAndNoDoubleThickPillars() {
+        BoundingBox pieceBox = new BoundingBox(0, 60, 0, 18, 72, 18);
+        int width = 19;
+        int depth = 19;
+        int[][] baseYs = new int[width][depth];
+        int[][] gapDepths = new int[width][depth];
+        for (int x = 0; x < width; x++) {
+            for (int z = 0; z < depth; z++) {
+                baseYs[x][z] = 60;
+                gapDepths[x][z] = 6;
             }
+        }
 
-            Assertions.assertTrue(minClearGap >= 5,
-                    "Expected clear gap >= 5 blocks for pillarSize=" + size + ", got " + minClearGap);
-            Assertions.assertEquals(6, minClearGap);
+        boolean[][] mask = AnchoredJigsawStructure.planPiecePillars(pieceBox, 0, 18, 0, 18, baseYs, gapDepths);
 
-            // Verify exact 2x2 / 3x3 / 4x4 footprint around negative boundary (-stride .. -stride + size - 1)
-            for (int dx = 0; dx < stride; dx++) {
-                for (int dz = 0; dz < stride; dz++) {
-                    boolean expected = dx < size && dz < size;
-                    Assertions.assertEquals(expected,
-                            AnchoredJigsawStructure.isOnGlobalPillarGrid(-stride + dx, -stride + dz, size, stride));
+        // All 4 2x2 corners + center must be marked, and every run of true cells along X or Z is exactly 2
+        Assertions.assertTrue(mask[0][0] && mask[1][1]);
+        Assertions.assertTrue(mask[17][0] && mask[18][1]);
+        Assertions.assertTrue(mask[0][17] && mask[1][18]);
+        Assertions.assertTrue(mask[17][17] && mask[18][18]);
+        Assertions.assertTrue(mask[9][9] && mask[10][10]);
+
+        for (int x = 0; x < width; x++) {
+            int run = 0;
+            for (int z = 0; z < depth; z++) {
+                if (mask[x][z]) {
+                    run++;
+                    Assertions.assertTrue(run <= 2, "Pillar thickness exceeded 2 at x=" + x + ", z=" + z);
+                } else {
+                    run = 0;
                 }
             }
         }
+    }
+
+    @Test
+    public void testConvexOverhangCornerDetection() {
+        Assertions.assertTrue(AnchoredJigsawStructure.isConvexFootprintCorner(true, true, false, true, false));
+        Assertions.assertTrue(AnchoredJigsawStructure.isConvexFootprintCorner(true, false, true, false, true));
+        Assertions.assertFalse(AnchoredJigsawStructure.isConvexFootprintCorner(false, true, false, true, false));
+        Assertions.assertFalse(AnchoredJigsawStructure.isConvexFootprintCorner(true, true, false, false, false));
+        Assertions.assertFalse(AnchoredJigsawStructure.isConvexFootprintCorner(true, false, false, false, false));
+
+        // L-shaped footprint: [0..14, 0..14] with [0..6, 0..6] cut out so (7, 0) and (0, 7) are convex corners
+        BoundingBox pieceBox = new BoundingBox(0, 60, 0, 14, 70, 14);
+        int[][] baseYs = new int[15][15];
+        int[][] gapDepths = new int[15][15];
+        for (int x = 0; x < 15; x++) {
+            for (int z = 0; z < 15; z++) {
+                boolean occupied = !(x <= 6 && z <= 6);
+                baseYs[x][z] = occupied ? 60 : -1;
+                gapDepths[x][z] = occupied ? 5 : 0;
+            }
+        }
+
+        boolean[][] mask = AnchoredJigsawStructure.planPiecePillars(pieceBox, 0, 14, 0, 14, baseYs, gapDepths);
+        // Cutout convex overhang corners (7, 0) and (0, 7) must receive 2x2 support pillars
+        Assertions.assertTrue(mask[7][0] && mask[8][1], "Expected 2x2 pillar at convex corner (7, 0)");
+        Assertions.assertTrue(mask[0][7] && mask[1][8], "Expected 2x2 pillar at convex corner (0, 7)");
+        // Outer corners (13..14, 0..1), (0..1, 13..14), (13..14, 13..14) must also be supported
+        Assertions.assertTrue(mask[13][0] && mask[14][1]);
+        Assertions.assertTrue(mask[0][13] && mask[1][14]);
+        Assertions.assertTrue(mask[13][13] && mask[14][14]);
+    }
+
+    @Test
+    public void testNaturalOverhangBlockClassification() {
+        Assertions.assertTrue(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.STONE.defaultBlockState()));
+        Assertions.assertTrue(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.TERRACOTTA.defaultBlockState()));
+        Assertions.assertTrue(AnchoredJigsawStructure.isNaturalOverhangBlock(
+                net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(
+                        net.minecraft.resources.Identifier.withDefaultNamespace("orange_terracotta")).defaultBlockState()));
+        Assertions.assertTrue(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.RED_SAND.defaultBlockState()));
+        Assertions.assertTrue(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.SANDSTONE.defaultBlockState()));
+        Assertions.assertTrue(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.DIRT.defaultBlockState()));
+        Assertions.assertTrue(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.GRASS_BLOCK.defaultBlockState()));
+        Assertions.assertTrue(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.ANDESITE.defaultBlockState()));
+        Assertions.assertTrue(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.DEEPSLATE.defaultBlockState()));
+        Assertions.assertTrue(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.IRON_ORE.defaultBlockState()));
+
+        Assertions.assertFalse(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.AIR.defaultBlockState()));
+        Assertions.assertFalse(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.WATER.defaultBlockState()));
+        Assertions.assertFalse(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.OAK_PLANKS.defaultBlockState()));
+        Assertions.assertFalse(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.STONE_BRICKS.defaultBlockState()));
+        Assertions.assertFalse(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.OAK_FENCE.defaultBlockState()));
+        Assertions.assertFalse(AnchoredJigsawStructure.isNaturalOverhangBlock(Blocks.LANTERN.defaultBlockState()));
+    }
+
+    @Test
+    public void testWaterEdgeFramingHelper() {
+        BlockState water = Blocks.WATER.defaultBlockState();
+        BlockState air = Blocks.AIR.defaultBlockState();
+        BlockState stone = Blocks.STONE.defaultBlockState();
+
+        // Basin water adjacent to air should be framed
+        Assertions.assertTrue(AnchoredJigsawStructure.isWaterEdgeToFrame(water, air, air, stone, stone, 65, 60));
+        // Bottom layer of a 2-deep pool (y <= minY + 6, water above) should still be framed
+        Assertions.assertTrue(AnchoredJigsawStructure.isWaterEdgeToFrame(water, air, water, stone, stone, 65, 60));
+
+        // Adjacent water-to-water (jigsaw river connection) must stay open
+        Assertions.assertFalse(AnchoredJigsawStructure.isWaterEdgeToFrame(water, water, air, stone, stone, 65, 60));
+        // Already framed by solid block
+        Assertions.assertFalse(AnchoredJigsawStructure.isWaterEdgeToFrame(water, stone, air, stone, stone, 65, 60));
+        // Non-water source block
+        Assertions.assertFalse(AnchoredJigsawStructure.isWaterEdgeToFrame(stone, air, air, stone, stone, 65, 60));
+        // Waterfall cascade (y > minY + 6 with water above/below) must not be bricked up
+        Assertions.assertFalse(AnchoredJigsawStructure.isWaterEdgeToFrame(water, air, water, water, stone, 80, 60));
+        // Water directly below neighbor air (waterfall splash) must not be sealed
+        Assertions.assertFalse(AnchoredJigsawStructure.isWaterEdgeToFrame(water, air, air, stone, water, 65, 60));
     }
 
     @Test

@@ -279,4 +279,31 @@ public class JutsuEntitiesPhysicsTest {
         assertTrue(sharinganSrc.contains("JutsuCombatHelper.awardMeleeCombatMastery("),
                 "SharinganCombatEvents.onLivingHurt must delegate to JutsuCombatHelper.awardMeleeCombatMastery");
     }
+
+    @Test
+    @DisplayName("Verify Water Wall dimensions (3.6F x 2.8F), pickability, barrier geometry, and Fireball extinguishing")
+    public void testWaterWallDimensionsPickabilityAndFireballExtinguish() throws IOException {
+        assertEquals(3.6F, com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.WATER_WALL_WIDTH, 0.001F);
+        assertEquals(2.8F, com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.WATER_WALL_HEIGHT, 0.001F);
+
+        net.minecraft.world.phys.Vec3 wallOrigin = new net.minecraft.world.phys.Vec3(10.0D, 64.0D, 10.0D);
+        assertTrue(com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.isBlockedByWaterWall(
+                new net.minecraft.world.phys.Vec3(11.5D, 65.2D, 10.5D), wallOrigin, 3.0D, 2.8D));
+        assertFalse(com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.isBlockedByWaterWall(
+                new net.minecraft.world.phys.Vec3(14.5D, 65.2D, 10.5D), wallOrigin, 3.0D, 2.8D));
+        assertFalse(com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.isBlockedByWaterWall(
+                new net.minecraft.world.phys.Vec3(10.0D, 68.0D, 10.0D), wallOrigin, 3.0D, 2.8D));
+
+        String visualSrc = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/entity/jutsuprojectile/JutsuVisualEffectEntity.java"));
+        assertTrue(visualSrc.contains("EntityDimensions.scalable(WATER_WALL_WIDTH, WATER_WALL_HEIGHT)"));
+        assertTrue(visualSrc.contains("public boolean isPickable()"));
+        assertTrue(visualSrc.contains("public boolean canBeCollidedWith(@Nullable Entity other)"));
+        assertTrue(visualSrc.contains("getWaterWallBarrierBox()"));
+        assertTrue(visualSrc.contains("extinguishByWaterWall(serverLevel)"));
+
+        String fireballSrc = Files.readString(Paths.get("src/main/java/com/sekwah/narutomod/entity/jutsuprojectile/FireballJutsuEntity.java"));
+        assertTrue(fireballSrc.contains("extinguishByWaterWall(serverLevel)"));
+        assertTrue(fireballSrc.contains("getWaterWallBarrierBox().intersects(sweptBox)"));
+        assertTrue(fireballSrc.contains("this.lifeSpan = 65;"));
+    }
 }

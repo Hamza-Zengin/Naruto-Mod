@@ -162,4 +162,46 @@ public class CoreJutsuAbilitiesTest {
         assertEquals(amaterasu.getScaledChakraCost(ninjaData), amaterasu.getFinalChakraCost(null, ninjaData), 0.001f);
         assertEquals(0.0f, susanoo.getFinalChakraCost(null, ninjaData), 0.001f);
     }
+
+    @Test
+    @DisplayName("Seal timeout mastery scaling and default 1000ms config")
+    void testSealTimeoutMasteryScaling() {
+        assertEquals(1000, com.sekwah.narutomod.config.NarutoConfig.sealTimeoutMs);
+        assertEquals(20, Ability.getScaledSealTimeoutTicks(20, 0));
+        assertEquals(20, Ability.getScaledSealTimeoutTicks(20, -15));
+        assertEquals(12, Ability.getScaledSealTimeoutTicks(20, 350));
+        assertEquals(4, Ability.getScaledSealTimeoutTicks(20, 700));
+        assertEquals(4, Ability.getScaledSealTimeoutTicks(20, 1200));
+        assertEquals(4, Ability.getScaledSealTimeoutTicks(2, 0));
+    }
+
+    @Test
+    @DisplayName("Jutsu range helpers scale properly with mastery and Byakugan")
+    void testJutsuRangeHelpers() {
+        assertEquals(18.0D, com.sekwah.narutomod.abilities.jutsus.AshPileBurningAbility.getScaledRange(0), 0.001D);
+        assertEquals(20.0D, com.sekwah.narutomod.abilities.jutsus.AshPileBurningAbility.getScaledRange(350), 0.001D);
+        assertEquals(22.0D, com.sekwah.narutomod.abilities.jutsus.AshPileBurningAbility.getScaledRange(700), 0.001D);
+
+        assertEquals(22.0D, com.sekwah.narutomod.abilities.jutsus.StoneSpikesAbility.getScaledRange(0), 0.001D);
+        assertEquals(26.0D, com.sekwah.narutomod.abilities.jutsus.StoneSpikesAbility.getScaledRange(700), 0.001D);
+
+        assertEquals(22.0D, com.sekwah.narutomod.abilities.jutsus.AdamantineChainsAbility.getScaledRange(0), 0.001D);
+        assertEquals(26.0D, com.sekwah.narutomod.abilities.jutsus.AdamantineChainsAbility.getScaledRange(700), 0.001D);
+
+        assertEquals(20.0D, com.sekwah.narutomod.abilities.jutsus.WoodPrisonAbility.getScaledRange(0), 0.001D);
+        assertEquals(24.0D, com.sekwah.narutomod.abilities.jutsus.WoodPrisonAbility.getScaledRange(700), 0.001D);
+
+        assertEquals(22, com.sekwah.narutomod.abilities.jutsus.HakkeKushoAbility.getScaledRange(false));
+        assertEquals(26, com.sekwah.narutomod.abilities.jutsus.HakkeKushoAbility.getScaledRange(true));
+
+        assertEquals(20.0D, com.sekwah.narutomod.abilities.jutsus.ShadowPossessionAbility.getScaledRange(0), 0.001D);
+        assertEquals(25.0D, com.sekwah.narutomod.abilities.jutsus.ShadowPossessionAbility.getScaledRange(350), 0.001D);
+        assertEquals(30.0D, com.sekwah.narutomod.abilities.jutsus.ShadowPossessionAbility.getScaledRange(700), 0.001D);
+
+        net.minecraft.world.phys.Vec3 anchor = com.sekwah.narutomod.abilities.JutsuTargetingHelper.computeMissAnchor(
+                new net.minecraft.world.phys.Vec3(0, 0, 0),
+                new net.minecraft.world.phys.Vec3(0, 0, 1),
+                20.0D);
+        assertEquals(17.0D, anchor.z, 0.001D);
+    }
 }

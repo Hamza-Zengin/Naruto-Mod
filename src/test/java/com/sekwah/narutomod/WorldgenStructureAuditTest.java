@@ -390,15 +390,15 @@ public class WorldgenStructureAuditTest {
                     name + ".json must specify max_foundation_depth >= 16");
         }
 
-        // Verify terrain_matching projections on rolling path/shore/wall pools
-        java.util.Map<String, List<String>> expectedTerrainMatching = java.util.Map.of(
+        // Verify rigid projections on all path/addon/shore/wall pools (handled by AnchoredJigsawStructure runtime pillars)
+        java.util.Map<String, List<String>> expectedRigidPools = java.util.Map.of(
                 "konoha_streets", List.of("narutomod:konoha_main_street"),
                 "konoha_village_addons", List.of("narutomod:konoha_training_ground"),
                 "suna_streets", List.of("narutomod:suna_avenue"),
                 "akatsuki_hideout_addons", List.of("narutomod:akatsuki_canyon"),
                 "valley_of_the_end_addons", List.of("narutomod:valley_canyon_walls", "narutomod:valley_shore")
         );
-        for (var entry : expectedTerrainMatching.entrySet()) {
+        for (var entry : expectedRigidPools.entrySet()) {
             JsonObject pool = JsonParser.parseString(
                     Files.readString(TEMPLATE_POOL_DIR.resolve(entry.getKey() + ".json"))).getAsJsonObject();
             for (String targetLoc : entry.getValue()) {
@@ -406,12 +406,27 @@ public class WorldgenStructureAuditTest {
                 for (JsonElement el : pool.getAsJsonArray("elements")) {
                     JsonObject obj = el.getAsJsonObject().getAsJsonObject("element");
                     if (targetLoc.equals(obj.get("location").getAsString())) {
-                        Assertions.assertEquals("terrain_matching", obj.get("projection").getAsString(),
-                                targetLoc + " in " + entry.getKey() + " must use terrain_matching projection");
+                        Assertions.assertEquals("rigid", obj.get("projection").getAsString(),
+                                targetLoc + " in " + entry.getKey() + " must use rigid projection");
                         matched = true;
                     }
                 }
                 Assertions.assertTrue(matched, "Expected element " + targetLoc + " in " + entry.getKey());
+            }
+        }
+
+        // Verify no template_pool element uses terrain_matching
+        try (Stream<Path> walk = Files.walk(TEMPLATE_POOL_DIR)) {
+            List<Path> allPools = walk.filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".json")).sorted().toList();
+            for (Path poolFile : allPools) {
+                JsonObject pool = JsonParser.parseString(Files.readString(poolFile)).getAsJsonObject();
+                for (JsonElement el : pool.getAsJsonArray("elements")) {
+                    JsonObject obj = el.getAsJsonObject().getAsJsonObject("element");
+                    if (obj.has("projection")) {
+                        Assertions.assertEquals("rigid", obj.get("projection").getAsString(),
+                                poolFile.getFileName() + " must use rigid projection");
+                    }
+                }
             }
         }
 
@@ -454,6 +469,74 @@ public class WorldgenStructureAuditTest {
                 Assertions.assertTrue(y1.isEmpty(),
                         fname + " has " + y1.size() + " column(s) with y=1 blocks lacking y=0 foundation support");
             }
+        }
+    }
+
+    @Test
+    public void testFifthRevisionWaterFramingAndValleyMonumentChest() throws IOException {
+        Path structNbtDir = DATA_DIR.resolve("narutomod/structure");
+
+        // 1. Kiri water structures must not leave unframed boundary water at x=0/sx-1/z=0/sz-1
+        for (String kiriWaterFile : List.of("kiri_bridge.nbt", "kiri_gate.nbt")) {
+            net.minecraft.nbt.CompoundTag rootTag = net.minecraft.nbt.NbtIo.readCompressed(
+                    structNbtDir.resolve(kiriWaterFile), net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+            net.minecraft.nbt.ListTag sizeTag = rootTag.getListOrEmpty("size");
+            int sx = sizeTag.getIntOr(0, 0);
+            int sz = sizeTag.getIntOr(2, 0);
+            net.minecraft.nbt.ListTag palette = rootTag.getListOrEmpty("palette");
+            int waterState = -1;
+            for (int i = 0; i < palette.size(); i++) {
+                if ("minecraft:water".equals(palette.getCompoundOrEmpty(i).getStringOr("Name", ""))) {
+                    waterState = i;
+                    break;
+                }
+            }
+            Assertions.assertTrue(waterState >= 0, kiriWaterFile + " should still contain framed water");
+            net.minecraft.nbt.ListTag blocks = rootTag.getListOrEmpty("blocks");
+            for (int i = 0; i < blocks.size(); i++) {
+                net.minecraft.nbt.CompoundTag b = blocks.getCompoundOrEmpty(i);
+                if (b.getIntOr("state", -1) != waterState) continue;
+                net.minecraft.nbt.ListTag pos = b.getListOrEmpty("pos");
+                int x = pos.getIntOr(0, 0);
+                int z = pos.getIntOr(2, 0);
+                Assertions.assertTrue(x > 0 && x < sx - 1 && z > 0 && z < sz - 1,
+                        kiriWaterFile + " has unframed boundary water at (" + x + "," + z + ")");
+            }
+        }
+
+        // 2. Hashirama statue uses minimalist palette (no gold/emerald/copper clutter) and includes visible chest
+        for (String statueFile : List.of("valley_hashirama_statue.nbt", "valley_madara_statue.nbt")) {
+            net.minecraft.nbt.CompoundTag rootTag = net.minecraft.nbt.NbtIo.readCompressed(
+                    structNbtDir.resolve(statueFile), net.minecraft.nbt.NbtAccounter.unlimitedHeap());
+            net.minecraft.nbt.ListTag palette = rootTag.getListOrEmpty("palette");
+            int chestState = -1;
+            for (int i = 0; i < palette.size(); i++) {
+                String bName = palette.getCompoundOrEmpty(i).getStringOr("Name", "");
+                if ("minecraft:chest".equals(bName)) {
+                    chestState = i;
+                }
+                if ("valley_hashirama_statue.nbt".equals(statueFile)) {
+                    Assertions.assertFalse(
+                            "minecraft:gold_block".equals(bName)
+                                    || "minecraft:emerald_block".equals(bName)
+                                    || "minecraft:copper_block".equals(bName),
+                            "valley_hashirama_statue.nbt should use minimalist palette without " + bName);
+                }
+            }
+            Assertions.assertTrue(chestState >= 0, statueFile + " must contain a visible chest");
+            boolean foundLootChest = false;
+            net.minecraft.nbt.ListTag blocks = rootTag.getListOrEmpty("blocks");
+            for (int i = 0; i < blocks.size(); i++) {
+                net.minecraft.nbt.CompoundTag b = blocks.getCompoundOrEmpty(i);
+                if (b.getIntOr("state", -1) == chestState) {
+                    String loot = b.getCompoundOrEmpty("nbt").getStringOr("LootTable", "");
+                    if ("narutomod:chests/valley_of_the_end".equals(loot)) {
+                        foundLootChest = true;
+                        break;
+                    }
+                }
+            }
+            Assertions.assertTrue(foundLootChest, statueFile + " chest must reference narutomod:chests/valley_of_the_end");
         }
     }
 }

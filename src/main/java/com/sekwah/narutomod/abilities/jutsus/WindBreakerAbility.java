@@ -60,7 +60,7 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
         float powerMult = getPowerMultiplier(mastery);
         float damage = this.getDamage(ninjaData);
-        int maxRange = 10 + (getMasteryTier(mastery) >= 4 ? 3 : 0);
+        int maxRange = 16 + (getMasteryTier(mastery) >= 4 ? 4 : 0);
 
         Vec3 look = player.getLookAngle();
         serverLevel.playSound(null, player.blockPosition(), SoundEvents.PHANTOM_FLAP, SoundSource.PLAYERS, 2.0f, 0.7f);
@@ -80,7 +80,7 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
                         serverLevel, player.getX() + look.x * 1.4, player.getY(), player.getZ() + look.z * 1.4,
                         com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.TYPE_WIND_SHOCKWAVE,
                         22, player.getYRot());
-        windFunnel.setDeltaMovement(look.scale(0.60 * Math.min(1.3, powerMult)));
+        windFunnel.setDeltaMovement(look.scale(0.90D * Math.min(1.3D, powerMult)));
         serverLevel.addFreshEntity(windFunnel);
 
         for (int i = 1; i <= maxRange; i++) {

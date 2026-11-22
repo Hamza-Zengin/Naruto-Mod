@@ -83,7 +83,8 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
     }
 
     public static double getScaledRange(int mastery) {
-        return 14.0D * (1.0 + 0.10 * (Math.max(0, mastery) / 100.0));
+        double progress = Math.min(1.0D, Math.max(0, mastery) / 700.0D);
+        return 20.0D + (10.0D * progress);
     }
 
     public static float getScaledDamage(int mastery) {
@@ -125,7 +126,7 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
         }
 
         if (capturedTarget == null) {
-            Vec3 endSpot = player.position().add(horizDir.scale(5.5));
+            Vec3 endSpot = player.position().add(horizDir.scale(Math.min(12.0D, maxReach * 0.6D)));
             com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity missShadow =
                     com.sekwah.narutomod.entity.jutsuprojectile.JutsuVisualEffectEntity.create(
                             serverLevel, endSpot.x, player.getY(), endSpot.z,

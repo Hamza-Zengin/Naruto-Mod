@@ -83,8 +83,8 @@ public class VacuumSpheresAbility extends Ability implements Ability.Cooldown {
         sphere.setYRot(player.getYRot());
         sphere.setXRot(player.getXRot());
         sphere.setDamage(damage);
-        sphere.setMaxLife(32);
-        sphere.setDeltaMovement(look.scale(1.65D * Math.min(1.25D, powerMult)));
+        sphere.setMaxLife(50);
+        sphere.setDeltaMovement(look.scale(1.95D * Math.min(1.25D, powerMult)));
         serverLevel.addFreshEntity(sphere);
 
         serverLevel.sendParticles(ParticleTypes.CLOUD, spawnPos.x, spawnPos.y, spawnPos.z,

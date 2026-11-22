@@ -1,5 +1,6 @@
 package com.sekwah.narutomod.entity.mob;
 
+import com.sekwah.narutomod.entity.ShadowCloneEntity;
 import com.sekwah.narutomod.entity.ai.NinjaJutsuAttackGoal;
 import com.sekwah.narutomod.entity.ai.NinjaJutsuCooldowns;
 import com.sekwah.narutomod.entity.ai.NinjaJutsuProfile;
@@ -17,7 +18,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.animal.golem.AbstractGolem;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -64,8 +67,54 @@ public class RogueNinjaEntity extends Monster implements NinjaJutsuUser {
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 12.0F));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
 
-        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this, RogueNinjaEntity.class, AkatsukiNinjaEntity.class).setAlertOthers());
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, VillageNinjaEntity.class, true));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, ChuninChampionEntity.class, true));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, ShadowCloneEntity.class, true));
+        this.targetSelector.addGoal(6, new NearestAttackableTargetGoal<>(this, AbstractGolem.class, true));
+        this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, ShinobiVillagerEntity.class, true));
+        this.targetSelector.addGoal(8, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, true));
+        this.targetSelector.addGoal(9, new NearestAttackableTargetGoal<>(this, Monster.class, 10, true, false,
+                (target, serverLevel) -> isValidHostileTarget(target)));
+    }
+
+    public static boolean isOutlawAlly(@Nullable Entity target) {
+        return target instanceof RogueNinjaEntity || target instanceof AkatsukiNinjaEntity;
+    }
+
+    public static boolean isOutlawAllyClass(@Nullable Class<?> targetClass) {
+        if (targetClass == null) {
+            return false;
+        }
+        return RogueNinjaEntity.class.isAssignableFrom(targetClass)
+                || AkatsukiNinjaEntity.class.isAssignableFrom(targetClass);
+    }
+
+    public static boolean isValidHostileTarget(@Nullable LivingEntity target) {
+        return target != null && !isOutlawAlly(target);
+    }
+
+    public static boolean shouldTargetClass(@Nullable Class<?> targetClass) {
+        if (targetClass == null || isOutlawAllyClass(targetClass)) {
+            return false;
+        }
+        return Player.class.isAssignableFrom(targetClass)
+                || VillageNinjaEntity.class.isAssignableFrom(targetClass)
+                || ShinobiVillagerEntity.class.isAssignableFrom(targetClass)
+                || ChuninChampionEntity.class.isAssignableFrom(targetClass)
+                || ShadowCloneEntity.class.isAssignableFrom(targetClass)
+                || AbstractVillager.class.isAssignableFrom(targetClass)
+                || AbstractGolem.class.isAssignableFrom(targetClass)
+                || Monster.class.isAssignableFrom(targetClass);
+    }
+
+    @Override
+    public boolean canAttack(LivingEntity target) {
+        if (isOutlawAlly(target)) {
+            return false;
+        }
+        return super.canAttack(target);
     }
 
     @Nullable

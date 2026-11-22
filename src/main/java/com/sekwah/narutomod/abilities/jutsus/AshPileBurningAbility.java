@@ -64,12 +64,17 @@ public class AshPileBurningAbility extends Ability implements Ability.Cooldown {
         return (int) Math.round(CLOUD_DURATION_TICKS * (1.0D + 0.15D * (Math.max(0, mastery) / 100.0D)));
     }
 
+    public static double getScaledRange(int mastery) {
+        double progress = Math.min(1.0D, Math.max(0, mastery) / 700.0D);
+        return 18.0D + (4.0D * progress);
+    }
+
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
-        Vec3 targetPos = JutsuTargetingHelper.resolveTargetOrGroundOrigin(serverLevel, player, 10.0D, 2.2D);
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        Vec3 targetPos = JutsuTargetingHelper.resolveTargetOrGroundOrigin(serverLevel, player, getScaledRange(mastery), 2.8D);
         int duration = getScaledDuration(mastery);
         float damage = this.getDamage(ninjaData);
 

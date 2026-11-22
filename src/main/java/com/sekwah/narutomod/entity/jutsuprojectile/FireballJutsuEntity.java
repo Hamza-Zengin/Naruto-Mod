@@ -59,7 +59,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         this.customDamage = damage;
         this.explosionPower = 0.8f;
         this.jutsuPower = 25;
-        this.lifeSpan = 45;
+        this.lifeSpan = 65;
         this.refreshDimensions();
     }
 
@@ -173,6 +173,20 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         if (!this.level().isClientSide() && !this.isImpacted()) {
             Vec3 start = this.position();
             Vec3 delta = this.getDeltaMovement();
+            if (this.level() instanceof ServerLevel serverLevel) {
+                AABB sweptBox = this.getBoundingBox().expandTowards(delta).inflate(0.65D);
+                List<JutsuVisualEffectEntity> waterWalls = serverLevel.getEntitiesOfClass(
+                        JutsuVisualEffectEntity.class,
+                        sweptBox.inflate(2.0D),
+                        wall -> wall.isAlive()
+                                && wall.getVisualType() == JutsuVisualEffectEntity.TYPE_WATER_WALL
+                                && !wall.isOwnedByAlly(this.getOwner())
+                                && wall.getWaterWallBarrierBox().intersects(sweptBox));
+                if (!waterWalls.isEmpty()) {
+                    this.extinguishByWaterWall(serverLevel);
+                    return;
+                }
+            }
             Vec3 end = start.add(delta);
             HitResult hitResult = this.level().clip(new ClipContext(
                     start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
@@ -262,8 +276,28 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         }
     }
 
+    public void extinguishByWaterWall(ServerLevel serverLevel) {
+        if (!this.isAlive()) {
+            return;
+        }
+        serverLevel.playSound(null, this.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1.3F, 1.05F);
+        serverLevel.sendParticles(ParticleTypes.CLOUD,
+                this.getX(), this.getY() + 0.3D, this.getZ(),
+                this.isPhoenixMini() ? 12 : 28, 0.5D, 0.45D, 0.5D, 0.06D,
+                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+        this.discard();
+    }
+
     @Override
     protected boolean canHitEntity(Entity entity) {
+        if (entity instanceof JutsuVisualEffectEntity visual) {
+            int type = visual.getVisualType();
+            if (type == JutsuVisualEffectEntity.TYPE_WATER_WALL || type == JutsuVisualEffectEntity.TYPE_EARTH_WALL) {
+                if (visual.isOwnedByAlly(this.getOwner()) || type == JutsuVisualEffectEntity.TYPE_WATER_WALL) {
+                    return false;
+                }
+            }
+        }
         return super.canHitEntity(entity) && entity != this.getOwner()
                 && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(this.getOwner(), entity);
     }
