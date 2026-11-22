@@ -6,6 +6,7 @@ import com.sekwah.narutomod.entity.ai.NinjaJutsuAttackGoal;
 import com.sekwah.narutomod.entity.ai.NinjaJutsuCooldowns;
 import com.sekwah.narutomod.entity.ai.NinjaJutsuProfile;
 import com.sekwah.narutomod.entity.ai.NinjaJutsuUser;
+import com.sekwah.narutomod.entity.ShadowCloneEntity;
 import com.sekwah.narutomod.item.NarutoItems;
 import com.sekwah.narutomod.registries.NarutoRegistries;
 import com.sekwah.narutomod.sounds.NarutoSounds;
@@ -26,6 +27,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -41,6 +43,9 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.animal.golem.AbstractGolem;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -105,18 +110,66 @@ public class ChuninChampionEntity extends PathfinderMob implements NinjaJutsuUse
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 16.0F));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
 
-        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this,
+                VillageNinjaEntity.class, ShinobiVillagerEntity.class, ChuninChampionEntity.class,
+                AbstractVillager.class, AbstractGolem.class));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false,
                 (target, serverLevel) -> this.duelActive));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AkatsukiNinjaEntity.class, true));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, RogueNinjaEntity.class, true));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Monster.class, 10, true, false,
+                (target, serverLevel) -> isValidHostileTarget(target)
+                        && !(target instanceof RogueNinjaEntity)
+                        && !(target instanceof AkatsukiNinjaEntity)));
+    }
+
+    public static boolean isProtectedFriendly(@Nullable Entity target) {
+        return target instanceof VillageNinjaEntity
+                || target instanceof ShinobiVillagerEntity
+                || target instanceof ChuninChampionEntity
+                || target instanceof AbstractVillager
+                || target instanceof AbstractGolem;
+    }
+
+    public static boolean isProtectedFriendlyClass(@Nullable Class<?> targetClass) {
+        if (targetClass == null) {
+            return false;
+        }
+        return VillageNinjaEntity.class.isAssignableFrom(targetClass)
+                || ShinobiVillagerEntity.class.isAssignableFrom(targetClass)
+                || ChuninChampionEntity.class.isAssignableFrom(targetClass)
+                || AbstractVillager.class.isAssignableFrom(targetClass)
+                || AbstractGolem.class.isAssignableFrom(targetClass);
+    }
+
+    public static boolean isValidHostileTarget(@Nullable LivingEntity target) {
+        return target != null
+                && !isProtectedFriendly(target)
+                && !(target instanceof Player)
+                && !(target instanceof ShadowCloneEntity);
+    }
+
+    public static boolean canAttackTargetClass(@Nullable Class<?> targetClass, boolean duelActive) {
+        if (targetClass == null || isProtectedFriendlyClass(targetClass)) {
+            return false;
+        }
+        if (Player.class.isAssignableFrom(targetClass) || ShadowCloneEntity.class.isAssignableFrom(targetClass)) {
+            return duelActive;
+        }
+        return true;
+    }
+
+    public static boolean shouldClearTargetOutsideDuel(@Nullable LivingEntity currentTarget, boolean duelActive) {
+        return !duelActive && (currentTarget instanceof Player || currentTarget instanceof ShadowCloneEntity);
     }
 
     @Override
     public boolean canAttack(LivingEntity target) {
-        if (!this.duelActive) {
+        if (isProtectedFriendly(target)) {
             return false;
         }
-        if (target instanceof VillageNinjaEntity || target instanceof ShinobiVillagerEntity) {
-            return false;
+        if (target instanceof Player || target instanceof ShadowCloneEntity) {
+            return this.duelActive && super.canAttack(target);
         }
         return super.canAttack(target);
     }
@@ -212,21 +265,20 @@ public class ChuninChampionEntity extends PathfinderMob implements NinjaJutsuUse
                 this.equipDefaultGear();
             }
 
-            if (!this.duelActive) {
-                if (this.getTarget() != null) {
-                    this.setTarget(null);
-                }
-                return;
+            if (shouldClearTargetOutsideDuel(this.getTarget(), this.duelActive)) {
+                this.setTarget(null);
             }
 
-            this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
+            if (this.duelActive) {
+                this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
+                if (!this.phaseTwoTriggered && this.getHealth() <= this.getMaxHealth() * 0.5F) {
+                    triggerPhaseTwo();
+                }
+            }
+
             this.jutsuCooldowns.tick();
             if (this.dashCooldown > 0) {
                 this.dashCooldown--;
-            }
-
-            if (!this.phaseTwoTriggered && this.getHealth() <= this.getMaxHealth() * 0.5F) {
-                triggerPhaseTwo();
             }
 
             LivingEntity target = this.getTarget();
@@ -260,7 +312,7 @@ public class ChuninChampionEntity extends PathfinderMob implements NinjaJutsuUse
                     ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
             for (LivingEntity entity : serverLevel.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(4.5D))) {
-                if (entity == this || entity instanceof VillageNinjaEntity || entity instanceof ShinobiVillagerEntity) {
+                if (entity == this || isProtectedFriendly(entity)) {
                     continue;
                 }
                 if (entity.distanceToSqr(this) <= 4.5D * 4.5D) {

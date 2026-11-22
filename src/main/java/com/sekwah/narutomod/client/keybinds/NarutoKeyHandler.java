@@ -169,7 +169,21 @@ public class NarutoKeyHandler {
     }
 
     private static int getSealTimeoutTicks() {
-        return Math.max(1, NarutoConfig.sealTimeoutMs / 50);
+        int baseTicks = Math.max(4, NarutoConfig.sealTimeoutMs / 50);
+        if (currentJutsuComboAbility == null) {
+            return baseTicks;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc == null || mc.player == null) {
+            return baseTicks;
+        }
+        Identifier abilityId = currentJutsuComboAbility.getRegistryName();
+        if (abilityId == null) {
+            return baseTicks;
+        }
+        var ninjaData = mc.player.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA);
+        int mastery = ninjaData != null ? ninjaData.getMastery(abilityId) : 0;
+        return Ability.getScaledSealTimeoutTicks(baseTicks, mastery);
     }
 
     private static void resetJutsuCasting() {

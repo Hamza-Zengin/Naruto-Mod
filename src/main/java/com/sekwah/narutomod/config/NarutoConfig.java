@@ -75,7 +75,7 @@ public class NarutoConfig {
     public static float waterWalkSpeed = 1.0f;
 
     private static final ModConfigSpec.IntValue CONFIG_SEAL_TIMEOUT_MS;
-    public static int sealTimeoutMs = 1500;
+    public static int sealTimeoutMs = 1000;
 
     private static final ModConfigSpec.DoubleValue CONFIG_KAWARIMI_MIN_DISTANCE;
     public static double kawarimiMinDistance = 5.0d;
@@ -155,7 +155,7 @@ public class NarutoConfig {
                 .defineInRange("waterWalkSpeed", 1.0d, 0.1d, 10.0d);
 
         CONFIG_SEAL_TIMEOUT_MS = configBuilder.comment("Seal typing timeout in milliseconds (1000ms = 1s = 20 ticks)")
-                .defineInRange("sealTimeoutMs", 1500, 100, 10000);
+                .defineInRange("sealTimeoutMs", 1000, 100, 10000);
 
         CONFIG_KAWARIMI_MIN_DISTANCE = configBuilder.comment("Kawarimi minimum teleport distance at max mastery")
                 .defineInRange("kawarimiMinDistance", 5.0d, 1.0d, 64.0d);

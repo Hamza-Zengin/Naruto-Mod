@@ -82,11 +82,17 @@ public class AdamantineChainsAbility extends Ability implements Ability.Cooldown
         return tryConsume(player, ninjaData, getFinalChakraCost(player, ninjaData), getStaminaCost(), 45);
     }
 
+    public static double getScaledRange(int mastery) {
+        double progress = Math.min(1.0D, Math.max(0, mastery) / 700.0D);
+        return 22.0D + (4.0D * progress);
+    }
+
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
-        Vec3 targetPos = JutsuTargetingHelper.resolveTargetOrGroundOrigin(serverLevel, player, 15.0D, 2.6D);
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        Vec3 targetPos = JutsuTargetingHelper.resolveTargetOrGroundOrigin(serverLevel, player, getScaledRange(mastery), 3.2D);
         float damage = this.getDamage(ninjaData);
 
         serverLevel.playSound(null, BlockPos.containing(targetPos), SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1.6F, 0.85F);

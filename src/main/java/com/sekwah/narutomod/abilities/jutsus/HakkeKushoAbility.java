@@ -67,6 +67,10 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
         return true;
     }
 
+    public static int getScaledRange(boolean byakuganOn) {
+        return byakuganOn ? 26 : 22;
+    }
+
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
@@ -93,12 +97,13 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
                 new com.sekwah.narutomod.network.s2c.ClientCameraShakePacket(0.45f, 8),
                 player);
 
-        for (int i = 1; i <= 14; i++) {
+        int maxRange = getScaledRange(byakuganOn);
+        for (int i = 1; i <= maxRange; i++) {
             Vec3 pos = eyePos.add(look.scale(i));
             serverLevel.sendParticles(ParticleTypes.SONIC_BOOM, pos.x, pos.y, pos.z, 1, 0.0, 0.0, 0.0, 0.0,
                     net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
             if (i % 2 == 0) {
-                AABB box = new AABB(pos.x - 1.3, pos.y - 1.3, pos.z - 1.3, pos.x + 1.3, pos.y + 1.3, pos.z + 1.3);
+                AABB box = new AABB(pos.x - 1.6D, pos.y - 1.6D, pos.z - 1.6D, pos.x + 1.6D, pos.y + 1.6D, pos.z + 1.6D);
                 List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, box,
                         e -> e.isAlive() && e != player && !ShadowCloneEntity.areAllies(player, e));
                 for (LivingEntity target : targets) {

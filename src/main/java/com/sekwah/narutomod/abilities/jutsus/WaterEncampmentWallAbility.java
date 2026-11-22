@@ -71,6 +71,18 @@ public class WaterEncampmentWallAbility extends Ability implements Ability.Coold
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
         Vec3 wallPos = computeWallOrigin(player.position(), player.getYRot());
+        BlockPos baseBlock = BlockPos.containing(wallPos.x, wallPos.y, wallPos.z);
+        if (!serverLevel.getBlockState(baseBlock).isAir() && serverLevel.getBlockState(baseBlock.above()).isAir()) {
+            wallPos = new Vec3(wallPos.x, baseBlock.getY() + 1.0D, wallPos.z);
+        } else if (serverLevel.getBlockState(baseBlock).isAir()) {
+            for (int dy = 1; dy <= 3; dy++) {
+                BlockPos below = baseBlock.below(dy);
+                if (!serverLevel.getBlockState(below).isAir()) {
+                    wallPos = new Vec3(wallPos.x, below.getY() + 1.0D, wallPos.z);
+                    break;
+                }
+            }
+        }
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
         int duration = (int) Math.round(WALL_DURATION_TICKS * (1.0D + 0.20D * (Math.max(0, mastery) / 100.0D)));
         float damage = this.getDamage(ninjaData);
@@ -87,6 +99,7 @@ public class WaterEncampmentWallAbility extends Ability implements Ability.Coold
                 JutsuVisualEffectEntity.TYPE_WATER_WALL, duration, player.getYRot());
         wall.setCasterUUID(player.getUUID());
         wall.setEffectDamage(damage);
+        wall.refreshDimensions();
         serverLevel.addFreshEntity(wall);
     }
 }

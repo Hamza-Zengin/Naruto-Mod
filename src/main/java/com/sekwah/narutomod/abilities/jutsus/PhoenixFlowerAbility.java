@@ -76,7 +76,7 @@ public class PhoenixFlowerAbility extends Ability implements Ability.Cooldown {
             return;
         }
         Vec3 dir = computeRotatedDirection(player.getLookAngle(), yawOffsetDeg);
-        Vec3 vel = dir.scale(1.18D);
+        Vec3 vel = dir.scale(1.45D);
         FireballJutsuEntity miniFireball = new FireballJutsuEntity(player, vel.x, vel.y, vel.z);
         miniFireball.setPhoenixMini(perBallDamage);
         Vec3 spawnPos = player.getEyePosition().add(dir.scale(SPAWN_DISTANCE)).subtract(0.0D, 0.12D, 0.0D);

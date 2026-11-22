@@ -79,8 +79,8 @@ public class EarthDragonBulletAbility extends Ability implements Ability.Cooldow
         bullet.setYRot(player.getYRot());
         bullet.setXRot(player.getXRot());
         bullet.setDamage(damage);
-        bullet.setMaxLife(45);
-        bullet.setDeltaMovement(look.scale(1.15D * Math.min(1.35D, powerMult)));
+        bullet.setMaxLife(65);
+        bullet.setDeltaMovement(look.scale(1.45D * Math.min(1.35D, powerMult)));
         serverLevel.addFreshEntity(bullet);
 
         serverLevel.sendParticles(Particles.COBBLESTONE, spawnPos.x, spawnPos.y, spawnPos.z, 18, 0.35D, 0.35D, 0.35D, 0.1D,

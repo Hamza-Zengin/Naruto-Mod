@@ -74,11 +74,17 @@ public class StoneSpikesAbility extends Ability implements Ability.Cooldown {
         return 22.0f;
     }
 
+    public static double getScaledRange(int mastery) {
+        double progress = Math.min(1.0D, Math.max(0, mastery) / 700.0D);
+        return 22.0D + (4.0D * progress);
+    }
+
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
-        Vec3 targetPos = JutsuTargetingHelper.resolveTargetOrGroundOrigin(serverLevel, player, 14.0D, 2.0D);
+        int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
+        Vec3 targetPos = JutsuTargetingHelper.resolveTargetOrGroundOrigin(serverLevel, player, getScaledRange(mastery), 2.8D);
         float damage = this.getDamage(ninjaData);
 
         serverLevel.playSound(null, BlockPos.containing(targetPos), NarutoSounds.MUD_WALL_RISE.get(), SoundSource.PLAYERS, 1.5F, 0.85F);

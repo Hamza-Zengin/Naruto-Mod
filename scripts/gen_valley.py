@@ -12,12 +12,177 @@ Pieces generated:
   - valley_shore.nbt            (49x22x37) Riverside pebble/moss shore with torii arch & lanterns
 """
 import argparse
+import gzip
+import io
 import math
 import os
 import random
+import struct
 import sys
-import nbtlib
-from nbtlib.tag import Compound, Int, List, String
+
+try:
+    import nbtlib
+    from nbtlib.tag import Compound, Int, List, String
+except ImportError:
+    class _NBTList(list):
+        _elem_tag = 0
+
+    class _ListMeta:
+        def __getitem__(self, item_cls):
+            class TypedList(_NBTList):
+                _elem_tag = getattr(item_cls, "_tag_id", 10)
+            return TypedList
+
+    class Int(int):
+        _tag_id = 3
+
+    class String(str):
+        _tag_id = 8
+
+    class Compound(dict):
+        _tag_id = 10
+
+    List = _ListMeta()
+
+    def _tag_id_of(val) -> int:
+        if hasattr(val, "_tag_id"):
+            return val._tag_id
+        if isinstance(val, _NBTList):
+            return 9
+        if isinstance(val, dict):
+            return 10
+        if isinstance(val, list):
+            return 9
+        if isinstance(val, str):
+            return 8
+        if isinstance(val, bool):
+            return 1
+        if isinstance(val, int):
+            return 3
+        raise TypeError(f"Unsupported NBT value type: {type(val)}")
+
+    def _write_str(buf: io.BytesIO, s: str):
+        raw = s.encode("utf-8")
+        buf.write(struct.pack(">H", len(raw)))
+        buf.write(raw)
+
+    def _write_payload(buf: io.BytesIO, tag_id: int, val):
+        if tag_id == 1:
+            buf.write(struct.pack(">b", int(val)))
+        elif tag_id == 3:
+            buf.write(struct.pack(">i", int(val)))
+        elif tag_id == 8:
+            _write_str(buf, str(val))
+        elif tag_id == 9:
+            elem_tag = getattr(val, "_elem_tag", 0)
+            if elem_tag == 0 and val:
+                elem_tag = _tag_id_of(val[0])
+            buf.write(struct.pack(">Bi", elem_tag, len(val)))
+            for item in val:
+                _write_payload(buf, elem_tag, item)
+        elif tag_id == 10:
+            for k, v in val.items():
+                tid = _tag_id_of(v)
+                buf.write(struct.pack(">B", tid))
+                _write_str(buf, str(k))
+                _write_payload(buf, tid, v)
+            buf.write(b"\x00")
+        else:
+            raise ValueError(f"Unsupported NBT write tag_id={tag_id}")
+
+    class _NBTReader:
+        def __init__(self, data: bytes):
+            self.buf = io.BytesIO(data)
+
+        def _u8(self) -> int:
+            return struct.unpack(">B", self.buf.read(1))[0]
+
+        def _u16(self) -> int:
+            return struct.unpack(">H", self.buf.read(2))[0]
+
+        def _i32(self) -> int:
+            return struct.unpack(">i", self.buf.read(4))[0]
+
+        def _str(self) -> str:
+            return String(self.buf.read(self._u16()).decode("utf-8", errors="replace"))
+
+        def _payload(self, tid: int):
+            if tid == 1:
+                return struct.unpack(">b", self.buf.read(1))[0]
+            if tid == 2:
+                return struct.unpack(">h", self.buf.read(2))[0]
+            if tid == 3:
+                return Int(self._i32())
+            if tid == 4:
+                return struct.unpack(">q", self.buf.read(8))[0]
+            if tid == 5:
+                return struct.unpack(">f", self.buf.read(4))[0]
+            if tid == 6:
+                return struct.unpack(">d", self.buf.read(8))[0]
+            if tid == 7:
+                n = self._i32()
+                return list(struct.unpack(f">{n}b", self.buf.read(n)))
+            if tid == 8:
+                return self._str()
+            if tid == 9:
+                et = self._u8()
+                n = self._i32()
+                lst = _NBTList(self._payload(et) for _ in range(n))
+                lst._elem_tag = et
+                return lst
+            if tid == 10:
+                res = Compound()
+                while True:
+                    t = self._u8()
+                    if t == 0:
+                        break
+                    k = self._str()
+                    res[k] = self._payload(t)
+                return res
+            if tid == 11:
+                n = self._i32()
+                return list(struct.unpack(f">{n}i", self.buf.read(n * 4)))
+            if tid == 12:
+                n = self._i32()
+                return list(struct.unpack(f">{n}q", self.buf.read(n * 8)))
+            raise ValueError(f"Unknown NBT tag type: {tid}")
+
+        def read_root(self) -> Compound:
+            rt = self._u8()
+            if rt == 0:
+                return Compound()
+            _ = self._str()
+            return self._payload(rt)
+
+    class _File(Compound):
+        def __init__(self, root: Compound):
+            super().__init__(root)
+            self.root = root
+
+        def save(self, path: str, gzipped: bool = True):
+            buf = io.BytesIO()
+            buf.write(b"\x0a\x00\x00")
+            _write_payload(buf, 10, self.root)
+            raw = buf.getvalue()
+            if gzipped:
+                with gzip.open(path, "wb") as f:
+                    f.write(raw)
+            else:
+                with open(path, "wb") as f:
+                    f.write(raw)
+
+    class _NbtLibShim:
+        File = _File
+
+        @staticmethod
+        def load(path: str) -> Compound:
+            with open(path, "rb") as f:
+                raw = f.read()
+            if raw[:2] == b"\x1f\x8b":
+                raw = gzip.decompress(raw)
+            return _NBTReader(raw).read_root()
+
+    nbtlib = _NbtLibShim()
 
 STRUCT_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -87,6 +252,18 @@ class StructureBuilder:
             "joint": String(joint),
         })
         self.set(x, y, z, "minecraft:jigsaw", {"orientation": orientation}, nbt)
+
+    def add_chest(self, x: int, y: int, z: int, facing: str = "north",
+                  loot_table: str = "narutomod:chests/valley_of_the_end"):
+        nbt = Compound({
+            "id": String("minecraft:chest"),
+            "LootTable": String(loot_table),
+        })
+        self.set(x, y, z, "minecraft:chest", {
+            "facing": facing,
+            "type": "single",
+            "waterlogged": "false",
+        }, nbt)
 
     def add_arch_x(self, cx: int, y0: int, z0: int, z1: int, half_w: int, height: int,
                    pillar_mat: str, arch_mat: str, lantern_block: str = "minecraft:lantern"):
@@ -481,10 +658,22 @@ def build_valley_hashirama_monument():
     # Grand Stepped Pedestal / Plinth (y=3..11, symmetric with Madara)
     sb.fill(11, 3, 15, 29, 7, 33, "minecraft:stone_bricks")
     sb.fill(12, 8, 16, 28, 10, 32, "minecraft:polished_andesite")
+    for x in range(12, 29):
+        sb.set(x, 10, 16, "minecraft:chiseled_stone_bricks")
+        sb.set(x, 10, 32, "minecraft:chiseled_stone_bricks")
+    for z in range(16, 33):
+        sb.set(12, 10, z, "minecraft:chiseled_stone_bricks")
+        sb.set(28, 10, z, "minecraft:chiseled_stone_bricks")
     sb.fill(13, 11, 17, 27, 11, 31, "minecraft:smooth_stone")
-    for lx in (12, 28):
-        for lz in (16, 32):
+    for lx in (13, 27):
+        for lz in (17, 31):
             sb.add_lantern_post(lx, 12, lz, "minecraft:stone_brick_wall", "minecraft:lantern")
+
+    # Visible, well-lit shrine altar chest at top of ceremonial staircase
+    sb.add_chest(26, 12, 24, facing="east", loot_table="narutomod:chests/valley_of_the_end")
+    for lz in (21, 27):
+        sb.set(26, 12, lz, "minecraft:chiseled_stone_bricks")
+        sb.set(26, 13, lz, "minecraft:lantern", {"hanging": "false"})
 
     # Ceremonial Archway & leaf garlands
     sb.add_arch_z(31, 33, 4, 24, 6, 8, "minecraft:dark_oak_wood", "minecraft:polished_andesite", "minecraft:lantern")
@@ -493,7 +682,7 @@ def build_valley_hashirama_monument():
         if z % 3 == 0:
             sb.set(31, 12, z, "minecraft:jungle_leaves", {"persistent": "true"})
 
-    # Warring States Senju Obelisk Shaft (y=12..40, exact tier symmetry with Madara)
+    # Minimalist Senju Obelisk Shaft (y=12..40, clean stone & Mokuton dark-oak framing)
     cx, cz = 20, 24
     tiers = [(12, 20, 5), (21, 29, 4), (30, 36, 3), (37, 40, 2)]
     for y0, y1, r in tiers:
@@ -501,87 +690,91 @@ def build_valley_hashirama_monument():
             for dx in range(-r, r + 1):
                 for dz in range(-r, r + 1):
                     is_corner = abs(dx) == r and abs(dz) == r
+                    is_edge = abs(dx) == r or abs(dz) == r
                     if is_corner:
-                        mat = "minecraft:gold_block" if y % 4 == 0 else "minecraft:dark_oak_wood"
+                        mat = "minecraft:stripped_dark_oak_log" if (y == y0 or y == y1) else "minecraft:dark_oak_wood"
                     elif y == y0 or y == y1:
-                        mat = "minecraft:copper_block" if (abs(dx) + abs(dz)) % 2 == 0 else "minecraft:polished_andesite"
+                        mat = "minecraft:chiseled_stone_bricks" if (dx == 0 or dz == 0) else "minecraft:polished_andesite"
                     elif y in (16, 25, 33):
-                        mat = "minecraft:gold_block" if (abs(dx) == r or abs(dz) == r) else "minecraft:smooth_stone"
-                    elif (dx + dz + y) % 5 == 0:
+                        mat = "minecraft:chiseled_stone_bricks" if is_edge else "minecraft:smooth_stone"
+                    elif dx == 0 or dz == 0:
+                        mat = "minecraft:smooth_stone"
+                    elif y <= 15 and (dx + dz + y) % 7 == 0 and is_edge:
                         mat = "minecraft:mossy_stone_bricks"
-                    elif (dx * 3 + y) % 4 == 0:
-                        mat = "minecraft:stripped_dark_oak_log" if abs(dx) == r or abs(dz) == r else "minecraft:smooth_stone"
-                    elif (dx + dz) % 3 == 0:
-                        mat = "minecraft:stone_bricks"
+                    elif abs(dx) == 1 or abs(dz) == 1:
+                        mat = "minecraft:polished_andesite"
                     else:
-                        mat = "minecraft:stone"
+                        mat = "minecraft:stone_bricks"
                     sb.set(cx + dx, y, cz + dz, mat)
 
-        # Tier ledge foliage & Warring States timber trim
-        if r >= 2:
+        # Subtle lower-plinth moss trim only on tier 0
+        if y0 == 12:
             for dx in range(-r - 1, r + 2):
                 for dz in (-r - 1, r + 1):
-                    if (dx + dz) % 2 == 0 and rng.random() < 0.65:
+                    if (dx + dz) % 2 == 0 and rng.random() < 0.5:
                         sb.set(cx + dx, y0, cz + dz, "minecraft:moss_block")
 
-    # Warring States armor breastplate & Senju inlay on East face (+x, facing river/Madara)
+    # Minimalist Senju Clan Emblem inlay on East face (+x, facing river/Madara)
     for dy in range(-3, 4):
         for dz in range(-3, 4):
             if abs(dy) + abs(dz) <= 4:
-                if abs(dz) == 0:
-                    mat = "minecraft:gold_block"
-                elif abs(dy) + abs(dz) == 4:
+                if abs(dy) + abs(dz) == 4:
                     mat = "minecraft:dark_oak_wood"
-                elif abs(dy) <= 1 and abs(dz) <= 1:
-                    mat = "minecraft:emerald_block"
+                elif dz == 0 and abs(dy) <= 3:
+                    mat = "minecraft:smooth_quartz"
+                elif abs(dz) == 2 and -1 <= dy <= 2:
+                    mat = "minecraft:smooth_quartz"
                 else:
-                    mat = "minecraft:copper_block"
+                    mat = "minecraft:chiseled_stone_bricks"
                 sb.set(cx + 4, 25 + dy, cz + dz, mat)
 
-    # Large 3D Senju Clan Logo Crown (y=40..56, symmetric scale with Madara's Uchiha Fan)
-    sb.fill(cx - 1, 40, cz - 1, cx + 1, 40, cz + 1, "minecraft:gold_block")
+    # Minimalist 3D Senju Clan Logo Crown (y=40..56, symmetric scale with Madara's Uchiha Fan)
+    sb.fill(cx - 1, 40, cz - 1, cx + 1, 40, cz + 1, "minecraft:polished_andesite")
+    for dx in (-1, 1):
+        for dz in (-1, 1):
+            sb.set(cx + dx, 40, cz + dz, "minecraft:dark_oak_wood")
     sb.fill(cx - 1, 41, cz - 1, cx + 1, 42, cz + 1, "minecraft:stripped_dark_oak_log")
-    sb.set(cx + 1, 42, cz, "minecraft:copper_block")
-    sb.set(cx - 1, 42, cz, "minecraft:copper_block")
+    sb.set(cx + 1, 42, cz, "minecraft:smooth_stone")
+    sb.set(cx - 1, 42, cz, "minecraft:smooth_stone")
 
     # Symmetrical 3-winged diamond-centered Senju Crest (y=43..55, dz=-5..+5)
     senju_crest_rows = {
-        55: [(0, "minecraft:gold_block")],
-        54: [(-3, "minecraft:dark_oak_wood"), (0, "minecraft:gold_block"), (3, "minecraft:dark_oak_wood")],
-        53: [(-4, "minecraft:dark_oak_wood"), (-3, "minecraft:gold_block"), (-2, "minecraft:dark_oak_wood"),
-             (0, "minecraft:gold_block"),
-             (2, "minecraft:dark_oak_wood"), (3, "minecraft:gold_block"), (4, "minecraft:dark_oak_wood")],
-        52: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:copper_block"), (-3, "minecraft:dark_oak_wood"),
-             (-1, "minecraft:dark_oak_wood"), (0, "minecraft:gold_block"), (1, "minecraft:dark_oak_wood"),
-             (3, "minecraft:dark_oak_wood"), (4, "minecraft:copper_block"), (5, "minecraft:dark_oak_wood")],
-        51: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:copper_block"), (-3, "minecraft:dark_oak_wood"),
-             (-1, "minecraft:gold_block"), (0, "minecraft:emerald_block"), (1, "minecraft:gold_block"),
-             (3, "minecraft:dark_oak_wood"), (4, "minecraft:copper_block"), (5, "minecraft:dark_oak_wood")],
-        50: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:gold_block"), (-3, "minecraft:dark_oak_wood"),
-             (-2, "minecraft:dark_oak_wood"), (-1, "minecraft:gold_block"), (0, "minecraft:emerald_block"),
-             (1, "minecraft:gold_block"), (2, "minecraft:dark_oak_wood"),
-             (3, "minecraft:dark_oak_wood"), (4, "minecraft:gold_block"), (5, "minecraft:dark_oak_wood")],
-        49: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:gold_block"), (-3, "minecraft:dark_oak_wood"),
-             (-2, "minecraft:gold_block"), (-1, "minecraft:emerald_block"), (0, "minecraft:moss_block"),
-             (1, "minecraft:emerald_block"), (2, "minecraft:gold_block"),
-             (3, "minecraft:dark_oak_wood"), (4, "minecraft:gold_block"), (5, "minecraft:dark_oak_wood")],
-        48: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:copper_block"), (-3, "minecraft:dark_oak_wood"),
-             (-2, "minecraft:dark_oak_wood"), (-1, "minecraft:gold_block"), (0, "minecraft:emerald_block"),
-             (1, "minecraft:gold_block"), (2, "minecraft:dark_oak_wood"),
-             (3, "minecraft:dark_oak_wood"), (4, "minecraft:copper_block"), (5, "minecraft:dark_oak_wood")],
-        47: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:copper_block"), (-3, "minecraft:dark_oak_wood"),
-             (-1, "minecraft:gold_block"), (0, "minecraft:gold_block"), (1, "minecraft:gold_block"),
-             (3, "minecraft:dark_oak_wood"), (4, "minecraft:copper_block"), (5, "minecraft:dark_oak_wood")],
-        46: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:gold_block"), (-3, "minecraft:copper_block"),
-             (-2, "minecraft:dark_oak_wood"), (0, "minecraft:gold_block"), (2, "minecraft:dark_oak_wood"),
-             (3, "minecraft:copper_block"), (4, "minecraft:gold_block"), (5, "minecraft:dark_oak_wood")],
-        45: [(-4, "minecraft:dark_oak_wood"), (-3, "minecraft:gold_block"), (-2, "minecraft:copper_block"),
-             (-1, "minecraft:gold_block"), (0, "minecraft:gold_block"), (1, "minecraft:gold_block"),
-             (2, "minecraft:copper_block"), (3, "minecraft:gold_block"), (4, "minecraft:dark_oak_wood")],
-        44: [(-3, "minecraft:dark_oak_wood"), (-2, "minecraft:dark_oak_wood"), (-1, "minecraft:copper_block"),
-             (0, "minecraft:gold_block"), (1, "minecraft:copper_block"),
+        55: [(0, "minecraft:quartz_bricks")],
+        54: [(-3, "minecraft:dark_oak_wood"), (0, "minecraft:quartz_bricks"), (3, "minecraft:dark_oak_wood")],
+        53: [(-4, "minecraft:dark_oak_wood"), (-3, "minecraft:quartz_bricks"), (-2, "minecraft:dark_oak_wood"),
+             (0, "minecraft:quartz_bricks"),
+             (2, "minecraft:dark_oak_wood"), (3, "minecraft:quartz_bricks"), (4, "minecraft:dark_oak_wood")],
+        52: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:chiseled_stone_bricks"), (-3, "minecraft:dark_oak_wood"),
+             (-1, "minecraft:dark_oak_wood"), (0, "minecraft:quartz_bricks"), (1, "minecraft:dark_oak_wood"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:chiseled_stone_bricks"), (5, "minecraft:dark_oak_wood")],
+        51: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:smooth_stone"), (-3, "minecraft:dark_oak_wood"),
+             (-1, "minecraft:chiseled_stone_bricks"), (0, "minecraft:smooth_quartz"), (1, "minecraft:chiseled_stone_bricks"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:smooth_stone"), (5, "minecraft:dark_oak_wood")],
+        50: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:quartz_bricks"), (-3, "minecraft:dark_oak_wood"),
+             (-2, "minecraft:dark_oak_wood"), (-1, "minecraft:chiseled_stone_bricks"), (0, "minecraft:smooth_quartz"),
+             (1, "minecraft:chiseled_stone_bricks"), (2, "minecraft:dark_oak_wood"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:quartz_bricks"), (5, "minecraft:dark_oak_wood")],
+        49: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:quartz_bricks"), (-3, "minecraft:dark_oak_wood"),
+             (-2, "minecraft:chiseled_stone_bricks"), (-1, "minecraft:smooth_quartz"), (0, "minecraft:chiseled_stone_bricks"),
+             (1, "minecraft:smooth_quartz"), (2, "minecraft:chiseled_stone_bricks"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:quartz_bricks"), (5, "minecraft:dark_oak_wood")],
+        48: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:smooth_stone"), (-3, "minecraft:dark_oak_wood"),
+             (-2, "minecraft:dark_oak_wood"), (-1, "minecraft:chiseled_stone_bricks"), (0, "minecraft:smooth_quartz"),
+             (1, "minecraft:chiseled_stone_bricks"), (2, "minecraft:dark_oak_wood"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:smooth_stone"), (5, "minecraft:dark_oak_wood")],
+        47: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:chiseled_stone_bricks"), (-3, "minecraft:dark_oak_wood"),
+             (-1, "minecraft:smooth_stone"), (0, "minecraft:quartz_bricks"), (1, "minecraft:smooth_stone"),
+             (3, "minecraft:dark_oak_wood"), (4, "minecraft:chiseled_stone_bricks"), (5, "minecraft:dark_oak_wood")],
+        46: [(-5, "minecraft:dark_oak_wood"), (-4, "minecraft:smooth_stone"), (-3, "minecraft:chiseled_stone_bricks"),
+             (-2, "minecraft:dark_oak_wood"), (0, "minecraft:quartz_bricks"), (2, "minecraft:dark_oak_wood"),
+             (3, "minecraft:chiseled_stone_bricks"), (4, "minecraft:smooth_stone"), (5, "minecraft:dark_oak_wood")],
+        45: [(-4, "minecraft:dark_oak_wood"), (-3, "minecraft:smooth_stone"), (-2, "minecraft:chiseled_stone_bricks"),
+             (-1, "minecraft:smooth_stone"), (0, "minecraft:quartz_bricks"), (1, "minecraft:smooth_stone"),
+             (2, "minecraft:chiseled_stone_bricks"), (3, "minecraft:smooth_stone"), (4, "minecraft:dark_oak_wood")],
+        44: [(-3, "minecraft:dark_oak_wood"), (-2, "minecraft:dark_oak_wood"), (-1, "minecraft:chiseled_stone_bricks"),
+             (0, "minecraft:quartz_bricks"), (1, "minecraft:chiseled_stone_bricks"),
              (2, "minecraft:dark_oak_wood"), (3, "minecraft:dark_oak_wood")],
-        43: [(-2, "minecraft:dark_oak_wood"), (-1, "minecraft:dark_oak_wood"), (0, "minecraft:gold_block"),
+        43: [(-2, "minecraft:dark_oak_wood"), (-1, "minecraft:dark_oak_wood"), (0, "minecraft:quartz_bricks"),
              (1, "minecraft:dark_oak_wood"), (2, "minecraft:dark_oak_wood")],
     }
     for y, cells in senju_crest_rows.items():
@@ -669,9 +862,15 @@ def build_valley_madara_monument():
     sb.fill(19, 3, 15, 37, 7, 33, "minecraft:deepslate_bricks")
     sb.fill(20, 8, 16, 36, 10, 32, "minecraft:polished_blackstone_bricks")
     sb.fill(21, 11, 17, 35, 11, 31, "minecraft:deepslate_tiles")
-    for lx in (20, 36):
-        for lz in (16, 32):
+    for lx in (21, 35):
+        for lz in (17, 31):
             sb.add_lantern_post(lx, 12, lz, "minecraft:polished_blackstone_wall", "minecraft:soul_lantern")
+
+    # Visible, well-lit shrine altar chest at top of ceremonial staircase
+    sb.add_chest(22, 12, 24, facing="west", loot_table="narutomod:chests/valley_of_the_end")
+    for lz in (21, 27):
+        sb.set(22, 12, lz, "minecraft:deepslate_tiles")
+        sb.set(22, 13, lz, "minecraft:soul_lantern", {"hanging": "false"})
 
     sb.add_arch_z(15, 17, 4, 24, 6, 8, "minecraft:polished_blackstone_bricks", "minecraft:deepslate_tiles", "minecraft:soul_lantern")
 
@@ -920,6 +1119,9 @@ def verify_all() -> int:
         blocks = {}
         jigsaws = []
         lanterns = []
+        chests = []
+        y0_cols = set()
+        y1_cols = set()
 
         for b in nbt_file["blocks"]:
             x, y, z = [int(v) for v in b["pos"]]
@@ -928,12 +1130,24 @@ def verify_all() -> int:
             name = str(entry["Name"])
             props = {str(k): str(v) for k, v in entry.get("Properties", {}).items()}
             blocks[(x, y, z)] = (name, props)
+            if name not in ("minecraft:air", "minecraft:cave_air", "minecraft:void_air"):
+                if y == 0:
+                    y0_cols.add((x, z))
+                elif y == 1:
+                    y1_cols.add((x, z))
             if name == "minecraft:jigsaw":
                 jigsaws.append((x, y, z, b.get("nbt")))
             elif name in ("minecraft:lantern", "minecraft:soul_lantern"):
                 lanterns.append((x, y, z, name, props))
+            elif name == "minecraft:chest":
+                chests.append((x, y, z, b.get("nbt")))
 
         file_errors = []
+
+        # 0. Verify y=0 foundation support for all y=1 blocks
+        unsupported_base = y1_cols - y0_cols
+        if unsupported_base:
+            file_errors.append(f"{len(unsupported_base)} column(s) have y=1 blocks lacking y=0 support")
 
         # 1. Verify Jigsaws
         if len(jigsaws) != exp_jigsaw_count:
@@ -949,6 +1163,22 @@ def verify_all() -> int:
             sup = blocks.get(sup_pos)
             if sup is None or sup[0] in NON_SOLID_BLOCKS:
                 file_errors.append(f"Unsupported {lname} (hanging={hanging}) at ({lx},{ly},{lz})")
+
+        # 2b. Verify Monument Chests & Minimalist Senju Palette
+        if filename in ("valley_hashirama_statue.nbt", "valley_madara_statue.nbt"):
+            if not chests:
+                file_errors.append(f"Expected visible loot chest in {filename}")
+            for cx_b, cy_b, cz_b, cnbt in chests:
+                if not cnbt or str(cnbt.get("LootTable", "")) != "narutomod:chests/valley_of_the_end":
+                    file_errors.append(f"Chest at ({cx_b},{cy_b},{cz_b}) missing LootTable narutomod:chests/valley_of_the_end")
+                above = blocks.get((cx_b, cy_b + 1, cz_b))
+                if above is not None and above[0] not in ("minecraft:air", "minecraft:cave_air"):
+                    file_errors.append(f"Chest at ({cx_b},{cy_b},{cz_b}) blocked above by {above[0]}")
+        if filename == "valley_hashirama_statue.nbt":
+            banned = {"minecraft:gold_block", "minecraft:emerald_block", "minecraft:copper_block"}
+            found_banned = {str(e["Name"]) for e in palette if str(e["Name"]) in banned}
+            if found_banned:
+                file_errors.append(f"Minimalist Hashirama monument must not use {sorted(found_banned)}")
 
         # 3. Verify Water Containment
         def is_allowed_mouth(x, y, z, dx, dz):
