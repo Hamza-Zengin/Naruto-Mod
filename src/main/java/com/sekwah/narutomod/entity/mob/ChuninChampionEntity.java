@@ -126,11 +126,6 @@ public class ChuninChampionEntity extends PathfinderMob implements NinjaJutsuUse
         return false;
     }
 
-    @Override
-    protected boolean shouldDespawnInPeaceful() {
-        return false;
-    }
-
     @Nullable
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason,
@@ -143,6 +138,10 @@ public class ChuninChampionEntity extends PathfinderMob implements NinjaJutsuUse
 
     @Override
     protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance difficulty) {
+        this.equipDefaultGear();
+    }
+
+    private void equipDefaultGear() {
         this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(NarutoItems.CHAKRA_BLADES.get()));
         this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(NarutoItems.HEADBAND_LEAF.get()));
         this.setItemSlot(EquipmentSlot.CHEST, new ItemStack(NarutoItems.CHUNIN_VEST.get()));
@@ -210,7 +209,7 @@ public class ChuninChampionEntity extends PathfinderMob implements NinjaJutsuUse
         if (!this.level().isClientSide()) {
             // Ensure structure-spawned champions always have their iconic gear
             if (this.tickCount == 1 && this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()) {
-                this.populateDefaultEquipmentSlots(this.random, this.level().getCurrentDifficultyAt(this.blockPosition()));
+                this.equipDefaultGear();
             }
 
             if (!this.duelActive) {
