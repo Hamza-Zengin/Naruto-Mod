@@ -3,7 +3,7 @@
   "biomes": "#minecraft:is_forest",
   "step": "surface_structures",
   "spawn_overrides": {},
-  "terrain_adaptation": "beard_box",
+  "terrain_adaptation": "beard_thin",
   "start_pool": "narutomod:konoha_village",
   "size": 5,
   "start_height": {
