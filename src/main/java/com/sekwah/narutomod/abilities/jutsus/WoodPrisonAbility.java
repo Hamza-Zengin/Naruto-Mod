@@ -78,8 +78,7 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
-        float powerMult = getPowerMultiplier(mastery);
-        int prisonLife = (int) (75 * powerMult);
+        int prisonLife = Ability.getScaledDurationTicks(75, mastery, 0.60D);
 
         Vec3 center = JutsuTargetingHelper.resolveTargetOrGroundOrigin(serverLevel, player, getScaledRange(mastery), 2.8D);
 

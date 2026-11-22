@@ -40,7 +40,7 @@ import java.util.UUID;
  * Renders custom multi-part 3D models while executing authentic server-side physics,
  * projectile collisions, physical barrier defense, and combat mechanics.
  */
-public class JutsuVisualEffectEntity extends Entity {
+public class JutsuVisualEffectEntity extends Entity implements JutsuProjectile {
 
     public static final int TYPE_KIRIN_DRAGON = 0;
     public static final int TYPE_WOOD_PRISON = 1;
@@ -57,8 +57,8 @@ public class JutsuVisualEffectEntity extends Entity {
     public static final int TYPE_ASH_CLOUD = 12;
     public static final int TYPE_WATER_WALL = 13;
 
-    public static final float WATER_WALL_WIDTH = 3.6F;
-    public static final float WATER_WALL_HEIGHT = 2.8F;
+    public static final float WATER_WALL_WIDTH = 5.2F;
+    public static final float WATER_WALL_HEIGHT = 3.2F;
     public static final float EARTH_WALL_WIDTH = 3.2F;
     public static final float EARTH_WALL_HEIGHT = 2.8F;
 
@@ -153,7 +153,7 @@ public class JutsuVisualEffectEntity extends Entity {
     }
 
     public AABB getWaterWallBarrierBox() {
-        return this.getBoundingBox().inflate(1.2D, 0.5D, 1.2D);
+        return this.getBoundingBox().inflate(0.8D, 0.5D, 0.8D);
     }
 
     public static boolean isBlockedByWaterWall(Vec3 pos, Vec3 wallOrigin, double halfWidth, double height) {
@@ -413,7 +413,7 @@ public class JutsuVisualEffectEntity extends Entity {
                                 36, 1.6D, 0.8D, 1.6D, 0.16D,
                                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
-                    if (this.tickCount == 3 || this.tickCount == 12) {
+                    if (this.tickCount == 3 || (this.tickCount >= 12 && this.tickCount <= this.getMaxLife() - 8 && this.tickCount % 12 == 0)) {
                         Player caster = this.getCasterPlayer();
                         float baseDmg = Math.max(4.0F, this.getEffectDamage());
                         float hitDmg = this.tickCount == 3 ? baseDmg * 0.70F : baseDmg * 0.35F;
@@ -443,8 +443,8 @@ public class JutsuVisualEffectEntity extends Entity {
                                 18, 1.4D, 0.4D, 1.4D, 0.08D,
                                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
-                    boolean doPin = this.tickCount % 2 == 0 && this.tickCount <= 52;
-                    boolean doPulse = this.tickCount == 3 || this.tickCount == 18 || this.tickCount == 33 || this.tickCount == 48;
+                    boolean doPin = this.tickCount % 2 == 0 && this.tickCount <= this.getMaxLife() - 6;
+                    boolean doPulse = this.tickCount == 3 || (this.tickCount >= 18 && this.tickCount <= this.getMaxLife() - 6 && this.tickCount % 15 == 0);
                     Player caster = (doPin || doPulse) ? this.getCasterPlayer() : null;
                     if (doPin) {
                         List<LivingEntity> pinned = JutsuCombatHelper.findHostileTargetsInRadius(
@@ -457,7 +457,7 @@ public class JutsuVisualEffectEntity extends Entity {
                             JutsuCombatHelper.applyVelocity(victim, new Vec3(pullX, clampedY, pullZ), false);
                         }
                     }
-                    if (this.tickCount == 3 || this.tickCount == 18 || this.tickCount == 33 || this.tickCount == 48) {
+                    if (doPulse) {
                         float baseDmg = Math.max(4.0F, this.getEffectDamage());
                         float pulseDmg = (this.tickCount == 3) ? baseDmg * 0.40F : baseDmg * 0.20F;
                         serverLevel.playSound(null, this.blockPosition(), SoundEvents.CHAIN_HIT, SoundSource.PLAYERS,
@@ -485,7 +485,7 @@ public class JutsuVisualEffectEntity extends Entity {
                                 targetData.setChakra(Math.max(0.0F, targetData.getChakra() - siphon));
                             }
                         }
-                    } else if (this.tickCount == 12 || this.tickCount == 27 || this.tickCount == 42) {
+                    } else if (this.tickCount >= 12 && this.tickCount <= this.getMaxLife() - 6 && this.tickCount % 15 == 12) {
                         serverLevel.sendParticles(ParticleTypes.END_ROD,
                                 this.getX(), this.getY() + 0.6D, this.getZ(),
                                 6, 1.5D, 0.4D, 1.5D, 0.02D,
@@ -556,11 +556,9 @@ public class JutsuVisualEffectEntity extends Entity {
                     List<Entity> incoming = serverLevel.getEntities(this, barrierBox.inflate(4.0D),
                             e -> e.isAlive()
                                     && !(e instanceof JutsuVisualEffectEntity)
-                                    && (e instanceof Projectile || e instanceof JutsuProjectile)
-                                    && !this.isOwnedByAlly(e)
-                                    && (caster == null || !(e instanceof Projectile p && (p.getOwner() == caster || ShadowCloneEntity.areAllies(caster, p.getOwner())))));
+                                    && (e instanceof Projectile || e instanceof JutsuProjectile));
                     for (Entity entity : incoming) {
-                        AABB sweptBox = entity.getBoundingBox().expandTowards(entity.getDeltaMovement()).inflate(0.35D);
+                        AABB sweptBox = entity.getBoundingBox().expandTowards(entity.getDeltaMovement()).inflate(0.5D);
                         if (!barrierBox.intersects(entity.getBoundingBox()) && !barrierBox.intersects(sweptBox)) {
                             continue;
                         }
@@ -570,7 +568,10 @@ public class JutsuVisualEffectEntity extends Entity {
                             }
                             continue;
                         }
-                        boolean hadHorizontalMotion = entity.getDeltaMovement().horizontalDistanceSqr() > 0.01D;
+                        if (entity instanceof JutsuProjectile jutsuProj && jutsuProj.getElement() == ChakraElement.FIRE) {
+                            jutsuProj.explodeAndDiscard();
+                            continue;
+                        }
                         if (entity instanceof Projectile projectile && projectile.isOnFire()) {
                             projectile.clearFire();
                             serverLevel.playSound(null, projectile.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1.1F, 1.1F);
@@ -579,11 +580,14 @@ public class JutsuVisualEffectEntity extends Entity {
                                     12, 0.4D, 0.4D, 0.4D, 0.05D,
                                     ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                         }
+                        boolean ownedByAlly = this.isOwnedByAlly(entity)
+                                || (caster != null && entity instanceof Projectile p
+                                        && (p.getOwner() == caster || ShadowCloneEntity.areAllies(caster, p.getOwner())));
+                        if (ownedByAlly) {
+                            continue;
+                        }
+                        boolean hadHorizontalMotion = entity.getDeltaMovement().horizontalDistanceSqr() > 0.01D;
                         if (entity instanceof JutsuProjectile jutsuProj) {
-                            if (jutsuProj.getElement() == ChakraElement.FIRE) {
-                                jutsuProj.explodeAndDiscard();
-                                continue;
-                            }
                             entity.setDeltaMovement(0.0D, -0.25D, 0.0D);
                             entity.setNoGravity(false);
                             entity.needsSync = true;
@@ -721,6 +725,49 @@ public class JutsuVisualEffectEntity extends Entity {
 
     public void setEffectDamage(float damage) {
         this.entityData.set(DATA_DAMAGE, damage);
+    }
+
+    private int weakenedAmount = 0;
+
+    @Override
+    public ChakraElement getElement() {
+        return switch (this.getVisualType()) {
+            case TYPE_WATER_WALL, TYPE_WATER_VORTEX -> ChakraElement.WATER;
+            case TYPE_EARTH_WALL, TYPE_STONE_SPIKES -> ChakraElement.EARTH;
+            case TYPE_WIND_SHOCKWAVE -> ChakraElement.WIND;
+            case TYPE_AMATERASU_PILLAR, TYPE_ASH_CLOUD -> ChakraElement.FIRE;
+            case TYPE_KIRIN_DRAGON, TYPE_CHIDORI_BURST -> ChakraElement.LIGHTNING;
+            default -> ChakraElement.NONE;
+        };
+    }
+
+    @Override
+    public int getJutsuPower() {
+        if (this.getVisualType() == TYPE_WATER_WALL) {
+            return 100;
+        }
+        return Math.max(40, Math.round(this.getEffectDamage() * 4.0F));
+    }
+
+    @Override
+    public void weaken(int amount) {
+        int type = this.getVisualType();
+        if (type == TYPE_WATER_WALL || type == TYPE_EARTH_WALL) {
+            return;
+        }
+        this.weakenedAmount += Math.max(0, amount);
+        if (this.getJutsuPower() - this.weakenedAmount <= 0) {
+            this.explodeAndDiscard();
+        }
+    }
+
+    @Override
+    public void explodeAndDiscard() {
+        int type = this.getVisualType();
+        if (type == TYPE_WATER_WALL || type == TYPE_EARTH_WALL) {
+            return;
+        }
+        this.discard();
     }
 
     @Override

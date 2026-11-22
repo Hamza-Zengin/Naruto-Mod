@@ -62,14 +62,19 @@ public class VacuumSpheresAbility extends Ability implements Ability.Cooldown {
         float powerMult = getPowerMultiplier(mastery);
         float damagePerSphere = this.getDamage(ninjaData);
 
-        fireSphere(player, damagePerSphere, powerMult);
+        int maxLife = Ability.getScaledDurationTicks(50, mastery, 0.30D);
+
+        fireSphere(player, damagePerSphere, powerMult, maxLife);
         if (ninjaData != null) {
-            ninjaData.scheduleDelayedTickEvent(p -> fireSphere(p, damagePerSphere, powerMult), 4);
-            ninjaData.scheduleDelayedTickEvent(p -> fireSphere(p, damagePerSphere, powerMult), 8);
+            ninjaData.scheduleDelayedTickEvent(p -> fireSphere(p, damagePerSphere, powerMult, maxLife), 4);
+            ninjaData.scheduleDelayedTickEvent(p -> fireSphere(p, damagePerSphere, powerMult, maxLife), 8);
+            if (getMasteryTier(mastery) >= 5) {
+                ninjaData.scheduleDelayedTickEvent(p -> fireSphere(p, damagePerSphere, powerMult, maxLife), 12);
+            }
         }
     }
 
-    private static void fireSphere(Player player, float damage, float powerMult) {
+    private static void fireSphere(Player player, float damage, float powerMult, int maxLife) {
         if (player == null || !player.isAlive() || !(player.level() instanceof ServerLevel serverLevel)) {
             return;
         }
@@ -83,7 +88,7 @@ public class VacuumSpheresAbility extends Ability implements Ability.Cooldown {
         sphere.setYRot(player.getYRot());
         sphere.setXRot(player.getXRot());
         sphere.setDamage(damage);
-        sphere.setMaxLife(50);
+        sphere.setMaxLife(maxLife);
         sphere.setDeltaMovement(look.scale(1.95D * Math.min(1.25D, powerMult)));
         serverLevel.addFreshEntity(sphere);
 

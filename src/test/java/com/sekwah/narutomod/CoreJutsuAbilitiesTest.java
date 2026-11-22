@@ -36,7 +36,9 @@ public class CoreJutsuAbilitiesTest {
 
         assertEquals(100, RasenganAbility.getScaledHoldDuration(0));
         assertEquals(100, RasenganAbility.getScaledHoldDuration(-10));
-        assertEquals(120, RasenganAbility.getScaledHoldDuration(100));
+        assertEquals(109, RasenganAbility.getScaledHoldDuration(100));
+        assertEquals(160, RasenganAbility.getScaledHoldDuration(700));
+        assertEquals(160, RasenganAbility.getScaledHoldDuration(1400));
     }
 
     @Test
@@ -52,7 +54,9 @@ public class CoreJutsuAbilitiesTest {
         assertEquals(26.0f, ability.getDefaultDamage(), 0.001f);
 
         assertEquals(100, ChidoriAbility.getScaledHoldDuration(0));
-        assertEquals(120, ChidoriAbility.getScaledHoldDuration(100));
+        assertEquals(109, ChidoriAbility.getScaledHoldDuration(100));
+        assertEquals(160, ChidoriAbility.getScaledHoldDuration(700));
+        assertEquals(160, ChidoriAbility.getScaledHoldDuration(1400));
     }
 
     @Test
@@ -203,5 +207,47 @@ public class CoreJutsuAbilitiesTest {
                 new net.minecraft.world.phys.Vec3(0, 0, 1),
                 20.0D);
         assertEquals(17.0D, anchor.z, 0.001D);
+    }
+
+    @Test
+    @DisplayName("Item 3: Ability mastery progress, clamped duration ticks, Fireball cast delay, and MysticalPalm heal range")
+    void testItem3MasteryProgressAndJutsuScaling() {
+        assertEquals(0.0D, Ability.getMasteryProgress(-25), 0.0001D);
+        assertEquals(0.0D, Ability.getMasteryProgress(0), 0.0001D);
+        assertEquals(0.5D, Ability.getMasteryProgress(350), 0.0001D);
+        assertEquals(1.0D, Ability.getMasteryProgress(700), 0.0001D);
+        assertEquals(1.0D, Ability.getMasteryProgress(2000), 0.0001D);
+
+        assertEquals(100, Ability.getScaledDurationTicks(100, 0, 0.60D));
+        assertEquals(130, Ability.getScaledDurationTicks(100, 350, 0.60D));
+        assertEquals(160, Ability.getScaledDurationTicks(100, 700, 0.60D));
+        assertEquals(160, Ability.getScaledDurationTicks(100, 1500, 0.60D));
+
+        assertEquals(10, com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility.getScaledCastDelayTicks(0));
+        assertEquals(6, com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility.getScaledCastDelayTicks(350));
+        assertEquals(2, com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility.getScaledCastDelayTicks(700));
+        assertEquals(2, com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility.getScaledCastDelayTicks(1500));
+
+        assertEquals(4.5D, com.sekwah.narutomod.abilities.jutsus.MysticalPalmAbility.getScaledHealRange(0), 0.001D);
+        assertEquals(5.85D, com.sekwah.narutomod.abilities.jutsus.MysticalPalmAbility.getScaledHealRange(350), 0.001D);
+        assertEquals(7.2D, com.sekwah.narutomod.abilities.jutsus.MysticalPalmAbility.getScaledHealRange(700), 0.001D);
+        assertEquals(7.2D, com.sekwah.narutomod.abilities.jutsus.MysticalPalmAbility.getScaledHealRange(1500), 0.001D);
+
+        assertEquals(200, com.sekwah.narutomod.abilities.jutsus.ChakraScalpelAbility.getScaledHoldDuration(0));
+        assertEquals(320, com.sekwah.narutomod.abilities.jutsus.ChakraScalpelAbility.getScaledHoldDuration(700));
+        assertEquals(320, com.sekwah.narutomod.abilities.jutsus.ChakraScalpelAbility.getScaledHoldDuration(1500));
+
+        assertEquals(80, com.sekwah.narutomod.abilities.jutsus.AshPileBurningAbility.getScaledDuration(0));
+        assertEquals(128, com.sekwah.narutomod.abilities.jutsus.AshPileBurningAbility.getScaledDuration(700));
+        assertEquals(128, com.sekwah.narutomod.abilities.jutsus.AshPileBurningAbility.getScaledDuration(1500));
+
+        assertEquals(30, com.sekwah.narutomod.abilities.jutsus.ShadowPossessionAbility.getScaledHoldDuration(0));
+        assertEquals(60, com.sekwah.narutomod.abilities.jutsus.ShadowPossessionAbility.getScaledHoldDuration(700));
+        assertEquals(60, com.sekwah.narutomod.abilities.jutsus.ShadowPossessionAbility.getScaledHoldDuration(1500));
+
+        assertEquals(22, com.sekwah.narutomod.abilities.jutsus.HakkeKushoAbility.getScaledRange(false, 0));
+        assertEquals(26, com.sekwah.narutomod.abilities.jutsus.HakkeKushoAbility.getScaledRange(false, 700));
+        assertEquals(26, com.sekwah.narutomod.abilities.jutsus.HakkeKushoAbility.getScaledRange(true, 0));
+        assertEquals(30, com.sekwah.narutomod.abilities.jutsus.HakkeKushoAbility.getScaledRange(true, 700));
     }
 }

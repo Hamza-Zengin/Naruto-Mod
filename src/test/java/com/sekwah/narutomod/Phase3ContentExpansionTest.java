@@ -76,7 +76,8 @@ public class Phase3ContentExpansionTest {
         assertFalse(scalpel.requiresScroll());
         assertNull(scalpel.getRequiredClanPath());
         assertEquals(200, ChakraScalpelAbility.getScaledHoldDuration(0));
-        assertEquals(240, ChakraScalpelAbility.getScaledHoldDuration(100));
+        assertEquals(217, ChakraScalpelAbility.getScaledHoldDuration(100));
+        assertEquals(320, ChakraScalpelAbility.getScaledHoldDuration(700));
 
         assertTrue(ChakraScalpelAbility.isStrikeCooldownReady(100, -1));
         assertFalse(ChakraScalpelAbility.isStrikeCooldownReady(105, 100));

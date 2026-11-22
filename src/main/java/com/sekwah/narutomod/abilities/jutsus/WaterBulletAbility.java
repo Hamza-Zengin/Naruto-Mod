@@ -66,7 +66,7 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
         Vec3 spawnPos = player.getEyePosition().add(look.scale(1.3));
         waterBullet.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
         waterBullet.setDamage(bulletDamage);
-        waterBullet.setMaxLife(25);
+        waterBullet.setMaxLife(Ability.getScaledDurationTicks(35, mastery, 0.43D));
         waterBullet.setDeltaMovement(look.scale(1.1 * Math.min(1.4, powerMult)));
         waterBullet.alignRotationToMovement();
         serverLevel.addFreshEntity(waterBullet);

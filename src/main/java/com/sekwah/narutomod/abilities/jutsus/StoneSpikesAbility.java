@@ -92,7 +92,8 @@ public class StoneSpikesAbility extends Ability implements Ability.Cooldown {
 
         JutsuVisualEffectEntity spikes = JutsuVisualEffectEntity.create(
                 serverLevel, targetPos.x, targetPos.y, targetPos.z,
-                JutsuVisualEffectEntity.TYPE_STONE_SPIKES, 50, player.getYRot());
+                JutsuVisualEffectEntity.TYPE_STONE_SPIKES,
+                Ability.getScaledDurationTicks(50, mastery, 0.60D), player.getYRot());
         spikes.setCasterUUID(player.getUUID());
         spikes.setEffectDamage(damage);
         serverLevel.addFreshEntity(spikes);

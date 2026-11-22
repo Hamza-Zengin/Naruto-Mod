@@ -77,7 +77,7 @@ public class ChakraScalpelAbility extends Ability implements Ability.Cooldown {
     }
 
     public static int getScaledHoldDuration(int mastery) {
-        return (int) Math.round(BASE_HOLD_TICKS * (1.0D + 0.20D * (Math.max(0, mastery) / 100.0D)));
+        return Ability.getScaledDurationTicks(BASE_HOLD_TICKS, mastery, 0.60D);
     }
 
     public static boolean isStrikeCooldownReady(int currentTick, int lastStrikeTick) {

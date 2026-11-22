@@ -68,7 +68,12 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
     }
 
     public static int getScaledRange(boolean byakuganOn) {
-        return byakuganOn ? 26 : 22;
+        return getScaledRange(byakuganOn, 0);
+    }
+
+    public static int getScaledRange(boolean byakuganOn, int mastery) {
+        int base = byakuganOn ? 26 : 22;
+        return base + (int) Math.round(4.0D * Ability.getMasteryProgress(mastery));
     }
 
     @Override
@@ -97,7 +102,7 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
                 new com.sekwah.narutomod.network.s2c.ClientCameraShakePacket(0.45f, 8),
                 player);
 
-        int maxRange = getScaledRange(byakuganOn);
+        int maxRange = getScaledRange(byakuganOn, mastery);
         for (int i = 1; i <= maxRange; i++) {
             Vec3 pos = eyePos.add(look.scale(i));
             serverLevel.sendParticles(ParticleTypes.SONIC_BOOM, pos.x, pos.y, pos.z, 1, 0.0, 0.0, 0.0, 0.0,

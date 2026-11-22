@@ -84,7 +84,7 @@ public class WaterEncampmentWallAbility extends Ability implements Ability.Coold
             }
         }
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
-        int duration = (int) Math.round(WALL_DURATION_TICKS * (1.0D + 0.20D * (Math.max(0, mastery) / 100.0D)));
+        int duration = Ability.getScaledDurationTicks(WALL_DURATION_TICKS, mastery, 0.80D);
         float damage = this.getDamage(ninjaData);
 
         serverLevel.playSound(null, BlockPos.containing(wallPos), SoundEvents.GENERIC_SPLASH, SoundSource.PLAYERS, 1.8F, 0.85F);
@@ -98,6 +98,7 @@ public class WaterEncampmentWallAbility extends Ability implements Ability.Coold
                 serverLevel, wallPos.x, wallPos.y, wallPos.z,
                 JutsuVisualEffectEntity.TYPE_WATER_WALL, duration, player.getYRot());
         wall.setCasterUUID(player.getUUID());
+        wall.setMaxLife(duration);
         wall.setEffectDamage(damage);
         wall.refreshDimensions();
         serverLevel.addFreshEntity(wall);

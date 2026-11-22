@@ -180,7 +180,6 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                         sweptBox.inflate(2.0D),
                         wall -> wall.isAlive()
                                 && wall.getVisualType() == JutsuVisualEffectEntity.TYPE_WATER_WALL
-                                && !wall.isOwnedByAlly(this.getOwner())
                                 && wall.getWaterWallBarrierBox().intersects(sweptBox));
                 if (!waterWalls.isEmpty()) {
                     this.extinguishByWaterWall(serverLevel);
@@ -276,14 +275,29 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         }
     }
 
+    public void setFireballSpeedAndRange(float speedMult, int extraLife) {
+        if (speedMult > 0.0F && speedMult != 1.0F) {
+            this.setDeltaMovement(this.getDeltaMovement().scale(speedMult));
+            this.accelerationPower *= speedMult;
+        }
+        if (extraLife > 0) {
+            this.lifeSpan += extraLife;
+        }
+    }
+
     public void extinguishByWaterWall(ServerLevel serverLevel) {
         if (!this.isAlive()) {
             return;
         }
         serverLevel.playSound(null, this.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1.3F, 1.05F);
+        serverLevel.playSound(null, this.blockPosition(), com.sekwah.narutomod.sounds.NarutoSounds.SIZZLE.get(), SoundSource.PLAYERS, 1.4F, 1.1F);
         serverLevel.sendParticles(ParticleTypes.CLOUD,
                 this.getX(), this.getY() + 0.3D, this.getZ(),
                 this.isPhoenixMini() ? 12 : 28, 0.5D, 0.45D, 0.5D, 0.06D,
+                net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+        serverLevel.sendParticles(ParticleTypes.SPLASH,
+                this.getX(), this.getY() + 0.3D, this.getZ(),
+                this.isPhoenixMini() ? 10 : 24, 0.5D, 0.45D, 0.5D, 0.08D,
                 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
         this.discard();
     }
@@ -292,10 +306,11 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
     protected boolean canHitEntity(Entity entity) {
         if (entity instanceof JutsuVisualEffectEntity visual) {
             int type = visual.getVisualType();
-            if (type == JutsuVisualEffectEntity.TYPE_WATER_WALL || type == JutsuVisualEffectEntity.TYPE_EARTH_WALL) {
-                if (visual.isOwnedByAlly(this.getOwner()) || type == JutsuVisualEffectEntity.TYPE_WATER_WALL) {
-                    return false;
-                }
+            if (type == JutsuVisualEffectEntity.TYPE_WATER_WALL) {
+                return true;
+            }
+            if (type == JutsuVisualEffectEntity.TYPE_EARTH_WALL && visual.isOwnedByAlly(this.getOwner())) {
+                return false;
             }
         }
         return super.canHitEntity(entity) && entity != this.getOwner()

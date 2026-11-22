@@ -132,8 +132,8 @@ public class JutsuVisualModels {
         }
 
         public void setupAnim(float age, float progress) {
-            // Plunge from the sky during first 25% of life, then coil & roar
-            float plunge = progress < 0.25F ? (1.0F - (progress / 0.25F)) * -48.0F : 0.0F;
+            // Plunge from the sky during first 7 ticks, then coil & roar
+            float plunge = age < 7.0F ? (1.0F - (age / 7.0F)) * -48.0F : 0.0F;
             this.dragonHead.y = -14.0F + plunge + Mth.sin(age * 0.4F) * 1.5F;
             this.dragonHead.xRot = 0.35F + Mth.sin(age * 0.3F) * 0.12F;
             this.dragonBody.y = plunge;
@@ -230,8 +230,8 @@ public class JutsuVisualModels {
         }
 
         public void setupAnim(float age, float progress) {
-            float emerge = progress < 0.15F ? (1.0F - (progress / 0.15F)) * 32.0F : 0.0F;
-            float sink = progress > 0.85F ? ((progress - 0.85F) / 0.15F) * 32.0F : 0.0F;
+            float emerge = age < 8.0F ? (1.0F - (age / 8.0F)) * 32.0F : 0.0F;
+            float sink = progress > 0.88F ? ((progress - 0.88F) / 0.12F) * 32.0F : 0.0F;
             this.pillars.y = emerge + sink;
             this.vineRings.y = emerge + sink;
             this.vineRings.yRot = Mth.sin(age * 0.15F) * 0.12F;
@@ -597,7 +597,7 @@ public class JutsuVisualModels {
         }
 
         public void setupAnim(float age, float progress) {
-            float emerge = progress < 0.12F ? (1.0F - (progress / 0.12F)) * 22.0F : 0.0F;
+            float emerge = age < 6.0F ? (1.0F - (age / 6.0F)) * 22.0F : 0.0F;
             this.claws.y = emerge;
             this.claws.yRot = Mth.sin(age * 0.18F) * 0.22F;
         }
@@ -663,7 +663,12 @@ public class JutsuVisualModels {
         @Override
         public void setupAnim(VisualState state) {
             super.setupAnim(state);
-            setupAnim(state.progress());
+            setupAnim(state.age(), state.progress());
+        }
+
+        public void setupAnim(float age, float progress) {
+            float emerge = age < 6.0F ? (1.0F - (age / 6.0F)) * 48.0F : 0.0F;
+            this.wallBody.y = emerge;
         }
 
         public void setupAnim(float progress) {
@@ -792,7 +797,13 @@ public class JutsuVisualModels {
         @Override
         public void setupAnim(VisualState state) {
             super.setupAnim(state);
-            setupAnim(state.progress());
+            setupAnim(state.age(), state.progress());
+        }
+
+        public void setupAnim(float age, float progress) {
+            float emerge = age < 6.0F ? (1.0F - (age / 6.0F)) * 54.0F : 0.0F;
+            float retract = progress > 0.85F ? ((progress - 0.85F) / 0.15F) * 54.0F : 0.0F;
+            this.spikesCluster.y = emerge + retract;
         }
 
         public void setupAnim(float progress) {
@@ -893,8 +904,8 @@ public class JutsuVisualModels {
         }
 
         public void setupAnim(float age, float progress) {
-            float emerge = progress < 0.12F ? (1.0F - (progress / 0.12F)) * 34.0F : 0.0F;
-            float retract = progress > 0.86F ? ((progress - 0.86F) / 0.14F) * 34.0F : 0.0F;
+            float emerge = age < 6.0F ? (1.0F - (age / 6.0F)) * 34.0F : 0.0F;
+            float retract = progress > 0.88F ? ((progress - 0.88F) / 0.12F) * 34.0F : 0.0F;
             float pulse = Mth.sin(age * 0.42F) * 0.8F;
             this.sealRing.yRot = age * 0.14F;
             this.innerSealRing.yRot = -age * 0.22F;
@@ -974,7 +985,7 @@ public class JutsuVisualModels {
 
         public void setupAnim(float age, float progress) {
             float rise = Mth.sin(age * 0.24F) * 1.2F;
-            float expand = progress < 0.15F ? (1.0F - (progress / 0.15F)) * 10.0F : 0.0F;
+            float expand = age < 7.0F ? (1.0F - (age / 7.0F)) * 10.0F : 0.0F;
             this.corePlume.y = rise + expand;
             this.corePlume.yRot = age * 0.08F;
             this.swirlRing.y = rise * 0.6F + expand;
@@ -1050,8 +1061,8 @@ public class JutsuVisualModels {
         }
 
         public void setupAnim(float age, float progress) {
-            float emerge = progress < 0.10F ? (1.0F - (progress / 0.10F)) * 46.0F : 0.0F;
-            float subsiding = progress > 0.88F ? ((progress - 0.88F) / 0.12F) * 46.0F : 0.0F;
+            float emerge = age < 6.0F ? (1.0F - (age / 6.0F)) * 46.0F : 0.0F;
+            float subsiding = progress > 0.90F ? ((progress - 0.90F) / 0.10F) * 46.0F : 0.0F;
             float surge = Mth.sin(age * 0.45F) * 1.4F;
             this.waveBase.y = emerge + subsiding;
             this.crestSurge.y = emerge + subsiding + surge;

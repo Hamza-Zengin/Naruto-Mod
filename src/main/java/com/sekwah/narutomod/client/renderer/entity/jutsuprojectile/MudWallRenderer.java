@@ -22,6 +22,7 @@ public class MudWallRenderer extends EntityRenderer<MudWallEntity, MudWallRender
 
     public static class MudWallRenderState extends EntityRenderState {
         public float wallYaw;
+        public float age;
         public float progress;
     }
 
@@ -41,6 +42,7 @@ public class MudWallRenderer extends EntityRenderer<MudWallEntity, MudWallRender
         float age = entity.tickCount + partialTicks;
         float maxLife = Math.max(1.0F, (float) entity.getMaxLife());
         state.wallYaw = entity.getWallYaw();
+        state.age = age;
         state.progress = Mth.clamp(age / maxLife, 0.0F, 1.0F);
     }
 
@@ -55,7 +57,7 @@ public class MudWallRenderer extends EntityRenderer<MudWallEntity, MudWallRender
             poseStack.scale(-1.0F, -1.0F, 1.0F);
             submitNodeCollector.submitModel(
                     this.earthModel,
-                    new VisualState(state.ageInTicks, state.progress),
+                    new VisualState(state.age, state.progress),
                     poseStack,
                     RenderTypes.entityCutout(JutsuVisualEffectRenderer.TEX_EARTH),
                     solidLight,

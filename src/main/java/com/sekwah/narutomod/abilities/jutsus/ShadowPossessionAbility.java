@@ -79,12 +79,11 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
     }
 
     public static int getScaledHoldDuration(int mastery) {
-        return (int) Math.round(30.0 * (1.0 + 0.10 * (Math.max(0, mastery) / 100.0)));
+        return Ability.getScaledDurationTicks(30, mastery, 1.00D);
     }
 
     public static double getScaledRange(int mastery) {
-        double progress = Math.min(1.0D, Math.max(0, mastery) / 700.0D);
-        return 20.0D + (10.0D * progress);
+        return 20.0D + (10.0D * Ability.getMasteryProgress(mastery));
     }
 
     public static float getScaledDamage(int mastery) {
