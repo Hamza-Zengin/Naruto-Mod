@@ -61,6 +61,90 @@ public enum NinjaRank {
         return staminaBonus;
     }
 
+    /**
+     * Proportional walking/running speed bonus (0.00 = +0%, 0.15 = +15%).
+     */
+    public float getMovementSpeedBonus() {
+        return switch (this) {
+            case ACADEMY_STUDENT -> 0.00F;
+            case GENIN -> 0.03F;
+            case CHUNIN -> 0.06F;
+            case JONIN -> 0.09F;
+            case ANBU -> 0.12F;
+            case KAGE -> 0.15F;
+        };
+    }
+
+    /**
+     * Additive jump strength bonus added to vanilla 0.42 base (~1.25 blocks -> ~2.00 blocks at Kage).
+     */
+    public double getJumpStrengthBonus() {
+        return switch (this) {
+            case ACADEMY_STUDENT -> 0.00D;
+            case GENIN -> 0.02D;
+            case CHUNIN -> 0.04D;
+            case JONIN -> 0.06D;
+            case ANBU -> 0.08D;
+            case KAGE -> 0.10D;
+        };
+    }
+
+    /**
+     * Extra safe fall distance in blocks before fall damage begins.
+     */
+    public double getSafeFallDistanceBonus() {
+        return switch (this) {
+            case ACADEMY_STUDENT -> 0.0D;
+            case GENIN -> 0.8D;
+            case CHUNIN -> 1.6D;
+            case JONIN -> 2.4D;
+            case ANBU -> 3.2D;
+            case KAGE -> 4.0D;
+        };
+    }
+
+    /**
+     * Percentage reduction applied to remaining fall distance (0.00 = 0%, 0.55 = 55%).
+     */
+    public float getFallDamageReduction() {
+        return switch (this) {
+            case ACADEMY_STUDENT -> 0.00F;
+            case GENIN -> 0.12F;
+            case CHUNIN -> 0.24F;
+            case JONIN -> 0.35F;
+            case ANBU -> 0.45F;
+            case KAGE -> 0.55F;
+        };
+    }
+
+    /**
+     * Flat melee damage bonus when attacking with an empty main hand.
+     */
+    public float getUnarmedDamageBonus() {
+        return switch (this) {
+            case ACADEMY_STUDENT -> 0.0F;
+            case GENIN -> 1.0F;
+            case CHUNIN -> 2.0F;
+            case JONIN -> 3.0F;
+            case ANBU -> 4.0F;
+            case KAGE -> 5.0F;
+        };
+    }
+
+    /**
+     * Incoming damage reduction when all 4 armor slots are completely empty (0.00 = 0%, 0.35 = 35%).
+     */
+    public float getUnarmoredDamageReduction() {
+        return switch (this) {
+            case ACADEMY_STUDENT -> 0.00F;
+            case GENIN -> 0.08F;
+            case CHUNIN -> 0.15F;
+            case JONIN -> 0.22F;
+            case ANBU -> 0.28F;
+            case KAGE -> 0.35F;
+        };
+    }
+
     public NinjaRank next() {
         int nextLevel = this.level + 1;
         for (NinjaRank rank : values()) {
