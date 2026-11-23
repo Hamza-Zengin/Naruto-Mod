@@ -55,7 +55,7 @@ public class BlankJutsuScrollItem extends JutsuScrollItem {
         if (JutsuScrollItem.isClanRestrictedJutsu(id)) {
             return false;
         }
-        if (ability.defaultCombo() <= 0 || ability.getDefaultChakraCost() <= 0) {
+        if (ability.isUtilityAbility() || ability.getDefaultChakraCost() <= 0) {
             return false;
         }
         if (!ninjaData.isAbilityUnlocked(id)) {

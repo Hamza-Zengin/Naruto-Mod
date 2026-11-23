@@ -35,11 +35,6 @@ public class VacuumSpheresAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 221;
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 26.0f;
     }

@@ -45,7 +45,6 @@ public class Phase3ContentExpansionTest {
 
         assertEquals(ChakraElement.FIRE, ash.getChakraElement());
         assertEquals(NinjaRank.JONIN, ash.getRequiredRank());
-        assertEquals(1231L, ash.defaultCombo());
         assertEquals(36.0f, ash.getDefaultChakraCost());
         assertEquals(180, ash.getDefaultCooldown());
         assertEquals(20.0f, ash.getDefaultDamage());
@@ -56,7 +55,6 @@ public class Phase3ContentExpansionTest {
 
         assertEquals(ChakraElement.WATER, waterWall.getChakraElement());
         assertEquals(NinjaRank.CHUNIN, waterWall.getRequiredRank());
-        assertEquals(223L, waterWall.defaultCombo());
         assertEquals(28.0f, waterWall.getDefaultChakraCost());
         assertEquals(160, waterWall.getDefaultCooldown());
         assertEquals(10.0f, waterWall.getDefaultDamage());
@@ -69,7 +67,6 @@ public class Phase3ContentExpansionTest {
 
         assertEquals(ChakraElement.NONE, scalpel.getChakraElement());
         assertEquals(NinjaRank.CHUNIN, scalpel.getRequiredRank());
-        assertEquals(331L, scalpel.defaultCombo());
         assertEquals(26.0f, scalpel.getDefaultChakraCost());
         assertEquals(180, scalpel.getDefaultCooldown());
         assertEquals(9.0f, scalpel.getDefaultDamage());

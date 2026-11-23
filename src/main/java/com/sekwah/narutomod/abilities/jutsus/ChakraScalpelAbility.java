@@ -57,11 +57,6 @@ public class ChakraScalpelAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 331L;
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 26.0f;
     }

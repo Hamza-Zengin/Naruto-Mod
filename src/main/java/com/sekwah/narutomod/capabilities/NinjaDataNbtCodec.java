@@ -26,11 +26,11 @@ final class NinjaDataNbtCodec {
     private static final String AKATSUKI_NINJAS_DEFEATED_TAG = "akatsukiNinjasDefeated";
     private static final String JUTSUS_CAST_TAG = "jutsusCast";
     private static final String UNLOCKED_JUTSUS_TAG = "unlockedJutsus";
+    private static final String EQUIPPED_JUTSUS_TAG = "equippedJutsus";
+    private static final String SELECTED_JUTSU_SLOT_TAG = "selectedJutsuSlot";
     private static final String ACTIVE_HAND_JUTSU_TAG = "activeHandJutsu";
     private static final String ACTIVE_HAND_JUTSU_TICKS_TAG = "activeHandJutsuTicks";
     private static final String ACTIVE_JUTSUS_FLAG_TAG = "activeJutsusFlag";
-    private static final String ACTIVE_SEALS_TAG = "activeSeals";
-    private static final String SEAL_TIMEOUT_TAG = "sealTimeout";
     private static final String JUTSU_MASTERY_TAG = "jutsuMastery";
     private static final String CHAKRA_REGEN_COOLDOWN_TAG = "chakraRegenCooldown";
 
@@ -55,17 +55,12 @@ final class NinjaDataNbtCodec {
         nbt.putInt(AKATSUKI_NINJAS_DEFEATED_TAG, data.getAkatsukiNinjasDefeated());
         nbt.putInt(JUTSUS_CAST_TAG, data.getJutsusCastCount());
         nbt.putString(UNLOCKED_JUTSUS_TAG, data.getUnlockedJutsusString());
+        nbt.putString(EQUIPPED_JUTSUS_TAG, data.getEquippedJutsusString());
+        nbt.putInt(SELECTED_JUTSU_SLOT_TAG, data.getSelectedJutsuSlot());
         nbt.putString(ACTIVE_HAND_JUTSU_TAG, data.getActiveHandJutsu());
         nbt.putInt(ACTIVE_HAND_JUTSU_TICKS_TAG, data.getActiveHandJutsuTicks());
         nbt.putInt(ACTIVE_JUTSUS_FLAG_TAG, data.getActiveJutsusFlag());
 
-        List<Byte> activeSeals = data.getMutableActiveSeals();
-        byte[] seals = new byte[activeSeals.size()];
-        for (int i = 0; i < activeSeals.size(); i++) {
-            seals[i] = activeSeals.get(i);
-        }
-        nbt.putByteArray(ACTIVE_SEALS_TAG, seals);
-        nbt.putInt(SEAL_TIMEOUT_TAG, data.getSealTimeout());
         nbt.putInt(CHAKRA_REGEN_COOLDOWN_TAG, data.getChakraRegenCooldown());
         nbt.putString("activeMissionId", data.getActiveMissionId());
         nbt.putInt("missionProgress", data.getMissionProgress());
@@ -139,6 +134,12 @@ final class NinjaDataNbtCodec {
         if (compoundTag.contains(UNLOCKED_JUTSUS_TAG)) {
             data.setUnlockedJutsusString(compoundTag.getStringOr(UNLOCKED_JUTSUS_TAG, ""));
         }
+        if (compoundTag.contains(EQUIPPED_JUTSUS_TAG)) {
+            data.setEquippedJutsusString(compoundTag.getStringOr(EQUIPPED_JUTSUS_TAG, ";;;;;;;"));
+        }
+        if (compoundTag.contains(SELECTED_JUTSU_SLOT_TAG)) {
+            data.setSelectedJutsuSlot(compoundTag.getIntOr(SELECTED_JUTSU_SLOT_TAG, 0));
+        }
         if (compoundTag.contains(ACTIVE_HAND_JUTSU_TAG) || compoundTag.contains(ACTIVE_HAND_JUTSU_TICKS_TAG)) {
             String handJutsu = compoundTag.contains(ACTIVE_HAND_JUTSU_TAG)
                     ? compoundTag.getStringOr(ACTIVE_HAND_JUTSU_TAG, "")
@@ -150,16 +151,6 @@ final class NinjaDataNbtCodec {
         }
         if (compoundTag.contains(ACTIVE_JUTSUS_FLAG_TAG)) {
             data.setActiveJutsusFlag(compoundTag.getIntOr(ACTIVE_JUTSUS_FLAG_TAG, 0));
-        }
-        compoundTag.getByteArray(ACTIVE_SEALS_TAG).ifPresent(seals -> {
-            List<Byte> activeSeals = data.getMutableActiveSeals();
-            activeSeals.clear();
-            for (byte b : seals) {
-                activeSeals.add(b);
-            }
-        });
-        if (compoundTag.contains(SEAL_TIMEOUT_TAG)) {
-            data.setRawSealTimeout(compoundTag.getIntOr(SEAL_TIMEOUT_TAG, 0));
         }
         if (compoundTag.contains("activeMissionId")) {
             data.setActiveMissionId(compoundTag.getStringOr("activeMissionId", ""));

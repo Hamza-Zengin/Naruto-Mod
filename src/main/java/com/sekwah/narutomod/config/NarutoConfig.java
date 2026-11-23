@@ -53,9 +53,6 @@ public class NarutoConfig {
     private static final ModConfigSpec.BooleanValue CONFIG_PAPERBOMB_BLOCK_DAMAGE;
     public static boolean paperbombBlockDamage = true;
 
-    private static final ModConfigSpec.IntValue CONFIG_JUTSU_KEYBIND_HOLD_THRESHOLD;
-    public static int jutsuKeybindHoldThreshold = 15;
-
     private static final ModConfigSpec.IntValue CONFIG_JUTSU_CAST_DELAY;
     public static int jutsuCastDelay = 20;
 
@@ -73,9 +70,6 @@ public class NarutoConfig {
 
     private static final ModConfigSpec.DoubleValue CONFIG_WATER_WALK_SPEED;
     public static float waterWalkSpeed = 1.0f;
-
-    private static final ModConfigSpec.IntValue CONFIG_SEAL_TIMEOUT_MS;
-    public static int sealTimeoutMs = 1000;
 
     private static final ModConfigSpec.DoubleValue CONFIG_KAWARIMI_MIN_DISTANCE;
     public static double kawarimiMinDistance = 5.0d;
@@ -154,9 +148,6 @@ public class NarutoConfig {
         CONFIG_WATER_WALK_SPEED = configBuilder.comment("Water walking horizontal speed multiplier")
                 .defineInRange("waterWalkSpeed", 1.0d, 0.1d, 10.0d);
 
-        CONFIG_SEAL_TIMEOUT_MS = configBuilder.comment("Seal typing timeout in milliseconds (1000ms = 1s = 20 ticks)")
-                .defineInRange("sealTimeoutMs", 1000, 100, 10000);
-
         CONFIG_KAWARIMI_MIN_DISTANCE = configBuilder.comment("Kawarimi minimum teleport distance at max mastery")
                 .defineInRange("kawarimiMinDistance", 5.0d, 1.0d, 64.0d);
 
@@ -215,9 +206,6 @@ public class NarutoConfig {
         CONFIG_PAPERBOMB_BLOCK_DAMAGE = configBuilder.comment("Paper Bomb block damage")
                 .define("paperBombExplosionBreakBlocks", true);
 
-        CONFIG_JUTSU_KEYBIND_HOLD_THRESHOLD = configBuilder.comment("Key hold threshold in ticks (20 per second)")
-                .defineInRange("jutsuKeyHoldThreshold", 15, 0, Integer.MAX_VALUE);
-
         CONFIG_JUTSU_CAST_DELAY = configBuilder.comment("Jutsu activation delay (20 per second)")
                 .defineInRange("jutsuActivateDelay", 15, 0, Integer.MAX_VALUE);
 
@@ -261,7 +249,6 @@ public class NarutoConfig {
         kunaiExplosionRadius = CONFIG_KUNAI_EXPLOSION_RADIUS.get().floatValue();
         paperbombExplosionRadius = CONFIG_PAPERBOMB_EXPLOSION_RADIUS.get().floatValue();
         paperbombBlockDamage = CONFIG_PAPERBOMB_BLOCK_DAMAGE.get();
-        jutsuKeybindHoldThreshold = CONFIG_JUTSU_KEYBIND_HOLD_THRESHOLD.get();
         chakraBarDesign = CONFIG_CHAKRA_BAR_DESIGN.get();
         autoHideHud = CONFIG_AUTO_HIDE_HUD.get();
         hudFadeDelayTicks = CONFIG_HUD_FADE_DELAY_TICKS.get();
@@ -269,7 +256,6 @@ public class NarutoConfig {
         jutsuCastDelay = CONFIG_JUTSU_CAST_DELAY
                 .get();
         waterWalkSpeed = CONFIG_WATER_WALK_SPEED.get().floatValue();
-        sealTimeoutMs = CONFIG_SEAL_TIMEOUT_MS.get();
         kawarimiMinDistance = CONFIG_KAWARIMI_MIN_DISTANCE.get();
         kawarimiMaxDistance = CONFIG_KAWARIMI_MAX_DISTANCE.get();
         kawarimiMinCooldownTicks = CONFIG_KAWARIMI_MIN_COOLDOWN.get();

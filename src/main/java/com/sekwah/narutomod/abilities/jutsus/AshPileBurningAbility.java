@@ -41,11 +41,6 @@ public class AshPileBurningAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 1231L;
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 36.0f;
     }

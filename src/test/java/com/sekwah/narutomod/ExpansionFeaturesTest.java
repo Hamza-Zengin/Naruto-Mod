@@ -40,24 +40,20 @@ public class ExpansionFeaturesTest {
         EarthDragonBulletAbility doryudan = new EarthDragonBulletAbility();
         assertEquals(ChakraElement.EARTH, doryudan.getChakraElement());
         assertEquals(NinjaRank.CHUNIN, doryudan.getRequiredRank());
-        assertEquals(231L, doryudan.defaultCombo());
 
         VacuumSpheresAbility shinkugyoku = new VacuumSpheresAbility();
         assertEquals(ChakraElement.WIND, shinkugyoku.getChakraElement());
         assertEquals(NinjaRank.CHUNIN, shinkugyoku.getRequiredRank());
-        assertEquals(221L, shinkugyoku.defaultCombo());
 
         StoneSpikesAbility doryuso = new StoneSpikesAbility();
         assertEquals(ChakraElement.EARTH, doryuso.getChakraElement());
         assertEquals(NinjaRank.JONIN, doryuso.getRequiredRank());
-        assertEquals(2312L, doryuso.defaultCombo());
         assertTrue(doryuso.getPrerequisites().contains(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "mud_wall")));
         assertEquals(150, doryuso.getRequiredMastery());
 
         WaterDragonAbility suiryudan = new WaterDragonAbility();
         assertEquals(ChakraElement.WATER, suiryudan.getChakraElement());
         assertEquals(NinjaRank.JONIN, suiryudan.getRequiredRank());
-        assertEquals(2121L, suiryudan.defaultCombo());
         assertTrue(suiryudan.getPrerequisites().contains(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "water_bullet")));
         assertEquals(150, suiryudan.getRequiredMastery());
     }
@@ -202,13 +198,11 @@ public class ExpansionFeaturesTest {
         assertEquals(ChakraElement.FIRE, phoenix.getChakraElement());
         assertEquals(NinjaRank.CHUNIN, phoenix.getRequiredRank());
         assertEquals(Ability.ActivationType.INSTANT, phoenix.activationType());
-        assertEquals(131L, phoenix.defaultCombo());
 
         var chidoriStream = new com.sekwah.narutomod.abilities.jutsus.ChidoriStreamAbility();
         assertEquals(ChakraElement.LIGHTNING, chidoriStream.getChakraElement());
         assertEquals(NinjaRank.JONIN, chidoriStream.getRequiredRank());
         assertEquals(Ability.ActivationType.INSTANT, chidoriStream.activationType());
-        assertEquals(1313L, chidoriStream.defaultCombo());
         assertTrue(chidoriStream.getPrerequisites().contains(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori")));
         assertEquals(150, chidoriStream.getRequiredMastery());
 
@@ -216,7 +210,6 @@ public class ExpansionFeaturesTest {
         assertEquals(ChakraElement.NONE, mysticalPalm.getChakraElement());
         assertEquals(NinjaRank.CHUNIN, mysticalPalm.getRequiredRank());
         assertEquals(Ability.ActivationType.CHANNELED, mysticalPalm.activationType());
-        assertEquals(332L, mysticalPalm.defaultCombo());
         assertFalse(mysticalPalm.canActivateBelowMinCharge());
 
         Identifier streamId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori_stream");

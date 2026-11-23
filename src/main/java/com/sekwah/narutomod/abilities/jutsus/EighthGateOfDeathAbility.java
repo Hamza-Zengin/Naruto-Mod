@@ -45,11 +45,6 @@ public class EighthGateOfDeathAbility extends Ability implements Ability.Toggled
     }
 
     @Override
-    public long defaultCombo() {
-        return 31213; // V - B - B - C - C
-    }
-
-    @Override
     public boolean requiresScroll() {
         return true;
     }

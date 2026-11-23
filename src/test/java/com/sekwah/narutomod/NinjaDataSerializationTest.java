@@ -35,8 +35,11 @@ public class NinjaDataSerializationTest {
         original.setMastery(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball"), 150);
         original.setActiveHandJutsu("chidori", 40);
         original.setSharinganActive(true);
-        original.addSeal((byte) 1);
-        original.addSeal((byte) 2);
+        Identifier fireballId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball");
+        Identifier sharinganId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
+        original.setEquippedJutsu(0, fireballId);
+        original.setEquippedJutsu(5, sharinganId);
+        original.setSelectedJutsuSlot(5);
         original.setActiveMissionId("genin_patrol");
         original.setMissionProgress(2);
         original.setCompletedMissionsCount(5);
@@ -68,9 +71,11 @@ public class NinjaDataSerializationTest {
         assertEquals("chidori", restored.getActiveHandJutsu());
         assertEquals(40, restored.getActiveHandJutsuTicks());
         assertTrue(restored.isSharinganActive());
-        assertEquals(2, restored.getActiveSeals().size());
-        assertEquals((byte) 1, restored.getActiveSeals().get(0));
-        assertEquals((byte) 2, restored.getActiveSeals().get(1));
+        assertEquals(fireballId, restored.getEquippedJutsu(0));
+        assertNull(restored.getEquippedJutsu(1));
+        assertEquals(sharinganId, restored.getEquippedJutsu(5));
+        assertEquals(5, restored.getSelectedJutsuSlot());
+        assertEquals(sharinganId, restored.getSelectedJutsuId());
         assertEquals("genin_patrol", restored.getActiveMissionId());
         assertEquals(2, restored.getMissionProgress());
         assertEquals(5, restored.getCompletedMissionsCount());

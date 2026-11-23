@@ -38,11 +38,6 @@ public class AdamantineChainsAbility extends Ability implements Ability.Cooldown
     }
 
     @Override
-    public long defaultCombo() {
-        return 1321L;
-    }
-
-    @Override
     public String getRequiredClanPath() {
         return "uzumaki";
     }

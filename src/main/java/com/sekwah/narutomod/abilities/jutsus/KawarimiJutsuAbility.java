@@ -40,11 +40,6 @@ public class KawarimiJutsuAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 12L;
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 20.0f;
     }

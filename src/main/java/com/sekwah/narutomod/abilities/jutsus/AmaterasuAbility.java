@@ -56,11 +56,6 @@ public class AmaterasuAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 12321; // C - C - V - B
-    }
-
-    @Override
     public boolean requiresScroll() {
         return true;
     }

@@ -31,11 +31,6 @@ public class WaterBulletAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 212;
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 25.0f;
     }

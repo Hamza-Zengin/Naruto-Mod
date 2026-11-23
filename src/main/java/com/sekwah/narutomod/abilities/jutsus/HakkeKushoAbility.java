@@ -29,11 +29,6 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 3212;
-    }
-
-    @Override
     public String getRequiredClanPath() {
         return "hyuga";
     }

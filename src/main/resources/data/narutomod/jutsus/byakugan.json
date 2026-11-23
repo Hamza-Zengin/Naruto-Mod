@@ -3,11 +3,6 @@
   "stamina_cost": 0.0,
   "cooldown_ticks": 40,
   "base_damage": 0.0,
-  "combo": [
-    3,
-    3,
-    3
-  ],
   "extra_params": {
     "drain_per_tick": 0.25
   }

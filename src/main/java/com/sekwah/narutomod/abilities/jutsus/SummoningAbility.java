@@ -28,11 +28,6 @@ public class SummoningAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 132;
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 40.0f;
     }

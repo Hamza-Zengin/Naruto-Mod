@@ -39,11 +39,6 @@ public class ChidoriAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 1312;
-    }
-
-    @Override
     public boolean requiresScroll() {
         return true;
     }

@@ -109,110 +109,25 @@ public abstract class Ability {
         CHANNELED
     }
 
-    public static final int PERFECT_COMBO_DISCOUNT_PERCENT = 25;
-
     /**
-     * For now the combo to register the ability with. May be overrideable in the future.
+     * Whether this ability is a dedicated-keybind utility ability (Leap, Water Walk, Chakra Charge)
+     * excluded from the 8-slot Jutsu Radial Wheel.
      */
-    public long defaultCombo() {
-        return -1;
-    }
-
-    /**
-     * Hand seals required / expected for this jutsu combination.
-     * By default, derives expected seals from digits of defaultCombo() (e.g. 121 -> [1, 2, 1]).
-     */
-    public byte[] getExpectedSeals() {
-        long combo = defaultCombo();
-        if (combo <= 0) {
-            return new byte[0];
-        }
-        String s = Long.toString(combo);
-        byte[] seals = new byte[s.length()];
-        for (int i = 0; i < s.length(); i++) {
-            seals[i] = (byte) Character.digit(s.charAt(i), 10);
-        }
-        return seals;
-    }
-
-    public static int getComboKeyLength(Ability a) {
-        if (a == null || a.defaultCombo() <= 0) return 0;
-        return Long.toString(a.defaultCombo()).length();
+    public boolean isUtilityAbility() {
+        return false;
     }
 
     /**
      * Sorts abilities from simplest to most complex:
-     * 1) Combo key length (ascending)
+     * 1) Required rank level (ascending)
      * 2) Total default resource cost: chakra + stamina (ascending)
-     * 3) Required rank level (ascending)
-     * 4) Registry name (deterministic alphabetical order)
+     * 3) Registry name (deterministic alphabetical order)
      */
     public static final java.util.Comparator<Ability> COMPLEXITY_COMPARATOR =
             java.util.Comparator
-                    .comparingInt(Ability::getComboKeyLength)
+                    .comparingInt((Ability a) -> a.getRequiredRank() != null ? a.getRequiredRank().getLevel() : 0)
                     .thenComparingDouble(a -> a.getDefaultChakraCost() + a.getDefaultStaminaCost())
-                    .thenComparingInt(a -> a.getRequiredRank() != null ? a.getRequiredRank().getLevel() : 0)
                     .thenComparing(a -> a.getRegistryName() != null ? a.getRegistryName().toString() : "");
-
-    /**
-     * Checks if the entered seal list matches the ability's expected seal sequence or defaultCombo digits.
-     */
-    public boolean matchesExpectedSeals(java.util.List<Byte> activeSeals) {
-        if (activeSeals == null || activeSeals.isEmpty()) {
-            return false;
-        }
-        byte[] expected = getExpectedSeals();
-        if (matchesSequence(activeSeals, expected)) {
-            return true;
-        }
-        long combo = defaultCombo();
-        if (combo > 0) {
-            String s = Long.toString(combo);
-            byte[] comboBytes = new byte[s.length()];
-            for (int i = 0; i < s.length(); i++) {
-                comboBytes[i] = (byte) Character.digit(s.charAt(i), 10);
-            }
-            if (matchesSequence(activeSeals, comboBytes)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean matchesSequence(java.util.List<Byte> activeSeals, byte[] expected) {
-        if (expected == null || expected.length == 0 || activeSeals.size() < expected.length) {
-            return false;
-        }
-        int offset = activeSeals.size() - expected.length;
-        for (int i = 0; i < expected.length; i++) {
-            if (activeSeals.get(offset + i) != expected[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Returns the calculated chakra discount percentage (e.g. 25) when the entered seals match.
-     */
-    public int getPerfectComboDiscountPercent(INinjaData ninjaData) {
-        if (ninjaData != null && matchesExpectedSeals(ninjaData.getActiveSeals())) {
-            return PERFECT_COMBO_DISCOUNT_PERCENT;
-        }
-        return 0;
-    }
-
-    /**
-     * Calculates the effective chakra cost with the combo discount if the entered seals match.
-     */
-    public float getEffectiveChakraCost(INinjaData ninjaData) {
-        float cost = getChakraCost();
-        int discountPercent = getPerfectComboDiscountPercent(ninjaData);
-        if (discountPercent > 0) {
-            return cost * (1.0f - (discountPercent / 100.0f));
-        }
-        return cost;
-    }
 
     public abstract ActivationType activationType();
 
@@ -357,7 +272,7 @@ public abstract class Ability {
     }
 
     public float getScaledChakraCost(INinjaData ninjaData) {
-        float baseCost = getEffectiveChakraCost(ninjaData);
+        float baseCost = getChakraCost();
         if (baseCost <= 0f) return 0f;
         if (ninjaData == null) return baseCost;
         Identifier reg = getRegistryName();
@@ -365,8 +280,8 @@ public abstract class Ability {
         return Math.max(1.0f, baseCost * getChakraCostMultiplier(mastery));
     }
 
-    public boolean requiresSealActivationDelay() {
-        return this.defaultCombo() > 0 && this.getDefaultChakraCost() > 0;
+    public boolean requiresActivationDelay() {
+        return !this.isUtilityAbility() && this.getDefaultChakraCost() > 0;
     }
 
     public int getBaseActivationDelayTicks() {
@@ -380,7 +295,7 @@ public abstract class Ability {
     }
 
     public int getScaledActivationDelay(int mastery) {
-        if (!this.requiresSealActivationDelay()) {
+        if (!this.requiresActivationDelay()) {
             return 0;
         }
         int baseDelayTicks = this.getBaseActivationDelayTicks();
@@ -397,7 +312,7 @@ public abstract class Ability {
     }
 
     public int getActivationDelayTicks(INinjaData ninjaData) {
-        if (ninjaData == null || !this.requiresSealActivationDelay()) return 0;
+        if (ninjaData == null || !this.requiresActivationDelay()) return 0;
         Identifier reg = getRegistryName();
         int mastery = reg != null ? ninjaData.getMastery(reg) : 0;
         return getScaledActivationDelay(mastery);
@@ -409,18 +324,6 @@ public abstract class Ability {
 
     public static int getScaledDurationTicks(int baseTicks, int mastery, double maxBonusRatio) {
         return (int) Math.round(baseTicks * (1.0D + Math.max(0.0D, maxBonusRatio) * getMasteryProgress(mastery)));
-    }
-
-    /**
-     * Scales client hand-seal completion timeout ticks downward as jutsu mastery grows
-     * (from {@code baseTimeoutTicks} at mastery 0 down to 20% / minimum 4 ticks at 700+ mastery).
-     */
-    public static int getScaledSealTimeoutTicks(int baseTimeoutTicks, int mastery) {
-        if (mastery <= 0) {
-            return Math.max(4, baseTimeoutTicks);
-        }
-        double progress = getMasteryProgress(mastery);
-        return Math.max(4, (int) Math.round(baseTimeoutTicks * (1.0D - 0.80D * progress)));
     }
 
     public static int applyArmorDelayReduction(Player player, int baseDelayTicks) {

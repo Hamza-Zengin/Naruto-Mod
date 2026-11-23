@@ -26,7 +26,6 @@ public class NarutoAbilities {
 
     public static final DeferredRegister<Ability> ABILITY = DeferredRegister.create(NarutoRegistries.ABILITY_KEY, MOD_ID);
 
-    public static final Map<Long, Identifier> COMBO_MAP = new HashMap<>();
     private static volatile Map<Identifier, Ability> ABILITY_BY_ID = Collections.emptyMap();
 
     // Utility
@@ -81,7 +80,7 @@ public class NarutoAbilities {
         ABILITY.register(eventBus);
     }
 
-    public static void registerKeyCombos() {
+    public static void cacheAbilitiesById() {
         var entries = ABILITY.getEntries();
         Map<Identifier, Ability> byId = HashMap.newHashMap(entries.size());
         entries.forEach(abilityEntry -> {
@@ -89,14 +88,6 @@ public class NarutoAbilities {
             Identifier id = abilityEntry.getId();
             ability.setRegistryName(id);
             byId.put(id, ability);
-            long combo = ability.defaultCombo();
-            if (combo > 0) {
-                if (COMBO_MAP.containsKey(combo)) {
-                    NarutoMod.LOGGER.error("Ability already registered with combo {}", combo);
-                } else {
-                    COMBO_MAP.put(combo, id);
-                }
-            }
         });
         ABILITY_BY_ID = Map.copyOf(byId);
     }
@@ -115,36 +106,20 @@ public class NarutoAbilities {
         return null;
     }
 
-    public static Ability getAbilityFromCombo(long combo) {
-        if (COMBO_MAP.containsKey(combo)) {
-            return getAbility(COMBO_MAP.get(combo));
-        }
-        return null;
-    }
-
     public static void triggerAbility(Identifier ability) {
-        ClientPacketDistributor.sendToServer(new ServerAbilityActivatePacket(ability));
+        if (ability != null) {
+            ClientPacketDistributor.sendToServer(new ServerAbilityActivatePacket(ability));
+        }
     }
 
-    public static boolean triggerAbility(long combo) {
-        if (COMBO_MAP.containsKey(combo)) {
-            triggerAbility(COMBO_MAP.get(combo));
-            return true;
+    public static void handleCharging(Identifier ability, ServerAbilityChannelPacket.ChannelStatus channelStatus) {
+        if (ability != null && channelStatus != null) {
+            ClientPacketDistributor.sendToServer(new ServerAbilityChannelPacket(ability, channelStatus));
         }
-        return false;
-    }
-
-    public static boolean handleCharging(long combo, ServerAbilityChannelPacket.ChannelStatus channelStatus) {
-        if (COMBO_MAP.containsKey(combo)) {
-            Identifier abilityResource = COMBO_MAP.get(combo);
-            ClientPacketDistributor.sendToServer(new ServerAbilityChannelPacket(abilityResource, channelStatus));
-            return true;
-        }
-        return false;
     }
 
     @SubscribeEvent
     public static void setup(FMLCommonSetupEvent event) {
-        event.enqueueWork(NarutoAbilities::registerKeyCombos);
+        event.enqueueWork(NarutoAbilities::cacheAbilitiesById);
     }
 }

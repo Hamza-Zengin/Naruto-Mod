@@ -20,8 +20,8 @@ public class ChakraChargeAbility extends Ability implements Ability.Channeled {
     }
 
     @Override
-    public long defaultCombo() {
-        return 1L;
+    public boolean isUtilityAbility() {
+        return true;
     }
 
     @Override

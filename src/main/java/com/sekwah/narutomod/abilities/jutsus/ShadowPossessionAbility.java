@@ -38,11 +38,6 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
     }
 
     @Override
-    public long defaultCombo() {
-        return 2132; // B - B - C
-    }
-
-    @Override
     public String getRequiredClanPath() {
         return "nara";
     }

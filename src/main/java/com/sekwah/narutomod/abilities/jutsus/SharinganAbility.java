@@ -110,11 +110,6 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
     }
 
     @Override
-    public long defaultCombo() {
-        return 111;
-    }
-
-    @Override
     public String getRequiredClanPath() {
         return "uchiha";
     }

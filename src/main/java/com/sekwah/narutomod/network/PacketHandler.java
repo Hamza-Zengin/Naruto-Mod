@@ -2,11 +2,11 @@ package com.sekwah.narutomod.network;
 
 import com.sekwah.narutomod.network.c2s.ServerAbilityActivatePacket;
 import com.sekwah.narutomod.network.c2s.ServerAbilityChannelPacket;
-import com.sekwah.narutomod.network.c2s.ServerJutsuCastingPacket;
 import com.sekwah.narutomod.network.c2s.ServerMissionActionPacket;
 import com.sekwah.narutomod.network.c2s.ServerRankUpPacket;
 import com.sekwah.narutomod.network.c2s.ServerSelectClanPacket;
 import com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket;
+import com.sekwah.narutomod.network.c2s.ServerUpdateJutsuLoadoutPacket;
 import com.sekwah.narutomod.network.s2c.ClientCameraShakePacket;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
 import com.sekwah.narutomod.network.s2c.ClientJutsuStatsSyncPacket;
@@ -26,7 +26,7 @@ public class PacketHandler {
         final PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
 
         // Client to server packets
-        registrar.playToServer(ServerJutsuCastingPacket.TYPE, ServerJutsuCastingPacket.STREAM_CODEC, ServerJutsuCastingPacket::handle);
+        registrar.playToServer(ServerUpdateJutsuLoadoutPacket.TYPE, ServerUpdateJutsuLoadoutPacket.STREAM_CODEC, ServerUpdateJutsuLoadoutPacket::handle);
         registrar.playToServer(ServerAbilityActivatePacket.TYPE, ServerAbilityActivatePacket.STREAM_CODEC, ServerAbilityActivatePacket::handle);
         registrar.playToServer(ServerAbilityChannelPacket.TYPE, ServerAbilityChannelPacket.STREAM_CODEC, ServerAbilityChannelPacket::handle);
         registrar.playToServer(ServerSelectClanPacket.TYPE, ServerSelectClanPacket.STREAM_CODEC, ServerSelectClanPacket::handle);

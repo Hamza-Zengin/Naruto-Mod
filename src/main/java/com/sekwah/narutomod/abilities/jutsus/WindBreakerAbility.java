@@ -34,11 +34,6 @@ public class WindBreakerAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 313;
-    }
-
-    @Override
     public float getDefaultDamage() {
         return 8.0f;
     }

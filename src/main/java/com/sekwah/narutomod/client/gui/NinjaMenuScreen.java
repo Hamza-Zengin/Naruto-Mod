@@ -11,6 +11,7 @@ import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import com.sekwah.narutomod.network.c2s.ServerRankUpPacket;
 import com.sekwah.narutomod.network.c2s.ServerSelectClanPacket;
+import com.sekwah.narutomod.network.c2s.ServerUpdateJutsuLoadoutPacket;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -36,7 +37,8 @@ public class NinjaMenuScreen extends Screen {
     private int clanPage = 0;
     private static final int CLANS_PER_PAGE = 4;
     private int jutsuPage = 0;
-    private static final int JUTSUS_PER_PAGE = 4;
+    private static final int JUTSUS_PER_PAGE = 3;
+    private int editingWheelSlot = -1;
     private int missionScrollOffset = 0;
     private int missionMaxScroll = 0;
     private final List<Button> missionAcceptButtons = new ArrayList<>();
@@ -86,14 +88,17 @@ public class NinjaMenuScreen extends Screen {
         this.addRenderableWidget(Button.builder(tab3, b -> switchTab(3))
                 .bounds(tabStartX + (tabBtnW + tabGap) * 3, topY, tabBtnW, 20).build());
 
-        // Cache and sort only unlocked abilities from simplest to most complex
+        // Cache and sort only unlocked non-utility abilities from simplest to most complex
         this.allAbilities.clear();
         Minecraft mcInit = Minecraft.getInstance();
         if (mcInit.player != null) {
             INinjaData ninjaData = mcInit.player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            if (this.editingWheelSlot < 0 || this.editingWheelSlot >= INinjaData.MAX_JUTSU_SLOTS) {
+                this.editingWheelSlot = Math.max(0, Math.min(INinjaData.MAX_JUTSU_SLOTS - 1, ninjaData.getSelectedJutsuSlot()));
+            }
             NarutoAbilities.ABILITY.getEntries().forEach(entry -> {
                 Ability ability = entry.get();
-                if (ability.defaultCombo() > 0 && ninjaData.isAbilityUnlocked(ability)) {
+                if (!ability.isUtilityAbility() && ninjaData.isAbilityUnlocked(ability)) {
                     this.allAbilities.add(ability);
                 }
             });
@@ -239,7 +244,123 @@ public class NinjaMenuScreen extends Screen {
     }
 
     private void initJutsuTab(int centerX, int boxY) {
+        Minecraft mc = Minecraft.getInstance();
+        INinjaData ninjaData = mc.player != null ? mc.player.getData(NinjaCapabilityHandler.NINJA_DATA) : null;
+        if (this.editingWheelSlot < 0 || this.editingWheelSlot >= INinjaData.MAX_JUTSU_SLOTS) {
+            this.editingWheelSlot = ninjaData != null
+                    ? Math.max(0, Math.min(INinjaData.MAX_JUTSU_SLOTS - 1, ninjaData.getSelectedJutsuSlot()))
+                    : 0;
+        }
+
+        int boxX = centerX - BOX_WIDTH / 2;
+
+        // 8-slot Radial Wheel Loadout Bar
+        int slotBtnW = 38;
+        int slotGap = 3;
+        int totalSlotsW = slotBtnW * INinjaData.MAX_JUTSU_SLOTS + slotGap * (INinjaData.MAX_JUTSU_SLOTS - 1);
+        int slotStartX = centerX - totalSlotsW / 2;
+        int slotY = boxY + 14;
+
+        for (int slot = 0; slot < INinjaData.MAX_JUTSU_SLOTS; slot++) {
+            final int targetSlot = slot;
+            Identifier equippedId = ninjaData != null ? ninjaData.getEquippedJutsu(slot) : null;
+            Ability equippedAbility = equippedId != null ? NarutoAbilities.getAbility(equippedId) : null;
+            boolean isOccupied = equippedId != null;
+            boolean isSelected = slot == this.editingWheelSlot;
+
+            Component slotLabel;
+            if (isSelected) {
+                slotLabel = Component.literal("§6§l*#" + (slot + 1) + (isOccupied ? "•" : ""));
+            } else if (isOccupied) {
+                slotLabel = Component.literal("§a#" + (slot + 1) + "•");
+            } else {
+                slotLabel = Component.literal("§7#" + (slot + 1));
+            }
+
+            Button slotBtn = Button.builder(slotLabel, b -> {
+                this.editingWheelSlot = targetSlot;
+                this.init();
+            }).bounds(slotStartX + slot * (slotBtnW + slotGap), slotY, slotBtnW, 20).build();
+
+            if (equippedAbility != null) {
+                slotBtn.setTooltip(Tooltip.create(
+                        Component.literal("#" + (slot + 1) + ": ").withStyle(ChatFormatting.GOLD)
+                                .append(Component.translatable(equippedAbility.getTranslationKey()).copy().withStyle(ChatFormatting.WHITE))
+                ));
+            } else {
+                slotBtn.setTooltip(Tooltip.create(
+                        Component.literal("#" + (slot + 1) + ": ").withStyle(ChatFormatting.GOLD)
+                                .append(Component.translatable("naruto.gui.jutsu_wheel.empty").copy().withStyle(ChatFormatting.GRAY))
+                ));
+            }
+            this.addRenderableWidget(slotBtn);
+        }
+
+        // Compact Clear button for the selected wheel slot
+        int clearW = 62;
+        Button clearBtn = Button.builder(Component.translatable("naruto.gui.ninja_menu.jutsu.clear_slot"), b -> {
+            if (ninjaData != null) {
+                ClientPacketDistributor.sendToServer(ServerUpdateJutsuLoadoutPacket.assignSlot(this.editingWheelSlot, null));
+                ninjaData.setEquippedJutsu(this.editingWheelSlot, null);
+                this.init();
+            }
+        }).bounds(boxX + BOX_WIDTH - clearW - 6, boxY + 37, clearW, 18).build();
+        clearBtn.active = ninjaData != null && ninjaData.getEquippedJutsu(this.editingWheelSlot) != null;
+        this.addRenderableWidget(clearBtn);
+
+        // Jutsu Cards & Equip Buttons
         int maxPages = Math.max(1, (int) Math.ceil((double) allAbilities.size() / JUTSUS_PER_PAGE));
+        if (this.jutsuPage >= maxPages) {
+            this.jutsuPage = maxPages - 1;
+        }
+        int startIndex = this.jutsuPage * JUTSUS_PER_PAGE;
+        int endIndex = Math.min(startIndex + JUTSUS_PER_PAGE, allAbilities.size());
+        int cardStartY = boxY + 60;
+        int cardH = 40;
+        int cardGap = 4;
+
+        if (ninjaData != null) {
+            for (int i = startIndex; i < endIndex; i++) {
+                Ability ability = allAbilities.get(i);
+                Identifier id = ability.getRegistryName();
+                if (id == null) continue;
+
+                int cardY = cardStartY + (i - startIndex) * (cardH + cardGap);
+                int equippedSlot = -1;
+                for (int s = 0; s < INinjaData.MAX_JUTSU_SLOTS; s++) {
+                    if (id.equals(ninjaData.getEquippedJutsu(s))) {
+                        equippedSlot = s;
+                        break;
+                    }
+                }
+
+                Component equipLabel = equippedSlot >= 0
+                        ? Component.literal("§a").append(Component.translatable("naruto.gui.ninja_menu.jutsu.equipped", equippedSlot + 1))
+                        : Component.translatable("naruto.gui.ninja_menu.jutsu.equip", this.editingWheelSlot + 1);
+
+                Button equipBtn = Button.builder(equipLabel, b -> {
+                    ClientPacketDistributor.sendToServer(ServerUpdateJutsuLoadoutPacket.assignSlot(this.editingWheelSlot, id));
+                    ninjaData.setEquippedJutsu(this.editingWheelSlot, id);
+
+                    int nextSlot = -1;
+                    for (int offset = 1; offset <= INinjaData.MAX_JUTSU_SLOTS; offset++) {
+                        int candidate = (this.editingWheelSlot + offset) % INinjaData.MAX_JUTSU_SLOTS;
+                        if (ninjaData.getEquippedJutsu(candidate) == null) {
+                            nextSlot = candidate;
+                            break;
+                        }
+                    }
+                    if (nextSlot < 0) {
+                        nextSlot = (this.editingWheelSlot + 1) % INinjaData.MAX_JUTSU_SLOTS;
+                    }
+                    this.editingWheelSlot = nextSlot;
+                    this.init();
+                }).bounds(boxX + BOX_WIDTH - 78, cardY + 10, 72, 20).build();
+
+                this.addRenderableWidget(equipBtn);
+            }
+        }
+
         int btnY = Math.min(boxY + BOX_HEIGHT + 4, this.height - 24);
 
         if (this.jutsuPage > 0) {
@@ -357,13 +478,13 @@ public class NinjaMenuScreen extends Screen {
             int startIndex = jutsuPage * JUTSUS_PER_PAGE;
             int endIndex = Math.min(startIndex + JUTSUS_PER_PAGE, allAbilities.size());
             int boxX = centerX - BOX_WIDTH / 2;
-            int cardStartY = boxY + 16;
-            int cardH = 36;
+            int cardStartY = boxY + 60;
+            int cardH = 40;
             int cardGap = 4;
 
             for (int i = startIndex; i < endIndex; i++) {
                 int cardY = cardStartY + (i - startIndex) * (cardH + cardGap);
-                if (mouseX >= boxX && mouseX <= boxX + BOX_WIDTH && mouseY >= cardY && mouseY <= cardY + cardH) {
+                if (mouseX >= boxX && mouseX <= boxX + BOX_WIDTH - 82 && mouseY >= cardY && mouseY <= cardY + cardH) {
                     Ability ability = allAbilities.get(i);
                     Identifier id = ability.getRegistryName();
                     JutsuDataManager.JutsuStats syncedStats = id != null ? JutsuDataManager.get(id) : null;
@@ -514,7 +635,12 @@ public class NinjaMenuScreen extends Screen {
     }
 
     private void renderJutsuTab(GuiGraphicsExtractor graphics, INinjaData ninjaData, int centerX, int boxY) {
-        NinjaMenuJutsuTab.render(graphics, this.font, ninjaData, allAbilities, jutsuPage, JUTSUS_PER_PAGE, centerX, boxY, BOX_WIDTH);
+        NinjaMenuJutsuTab.render(graphics, this.font, ninjaData, allAbilities, jutsuPage, JUTSUS_PER_PAGE, editingWheelSlot, centerX, boxY, BOX_WIDTH);
+        if (!allAbilities.isEmpty()) {
+            int maxPages = Math.max(1, (int) Math.ceil((double) allAbilities.size() / JUTSUS_PER_PAGE));
+            int navTextY = Math.min(boxY + BOX_HEIGHT + 10, this.height - 18);
+            graphics.centeredText(this.font, String.format("§eSayfa %d / %d", this.jutsuPage + 1, maxPages), centerX, navTextY, 0xFFFFFF88);
+        }
     }
 
     private void renderMissionsTab(GuiGraphicsExtractor graphics, INinjaData ninjaData, int centerX, int boxY) {

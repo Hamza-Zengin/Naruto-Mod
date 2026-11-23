@@ -50,11 +50,6 @@ public class RasenshurikenAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 21312; // C - C - V - V
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 55.0f;
     }

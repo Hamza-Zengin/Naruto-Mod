@@ -50,11 +50,6 @@ public class StoneSpikesAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 2312;
-    }
-
-    @Override
     public boolean requiresScroll() {
         return true;
     }

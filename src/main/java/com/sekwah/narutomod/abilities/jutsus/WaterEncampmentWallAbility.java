@@ -40,11 +40,6 @@ public class WaterEncampmentWallAbility extends Ability implements Ability.Coold
     }
 
     @Override
-    public long defaultCombo() {
-        return 223L;
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 28.0f;
     }

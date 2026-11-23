@@ -3,12 +3,5 @@
   "stamina_cost": 0.0,
   "cooldown_ticks": 360,
   "base_damage": 18.0,
-  "combo": [
-    3,
-    2,
-    1,
-    3,
-    2
-  ],
   "requiredRank": "JONIN"
 }

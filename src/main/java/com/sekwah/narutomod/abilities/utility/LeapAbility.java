@@ -23,8 +23,8 @@ public class LeapAbility extends Ability {
     }
 
     @Override
-    public long defaultCombo() {
-        return 22L;
+    public boolean isUtilityAbility() {
+        return true;
     }
 
     @Override
