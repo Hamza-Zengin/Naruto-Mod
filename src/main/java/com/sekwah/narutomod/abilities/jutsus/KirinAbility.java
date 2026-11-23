@@ -50,11 +50,6 @@ public class KirinAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 13231; // V - C - C - B
-    }
-
-    @Override
     public boolean requiresScroll() {
         return true;
     }

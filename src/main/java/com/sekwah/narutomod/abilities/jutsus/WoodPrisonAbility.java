@@ -32,11 +32,6 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 2321; // B - C - B
-    }
-
-    @Override
     public String getRequiredClanPath() {
         return "senju";
     }

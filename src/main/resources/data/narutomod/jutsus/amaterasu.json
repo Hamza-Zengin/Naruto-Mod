@@ -3,13 +3,6 @@
   "stamina_cost": 50.0,
   "cooldown_ticks": 180,
   "base_damage": 38.0,
-  "combo": [
-    1,
-    2,
-    3,
-    2,
-    1
-  ],
   "extra_params": {
     "cast_cooldown_ticks": 45.0
   }

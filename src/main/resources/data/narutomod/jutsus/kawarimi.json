@@ -2,9 +2,5 @@
   "chakra_cost": 15.0,
   "stamina_cost": 5.0,
   "cooldown_ticks": 100,
-  "base_damage": 0.0,
-  "combo": [
-    1,
-    2
-  ]
+  "base_damage": 0.0
 }

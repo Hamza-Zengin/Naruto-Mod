@@ -42,11 +42,6 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
     }
 
     @Override
-    public long defaultCombo() {
-        return 333;
-    }
-
-    @Override
     public String getRequiredClanPath() {
         return "hyuga";
     }

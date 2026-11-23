@@ -236,78 +236,126 @@ public class NinjaDataLogicTest {
     }
 
     @Test
-    @DisplayName("Verify hand seals buffer and timeout initialization")
-    public void testHandSealsBuffer() {
-        assertTrue(ninjaData.getActiveSeals().isEmpty(), "Active seals should initially be empty");
-        assertEquals(0, ninjaData.getSealTimeout());
+    @DisplayName("Verify 8-slot jutsu loadout default state")
+    public void testLoadoutDefaults() {
+        assertEquals(8, INinjaData.MAX_JUTSU_SLOTS);
+        assertEquals(0, ninjaData.getSelectedJutsuSlot());
+        assertNull(ninjaData.getSelectedJutsuId());
+        assertEquals(";;;;;;;", ninjaData.getEquippedJutsusString());
 
-        ninjaData.addSeal((byte) 1);
-        assertEquals(1, ninjaData.getActiveSeals().size());
-        assertEquals((byte) 1, ninjaData.getActiveSeals().get(0));
-        assertEquals(NinjaData.DEFAULT_SEAL_TIMEOUT, ninjaData.getSealTimeout());
-
-        ninjaData.addSeal((byte) 2);
-        ninjaData.addSeal((byte) 1);
-        assertEquals(3, ninjaData.getActiveSeals().size());
-        assertEquals((byte) 1, ninjaData.getActiveSeals().get(0));
-        assertEquals((byte) 2, ninjaData.getActiveSeals().get(1));
-        assertEquals((byte) 1, ninjaData.getActiveSeals().get(2));
-
-        ninjaData.clearSeals();
-        assertTrue(ninjaData.getActiveSeals().isEmpty());
-        assertEquals(0, ninjaData.getSealTimeout());
+        List<Identifier> slots = ninjaData.getEquippedJutsusList();
+        assertEquals(8, slots.size());
+        for (int i = 0; i < INinjaData.MAX_JUTSU_SLOTS; i++) {
+            assertNull(ninjaData.getEquippedJutsu(i), "Default slot " + i + " should be null");
+            assertNull(slots.get(i), "Default list entry " + i + " should be null");
+        }
     }
 
     @Test
-    @DisplayName("Verify hand seal timeout countdown and automatic clearance")
-    public void testHandSealTimeoutCountdown() {
-        ninjaData.addSeal((byte) 2);
-        ninjaData.addSeal((byte) 3);
-        assertEquals(2, ninjaData.getActiveSeals().size());
-        assertEquals(NinjaData.DEFAULT_SEAL_TIMEOUT, ninjaData.getSealTimeout());
+    @DisplayName("Verify setEquippedJutsu assignment, deduplication, clearing, and bounds safety")
+    public void testLoadoutAssignDeduplicateAndClear() {
+        Identifier fireball = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball");
+        Identifier chidori = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori");
 
-        // Tick 20 times (1 second)
-        for (int i = 0; i < 20; i++) {
-            ninjaData.tick();
-        }
-        assertEquals(NinjaData.DEFAULT_SEAL_TIMEOUT - 20, ninjaData.getSealTimeout());
-        assertEquals(2, ninjaData.getActiveSeals().size(), "Seals should remain before timeout");
+        ninjaData.setEquippedJutsu(0, fireball);
+        ninjaData.setEquippedJutsu(7, chidori);
+        assertEquals(fireball, ninjaData.getEquippedJutsu(0));
+        assertEquals(chidori, ninjaData.getEquippedJutsu(7));
 
-        // Tick remaining 40 times to reach 0
-        for (int i = 0; i < 40; i++) {
-            ninjaData.tick();
-        }
-        assertEquals(0, ninjaData.getSealTimeout());
-        assertTrue(ninjaData.getActiveSeals().isEmpty(), "Seals should be cleared after timeout");
+        // Moving fireball to slot 3 deduplicates slot 0
+        ninjaData.setEquippedJutsu(3, fireball);
+        assertNull(ninjaData.getEquippedJutsu(0), "Old slot should be cleared when jutsu moves");
+        assertEquals(fireball, ninjaData.getEquippedJutsu(3));
+        assertEquals(chidori, ninjaData.getEquippedJutsu(7));
+
+        // Clearing with null
+        ninjaData.setEquippedJutsu(3, null);
+        assertNull(ninjaData.getEquippedJutsu(3));
+        assertEquals(chidori, ninjaData.getEquippedJutsu(7));
+
+        // Out-of-range slots are safely ignored
+        ninjaData.setEquippedJutsu(-1, fireball);
+        ninjaData.setEquippedJutsu(8, fireball);
+        assertNull(ninjaData.getEquippedJutsu(-1));
+        assertNull(ninjaData.getEquippedJutsu(8));
     }
 
     @Test
-    @DisplayName("Verify hand seal max capacity constraint")
-    public void testHandSealMaxCapacity() {
-        for (byte b = 1; b <= 20; b++) {
-            ninjaData.addSeal(b);
-        }
-        assertEquals(NinjaData.MAX_ACTIVE_SEALS, ninjaData.getActiveSeals().size());
-        // Oldest seals (1..8) dropped, last 12 (9..20) kept
-        assertEquals((byte) 9, ninjaData.getActiveSeals().get(0));
-        assertEquals((byte) 20, ninjaData.getActiveSeals().get(NinjaData.MAX_ACTIVE_SEALS - 1));
+    @DisplayName("Verify selected jutsu slot clamping and getSelectedJutsuId resolution")
+    public void testLoadoutSelectedSlotClamping() {
+        Identifier rasengan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan");
+        Identifier shadowClone = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shadow_clone");
+
+        ninjaData.setEquippedJutsu(0, rasengan);
+        ninjaData.setEquippedJutsu(7, shadowClone);
+
+        ninjaData.setSelectedJutsuSlot(-5);
+        assertEquals(0, ninjaData.getSelectedJutsuSlot());
+        assertEquals(rasengan, ninjaData.getSelectedJutsuId());
+
+        ninjaData.setSelectedJutsuSlot(99);
+        assertEquals(7, ninjaData.getSelectedJutsuSlot());
+        assertEquals(shadowClone, ninjaData.getSelectedJutsuId());
+
+        ninjaData.setSelectedJutsuSlot(4);
+        assertEquals(4, ninjaData.getSelectedJutsuSlot());
+        assertNull(ninjaData.getSelectedJutsuId());
     }
 
     @Test
-    @DisplayName("Verify hand seals NBT serialization and deserialization")
-    public void testHandSealsNBT() {
-        ninjaData.addSeal((byte) 1);
-        ninjaData.addSeal((byte) 2);
-        ninjaData.addSeal((byte) 3);
+    @DisplayName("Verify lockAbility removes jutsu from equipped loadout and resetData clears all slots")
+    public void testLoadoutLockAbilityAndReset() {
+        Identifier fireball = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball");
+        Identifier chidori = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori");
+
+        ninjaData.unlockAbility(fireball);
+        ninjaData.unlockAbility(chidori);
+        ninjaData.setEquippedJutsu(2, fireball);
+        ninjaData.setEquippedJutsu(5, chidori);
+        ninjaData.setSelectedJutsuSlot(2);
+        assertEquals(fireball, ninjaData.getSelectedJutsuId());
+
+        ninjaData.lockAbility(fireball);
+        assertNull(ninjaData.getEquippedJutsu(2), "lockAbility must remove locked jutsu from its equipped slot");
+        assertNull(ninjaData.getSelectedJutsuId());
+        assertEquals(chidori, ninjaData.getEquippedJutsu(5));
+
+        ninjaData.resetData();
+        assertEquals(0, ninjaData.getSelectedJutsuSlot());
+        assertNull(ninjaData.getSelectedJutsuId());
+        for (int i = 0; i < INinjaData.MAX_JUTSU_SLOTS; i++) {
+            assertNull(ninjaData.getEquippedJutsu(i));
+        }
+    }
+
+    @Test
+    @DisplayName("Verify NinjaData loadout NBT save/load round-trip")
+    public void testLoadoutNBTRoundTrip() {
+        Identifier fireball = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball");
+        Identifier rasengan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan");
+        Identifier amaterasu = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "amaterasu");
+
+        ninjaData.setEquippedJutsu(0, fireball);
+        ninjaData.setEquippedJutsu(3, rasengan);
+        ninjaData.setEquippedJutsu(7, amaterasu);
+        ninjaData.setSelectedJutsuSlot(3);
 
         CompoundTag serialized = new CompoundTag();
         ninjaData.saveNBTData(serialized);
+
         NinjaData restored = new NinjaData(false);
         restored.loadNBTData(serialized);
 
-        assertEquals(ninjaData.getActiveSeals().size(), restored.getActiveSeals().size());
-        assertEquals(ninjaData.getActiveSeals(), restored.getActiveSeals());
-        assertEquals(ninjaData.getSealTimeout(), restored.getSealTimeout());
+        assertEquals(fireball, restored.getEquippedJutsu(0));
+        assertNull(restored.getEquippedJutsu(1));
+        assertNull(restored.getEquippedJutsu(2));
+        assertEquals(rasengan, restored.getEquippedJutsu(3));
+        assertNull(restored.getEquippedJutsu(4));
+        assertNull(restored.getEquippedJutsu(5));
+        assertNull(restored.getEquippedJutsu(6));
+        assertEquals(amaterasu, restored.getEquippedJutsu(7));
+        assertEquals(3, restored.getSelectedJutsuSlot());
+        assertEquals(rasengan, restored.getSelectedJutsuId());
     }
 
     @Test
@@ -324,42 +372,6 @@ public class NinjaDataLogicTest {
         // Tier 2 mastery (50+): 10% reduction
         ninjaData.setMastery(fireballId, 50);
         assertEquals(baseCost * 0.90f, fireball.getScaledChakraCost(ninjaData), 0.01f);
-    }
-
-    @Test
-    @DisplayName("Verify Ability expected seals, dynamic discount percentage, and 25% chakra cost discount")
-    public void testHandSealComboCostDiscount() {
-        com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility fireball = new com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility();
-        fireball.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball"));
-
-        assertArrayEquals(new byte[]{6, 8, 9, 12, 7, 3}, fireball.getExpectedSeals());
-
-        java.util.List<Byte> canonSeals = java.util.List.of((byte) 6, (byte) 8, (byte) 9, (byte) 12, (byte) 7, (byte) 3);
-        assertTrue(fireball.matchesExpectedSeals(canonSeals));
-
-        java.util.List<Byte> comboSeals = java.util.List.of((byte) 1, (byte) 2, (byte) 1);
-        assertTrue(fireball.matchesExpectedSeals(comboSeals));
-
-        java.util.List<Byte> wrongSeals = java.util.List.of((byte) 2, (byte) 3, (byte) 2);
-        assertFalse(fireball.matchesExpectedSeals(wrongSeals));
-
-        float baseCost = fireball.getDefaultChakraCost();
-        assertEquals(baseCost * 0.75f,
-                com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket.calculateEffectiveChakraCost(fireball, baseCost, canonSeals),
-                0.01f);
-        assertEquals(baseCost,
-                com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket.calculateEffectiveChakraCost(fireball, baseCost, wrongSeals),
-                0.01f);
-
-        ninjaData.clearSeals();
-        assertEquals(0, fireball.getPerfectComboDiscountPercent(ninjaData));
-        assertEquals(baseCost, fireball.getEffectiveChakraCost(ninjaData), 0.01f);
-
-        for (byte b : comboSeals) {
-            ninjaData.addSeal(b);
-        }
-        assertEquals(25, fireball.getPerfectComboDiscountPercent(ninjaData));
-        assertEquals(baseCost * 0.75f, fireball.getEffectiveChakraCost(ninjaData), 0.01f);
     }
 
     @Test
@@ -939,7 +951,7 @@ public class NinjaDataLogicTest {
     public void testScaledActivationDelayFormula() {
         // Genin / Base 10 ticks (0.50s): -10% per 100 mastery, 0 at 1000+
         com.sekwah.narutomod.abilities.jutsus.BoneDanceAbility geninAbility = new com.sekwah.narutomod.abilities.jutsus.BoneDanceAbility();
-        assertTrue(geninAbility.requiresSealActivationDelay());
+        assertTrue(geninAbility.requiresActivationDelay());
         assertEquals(10, geninAbility.getBaseActivationDelayTicks());
         assertEquals(10, geninAbility.getScaledActivationDelay(0));
         assertEquals(10, geninAbility.getScaledActivationDelay(50));
@@ -952,7 +964,7 @@ public class NinjaDataLogicTest {
 
         // Chunin / Base 8 ticks (0.40s)
         ShadowCloneAbility chuninAbility = new ShadowCloneAbility();
-        assertTrue(chuninAbility.requiresSealActivationDelay());
+        assertTrue(chuninAbility.requiresActivationDelay());
         assertEquals(8, chuninAbility.getBaseActivationDelayTicks());
         assertEquals(8, chuninAbility.getScaledActivationDelay(0));
         assertEquals(7, chuninAbility.getScaledActivationDelay(100)); // 8 * 0.9 = 7.2 -> 7
@@ -962,7 +974,7 @@ public class NinjaDataLogicTest {
 
         // Jonin / Base 6 ticks (0.30s)
         RasenshurikenAbility joninAbility = new RasenshurikenAbility();
-        assertTrue(joninAbility.requiresSealActivationDelay());
+        assertTrue(joninAbility.requiresActivationDelay());
         assertEquals(6, joninAbility.getBaseActivationDelayTicks());
         assertEquals(6, joninAbility.getScaledActivationDelay(0));
         assertEquals(5, joninAbility.getScaledActivationDelay(100)); // 6 * 0.9 = 5.4 -> 5
@@ -1030,7 +1042,7 @@ public class NinjaDataLogicTest {
     @DisplayName("Verify utility abilities require zero activation delay")
     public void testUtilityAbilitiesRequireZeroDelay() {
         com.sekwah.narutomod.abilities.utility.LeapAbility leapAbility = new com.sekwah.narutomod.abilities.utility.LeapAbility();
-        assertFalse(leapAbility.requiresSealActivationDelay());
+        assertFalse(leapAbility.requiresActivationDelay());
         assertEquals(0, leapAbility.getScaledActivationDelay(0));
         assertEquals(0, leapAbility.getScaledActivationDelay(500));
     }
@@ -1139,24 +1151,31 @@ public class NinjaDataLogicTest {
     }
 
     @Test
-    @DisplayName("Verify Ability.COMPLEXITY_COMPARATOR sorts from simplest (2-key) to most complex (5-key)")
+    @DisplayName("Verify Ability.COMPLEXITY_COMPARATOR sorts by rank level, resource cost, then registry name")
     public void testAbilityComplexityComparator() {
         Ability charge = new com.sekwah.narutomod.abilities.utility.ChakraChargeAbility();
-        charge.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chakra_charge")); // 1 key
+        charge.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chakra_charge")); // ACADEMY_STUDENT (0), cost 0
+
+        Ability dummyA = new DummyAbility(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "a_dummy")); // GENIN (1), cost 0
+        Ability dummyB = new DummyAbility(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "b_dummy")); // GENIN (1), cost 0
 
         Ability fireball = new com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility();
-        fireball.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball")); // 3 keys
+        fireball.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball")); // GENIN (1), cost 30
 
         Ability chidori = new com.sekwah.narutomod.abilities.jutsus.ChidoriAbility();
-        chidori.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori")); // 4 keys
+        chidori.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "chidori")); // CHUNIN (2), cost 35
+
+        Ability rasengan = new com.sekwah.narutomod.abilities.jutsus.RasenganAbility();
+        rasengan.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan")); // CHUNIN (2), cost 40
 
         Ability amaterasu = new AmaterasuAbility();
-        amaterasu.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "amaterasu")); // 5 keys
+        amaterasu.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "amaterasu")); // JONIN (3), cost 160
 
-        java.util.List<Ability> list = new java.util.ArrayList<>(List.of(amaterasu, fireball, chidori, charge));
+        java.util.List<Ability> list = new java.util.ArrayList<>(
+                List.of(amaterasu, rasengan, fireball, dummyB, chidori, dummyA, charge));
         list.sort(Ability.COMPLEXITY_COMPARATOR);
 
-        assertEquals(List.of(charge, fireball, chidori, amaterasu), list);
+        assertEquals(List.of(charge, dummyA, dummyB, fireball, chidori, rasengan, amaterasu), list);
     }
 
     @Test

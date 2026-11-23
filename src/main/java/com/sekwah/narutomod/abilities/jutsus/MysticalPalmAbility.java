@@ -47,11 +47,6 @@ public class MysticalPalmAbility extends Ability implements Ability.Channeled, A
     }
 
     @Override
-    public long defaultCombo() {
-        return 332L;
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 18.0f;
     }

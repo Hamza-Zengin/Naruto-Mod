@@ -40,11 +40,6 @@ public class PhoenixFlowerAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 131L;
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 26.0f;
     }

@@ -105,11 +105,11 @@ public class NinjaData implements INinjaData {
     @Sync
     private boolean kageHatEquipped = false;
 
-    public static final int DEFAULT_SEAL_TIMEOUT = 60;
-    public static final int MAX_ACTIVE_SEALS = 12;
+    @Sync
+    private String equippedJutsus = ";;;;;;;";
 
-    private final List<Byte> activeSeals = new ArrayList<>();
-    private int sealTimeout = 0;
+    @Sync
+    private int selectedJutsuSlot = 0;
 
     private ArrayList<DelayedPlayerTickEvent> delayedTickEvents = new ArrayList<>();
     private HashMap<String, CooldownTickEvent> cooldownTickEvents = new HashMap<>();
@@ -136,6 +136,8 @@ public class NinjaData implements INinjaData {
             this.clan = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shinobi");
             this.clanLocked = false;
             this.unlockedJutsus = "";
+            this.equippedJutsus = ";;;;;;;";
+            this.selectedJutsuSlot = 0;
             this.rank = "ACADEMY_STUDENT";
             this.chakraExp = 0;
             this.staminaExp = 0;
@@ -322,6 +324,13 @@ public class NinjaData implements INinjaData {
     @Override
     public void lockAbility(Identifier abilityId) {
         this.unlockedJutsus = JutsuUnlockRules.removeUnlockedAbility(this.unlockedJutsus, abilityId);
+        if (abilityId != null) {
+            for (int i = 0; i < MAX_JUTSU_SLOTS; i++) {
+                if (abilityId.equals(getEquippedJutsu(i))) {
+                    setEquippedJutsu(i, null);
+                }
+            }
+        }
     }
 
     @Override
@@ -504,12 +513,13 @@ public class NinjaData implements INinjaData {
         this.completedMissionsCount = 0;
         this.missionStatus = "NONE";
         this.unlockedJutsus = "";
+        this.equippedJutsus = ";;;;;;;";
+        this.selectedJutsuSlot = 0;
         this.jutsuMastery.clear();
         this.activeJutsusFlag = 0;
         if (this.toggleAbilityData != null) {
             this.toggleAbilityData.clear();
         }
-        this.clearSeals();
         this.chakra = this.getMaxChakra();
         this.stamina = this.getMaxStamina();
         this.chakraRegenInfo.cooldown = 0;
@@ -608,13 +618,9 @@ public class NinjaData implements INinjaData {
             if (this.activeHandJutsuTicks > 0) {
                 this.clearActiveHandJutsu();
             }
-            this.clearSeals();
             this.activeJutsusFlag = 0;
             return;
         }
-
-        // Tick hand seal timeout
-        this.tick();
 
         // Countdown active hand jutsu (Rasengan/Chidori 5-second window)
         if (this.activeHandJutsuTicks > 0) {
@@ -852,39 +858,107 @@ public class NinjaData implements INinjaData {
         return cooldownTickEvents;
     }
 
-    @Override
-    public List<Byte> getActiveSeals() {
-        return Collections.unmodifiableList(this.activeSeals);
-    }
-
-    @Override
-    public void addSeal(byte seal) {
-        if (this.activeSeals.size() >= MAX_ACTIVE_SEALS) {
-            this.activeSeals.remove(0);
-        }
-        this.activeSeals.add(seal);
-        this.sealTimeout = DEFAULT_SEAL_TIMEOUT;
-    }
-
-    @Override
-    public void clearSeals() {
-        this.activeSeals.clear();
-        this.sealTimeout = 0;
-    }
-
-    @Override
-    public int getSealTimeout() {
-        return this.sealTimeout;
-    }
-
-    @Override
-    public void tick() {
-        if (this.sealTimeout > 0) {
-            this.sealTimeout--;
-            if (this.sealTimeout == 0) {
-                this.clearSeals();
+    private String[] parseEquippedSlots() {
+        String[] slots = new String[MAX_JUTSU_SLOTS];
+        java.util.Arrays.fill(slots, "");
+        if (this.equippedJutsus != null && !this.equippedJutsus.isEmpty()) {
+            String[] parts = this.equippedJutsus.split(";", -1);
+            for (int i = 0; i < Math.min(MAX_JUTSU_SLOTS, parts.length); i++) {
+                slots[i] = parts[i] != null ? parts[i].trim() : "";
             }
         }
+        return slots;
+    }
+
+    private void writeEquippedSlots(String[] slots) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < MAX_JUTSU_SLOTS; i++) {
+            if (i > 0) sb.append(';');
+            if (slots[i] != null && !slots[i].isEmpty()) {
+                sb.append(slots[i]);
+            }
+        }
+        this.equippedJutsus = sb.toString();
+    }
+
+    @Override
+    @javax.annotation.Nullable
+    public Identifier getEquippedJutsu(int slot) {
+        if (slot < 0 || slot >= MAX_JUTSU_SLOTS) {
+            return null;
+        }
+        String raw = parseEquippedSlots()[slot];
+        if (raw.isEmpty()) {
+            return null;
+        }
+        return Identifier.tryParse(raw);
+    }
+
+    @Override
+    public void setEquippedJutsu(int slot, @javax.annotation.Nullable Identifier abilityId) {
+        if (slot < 0 || slot >= MAX_JUTSU_SLOTS) {
+            return;
+        }
+        String[] slots = parseEquippedSlots();
+        String idStr = abilityId != null ? abilityId.toString() : "";
+        if (!idStr.isEmpty()) {
+            for (int i = 0; i < MAX_JUTSU_SLOTS; i++) {
+                if (i != slot && idStr.equals(slots[i])) {
+                    slots[i] = "";
+                }
+            }
+        }
+        slots[slot] = idStr;
+        writeEquippedSlots(slots);
+    }
+
+    @Override
+    public List<Identifier> getEquippedJutsusList() {
+        String[] slots = parseEquippedSlots();
+        List<Identifier> list = new ArrayList<>(MAX_JUTSU_SLOTS);
+        for (int i = 0; i < MAX_JUTSU_SLOTS; i++) {
+            list.add(slots[i].isEmpty() ? null : Identifier.tryParse(slots[i]));
+        }
+        return Collections.unmodifiableList(list);
+    }
+
+    @Override
+    public String getEquippedJutsusString() {
+        return this.equippedJutsus != null ? this.equippedJutsus : ";;;;;;;";
+    }
+
+    @Override
+    public void setEquippedJutsusString(String serialized) {
+        if (serialized == null || serialized.isEmpty()) {
+            this.equippedJutsus = ";;;;;;;";
+            return;
+        }
+        String[] slots = new String[MAX_JUTSU_SLOTS];
+        java.util.Arrays.fill(slots, "");
+        String[] parts = serialized.split(";", -1);
+        for (int i = 0; i < Math.min(MAX_JUTSU_SLOTS, parts.length); i++) {
+            String trimmed = parts[i] != null ? parts[i].trim() : "";
+            if (!trimmed.isEmpty() && Identifier.tryParse(trimmed) != null) {
+                slots[i] = trimmed;
+            }
+        }
+        writeEquippedSlots(slots);
+    }
+
+    @Override
+    public int getSelectedJutsuSlot() {
+        return Math.max(0, Math.min(MAX_JUTSU_SLOTS - 1, this.selectedJutsuSlot));
+    }
+
+    @Override
+    public void setSelectedJutsuSlot(int slot) {
+        this.selectedJutsuSlot = Math.max(0, Math.min(MAX_JUTSU_SLOTS - 1, slot));
+    }
+
+    @Override
+    @javax.annotation.Nullable
+    public Identifier getSelectedJutsuId() {
+        return getEquippedJutsu(getSelectedJutsuSlot());
     }
 
     /**
@@ -1002,10 +1076,6 @@ public class NinjaData implements INinjaData {
     void setRawMaxStamina(float value) { this.maxStamina = value; }
 
     void setRawClan(Identifier clan) { this.clan = clan; }
-
-    List<Byte> getMutableActiveSeals() { return this.activeSeals; }
-
-    void setRawSealTimeout(int value) { this.sealTimeout = value; }
 
     void setRawMissionProgress(int value) { this.missionProgress = value; }
 

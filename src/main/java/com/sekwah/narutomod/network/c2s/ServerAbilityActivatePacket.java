@@ -76,17 +76,11 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                     return;
                 }
 
-                int discountPercent = ability.getPerfectComboDiscountPercent(ninjaData);
                 if (ability.handleCost(player, ninjaData)) {
                     if (ability.logInChat()) {
                         player.sendSystemMessage(Component.translatable("jutsu.cast", Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
-                        if (discountPercent > 0) {
-                            player.sendSystemMessage(Component.translatable("jutsu.combo.perfect",
-                                    Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW),
-                                    discountPercent).withStyle(ChatFormatting.GOLD));
-                        }
                     }
-                    int rawDelay = (ability.requiresSealActivationDelay() && discountPercent > 0) ? ability.getActivationDelayTicks(ninjaData) : 0;
+                    int rawDelay = ability.requiresActivationDelay() ? ability.getActivationDelayTicks(ninjaData) : 0;
                     int delay = Ability.applyArmorDelayReduction(player, rawDelay);
                     if (delay > 0) {
                         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -113,7 +107,6 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                         sendHandSealSpark(player, ability);
                     }
                     ninjaData.addJutsuCast();
-                    ninjaData.clearSeals();
                     NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
                             .trigger(player, NinjaProgressTrigger.Action.USE_JUTSU, msg.abilityId.getPath());
 

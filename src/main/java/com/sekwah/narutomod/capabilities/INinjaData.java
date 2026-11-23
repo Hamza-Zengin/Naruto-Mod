@@ -138,11 +138,18 @@ public interface INinjaData extends ValueIOSerializable {
     boolean isEighthGateActive();
     void setEighthGateActive(boolean active);
 
-    List<Byte> getActiveSeals();
-    void addSeal(byte seal);
-    void clearSeals();
-    int getSealTimeout();
-    void tick();
+    int MAX_JUTSU_SLOTS = 8;
+
+    @javax.annotation.Nullable
+    Identifier getEquippedJutsu(int slot);
+    void setEquippedJutsu(int slot, @javax.annotation.Nullable Identifier abilityId);
+    List<Identifier> getEquippedJutsusList();
+    String getEquippedJutsusString();
+    void setEquippedJutsusString(String serialized);
+    int getSelectedJutsuSlot();
+    void setSelectedJutsuSlot(int slot);
+    @javax.annotation.Nullable
+    Identifier getSelectedJutsuId();
 
     String getActiveMissionId();
     void setActiveMissionId(String missionId);

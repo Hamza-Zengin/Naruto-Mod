@@ -1,7 +1,6 @@
 package com.sekwah.narutomod;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.sekwah.narutomod.abilities.Ability;
 import com.sekwah.narutomod.abilities.jutsus.*;
@@ -18,10 +17,12 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Audits all 26 jutsu/utility abilities and their JSON definitions to guarantee:
- * 1. 100% unique, collision-free combos across all abilities.
- * 2. Exact parity between JSON "combo" array and Java Ability.defaultCombo().
- * 3. Tiered combo key lengths: 2-3 keys for basic, >=4 for high-level, 5 for ultimate jutsus.
+ * Audits all 36 jutsu/utility abilities, their JSON definitions, activation-delay rules,
+ * and the 8-slot Jutsu Radial Wheel angle-to-slot mapping:
+ * 1. Every JSON file exists and does NOT define a legacy "combo" field.
+ * 2. Exactly 3 abilities (chakra_charge, water_walk, leap) are utility abilities.
+ * 3. Ability.requiresActivationDelay() is false for utility abilities and true for chakra-costing combat jutsus.
+ * 4. JutsuWheelOverlay.computeHoveredSlot maps deadzone and all 8 radial sectors accurately.
  */
 public class JutsuComboAuditTest {
 
@@ -29,7 +30,7 @@ public class JutsuComboAuditTest {
     private static final Path JUTSU_DIR = Paths.get("src/main/resources/data/narutomod/jutsus");
 
     private static final Map<String, Ability> ALL_ABILITIES = Map.ofEntries(
-            // [A] Basic & Movement (2-3 keys)
+            // [A] Basic & Movement
             Map.entry("chakra_charge", new ChakraChargeAbility()),
             Map.entry("water_walk", new WaterWalkAbility()),
             Map.entry("leap", new LeapAbility()),
@@ -45,7 +46,7 @@ public class JutsuComboAuditTest {
             Map.entry("water_encampment_wall", new WaterEncampmentWallAbility()),
             Map.entry("chakra_scalpel", new ChakraScalpelAbility()),
             Map.entry("summoning", new SummoningAbility()),
-            // [B] High Level (4 keys)
+            // [B] High Level
             Map.entry("sharingan", new SharinganAbility()),
             Map.entry("byakugan", new ByakuganAbility()),
             Map.entry("shadow_clone", new ShadowCloneAbility()),
@@ -61,7 +62,7 @@ public class JutsuComboAuditTest {
             Map.entry("wood_prison", new WoodPrisonAbility()),
             Map.entry("adamantine_chains", new AdamantineChainsAbility()),
             Map.entry("eight_gates", new EightGatesAbility()),
-            // [C] Ultimate (5 keys)
+            // [C] Ultimate
             Map.entry("rasenshuriken", new RasenshurikenAbility()),
             Map.entry("kirin", new KirinAbility()),
             Map.entry("amaterasu", new AmaterasuAbility()),
@@ -70,23 +71,16 @@ public class JutsuComboAuditTest {
             Map.entry("eight_gates_death", new EighthGateOfDeathAbility())
     );
 
-    private static final Set<String> HIGH_LEVEL = Set.of(
-            "shadow_clone", "shadow_possession", "chidori", "chidori_stream",
-            "rasengan", "stone_spikes", "water_dragon", "ash_pile_burning",
-            "hakke_kusho", "bone_dance", "wood_prison", "adamantine_chains", "eight_gates"
-    );
-
-    private static final Set<String> ULTIMATE = Set.of(
-            "rasenshuriken", "kirin", "amaterasu", "tsukuyomi", "susanoo_ribcage", "eight_gates_death"
-    );
+    private static final Set<String> EXPECTED_UTILITIES = Set.of("chakra_charge", "water_walk", "leap");
 
     @Test
-    @DisplayName("Verify all 36 jutsu combos are 100% unique, match JSON, and obey tier key lengths")
-    public void testAllJutsuCombosUniqueAndTiered() throws IOException {
+    @DisplayName("Verify all 36 jutsu JSONs omit 'combo', utility count is 3, and requiresActivationDelay matches")
+    public void testAllAbilitiesAndJsonAudit() throws IOException {
         assertTrue(Files.isDirectory(JUTSU_DIR), "Jutsu data directory must exist");
+        assertEquals(36, ALL_ABILITIES.size(), "Audit map must cover all 36 abilities");
 
-        Set<List<Integer>> uniqueCombos = new HashSet<>();
-        Set<Long> uniqueJavaCombos = new HashSet<>();
+        Set<String> foundUtilities = new HashSet<>();
+        int nonUtilityCount = 0;
 
         for (Map.Entry<String, Ability> entry : ALL_ABILITIES.entrySet()) {
             String name = entry.getKey();
@@ -97,40 +91,61 @@ public class JutsuComboAuditTest {
 
             String content = Files.readString(jsonPath);
             JsonObject obj = GSON.fromJson(content, JsonObject.class);
-            assertTrue(obj.has("combo"), name + ".json must define a 'combo' array");
+            assertNotNull(obj, name + ".json must parse as a JSON object");
+            assertFalse(obj.has("combo"), name + ".json must NOT contain a 'combo' field");
 
-            JsonArray arr = obj.getAsJsonArray("combo");
-            List<Integer> jsonCombo = new ArrayList<>();
-            long reconstructedCombo = 0;
-            for (int i = 0; i < arr.size(); i++) {
-                int key = arr.get(i).getAsInt();
-                assertTrue(key >= 1 && key <= 3, "Combo key must be 1, 2, or 3 in " + name);
-                jsonCombo.add(key);
-                reconstructedCombo = reconstructedCombo * 10L + key;
-            }
-
-            long javaCombo = ability.defaultCombo();
-            assertEquals(reconstructedCombo, javaCombo,
-                    "Java defaultCombo() must match JSON combo for " + name);
-
-            assertTrue(uniqueCombos.add(jsonCombo),
-                    "Duplicate combo detected for " + name + ": " + jsonCombo);
-            assertTrue(uniqueJavaCombos.add(javaCombo),
-                    "Duplicate Java defaultCombo() detected for " + name + ": " + javaCombo);
-
-            if (ULTIMATE.contains(name)) {
-                assertEquals(5, jsonCombo.size(), "Ultimate jutsu " + name + " must have 5 keys");
-            } else if (HIGH_LEVEL.contains(name)) {
-                assertTrue(jsonCombo.size() >= 4, "High-level jutsu " + name + " must have >= 4 keys");
-            } else if ("chakra_charge".equals(name) || "water_walk".equals(name)) {
-                assertEquals(1, jsonCombo.size(), "Starter utility " + name + " must have 1 key");
+            if (ability.isUtilityAbility()) {
+                foundUtilities.add(name);
+                assertFalse(ability.requiresActivationDelay(),
+                        "Utility ability " + name + " must not require activation delay");
             } else {
-                assertTrue(jsonCombo.size() >= 2 && jsonCombo.size() <= 3,
-                        "Basic/movement ability " + name + " must have 2-3 keys");
+                nonUtilityCount++;
+                if (ability.getDefaultChakraCost() > 0) {
+                    assertTrue(ability.requiresActivationDelay(),
+                            "Chakra-costing combat jutsu " + name + " must require activation delay");
+                } else {
+                    assertFalse(ability.requiresActivationDelay(),
+                            "Zero-chakra-cost ability " + name + " should not require activation delay");
+                }
             }
         }
 
-        assertEquals(ALL_ABILITIES.size(), uniqueCombos.size());
-        assertEquals(ALL_ABILITIES.size(), uniqueJavaCombos.size());
+        assertEquals(EXPECTED_UTILITIES, foundUtilities,
+                "Exactly chakra_charge, water_walk, and leap must be utility abilities");
+        assertEquals(33, nonUtilityCount, "Remaining 33 abilities must have isUtilityAbility() == false");
+    }
+
+    @Test
+    @DisplayName("Verify JutsuWheelOverlay radial wheel angle-to-slot mapping and deadzone")
+    public void testRadialWheelAngleMapping() {
+        double centerX = 200.0;
+        double centerY = 150.0;
+        double deadzone = 30.0;
+
+        // Inside deadzone (distance < 30) returns -1
+        assertEquals(-1, com.sekwah.narutomod.client.gui.JutsuWheelOverlay.computeHoveredSlot(
+                centerX, centerY, centerX, centerY, deadzone));
+        assertEquals(-1, com.sekwah.narutomod.client.gui.JutsuWheelOverlay.computeHoveredSlot(
+                centerX + 20.0, centerY - 15.0, centerX, centerY, deadzone));
+        assertEquals(-1, com.sekwah.narutomod.client.gui.JutsuWheelOverlay.computeHoveredSlot(
+                centerX + 29.0, centerY, centerX, centerY, deadzone));
+
+        // 8 radial sectors starting from Top (slot 0) clockwise to Top-Left (slot 7)
+        assertEquals(0, com.sekwah.narutomod.client.gui.JutsuWheelOverlay.computeHoveredSlot(
+                centerX, centerY - 60.0, centerX, centerY, deadzone));
+        assertEquals(1, com.sekwah.narutomod.client.gui.JutsuWheelOverlay.computeHoveredSlot(
+                centerX + 45.0, centerY - 45.0, centerX, centerY, deadzone));
+        assertEquals(2, com.sekwah.narutomod.client.gui.JutsuWheelOverlay.computeHoveredSlot(
+                centerX + 60.0, centerY, centerX, centerY, deadzone));
+        assertEquals(3, com.sekwah.narutomod.client.gui.JutsuWheelOverlay.computeHoveredSlot(
+                centerX + 45.0, centerY + 45.0, centerX, centerY, deadzone));
+        assertEquals(4, com.sekwah.narutomod.client.gui.JutsuWheelOverlay.computeHoveredSlot(
+                centerX, centerY + 60.0, centerX, centerY, deadzone));
+        assertEquals(5, com.sekwah.narutomod.client.gui.JutsuWheelOverlay.computeHoveredSlot(
+                centerX - 45.0, centerY + 45.0, centerX, centerY, deadzone));
+        assertEquals(6, com.sekwah.narutomod.client.gui.JutsuWheelOverlay.computeHoveredSlot(
+                centerX - 60.0, centerY, centerX, centerY, deadzone));
+        assertEquals(7, com.sekwah.narutomod.client.gui.JutsuWheelOverlay.computeHoveredSlot(
+                centerX - 45.0, centerY - 45.0, centerX, centerY, deadzone));
     }
 }

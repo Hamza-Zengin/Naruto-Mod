@@ -35,11 +35,6 @@ public class TsukuyomiAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 32132;
-    }
-
-    @Override
     public String getRequiredClanPath() {
         return "uchiha";
     }

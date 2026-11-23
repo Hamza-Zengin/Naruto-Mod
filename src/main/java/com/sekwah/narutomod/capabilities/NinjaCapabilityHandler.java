@@ -106,7 +106,6 @@ public class NinjaCapabilityHandler {
     public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
             com.sekwah.narutomod.network.ServerSecurityValidator.clearPlayer(serverPlayer.getUUID());
-            com.sekwah.narutomod.network.c2s.ServerJutsuCastingPacket.clearPlayer(serverPlayer.getUUID());
         }
     }
 

@@ -35,11 +35,6 @@ public class MudWallAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 232; // B - V - C
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 30.0f;
     }

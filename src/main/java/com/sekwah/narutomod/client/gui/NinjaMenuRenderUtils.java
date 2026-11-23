@@ -23,23 +23,6 @@ final class NinjaMenuRenderUtils {
         }
     }
 
-    static String formatCombo(long combo) {
-        String s = String.valueOf(combo);
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '1') sb.append("C");
-            else if (c == '2') sb.append("V");
-            else if (c == '3') sb.append("B");
-            else sb.append(c);
-
-            if (i < s.length() - 1) {
-                sb.append(" - ");
-            }
-        }
-        return sb.toString();
-    }
-
     static void renderBar(GuiGraphicsExtractor graphics, int x, int y, int width, int height, float ratio, int fillCol, int bgCol) {
         ratio = Math.max(0f, Math.min(1f, ratio));
         graphics.fill(x, y, x + width, y + height, bgCol);

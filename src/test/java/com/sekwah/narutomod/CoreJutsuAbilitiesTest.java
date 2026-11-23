@@ -29,7 +29,6 @@ public class CoreJutsuAbilitiesTest {
         RasenganAbility ability = new RasenganAbility();
         assertEquals(Ability.ActivationType.INSTANT, ability.activationType());
         assertEquals(NinjaRank.CHUNIN, ability.getRequiredRank());
-        assertEquals(2123L, ability.defaultCombo());
         assertEquals(40.0f, ability.getDefaultChakraCost(), 0.001f);
         assertEquals(160, ability.getDefaultCooldown());
         assertEquals(22.0f, ability.getDefaultDamage(), 0.001f);
@@ -48,7 +47,6 @@ public class CoreJutsuAbilitiesTest {
         assertEquals(Ability.ActivationType.INSTANT, ability.activationType());
         assertEquals(ChakraElement.LIGHTNING, ability.getChakraElement());
         assertEquals(NinjaRank.CHUNIN, ability.getRequiredRank());
-        assertEquals(1312L, ability.defaultCombo());
         assertEquals(35.0f, ability.getDefaultChakraCost(), 0.001f);
         assertEquals(120, ability.getDefaultCooldown());
         assertEquals(26.0f, ability.getDefaultDamage(), 0.001f);
@@ -65,7 +63,6 @@ public class CoreJutsuAbilitiesTest {
         ShadowCloneAbility ability = new ShadowCloneAbility();
         assertEquals(Ability.ActivationType.INSTANT, ability.activationType());
         assertEquals(NinjaRank.CHUNIN, ability.getRequiredRank());
-        assertEquals(3123L, ability.defaultCombo());
         assertEquals(30.0f, ability.getDefaultChakraCost(), 0.001f);
         assertEquals(240, ability.getDefaultCooldown());
 
@@ -165,18 +162,6 @@ public class CoreJutsuAbilitiesTest {
         amaterasu.setRegistryName(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "amaterasu"));
         assertEquals(amaterasu.getScaledChakraCost(ninjaData), amaterasu.getFinalChakraCost(null, ninjaData), 0.001f);
         assertEquals(0.0f, susanoo.getFinalChakraCost(null, ninjaData), 0.001f);
-    }
-
-    @Test
-    @DisplayName("Seal timeout mastery scaling and default 1000ms config")
-    void testSealTimeoutMasteryScaling() {
-        assertEquals(1000, com.sekwah.narutomod.config.NarutoConfig.sealTimeoutMs);
-        assertEquals(20, Ability.getScaledSealTimeoutTicks(20, 0));
-        assertEquals(20, Ability.getScaledSealTimeoutTicks(20, -15));
-        assertEquals(12, Ability.getScaledSealTimeoutTicks(20, 350));
-        assertEquals(4, Ability.getScaledSealTimeoutTicks(20, 700));
-        assertEquals(4, Ability.getScaledSealTimeoutTicks(20, 1200));
-        assertEquals(4, Ability.getScaledSealTimeoutTicks(2, 0));
     }
 
     @Test

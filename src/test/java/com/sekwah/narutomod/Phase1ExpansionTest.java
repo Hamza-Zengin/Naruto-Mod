@@ -47,7 +47,6 @@ public class Phase1ExpansionTest {
         assertEquals(Ability.ActivationType.INSTANT, chains.activationType());
         assertEquals(ChakraElement.NONE, chains.getChakraElement());
         assertEquals(NinjaRank.CHUNIN, chains.getRequiredRank());
-        assertEquals(1321L, chains.defaultCombo());
         assertEquals(42.0F, chains.getDefaultChakraCost(), 0.001F);
         assertEquals(220, chains.getDefaultCooldown());
         assertEquals(16.0F, chains.getDefaultDamage(), 0.001F);

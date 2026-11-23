@@ -42,11 +42,6 @@ public class EarthDragonBulletAbility extends Ability implements Ability.Cooldow
     }
 
     @Override
-    public long defaultCombo() {
-        return 231;
-    }
-
-    @Override
     public float getDefaultChakraCost() {
         return 28.0f;
     }

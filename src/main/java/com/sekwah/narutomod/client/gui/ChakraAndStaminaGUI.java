@@ -210,10 +210,10 @@ public class ChakraAndStaminaGUI {
                 boolean chakraChanged = this.prevChakra >= 0 && Math.abs(chakra - this.prevChakra) > 0.001f;
                 boolean staminaChanged = this.prevStamina >= 0 && Math.abs(stamina - this.prevStamina) > 0.001f;
                 boolean tookDamage = player.hurtTime > 0 || (this.prevHealth >= 0 && player.getHealth() < this.prevHealth);
-                boolean hasActiveSeals = ninjaData.getActiveSeals() != null && !ninjaData.getActiveSeals().isEmpty();
+                boolean isWheelOpen = JutsuWheelOverlay.isOpen();
                 boolean resourcesNotFull = chakra < maxChakra || stamina < maxStamina;
 
-                if (chakraChanged || staminaChanged || tookDamage || hasActiveSeals || resourcesNotFull) {
+                if (chakraChanged || staminaChanged || tookDamage || isWheelOpen || resourcesNotFull) {
                     this.hudAlpha = MAX_ALPHA;
                     this.fadeDelayTimer = NarutoConfig.hudFadeDelayTicks;
                 } else if (this.fadeDelayTimer > 0) {

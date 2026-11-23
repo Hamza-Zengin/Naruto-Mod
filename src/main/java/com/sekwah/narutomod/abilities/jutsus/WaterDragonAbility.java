@@ -49,11 +49,6 @@ public class WaterDragonAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 2121;
-    }
-
-    @Override
     public boolean requiresScroll() {
         return true;
     }

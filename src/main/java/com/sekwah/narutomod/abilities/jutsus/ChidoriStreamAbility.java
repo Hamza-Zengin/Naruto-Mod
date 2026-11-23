@@ -73,11 +73,6 @@ public class ChidoriStreamAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 1313L;
-    }
-
-    @Override
     public boolean requiresScroll() {
         return true;
     }

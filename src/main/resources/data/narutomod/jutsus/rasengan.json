@@ -3,11 +3,5 @@
   "stamina_cost": 0.0,
   "cooldown_ticks": 160,
   "base_damage": 22.0,
-  "combo": [
-    2,
-    1,
-    2,
-    3
-  ],
   "requiredRank": "CHUNIN"
 }

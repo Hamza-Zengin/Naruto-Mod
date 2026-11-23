@@ -44,11 +44,6 @@ public class BoneDanceAbility extends Ability implements Ability.Cooldown {
     }
 
     @Override
-    public long defaultCombo() {
-        return 1213; // C - B - V
-    }
-
-    @Override
     public String getRequiredClanPath() {
         return "kaguya";
     }
