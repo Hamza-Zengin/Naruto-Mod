@@ -50,6 +50,12 @@ public class PlayerEvents {
             Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "armor_movement_agility");
     public static final Identifier ARMOR_STEALTH_AGILITY_MODIFIER_ID =
             Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "armor_stealth_agility");
+    public static final Identifier RANK_MOVEMENT_SPEED_MODIFIER_ID =
+            Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rank_movement_speed");
+    public static final Identifier RANK_JUMP_STRENGTH_MODIFIER_ID =
+            Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rank_jump_strength");
+    public static final Identifier RANK_SAFE_FALL_MODIFIER_ID =
+            Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rank_safe_fall_distance");
 
     public static boolean isKageHat(Item item) {
         return item == NarutoItems.KAGE_HAT.get()
@@ -124,6 +130,39 @@ public class PlayerEvents {
         }
     }
 
+    public static boolean isCompletelyUnarmored(Player player) {
+        if (player == null) {
+            return false;
+        }
+        return player.getItemBySlot(EquipmentSlot.HEAD).isEmpty()
+                && player.getItemBySlot(EquipmentSlot.CHEST).isEmpty()
+                && player.getItemBySlot(EquipmentSlot.LEGS).isEmpty()
+                && player.getItemBySlot(EquipmentSlot.FEET).isEmpty();
+    }
+
+    public static float applyRankUnarmedDamageBonus(float baseDamage, NinjaRank rank, boolean isMainHandEmpty, boolean isDirectMelee) {
+        if (rank == null || !isMainHandEmpty || !isDirectMelee) {
+            return baseDamage;
+        }
+        return baseDamage + rank.getUnarmedDamageBonus();
+    }
+
+    public static float applyRankUnarmoredDamageReduction(float amount, NinjaRank rank, boolean completelyUnarmored, boolean bypassesInvulnerability) {
+        if (rank == null || !completelyUnarmored || bypassesInvulnerability) {
+            return amount;
+        }
+        float reduction = Math.max(0.0F, Math.min(0.60F, rank.getUnarmoredDamageReduction()));
+        return amount * (1.0F - reduction);
+    }
+
+    public static double applyRankFallDistanceReduction(double distance, NinjaRank rank) {
+        if (rank == null || distance <= 0.0D) {
+            return distance;
+        }
+        double reduction = Math.max(0.0D, Math.min(0.85D, rank.getFallDamageReduction()));
+        return distance * (1.0D - reduction);
+    }
+
     public static float applyVillageArmorDamageReduction(
             float amount,
             ChakraElement hatAffinity,
@@ -174,17 +213,28 @@ public class PlayerEvents {
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         Player player = event.getEntity();
         if (!player.level().isClientSide() && player.level() instanceof ServerLevel serverLevel) {
+            var handNinjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
+            NinjaRank playerRank = NinjaRank.fromString(handNinjaData.getRank());
             AttributeInstance speedAttr = player.getAttribute(Attributes.MOVEMENT_SPEED);
             if (speedAttr != null) {
                 double moveDelta = computeArmorMovementAttributeDelta(
                         NarutoArmorItem.getTotalMovementSpeedBonus(player), 0.0F, false);
                 double stealthDelta = computeArmorMovementAttributeDelta(
                         0.0F, NarutoArmorItem.getTotalStealthSpeedBonus(player), player.isCrouching());
+                double rankSpeedDelta = playerRank.getMovementSpeedBonus() * 0.1D;
                 syncTransientSpeedModifier(speedAttr, ARMOR_AGILITY_MODIFIER_ID, moveDelta);
                 syncTransientSpeedModifier(speedAttr, ARMOR_STEALTH_AGILITY_MODIFIER_ID, stealthDelta);
+                syncTransientSpeedModifier(speedAttr, RANK_MOVEMENT_SPEED_MODIFIER_ID, rankSpeedDelta);
+            }
+            AttributeInstance jumpAttr = player.getAttribute(Attributes.JUMP_STRENGTH);
+            if (jumpAttr != null) {
+                syncTransientSpeedModifier(jumpAttr, RANK_JUMP_STRENGTH_MODIFIER_ID, playerRank.getJumpStrengthBonus());
+            }
+            AttributeInstance safeFallAttr = player.getAttribute(Attributes.SAFE_FALL_DISTANCE);
+            if (safeFallAttr != null) {
+                syncTransientSpeedModifier(safeFallAttr, RANK_SAFE_FALL_MODIFIER_ID, playerRank.getSafeFallDistanceBonus());
             }
 
-            var handNinjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
             int handLightLevel = handNinjaData.getActiveHandJutsuTicks() > 0
                     ? JutsuLightManager.resolveLightLevelForHandJutsu(handNinjaData.getActiveHandJutsu())
                     : JutsuLightManager.LIGHT_NONE;
@@ -282,10 +332,14 @@ public class PlayerEvents {
         // Sage Cloak Senjutsu (+12% outgoing attack and jutsu damage)
         if (event.getSource().getEntity() instanceof Player attacker) {
             var ninjaData = attacker.getData(NinjaCapabilityHandler.NINJA_DATA);
+            NinjaRank attackerRank = NinjaRank.fromString(ninjaData.getRank());
+            boolean isDirectMelee = event.getSource().getDirectEntity() == attacker;
+            event.setAmount(applyRankUnarmedDamageBonus(
+                    event.getAmount(), attackerRank, attacker.getMainHandItem().isEmpty(), isDirectMelee));
             if (ninjaData.getClan() != null && ninjaData.getClan().getPath().equals("kaguya")) {
                 event.setAmount(event.getAmount() * 1.20F);
             }
-            if (event.getSource().getDirectEntity() == attacker
+            if (isDirectMelee
                     && attacker.getMainHandItem().getItem() instanceof AnbuTantoItem
                     && event.getEntity() instanceof LivingEntity livingTarget
                     && AnbuTantoItem.isStealthBackstab(attacker, livingTarget)) {
@@ -299,6 +353,12 @@ public class PlayerEvents {
         }
         if (event.getEntity() instanceof Player defender) {
             var ninjaData = defender.getData(NinjaCapabilityHandler.NINJA_DATA);
+            NinjaRank defenderRank = NinjaRank.fromString(ninjaData.getRank());
+            event.setAmount(applyRankUnarmoredDamageReduction(
+                    event.getAmount(),
+                    defenderRank,
+                    isCompletelyUnarmored(defender),
+                    event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)));
             if (ninjaData.getClan() != null && ninjaData.getClan().getPath().equals("kaguya")) {
                 event.setAmount(event.getAmount() * 0.85F);
             }
@@ -372,6 +432,9 @@ public class PlayerEvents {
             if (fallReduction > 0.0F) {
                 distance = applyArmorFallReduction(distance, fallReduction);
             }
+            NinjaRank defenderRank = NinjaRank.fromString(
+                    player.getData(NinjaCapabilityHandler.NINJA_DATA).getRank());
+            distance = applyRankFallDistanceReduction(distance, defenderRank);
             event.setDistance(distance);
         }
     }
