@@ -19,7 +19,10 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -110,6 +113,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
     public FireballJutsuEntity(EntityType<FireballJutsuEntity> entityConstructor, Level level) {
         super(entityConstructor, level);
         this.time = 0;
+        this.accelerationPower = 0.24D;
     }
 
     @Override
@@ -126,9 +130,17 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
     }
 
     public FireballJutsuEntity(LivingEntity player, double xVel, double yVel, double zVel) {
-        this(NarutoEntities.FIREBALL_JUTSU.get(), player.getX(), player.getEyeY() - 0.2f, player.getZ(), xVel, yVel, zVel, player.level());
+        this(NarutoEntities.FIREBALL_JUTSU.get(), player.getX(), player.getEyeY() - 0.15D, player.getZ(), xVel, yVel, zVel, player.level());
+        Vec3 look = player.getLookAngle();
+        this.setPos(player.getX() + look.x * 0.65D, (player.getEyeY() - 0.15D) + look.y * 0.65D, player.getZ() + look.z * 0.65D);
         this.setOwner(player);
         this.setRot(player.getYRot(), player.getXRot());
+        this.accelerationPower = 0.24D;
+        Vec3 dir = new Vec3(xVel, yVel, zVel);
+        if (dir.lengthSqr() > 1.0E-6D) {
+            this.setDeltaMovement(dir.normalize().scale(0.95D * dir.length()));
+            this.needsSync = true;
+        }
     }
 
     @Override
@@ -162,7 +174,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
                                 mini ? 1 : 2, 0.15, 0.15, 0.15, 0.03,
                                 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
                     }
-                    if (it >= (mini ? 8 : 18)) {
+                    if (it >= (mini ? 2 : 3)) {
                         this.discard();
                     }
                 }
@@ -189,6 +201,13 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
             Vec3 end = start.add(delta);
             HitResult hitResult = this.level().clip(new ClipContext(
                     start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+            if (hitResult instanceof BlockHitResult blockHit && hitResult.getType() == HitResult.Type.BLOCK) {
+                BlockPos hitPos = blockHit.getBlockPos();
+                BlockState hitState = this.level().getBlockState(hitPos);
+                if (hitState.is(Blocks.LIGHT) || hitState.getCollisionShape(this.level(), hitPos).isEmpty()) {
+                    hitResult = BlockHitResult.miss(end, blockHit.getDirection(), hitPos);
+                }
+            }
             if (hitResult.getType() != HitResult.Type.MISS) {
                 end = hitResult.getLocation();
             }
@@ -205,14 +224,13 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
 
         super.tick();
         ++this.time;
-        if (this.time <= (int) GROW_TIME) {
-            this.refreshDimensions();
-        }
 
         if (!this.level().isClientSide() && !this.isImpacted() && this.isAlive()) {
             AABB clashBox = this.getBoundingBox().inflate(this.isPhoenixMini() ? 0.15D : 0.35D);
             List<Entity> others = this.level().getEntities(this, clashBox,
-                    e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
+                    e -> e instanceof JutsuProjectile
+                            && (!(e instanceof JutsuVisualEffectEntity visual) || JutsuProjectile.isBarrierForProjectile(visual, this.getOwner()))
+                            && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
             for (Entity e : others) {
                 if (e instanceof EarthBulletEntity earthBullet
                         && com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(this.getOwner(), earthBullet.getOwner())) {
@@ -279,6 +297,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
         if (speedMult > 0.0F && speedMult != 1.0F) {
             this.setDeltaMovement(this.getDeltaMovement().scale(speedMult));
             this.accelerationPower *= speedMult;
+            this.needsSync = true;
         }
         if (extraLife > 0) {
             this.lifeSpan += extraLife;
@@ -305,13 +324,7 @@ public class FireballJutsuEntity extends AbstractHurtingProjectile implements Ju
     @Override
     protected boolean canHitEntity(Entity entity) {
         if (entity instanceof JutsuVisualEffectEntity visual) {
-            int type = visual.getVisualType();
-            if (type == JutsuVisualEffectEntity.TYPE_WATER_WALL) {
-                return true;
-            }
-            if (type == JutsuVisualEffectEntity.TYPE_EARTH_WALL && visual.isOwnedByAlly(this.getOwner())) {
-                return false;
-            }
+            return JutsuProjectile.isBarrierForProjectile(visual, this.getOwner());
         }
         return super.canHitEntity(entity) && entity != this.getOwner()
                 && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(this.getOwner(), entity);
