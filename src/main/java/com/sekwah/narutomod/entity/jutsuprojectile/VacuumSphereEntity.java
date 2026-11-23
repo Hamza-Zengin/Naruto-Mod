@@ -101,6 +101,9 @@ public class VacuumSphereEntity extends ThrowableItemProjectile implements Jutsu
 
     @Override
     protected boolean canHitEntity(Entity target) {
+        if (target instanceof JutsuVisualEffectEntity visual) {
+            return JutsuProjectile.isBarrierForProjectile(visual, this.getOwner());
+        }
         Entity owner = this.getOwner();
         if (target == owner || (owner != null && target.getUUID().equals(owner.getUUID()))
                 || ShadowCloneEntity.areAllies(owner, target)) {
@@ -167,7 +170,9 @@ public class VacuumSphereEntity extends ThrowableItemProjectile implements Jutsu
             if (this.isAlive()) {
                 AABB clashBox = this.getBoundingBox().inflate(0.35D);
                 List<Entity> others = this.level().getEntities(this, clashBox,
-                        e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
+                        e -> e instanceof JutsuProjectile
+                                && (!(e instanceof JutsuVisualEffectEntity visual) || JutsuProjectile.isBarrierForProjectile(visual, this.getOwner()))
+                                && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
                 for (Entity e : others) {
                     if (e instanceof Projectile p && ShadowCloneEntity.areAllies(this.getOwner(), p.getOwner())) {
                         // Never clash with allied Fireball (fanned above) or sibling VacuumSphere shots

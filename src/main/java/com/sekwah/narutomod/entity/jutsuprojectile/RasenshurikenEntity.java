@@ -88,6 +88,7 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
     public RasenshurikenEntity(EntityType<RasenshurikenEntity> entityConstructor, Level level) {
         super(entityConstructor, level);
         this.time = 0;
+        this.accelerationPower = 0.32D;
     }
 
     @Override
@@ -104,8 +105,16 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
 
     public RasenshurikenEntity(LivingEntity shooter, double xVel, double yVel, double zVel) {
         this(NarutoEntities.RASENSHURIKEN.get(), shooter.getX(), shooter.getEyeY() - 0.1f, shooter.getZ(), xVel, yVel, zVel, shooter.level());
+        Vec3 look = shooter.getLookAngle();
+        this.setPos(shooter.getX() + look.x * 0.65D, (shooter.getEyeY() - 0.1D) + look.y * 0.65D, shooter.getZ() + look.z * 0.65D);
         this.setOwner(shooter);
         this.setRot(shooter.getYRot(), shooter.getXRot());
+        this.accelerationPower = 0.32D;
+        Vec3 dir = new Vec3(xVel, yVel, zVel);
+        if (dir.lengthSqr() > 1.0E-6D) {
+            this.setDeltaMovement(dir.normalize().scale(0.95D * dir.length()));
+            this.needsSync = true;
+        }
     }
 
     @Override
@@ -205,6 +214,13 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
             Vec3 end = start.add(delta);
             HitResult hitResult = this.level().clip(new ClipContext(
                     start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+            if (hitResult instanceof BlockHitResult blockHit && hitResult.getType() == HitResult.Type.BLOCK) {
+                BlockPos hitPos = blockHit.getBlockPos();
+                BlockState hitState = this.level().getBlockState(hitPos);
+                if (hitState.is(Blocks.LIGHT) || hitState.getCollisionShape(this.level(), hitPos).isEmpty()) {
+                    hitResult = BlockHitResult.miss(end, blockHit.getDirection(), hitPos);
+                }
+            }
             if (hitResult.getType() != HitResult.Type.MISS) {
                 end = hitResult.getLocation();
             }
@@ -225,7 +241,9 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
         if (!this.level().isClientSide() && !this.isImpacted() && this.isAlive()) {
             AABB clashBox = this.getBoundingBox().inflate(0.4D);
             List<Entity> others = this.level().getEntities(this, clashBox,
-                    e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
+                    e -> e instanceof JutsuProjectile
+                            && (!(e instanceof JutsuVisualEffectEntity visual) || JutsuProjectile.isBarrierForProjectile(visual, this.getOwner()))
+                            && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
             for (Entity e : others) {
                 if (e instanceof JutsuProjectile other && this.isAlive() && e.isAlive()) {
                     this.handleClash(other);
@@ -262,6 +280,9 @@ public class RasenshurikenEntity extends AbstractHurtingProjectile implements Ju
 
     @Override
     protected boolean canHitEntity(Entity entity) {
+        if (entity instanceof JutsuVisualEffectEntity visual) {
+            return JutsuProjectile.isBarrierForProjectile(visual, this.getOwner());
+        }
         return super.canHitEntity(entity) && entity != this.getOwner()
                 && !com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(this.getOwner(), entity);
     }

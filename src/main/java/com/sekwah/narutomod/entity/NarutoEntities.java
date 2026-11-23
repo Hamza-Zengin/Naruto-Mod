@@ -58,10 +58,10 @@ public class NarutoEntities {
             PaperBombEntity::new, MobCategory.MISC, builder -> builder.fireImmune().sized(0.5F, 0.5F).clientTrackingRange(10));
 
     public static final DeferredHolder<EntityType<?>, EntityType<FireballJutsuEntity>> FIREBALL_JUTSU = register("fireball_jutsu",
-            FireballJutsuEntity::new, MobCategory.MISC, builder -> builder.sized(1.5F, 1.5F).clientTrackingRange(4).updateInterval(10));
+            FireballJutsuEntity::new, MobCategory.MISC, builder -> builder.sized(1.5F, 1.5F).clientTrackingRange(10).updateInterval(2));
 
     public static final DeferredHolder<EntityType<?>, EntityType<RasenshurikenEntity>> RASENSHURIKEN = register("rasenshuriken",
-            RasenshurikenEntity::new, MobCategory.MISC, builder -> builder.sized(1.6F, 0.8F).clientTrackingRange(8).updateInterval(5));
+            RasenshurikenEntity::new, MobCategory.MISC, builder -> builder.sized(1.6F, 0.8F).clientTrackingRange(10).updateInterval(2));
 
     public static final DeferredHolder<EntityType<?>, EntityType<WaterBulletEntity>> WATER_BULLET = register("water_bullet",
             WaterBulletEntity::new, MobCategory.MISC, builder -> builder.sized(1.0F, 1.0F).clientTrackingRange(8).updateInterval(2));

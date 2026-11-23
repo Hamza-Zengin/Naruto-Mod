@@ -55,20 +55,26 @@ public class FireballJutsuAbility extends Ability implements Ability.Cooldown {
         return Math.max(2, (int) Math.round(10.0D - 8.0D * Ability.getMasteryProgress(mastery)));
     }
 
+    public static double getScaledSpeedMult(int mastery) {
+        return 1.0D + 0.25D * Ability.getMasteryProgress(mastery);
+    }
+
+    public static int getScaledLifeSpan(int mastery) {
+        return 70 + (int) Math.round(25.0D * Ability.getMasteryProgress(mastery));
+    }
+
     @Override
     public void performServer(Player player, INinjaData ninjaData, int ticksActive) {
         int mastery = ninjaData != null ? ninjaData.getMastery(this.getRegistryName()) : 0;
-        int delayTicks = getScaledCastDelayTicks(mastery);
-        double speedMult = 1.0D + 0.25D * Ability.getMasteryProgress(mastery);
-        int lifeSpan = 70 + (int) Math.round(25.0D * Ability.getMasteryProgress(mastery));
+        double speedMult = getScaledSpeedMult(mastery);
+        int lifeSpan = getScaledLifeSpan(mastery);
 
-        ninjaData.scheduleDelayedTickEvent((delayedPlayer) -> {
-            Vec3 shootSpeed = delayedPlayer.getLookAngle().scale(speedMult);
-            FireballJutsuEntity fireball = new FireballJutsuEntity(delayedPlayer, shootSpeed.x, shootSpeed.y, shootSpeed.z);
-            fireball.lifeSpan = lifeSpan;
-            delayedPlayer.level().addFreshEntity(fireball);
-            delayedPlayer.level().playSound(null, delayedPlayer.getX(), delayedPlayer.getY(), delayedPlayer.getZ(), com.sekwah.narutomod.sounds.NarutoSounds.FIREBALL_CAST.get(), SoundSource.PLAYERS, 1.4f, 1.0f);
-            delayedPlayer.level().playSound(null, delayedPlayer.getX(), delayedPlayer.getY(), delayedPlayer.getZ(), SoundEvents.GHAST_SHOOT, SoundSource.PLAYERS, 0.8f, 0.9f);
-        }, delayTicks);
+        Vec3 look = player.getLookAngle();
+        FireballJutsuEntity fireball = new FireballJutsuEntity(player, look.x, look.y, look.z);
+        fireball.setFireballSpeedAndRange((float) speedMult, 0);
+        fireball.lifeSpan = lifeSpan;
+        player.level().addFreshEntity(fireball);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), com.sekwah.narutomod.sounds.NarutoSounds.FIREBALL_CAST.get(), SoundSource.PLAYERS, 1.4f, 1.0f);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SHOOT, SoundSource.PLAYERS, 0.8f, 0.9f);
     }
 }

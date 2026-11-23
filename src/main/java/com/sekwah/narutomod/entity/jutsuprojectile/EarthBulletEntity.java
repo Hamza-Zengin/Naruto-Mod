@@ -116,6 +116,9 @@ public class EarthBulletEntity extends ThrowableItemProjectile implements JutsuP
 
     @Override
     protected boolean canHitEntity(Entity target) {
+        if (target instanceof JutsuVisualEffectEntity visual) {
+            return JutsuProjectile.isBarrierForProjectile(visual, this.getOwner());
+        }
         Entity owner = this.getOwner();
         if (target == owner || (owner != null && target.getUUID().equals(owner.getUUID()))
                 || ShadowCloneEntity.areAllies(owner, target)) {
@@ -197,7 +200,9 @@ public class EarthBulletEntity extends ThrowableItemProjectile implements JutsuP
                 AABB clashBox = this.getBoundingBox().inflate(0.35D);
                 AABB scanBox = molten ? clashBox : this.getBoundingBox().inflate(2.2D);
                 List<Entity> others = this.level().getEntities(this, scanBox,
-                        e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
+                        e -> e instanceof JutsuProjectile
+                                && (!(e instanceof JutsuVisualEffectEntity visual) || JutsuProjectile.isBarrierForProjectile(visual, this.getOwner()))
+                                && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
                 Entity owner = this.getOwner();
                 for (Entity e : others) {
                     if (e instanceof FireballJutsuEntity fb && ShadowCloneEntity.areAllies(owner, fb.getOwner())) {

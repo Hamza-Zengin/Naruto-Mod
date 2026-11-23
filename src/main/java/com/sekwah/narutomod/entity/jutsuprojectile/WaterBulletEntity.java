@@ -157,6 +157,9 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
 
     @Override
     protected boolean canHitEntity(Entity target) {
+        if (target instanceof JutsuVisualEffectEntity visual) {
+            return JutsuProjectile.isBarrierForProjectile(visual, this.getOwner());
+        }
         Entity owner = this.getOwner();
         if (target == owner || (owner != null && target.getUUID().equals(owner.getUUID()))
                 || com.sekwah.narutomod.entity.ShadowCloneEntity.areAllies(owner, target)) {
@@ -247,7 +250,9 @@ public class WaterBulletEntity extends ThrowableItemProjectile implements JutsuP
             if (!this.level().isClientSide() && this.isAlive()) {
                 AABB clashBox = this.getBoundingBox().inflate(this.isDragon() ? 0.65D : 0.35D);
                 List<Entity> others = this.level().getEntities(this, clashBox,
-                        e -> e instanceof JutsuProjectile && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
+                        e -> e instanceof JutsuProjectile
+                                && (!(e instanceof JutsuVisualEffectEntity visual) || JutsuProjectile.isBarrierForProjectile(visual, this.getOwner()))
+                                && e.isAlive() && e != this && !this.isPassengerOfSameVehicle(e));
                 for (Entity e : others) {
                     if (e instanceof JutsuProjectile other && this.isAlive() && e.isAlive()) {
                         this.handleClash(other);

@@ -4,17 +4,23 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.Bootstrap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -290,5 +296,96 @@ public class AnchoredJigsawStructureTest {
         Assertions.assertFalse(AnchoredJigsawStructure.shouldRejectWaterSample(64, 64, 1));
         Assertions.assertFalse(AnchoredJigsawStructure.shouldRejectWaterSample(65, 64, 1));
         Assertions.assertTrue(AnchoredJigsawStructure.shouldRejectWaterSample(66, 64, 1));
+    }
+
+    @Test
+    public void testComputeSafeVerticalShift() {
+        int seaLevel = 62;
+
+        // Never shift downward negatively when already above seaLevel + 1
+        Assertions.assertEquals(0, AnchoredJigsawStructure.computeSafeVerticalShift(-10, 75, seaLevel, false));
+        Assertions.assertEquals(0, AnchoredJigsawStructure.computeSafeVerticalShift(-1, 63, seaLevel, false));
+
+        // Clamp positive upward shifts to [0, 4]
+        Assertions.assertEquals(2, AnchoredJigsawStructure.computeSafeVerticalShift(2, 70, seaLevel, false));
+        Assertions.assertEquals(4, AnchoredJigsawStructure.computeSafeVerticalShift(8, 70, seaLevel, false));
+
+        // Lift structures at or below seaLevel up to seaLevel + 1 (63)
+        Assertions.assertEquals(1, AnchoredJigsawStructure.computeSafeVerticalShift(0, 62, seaLevel, false));
+        Assertions.assertEquals(4, AnchoredJigsawStructure.computeSafeVerticalShift(-5, 59, seaLevel, false));
+        Assertions.assertEquals(3, AnchoredJigsawStructure.computeSafeVerticalShift(1, 60, seaLevel, false));
+
+        // Preserve valley_of_the_end sunken offset (no sea-level lift, still no downward burial)
+        Assertions.assertEquals(0, AnchoredJigsawStructure.computeSafeVerticalShift(-5, 58, seaLevel, true));
+        Assertions.assertEquals(2, AnchoredJigsawStructure.computeSafeVerticalShift(2, 58, seaLevel, true));
+    }
+
+    @Test
+    public void testClearOverheadNaturalTerrainWithoutAirGapAndTerracedBorder() {
+        Map<BlockPos, BlockState> blocks = new HashMap<>();
+        WorldGenLevel level = (WorldGenLevel) Proxy.newProxyInstance(
+                WorldGenLevel.class.getClassLoader(),
+                new Class<?>[]{WorldGenLevel.class},
+                (proxy, method, args) -> switch (method.getName()) {
+                    case "getBlockState" -> blocks.getOrDefault(((BlockPos) args[0]).immutable(), Blocks.AIR.defaultBlockState());
+                    case "setBlock" -> {
+                        blocks.put(((BlockPos) args[0]).immutable(), (BlockState) args[1]);
+                        yield true;
+                    }
+                    default -> throw new UnsupportedOperationException("Unexpected method: " + method.getName());
+                });
+
+        BoundingBox chunkBox = new BoundingBox(0, 0, 0, 15, 255, 15);
+        BoundingBox pieceBox = new BoundingBox(5, 60, 5, 8, 65, 8);
+
+        // Place structure roof at y = 65 (no air gap between roof and natural overhang)
+        blocks.put(new BlockPos(6, 65, 6), Blocks.OAK_PLANKS.defaultBlockState());
+        // Terracotta and stone sitting directly on pieceBox.maxY() + 1 = 66 with NO air gap
+        blocks.put(new BlockPos(6, 66, 6), Blocks.TERRACOTTA.defaultBlockState());
+        blocks.put(new BlockPos(6, 67, 6), Blocks.STONE.defaultBlockState());
+        // Floating water above pieceBox.maxY()
+        blocks.put(new BlockPos(6, 68, 6), Blocks.WATER.defaultBlockState());
+
+        // Terraced border at dist = 1 (x = 4, z = 6): clears above minY + 2 + 1 = 63 (i.e. y >= 64)
+        blocks.put(new BlockPos(4, 63, 6), Blocks.DIRT.defaultBlockState());
+        blocks.put(new BlockPos(4, 64, 6), Blocks.DIRT.defaultBlockState());
+        blocks.put(new BlockPos(4, 65, 6), Blocks.TERRACOTTA.defaultBlockState());
+
+        // Terraced border at dist = 2 (x = 3, z = 6): clears above minY + 2 + 2 = 64 (i.e. y >= 65)
+        blocks.put(new BlockPos(3, 64, 6), Blocks.STONE.defaultBlockState());
+        blocks.put(new BlockPos(3, 65, 6), Blocks.STONE.defaultBlockState());
+
+        int[][] baseYs = new int[4][4];
+        for (int xi = 0; xi < 4; xi++) {
+            for (int zi = 0; zi < 4; zi++) {
+                baseYs[xi][zi] = 60;
+            }
+        }
+
+        AnchoredJigsawStructure.clearOverheadNaturalTerrain(
+                level,
+                new BlockPos.MutableBlockPos(),
+                chunkBox,
+                new PiecesContainer(List.of()),
+                null,
+                pieceBox,
+                5, 8, 5, 8,
+                65,
+                256,
+                baseYs
+        );
+
+        // Roof preserved, direct-contact overhang and water cleared despite zero air gap
+        Assertions.assertEquals(Blocks.OAK_PLANKS, blocks.get(new BlockPos(6, 65, 6)).getBlock());
+        Assertions.assertTrue(blocks.get(new BlockPos(6, 66, 6)).isAir());
+        Assertions.assertTrue(blocks.get(new BlockPos(6, 67, 6)).isAir());
+        Assertions.assertTrue(blocks.get(new BlockPos(6, 68, 6)).isAir());
+
+        // 45-degree terraced border checks
+        Assertions.assertEquals(Blocks.DIRT, blocks.get(new BlockPos(4, 63, 6)).getBlock());
+        Assertions.assertTrue(blocks.get(new BlockPos(4, 64, 6)).isAir());
+        Assertions.assertTrue(blocks.get(new BlockPos(4, 65, 6)).isAir());
+        Assertions.assertEquals(Blocks.STONE, blocks.get(new BlockPos(3, 64, 6)).getBlock());
+        Assertions.assertTrue(blocks.get(new BlockPos(3, 65, 6)).isAir());
     }
 }

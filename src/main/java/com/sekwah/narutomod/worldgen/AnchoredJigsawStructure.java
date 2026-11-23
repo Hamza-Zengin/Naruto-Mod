@@ -166,17 +166,18 @@ public class AnchoredJigsawStructure extends Structure {
         int medianY = sorted[8];
         int targetSurfaceY = (p25Y + medianY) / 2;
         int rawDy = targetSurfaceY - centerSurfaceY;
-        int clampedDy = Math.max(-maxHeightVariance, Math.min(3, rawDy));
 
         Optional<GenerationStub> delegateStubOpt = delegate.findValidGenerationPoint(context);
-        if (delegateStubOpt.isEmpty() || clampedDy == 0) {
+        if (delegateStubOpt.isEmpty()) {
             return delegateStubOpt;
         }
 
         GenerationStub delegateStub = delegateStubOpt.get();
-        int safeDy = clampedDy;
-        if (delegateStub.position().getY() + safeDy < heightAccessor.getMinY() + 8) {
-            safeDy = (heightAccessor.getMinY() + 8) - delegateStub.position().getY();
+        int delegateY = delegateStub.position().getY();
+        boolean preserveSunkenOffset = delegateY <= centerSurfaceY - 3;
+        int safeDy = computeSafeVerticalShift(rawDy, delegateY, generator.getSeaLevel(), preserveSunkenOffset);
+        if (delegateY + safeDy < heightAccessor.getMinY() + 8) {
+            safeDy = (heightAccessor.getMinY() + 8) - delegateY;
         }
         if (safeDy == 0) {
             return delegateStubOpt;
@@ -191,6 +192,17 @@ public class AnchoredJigsawStructure extends Structure {
                 builder.addPiece(piece);
             }
         }));
+    }
+
+    static int computeSafeVerticalShift(int rawDy, int delegateY, int seaLevel, boolean preserveSunkenOffset) {
+        int clampedDy = Math.max(0, Math.min(4, rawDy));
+        if (!preserveSunkenOffset) {
+            int minSafeStartY = seaLevel + 1;
+            if (delegateY + clampedDy < minSafeStartY) {
+                clampedDy = minSafeStartY - delegateY;
+            }
+        }
+        return clampedDy;
     }
 
     @Override
@@ -239,7 +251,6 @@ public class AnchoredJigsawStructure extends Structure {
             int width = (x1 - x0) + 1;
             int depthSpan = (z1 - z0) + 1;
             int[][] baseYs = new int[width][depthSpan];
-            int[][] topYs = new int[width][depthSpan];
             int[][] gapDepths = new int[width][depthSpan];
             BlockState[][] baseStates = new BlockState[width][depthSpan];
 
@@ -248,7 +259,6 @@ public class AnchoredJigsawStructure extends Structure {
                 for (int z = z0; z <= z1; z++) {
                     int zi = z - z0;
                     int baseY = -1;
-                    int topY = -1;
                     BlockState baseState = null;
                     for (int y = scanLow; y <= scanHigh; y++) {
                         BlockState candidate = level.getBlockState(cursor.set(x, y, z));
@@ -256,12 +266,11 @@ public class AnchoredJigsawStructure extends Structure {
                             if (baseY < 0) {
                                 baseY = y;
                                 baseState = candidate;
+                                break;
                             }
-                            topY = y;
                         }
                     }
                     baseYs[xi][zi] = baseY;
-                    topYs[xi][zi] = topY;
                     baseStates[xi][zi] = baseState;
                     if (baseY < 0) {
                         continue;
@@ -335,8 +344,8 @@ public class AnchoredJigsawStructure extends Structure {
 
             frameStructureWater(level, chunkBox, pieceBox, x0, x1, z0, z1, scanLow, scanHigh, worldMinY, worldMaxY,
                     maxFoundationDepth, dominantBaseState);
-            clearOverheadNaturalTerrain(level, cursor, pieces, piece, pieceBox, x0, x1, z0, z1, scanHigh, worldMaxY,
-                    baseYs, topYs);
+            clearOverheadNaturalTerrain(level, cursor, chunkBox, pieces, piece, pieceBox, x0, x1, z0, z1, scanHigh, worldMaxY,
+                    baseYs);
         }
     }
 
@@ -546,19 +555,19 @@ public class AnchoredJigsawStructure extends Structure {
         }
     }
 
-    private static void clearOverheadNaturalTerrain(WorldGenLevel level,
-                                                    BlockPos.MutableBlockPos cursor,
-                                                    PiecesContainer pieces,
-                                                    StructurePiece currentPiece,
-                                                    BoundingBox pieceBox,
-                                                    int x0,
-                                                    int x1,
-                                                    int z0,
-                                                    int z1,
-                                                    int scanHigh,
-                                                    int worldMaxY,
-                                                    int[][] baseYs,
-                                                    int[][] topYs) {
+    static void clearOverheadNaturalTerrain(WorldGenLevel level,
+                                            BlockPos.MutableBlockPos cursor,
+                                            BoundingBox chunkBox,
+                                            PiecesContainer pieces,
+                                            StructurePiece currentPiece,
+                                            BoundingBox pieceBox,
+                                            int x0,
+                                            int x1,
+                                            int z0,
+                                            int z1,
+                                            int scanHigh,
+                                            int worldMaxY,
+                                            int[][] baseYs) {
         if (pieceBox.maxY() >= worldMaxY - 1 || scanHigh < pieceBox.maxY()) {
             return;
         }
@@ -571,23 +580,37 @@ public class AnchoredJigsawStructure extends Structure {
                 if (baseYs[xi][zi] < 0) {
                     continue;
                 }
-                int topY = topYs[xi][zi];
-                BlockState ceilingState = level.getBlockState(cursor.set(x, scanHigh, z));
-                boolean sawAirGap = topY < pieceBox.maxY()
-                        && (ceilingState.isAir()
-                        || (ceilingState.canBeReplaced() && ceilingState.getFluidState().isEmpty()));
-
                 for (int y = pieceBox.maxY() + 1; y <= maxClearY; y++) {
                     if (isInsideOtherPiece(pieces, currentPiece, x, y, z)) {
-                        sawAirGap = false;
                         continue;
                     }
                     BlockState state = level.getBlockState(cursor.set(x, y, z));
-                    if (state.isAir() || (state.canBeReplaced() && state.getFluidState().isEmpty())) {
-                        sawAirGap = true;
+                    if (isNaturalOverhangBlock(state) || !state.getFluidState().isEmpty()) {
+                        level.setBlock(cursor, Blocks.AIR.defaultBlockState(), 2);
+                    }
+                }
+            }
+        }
+
+        int bx0 = Math.max(chunkBox.minX(), pieceBox.minX() - 3);
+        int bx1 = Math.min(chunkBox.maxX(), pieceBox.maxX() + 3);
+        int bz0 = Math.max(chunkBox.minZ(), pieceBox.minZ() - 3);
+        int bz1 = Math.min(chunkBox.maxZ(), pieceBox.maxZ() + 3);
+        for (int x = bx0; x <= bx1; x++) {
+            int dxOutside = x < pieceBox.minX() ? pieceBox.minX() - x : (x > pieceBox.maxX() ? x - pieceBox.maxX() : 0);
+            for (int z = bz0; z <= bz1; z++) {
+                int dzOutside = z < pieceBox.minZ() ? pieceBox.minZ() - z : (z > pieceBox.maxZ() ? z - pieceBox.maxZ() : 0);
+                int dist = Math.max(dxOutside, dzOutside);
+                if (dist == 0) {
+                    continue;
+                }
+                int startTerraceY = pieceBox.minY() + 3 + dist;
+                for (int y = startTerraceY; y <= maxClearY; y++) {
+                    if (isInsideOtherPiece(pieces, currentPiece, x, y, z)) {
                         continue;
                     }
-                    if (sawAirGap && isNaturalOverhangBlock(state)) {
+                    BlockState state = level.getBlockState(cursor.set(x, y, z));
+                    if (isNaturalOverhangBlock(state)) {
                         level.setBlock(cursor, Blocks.AIR.defaultBlockState(), 2);
                     }
                 }

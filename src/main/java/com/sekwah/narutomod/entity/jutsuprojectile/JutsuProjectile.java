@@ -49,4 +49,27 @@ public interface JutsuProjectile {
             other.explodeAndDiscard();
         }
     }
+
+    /**
+     * Returns true only when a JutsuVisualEffectEntity represents a physical barrier
+     * (Water Wall or enemy Earth Wall) that should block or clash with projectiles.
+     */
+    static boolean isBarrierForProjectile(JutsuVisualEffectEntity visual, @javax.annotation.Nullable Entity projectileOwner) {
+        if (visual == null) {
+            return false;
+        }
+        int type = visual.getVisualType();
+        boolean ownedByAlly = type == JutsuVisualEffectEntity.TYPE_EARTH_WALL && visual.isOwnedByAlly(projectileOwner);
+        return isBarrierVisualType(type, ownedByAlly);
+    }
+
+    static boolean isBarrierVisualType(int visualType, boolean ownedByAlly) {
+        if (visualType == JutsuVisualEffectEntity.TYPE_WATER_WALL) {
+            return true;
+        }
+        if (visualType == JutsuVisualEffectEntity.TYPE_EARTH_WALL) {
+            return !ownedByAlly;
+        }
+        return false;
+    }
 }
