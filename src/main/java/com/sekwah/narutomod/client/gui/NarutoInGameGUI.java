@@ -93,9 +93,21 @@ public class NarutoInGameGUI {
         }
     }
 
+    static int clampMaxBadgeWidth(int screenWidth) {
+        return Math.min(180, Math.max(64, (int) (screenWidth * 0.40f)));
+    }
+
+    static int[] computeBadgePosition(int screenWidth, int screenHeight, int pillW, int pillH) {
+        int pillX = Math.max(8, screenWidth - pillW - 8);
+        // Stamina value text is drawn at screenHeight - 26 with 1px outline (top at screenHeight - 27).
+        int pillY = Math.max(8, screenHeight - 31 - pillH);
+        return new int[]{pillX, pillY};
+    }
+
     /**
-     * Renders a minimalist floating HUD pill in the bottom-right corner showing
-     * an element-colored dot, the active jutsu name, and optional cooldown/toggle status.
+     * Renders a minimalist floating HUD pill in the bottom-right corner (above the stamina bar)
+     * showing an element-colored dot, the active jutsu name, and optional cooldown/toggle status,
+     * or a compact empty indicator when no jutsu is equipped.
      */
     public void renderSelectedJutsuHudBadge(GuiGraphicsExtractor guiGraphics) {
         Minecraft mc = Minecraft.getInstance();
@@ -116,14 +128,14 @@ public class NarutoInGameGUI {
         Font font = mc.font;
 
         int accent = ability != null ? JutsuWheelOverlay.getElementAccentColor(ability.getChakraElement()) : 0xFF64748B;
-        String dot = "● ";
+        String dot = ability != null ? "● " : "○ ";
         String labelText;
         int labelColor;
         String suffixText = "";
         int suffixColor = 0xFFFFFFFF;
 
         if (ability == null) {
-            labelText = Component.translatable("naruto.gui.jutsu_wheel.no_jutsu").getString();
+            labelText = "—";
             labelColor = 0xFF94A3B8;
         } else {
             labelText = Component.translatable(ability.getTranslationKey()).getString();
@@ -147,14 +159,27 @@ public class NarutoInGameGUI {
             }
         }
 
-        int dotW = font.width(dot);
-        int labelW = font.width(labelText);
-        int suffixW = suffixText.isEmpty() ? 0 : font.width(suffixText);
         int padX = 6;
+        int dotW = font.width(dot);
+        int suffixW = suffixText.isEmpty() ? 0 : font.width(suffixText);
+        int maxPillW = clampMaxBadgeWidth(screenWidth);
+        int maxLabelW = Math.max(16, maxPillW - (padX * 2 + dotW + suffixW));
+        int labelW = font.width(labelText);
+        if (labelW > maxLabelW) {
+            int ellipsisW = font.width("...");
+            if (maxLabelW > ellipsisW) {
+                labelText = font.plainSubstrByWidth(labelText, maxLabelW - ellipsisW) + "...";
+            } else {
+                labelText = font.plainSubstrByWidth(labelText, maxLabelW);
+            }
+            labelW = font.width(labelText);
+        }
+
         int pillW = padX * 2 + dotW + labelW + suffixW;
         int pillH = 14;
-        int pillX = screenWidth - pillW - 8;
-        int pillY = screenHeight - pillH - 8;
+        int[] pos = computeBadgePosition(screenWidth, screenHeight, pillW, pillH);
+        int pillX = pos[0];
+        int pillY = pos[1];
 
         guiGraphics.fill(pillX, pillY, pillX + pillW, pillY + pillH, 0x55000000);
 
