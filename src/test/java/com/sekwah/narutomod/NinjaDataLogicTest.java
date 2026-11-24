@@ -1148,6 +1148,17 @@ public class NinjaDataLogicTest {
                 Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "susanoo_ribcage")));
         assertFalse(NinjaData.isClanRestrictedJutsu(
                 Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "rasengan")));
+
+        // Explicitly unlocking via command (/naruto jutsu unlock) allows non-Nara / Academy Student to see & use it
+        NinjaData unlockedNonNara = new NinjaData(true);
+        unlockedNonNara.setRank("ACADEMY_STUDENT");
+        unlockedNonNara.setClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "uchiha"));
+        assertFalse(unlockedNonNara.isAbilityUnlocked(shadowPossession));
+        assertFalse(shadowPossession.canActivate(null, unlockedNonNara));
+
+        unlockedNonNara.unlockAbility(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "shadow_possession"));
+        assertTrue(unlockedNonNara.isAbilityUnlocked(shadowPossession));
+        assertTrue(shadowPossession.canActivate(null, unlockedNonNara));
     }
 
     @Test

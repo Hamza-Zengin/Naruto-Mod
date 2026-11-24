@@ -82,6 +82,9 @@ public final class JutsuUnlockRules {
         NinjaRank playerRank = NinjaRank.fromString(rankStr);
 
         if (requiredClanPath != null) {
+            if (!requiresScroll && abilityId != null && data.getUnlockedAbilities().contains(abilityId)) {
+                return true;
+            }
             if (clan == null || !clan.getPath().equals(requiredClanPath)) {
                 return false;
             }

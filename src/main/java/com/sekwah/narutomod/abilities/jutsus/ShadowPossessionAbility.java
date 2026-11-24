@@ -55,7 +55,8 @@ public class ShadowPossessionAbility extends Ability implements Ability.Cooldown
     @Override
     public boolean canActivate(Player player, INinjaData ninjaData) {
         if (!super.canActivate(player, ninjaData)) return false;
-        if (ninjaData == null || ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("nara")) {
+        if (!isExplicitlyUnlocked(ninjaData)
+                && (ninjaData == null || ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("nara"))) {
             if (player != null) {
                 player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
                         Component.literal("Nara").withStyle(ChatFormatting.DARK_GRAY)));
