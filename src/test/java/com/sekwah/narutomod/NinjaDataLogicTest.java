@@ -1349,4 +1349,100 @@ public class NinjaDataLogicTest {
         assertFalse(future.getToggleAbilityData().hasToggleAbility(sharinganId));
         assertEquals(0, future.getToggleAbilityData().getActiveTicks(sharinganId));
     }
+
+    @Test
+    @DisplayName("Verify NarutoAbilities.resolveDojutsuForPlayer resolves clan Dōjutsu and prioritizes active toggles")
+    public void testResolveDojutsuForPlayer() {
+        Identifier sharinganId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
+        Identifier byakuganId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "byakugan");
+        Identifier fireballId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "fireball");
+
+        SharinganAbility sharingan = new SharinganAbility();
+        sharingan.setRegistryName(sharinganId);
+        ByakuganAbility byakugan = new ByakuganAbility();
+        byakugan.setRegistryName(byakuganId);
+        Ability fireball = new com.sekwah.narutomod.abilities.jutsus.FireballJutsuAbility();
+        fireball.setRegistryName(fireballId);
+
+        List<Ability> candidates = List.of(fireball, sharingan, byakugan);
+
+        // 1. Returns null when no Dōjutsu is unlocked (Academy Student / Shinobi clan)
+        assertNull(com.sekwah.narutomod.abilities.NarutoAbilities.resolveDojutsuForPlayer(candidates, ninjaData),
+                "Academy Student in Shinobi clan should not resolve a Dōjutsu");
+
+        ninjaData.setRank("GENIN");
+        assertNull(com.sekwah.narutomod.abilities.NarutoAbilities.resolveDojutsuForPlayer(candidates, ninjaData),
+                "Shinobi clan Genin should not resolve a Dōjutsu");
+
+        ninjaData.forceSetClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "uchiha"));
+        ninjaData.setRank("ACADEMY_STUDENT");
+        assertNull(com.sekwah.narutomod.abilities.NarutoAbilities.resolveDojutsuForPlayer(candidates, ninjaData),
+                "Uchiha Academy Student has not unlocked Sharingan yet");
+
+        // 2. Uchiha Genin resolves narutomod:sharingan
+        ninjaData.setRank("GENIN");
+        assertEquals(sharinganId,
+                com.sekwah.narutomod.abilities.NarutoAbilities.resolveDojutsuForPlayer(candidates, ninjaData));
+
+        // 3. Hyūga Genin resolves narutomod:byakugan
+        ninjaData.forceSetClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "hyuga"));
+        assertEquals(byakuganId,
+                com.sekwah.narutomod.abilities.NarutoAbilities.resolveDojutsuForPlayer(candidates, ninjaData));
+
+        // 4. Active Dōjutsu in ToggleAbilityData takes precedence so pressing G toggles it off cleanly
+        ninjaData.forceSetClan(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "uchiha"));
+        Identifier customDojutsuId = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "custom_dojutsu");
+        Ability customDojutsu = new Ability() {
+            {
+                setRegistryName(customDojutsuId);
+            }
+
+            @Override
+            public ActivationType activationType() {
+                return ActivationType.TOGGLE;
+            }
+
+            @Override
+            public boolean isDojutsu() {
+                return true;
+            }
+
+            @Override
+            public void performServer(net.minecraft.world.entity.player.Player player, INinjaData data, int ticksActive) {
+            }
+        };
+        List<Ability> multiDojutsuCandidates = List.of(fireball, sharingan, byakugan, customDojutsu);
+
+        // With neither active, Uchiha Genin prefers clan-matched Sharingan
+        assertEquals(sharinganId,
+                com.sekwah.narutomod.abilities.NarutoAbilities.resolveDojutsuForPlayer(multiDojutsuCandidates, ninjaData));
+
+        // When customDojutsu is active in ToggleAbilityData, it takes precedence over Sharingan
+        ninjaData.getToggleAbilityData().addAbility(customDojutsuId);
+        assertEquals(customDojutsuId,
+                com.sekwah.narutomod.abilities.NarutoAbilities.resolveDojutsuForPlayer(multiDojutsuCandidates, ninjaData),
+                "Active Dōjutsu in ToggleAbilityData must take precedence so pressing G toggles it off");
+
+        // When Sharingan itself is active in ToggleAbilityData, it also resolves Sharingan cleanly
+        ninjaData.getToggleAbilityData().clear();
+        ninjaData.getToggleAbilityData().addAbility(sharinganId);
+        assertEquals(sharinganId,
+                com.sekwah.narutomod.abilities.NarutoAbilities.resolveDojutsuForPlayer(candidates, ninjaData));
+    }
+
+    @Test
+    @DisplayName("Verify ServerAbilityActivatePacket rapid 3-seal timing and strictly increasing pitches")
+    public void testRapidHandSealSequenceConstants() {
+        int[] delays = com.sekwah.narutomod.network.c2s.ServerAbilityActivatePacket.HAND_SEAL_DELAY_TICKS;
+        float[] pitches = com.sekwah.narutomod.network.c2s.ServerAbilityActivatePacket.HAND_SEAL_PITCHES;
+
+        assertArrayEquals(new int[]{0, 2, 4}, delays,
+                "Rapid hand-seal sequence must schedule 3 seals at ticks {0, 2, 4}");
+        assertEquals(3, pitches.length, "Hand-seal pitch array must have length 3");
+
+        for (int i = 1; i < pitches.length; i++) {
+            assertTrue(pitches[i] > pitches[i - 1],
+                    "Hand-seal pitches must be strictly increasing at index " + i);
+        }
+    }
 }

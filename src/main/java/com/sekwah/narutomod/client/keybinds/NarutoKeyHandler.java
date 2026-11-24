@@ -10,8 +10,10 @@ import com.sekwah.narutomod.client.gui.NinjaMenuScreen;
 import com.sekwah.narutomod.network.c2s.ServerAbilityChannelPacket;
 import com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket;
 import com.sekwah.narutomod.network.c2s.ServerUpdateJutsuLoadoutPacket;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.api.distmarker.Dist;
@@ -43,6 +45,7 @@ public class NarutoKeyHandler {
     private static KeyBindingTickHeld WATER_WALK_KEY;
     private static KeyBindingTickHeld LEAP_KEY;
     private static KeyBindingTickHeld NINJA_MENU_KEY;
+    private static KeyBindingTickHeld DOJUTSU_KEY;
 
     private static boolean isChargingChakra = false;
     private static Identifier channelingSelectedId = null;
@@ -54,6 +57,7 @@ public class NarutoKeyHandler {
         WATER_WALK_KEY = registerKeyBind("naruto.keys.water_walk", KeyEvent.VK_B);
         LEAP_KEY = registerKeyBind("naruto.keys.leap", KeyEvent.VK_X);
         NINJA_MENU_KEY = registerKeyBind("naruto.keys.ninja_menu", KeyEvent.VK_J);
+        DOJUTSU_KEY = registerKeyBind("naruto.keys.dojutsu", KeyEvent.VK_G);
 
         ALL_KEYS.clear();
         ALL_KEYS.add(JUTSU_WHEEL_KEY);
@@ -62,6 +66,7 @@ public class NarutoKeyHandler {
         ALL_KEYS.add(WATER_WALK_KEY);
         ALL_KEYS.add(LEAP_KEY);
         ALL_KEYS.add(NINJA_MENU_KEY);
+        ALL_KEYS.add(DOJUTSU_KEY);
 
         LEAP_KEY.registerClickConsumer(() -> {
             Minecraft mc = Minecraft.getInstance();
@@ -86,6 +91,19 @@ public class NarutoKeyHandler {
                     JutsuWheelOverlay.close();
                 }
                 mc.gui.setScreen(new NinjaMenuScreen());
+            }
+        });
+
+        DOJUTSU_KEY.registerClickConsumer(() -> {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null && mc.gui.screen() == null && !JutsuWheelOverlay.isOpen()) {
+                INinjaData ninjaData = mc.player.getData(NinjaCapabilityHandler.NINJA_DATA);
+                Identifier dojutsuId = NarutoAbilities.resolveDojutsuForPlayer(ninjaData);
+                if (dojutsuId != null) {
+                    NarutoAbilities.triggerAbility(dojutsuId);
+                } else {
+                    mc.player.sendOverlayMessage(Component.translatable("jutsu.dojutsu.none_unlocked").withStyle(ChatFormatting.RED));
+                }
             }
         });
     }
@@ -128,7 +146,7 @@ public class NarutoKeyHandler {
             return;
         }
         Ability ability = NarutoAbilities.getAbility(selectedId);
-        if (ability == null || ability.isUtilityAbility()) {
+        if (ability == null || !ability.isWheelEquippable()) {
             return;
         }
         if (ability.activationType() == Ability.ActivationType.CHANNELED) {

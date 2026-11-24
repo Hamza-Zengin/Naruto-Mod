@@ -515,5 +515,8 @@
   "naruto.gui.ninja_menu.jutsu.loadout_hint": "上のスロット(1〜8)をクリックし、下の術から「装備」を選択（右クリックで解除）",
   "naruto.hud.jutsu.active": "発動中",
   "naruto.hud.jutsu.slot": "スロット %s",
-  "naruto.hud.jutsu.empty": "空"
+  "naruto.hud.jutsu.empty": "空",
+  "naruto.keys.dojutsu": "瞳術の切替 (G)",
+  "naruto.gui.ninja_menu.jutsu.dojutsu_key": "[瞳術: G]",
+  "jutsu.dojutsu.none_unlocked": "まだ瞳術が解放されていません！"
 }

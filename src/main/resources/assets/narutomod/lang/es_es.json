@@ -515,5 +515,8 @@
   "naruto.gui.ninja_menu.jutsu.loadout_hint": "Haz clic en una ranura (1-8) arriba y luego equipa un jutsu abajo (Clic derecho para limpiar)",
   "naruto.hud.jutsu.active": "ACTIVO",
   "naruto.hud.jutsu.slot": "Ranura %s",
-  "naruto.hud.jutsu.empty": "Vacío"
+  "naruto.hud.jutsu.empty": "Vacío",
+  "naruto.keys.dojutsu": "Alternar Dōjutsu (G)",
+  "naruto.gui.ninja_menu.jutsu.dojutsu_key": "[Dōjutsu: G]",
+  "jutsu.dojutsu.none_unlocked": "¡Aún no has desbloqueado ningún Dōjutsu!"
 }

@@ -37,6 +37,11 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
     }
 
     @Override
+    public boolean isDojutsu() {
+        return true;
+    }
+
+    @Override
     public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
         return com.sekwah.narutomod.capabilities.NinjaRank.GENIN;
     }

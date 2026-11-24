@@ -80,6 +80,9 @@ public class ServerAbilityChannelPacket implements CustomPacketPayload {
                         return;
                     }
                     ninjaData.setCurrentlyChanneledAbility(player, ability);
+                    if (ability.playsHandSealSounds()) {
+                        ServerAbilityActivatePacket.playQuickHandSealSequence(player, ninjaData);
+                    }
                 } else if (msg.status == ChannelStatus.STOP) {
                     if (!ServerSecurityValidator.validateAbilityActivation(player, ninjaData, ability, false)) {
                         return;

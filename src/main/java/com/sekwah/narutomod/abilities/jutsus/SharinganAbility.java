@@ -105,6 +105,11 @@ public class SharinganAbility extends Ability implements Ability.Toggled, Abilit
     }
 
     @Override
+    public boolean isDojutsu() {
+        return true;
+    }
+
+    @Override
     public com.sekwah.narutomod.capabilities.NinjaRank getRequiredRank() {
         return com.sekwah.narutomod.capabilities.NinjaRank.GENIN;
     }

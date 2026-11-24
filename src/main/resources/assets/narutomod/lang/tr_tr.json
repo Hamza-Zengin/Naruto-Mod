@@ -515,5 +515,8 @@
   "naruto.gui.ninja_menu.jutsu.loadout_hint": "Yukarıdan bir yuva (1-8) seçin, ardından aşağıdan bir jutsu kuşanın (Temizlemek için yuvaya sağ tıklayın)",
   "naruto.hud.jutsu.active": "AKTİF",
   "naruto.hud.jutsu.slot": "Yuva %s",
-  "naruto.hud.jutsu.empty": "Boş"
+  "naruto.hud.jutsu.empty": "Boş",
+  "naruto.keys.dojutsu": "Göz Tekniği (G)",
+  "naruto.gui.ninja_menu.jutsu.dojutsu_key": "[Göz Tekniği: G]",
+  "jutsu.dojutsu.none_unlocked": "Henüz kilidi açılmış bir Göz Tekniğin yok!"
 }

@@ -110,6 +110,9 @@ public final class JutsuWheelOverlay {
         int activeSlot = hoveredSlot >= 0 ? hoveredSlot : ninjaData.getSelectedJutsuSlot();
         Identifier activeAbilityId = ninjaData.getEquippedJutsu(activeSlot);
         Ability activeAbility = NarutoAbilities.getAbility(activeAbilityId);
+        if (activeAbility != null && !activeAbility.isWheelEquippable()) {
+            activeAbility = null;
+        }
         int activeAccent = activeAbility != null ? getElementAccentColor(activeAbility.getChakraElement()) : 0xFF64748B;
 
         // Subtle translucent full-screen dim to separate wheel cleanly from world geometry
@@ -139,6 +142,9 @@ public final class JutsuWheelOverlay {
 
             Identifier slotAbilityId = ninjaData.getEquippedJutsu(slot);
             Ability slotAbility = NarutoAbilities.getAbility(slotAbilityId);
+            if (slotAbility != null && !slotAbility.isWheelEquippable()) {
+                slotAbility = null;
+            }
             boolean isHovered = (slot == activeSlot);
             int accent = slotAbility != null ? getElementAccentColor(slotAbility.getChakraElement()) : 0xFF64748B;
 

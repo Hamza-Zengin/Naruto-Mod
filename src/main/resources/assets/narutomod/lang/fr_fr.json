@@ -515,5 +515,8 @@
   "naruto.gui.ninja_menu.jutsu.loadout_hint": "Cliquez sur un emplacement (1-8) ci-dessus, puis équipez un jutsu ci-dessous (Clic droit pour vider)",
   "naruto.hud.jutsu.active": "ACTIF",
   "naruto.hud.jutsu.slot": "Emplacement %s",
-  "naruto.hud.jutsu.empty": "Vide"
+  "naruto.hud.jutsu.empty": "Vide",
+  "naruto.keys.dojutsu": "Basculer Dōjutsu (G)",
+  "naruto.gui.ninja_menu.jutsu.dojutsu_key": "[Dōjutsu: G]",
+  "jutsu.dojutsu.none_unlocked": "Aucun Dōjutsu débloqué pour l'instant !"
 }

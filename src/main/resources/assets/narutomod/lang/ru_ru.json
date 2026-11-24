@@ -515,5 +515,8 @@
   "naruto.gui.ninja_menu.jutsu.loadout_hint": "Выберите слот (1-8) выше, затем назначьте дзюцу ниже (ПКМ по слоту — очистить)",
   "naruto.hud.jutsu.active": "АКТИВНО",
   "naruto.hud.jutsu.slot": "Слот %s",
-  "naruto.hud.jutsu.empty": "Пусто"
+  "naruto.hud.jutsu.empty": "Пусто",
+  "naruto.keys.dojutsu": "Переключение додзюцу (G)",
+  "naruto.gui.ninja_menu.jutsu.dojutsu_key": "[Додзюцу: G]",
+  "jutsu.dojutsu.none_unlocked": "Додзюцу ещё не разблокировано!"
 }
