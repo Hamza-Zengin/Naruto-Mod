@@ -88,7 +88,7 @@ public class ServerUpdateJutsuLoadoutPacket implements CustomPacketPayload {
                     return;
                 }
                 Ability ability = NarutoAbilities.getAbility(abilityId);
-                if (ability == null || ability.isUtilityAbility()) {
+                if (ability == null || !ability.isWheelEquippable()) {
                     return;
                 }
                 if (!ServerSecurityValidator.isAbilityUnlocked(ninjaData, ability)) {

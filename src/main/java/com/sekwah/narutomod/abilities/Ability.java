@@ -118,6 +118,28 @@ public abstract class Ability {
     }
 
     /**
+     * Whether this ability is a Dōjutsu eye technique (Sharingan, Byakugan, etc.)
+     * controlled via the dedicated Dōjutsu keybind and excluded from the 8-slot wheel.
+     */
+    public boolean isDojutsu() {
+        return false;
+    }
+
+    /**
+     * Whether this ability can be equipped onto the 8-slot Jutsu Radial Wheel.
+     */
+    public boolean isWheelEquippable() {
+        return !this.isUtilityAbility() && !this.isDojutsu();
+    }
+
+    /**
+     * Whether activating this ability plays the rapid 3-seal anime hand-seal sound sequence.
+     */
+    public boolean playsHandSealSounds() {
+        return this.isWheelEquippable();
+    }
+
+    /**
      * Sorts abilities from simplest to most complex:
      * 1) Required rank level (ascending)
      * 2) Total default resource cost: chakra + stamina (ascending)

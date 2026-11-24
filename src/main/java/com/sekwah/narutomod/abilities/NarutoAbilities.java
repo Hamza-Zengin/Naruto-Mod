@@ -118,6 +118,65 @@ public class NarutoAbilities {
         }
     }
 
+    @javax.annotation.Nullable
+    public static Identifier resolveDojutsuForPlayer(com.sekwah.narutomod.capabilities.INinjaData ninjaData) {
+        if (ninjaData == null) {
+            return null;
+        }
+        Map<Identifier, Ability> byId = ABILITY_BY_ID;
+        if (!byId.isEmpty()) {
+            return resolveDojutsuForPlayer(byId.values(), ninjaData);
+        }
+        java.util.List<Ability> entries = new java.util.ArrayList<>();
+        for (DeferredHolder<Ability, ? extends Ability> holder : ABILITY.getEntries()) {
+            if (holder.isBound()) {
+                Ability ability = holder.get();
+                if (ability.getRegistryName() == null) {
+                    ability.setRegistryName(holder.getId());
+                }
+                entries.add(ability);
+            }
+        }
+        return resolveDojutsuForPlayer(entries, ninjaData);
+    }
+
+    @javax.annotation.Nullable
+    public static Identifier resolveDojutsuForPlayer(java.util.Collection<? extends Ability> candidates,
+                                                     com.sekwah.narutomod.capabilities.INinjaData ninjaData) {
+        if (candidates == null || candidates.isEmpty() || ninjaData == null) {
+            return null;
+        }
+        var toggleData = ninjaData.getToggleAbilityData();
+        String playerClanPath = ninjaData.getClan() != null ? ninjaData.getClan().getPath() : null;
+
+        java.util.List<Ability> unlockedDojutsus = new java.util.ArrayList<>();
+        for (Ability ability : candidates) {
+            if (ability == null || !ability.isDojutsu()) {
+                continue;
+            }
+            Identifier id = ability.getRegistryName();
+            if (id == null || !ninjaData.isAbilityUnlocked(ability)) {
+                continue;
+            }
+            if (toggleData != null && toggleData.hasToggleAbility(id)) {
+                return id;
+            }
+            unlockedDojutsus.add(ability);
+        }
+        if (unlockedDojutsus.isEmpty()) {
+            return null;
+        }
+        unlockedDojutsus.sort(java.util.Comparator.comparing(a -> a.getRegistryName().toString()));
+        if (playerClanPath != null) {
+            for (Ability ability : unlockedDojutsus) {
+                if (playerClanPath.equalsIgnoreCase(ability.getRequiredClanPath())) {
+                    return ability.getRegistryName();
+                }
+            }
+        }
+        return unlockedDojutsus.get(0).getRegistryName();
+    }
+
     @SubscribeEvent
     public static void setup(FMLCommonSetupEvent event) {
         event.enqueueWork(NarutoAbilities::cacheAbilitiesById);

@@ -323,7 +323,7 @@ public class NinjaMenuScreen extends Screen {
             for (int i = startIndex; i < endIndex; i++) {
                 Ability ability = allAbilities.get(i);
                 Identifier id = ability.getRegistryName();
-                if (id == null) continue;
+                if (id == null || !ability.isWheelEquippable()) continue;
 
                 int cardY = cardStartY + (i - startIndex) * (cardH + cardGap);
                 int equippedSlot = -1;

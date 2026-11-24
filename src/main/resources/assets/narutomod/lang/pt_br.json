@@ -515,5 +515,8 @@
   "naruto.gui.ninja_menu.jutsu.loadout_hint": "Clique em um espaço (1-8) acima e equipe um jutsu abaixo (Botão direito para limpar)",
   "naruto.hud.jutsu.active": "ATIVO",
   "naruto.hud.jutsu.slot": "Espaço %s",
-  "naruto.hud.jutsu.empty": "Vazio"
+  "naruto.hud.jutsu.empty": "Vazio",
+  "naruto.keys.dojutsu": "Alternar Dōjutsu (G)",
+  "naruto.gui.ninja_menu.jutsu.dojutsu_key": "[Dōjutsu: G]",
+  "jutsu.dojutsu.none_unlocked": "Nenhum Dōjutsu desbloqueado ainda!"
 }

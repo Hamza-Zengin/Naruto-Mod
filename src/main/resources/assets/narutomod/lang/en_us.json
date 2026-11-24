@@ -515,5 +515,8 @@
   "naruto.gui.ninja_menu.jutsu.loadout_hint": "Click a slot (1-8) above, then Equip a jutsu below (Right-click slot to clear)",
   "naruto.hud.jutsu.active": "ACTIVE",
   "naruto.hud.jutsu.slot": "Slot %s",
-  "naruto.hud.jutsu.empty": "Empty"
+  "naruto.hud.jutsu.empty": "Empty",
+  "naruto.keys.dojutsu": "Dōjutsu Toggle (G)",
+  "naruto.gui.ninja_menu.jutsu.dojutsu_key": "[Dōjutsu: G]",
+  "jutsu.dojutsu.none_unlocked": "No Dōjutsu unlocked yet!"
 }

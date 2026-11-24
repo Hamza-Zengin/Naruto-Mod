@@ -11,7 +11,7 @@ import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import com.sekwah.narutomod.network.ServerSecurityValidator;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
 import com.sekwah.narutomod.registries.NarutoRegistries;
-import com.sekwah.sekclib.util.ColorUtil;
+import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -19,7 +19,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -36,6 +36,10 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
 
     public static final StreamCodec<FriendlyByteBuf, ServerAbilityActivatePacket> STREAM_CODEC =
             StreamCodec.ofMember(ServerAbilityActivatePacket::encode, ServerAbilityActivatePacket::decode);
+
+    public static final int[] HAND_SEAL_DELAY_TICKS = {0, 2, 4};
+    public static final float[] HAND_SEAL_PITCHES = {0.95f, 1.05f, 1.15f};
+    public static final float HAND_SEAL_VOLUME = 0.85f;
 
     private final Identifier abilityId;
 
@@ -55,6 +59,34 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
     public static ServerAbilityActivatePacket decode(FriendlyByteBuf inBuffer) {
         Identifier abilityId = inBuffer.readIdentifier();
         return new ServerAbilityActivatePacket(abilityId);
+    }
+
+    /**
+     * Plays an anime-style rapid 3-seal hand-seal sequence (SEAL_A -> SEAL_B -> SEAL_C at 0/2/4 ticks)
+     * around the casting player.
+     */
+    public static void playQuickHandSealSequence(ServerPlayer player, NinjaData ninjaData) {
+        if (player == null || ninjaData == null || !ServerSecurityValidator.validatePlayerState(player)) {
+            return;
+        }
+        SoundEvent[] seals = {
+                NarutoSounds.SEAL_A.get(),
+                NarutoSounds.SEAL_B.get(),
+                NarutoSounds.SEAL_C.get()
+        };
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                seals[0], SoundSource.PLAYERS, HAND_SEAL_VOLUME, HAND_SEAL_PITCHES[0]);
+        for (int i = 1; i < seals.length; i++) {
+            final SoundEvent sealSound = seals[i];
+            final float pitch = HAND_SEAL_PITCHES[i];
+            ninjaData.scheduleDelayedTickEvent(p -> {
+                if (p instanceof ServerPlayer sp && !ServerSecurityValidator.validatePlayerState(sp)) {
+                    return;
+                }
+                p.level().playSound(null, p.getX(), p.getY(), p.getZ(),
+                        sealSound, SoundSource.PLAYERS, HAND_SEAL_VOLUME, pitch);
+            }, HAND_SEAL_DELAY_TICKS[i]);
+        }
     }
 
     public static void handle(final ServerAbilityActivatePacket msg, final IPayloadContext context) {
@@ -80,11 +112,12 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                     if (ability.logInChat()) {
                         player.sendSystemMessage(Component.translatable("jutsu.cast", Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
                     }
+                    if (ability.playsHandSealSounds()) {
+                        playQuickHandSealSequence(player, ninjaData);
+                    }
                     int rawDelay = ability.requiresActivationDelay() ? ability.getActivationDelayTicks(ninjaData) : 0;
                     int delay = Ability.applyArmorDelayReduction(player, rawDelay);
                     if (delay > 0) {
-                        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                                SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.4f, 1.2f);
                         ninjaData.scheduleDelayedTickEvent(p -> {
                             if (p instanceof ServerPlayer sp && !ServerSecurityValidator.validatePlayerState(sp)) {
                                 return;
@@ -137,6 +170,9 @@ public class ServerAbilityActivatePacket implements CustomPacketPayload {
                     }
                     // Toggle ability on
                     abilityTracker.addAbilityStarted(player, ninjaData, ability);
+                    if (ability.playsHandSealSounds()) {
+                        playQuickHandSealSequence(player, ninjaData);
+                    }
                     if (ServerSecurityValidator.shouldCountToggleCast(player, ability.getRegistryName())) {
                         ninjaData.addJutsuCast();
                         NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()

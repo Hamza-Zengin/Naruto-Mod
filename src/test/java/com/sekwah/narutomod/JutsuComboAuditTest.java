@@ -18,11 +18,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Audits all 36 jutsu/utility abilities, their JSON definitions, activation-delay rules,
+ * dedicated Dōjutsu / wheel-equippable / hand-seal sound separation,
  * and the 8-slot Jutsu Radial Wheel angle-to-slot mapping:
  * 1. Every JSON file exists and does NOT define a legacy "combo" field.
  * 2. Exactly 3 abilities (chakra_charge, water_walk, leap) are utility abilities.
- * 3. Ability.requiresActivationDelay() is false for utility abilities and true for chakra-costing combat jutsus.
- * 4. JutsuWheelOverlay.computeHoveredSlot maps deadzone and all 8 radial sectors accurately.
+ * 3. Exactly 2 abilities (sharingan, byakugan) are Dōjutsu abilities.
+ * 4. Remaining 31 abilities are wheel-equippable and play rapid hand-seal sounds, while utilities and Dōjutsu are not/do not.
+ * 5. Ability.requiresActivationDelay() is false for utility abilities and true for chakra-costing combat jutsus.
+ * 6. JutsuWheelOverlay.computeHoveredSlot maps deadzone and all 8 radial sectors accurately.
  */
 public class JutsuComboAuditTest {
 
@@ -72,15 +75,18 @@ public class JutsuComboAuditTest {
     );
 
     private static final Set<String> EXPECTED_UTILITIES = Set.of("chakra_charge", "water_walk", "leap");
+    private static final Set<String> EXPECTED_DOJUTSUS = Set.of("sharingan", "byakugan");
 
     @Test
-    @DisplayName("Verify all 36 jutsu JSONs omit 'combo', utility count is 3, and requiresActivationDelay matches")
+    @DisplayName("Verify all 36 jutsu JSONs omit 'combo', utility (3) and Dōjutsu (2) separation, wheel-equippable (31), and activation delay")
     public void testAllAbilitiesAndJsonAudit() throws IOException {
         assertTrue(Files.isDirectory(JUTSU_DIR), "Jutsu data directory must exist");
         assertEquals(36, ALL_ABILITIES.size(), "Audit map must cover all 36 abilities");
 
         Set<String> foundUtilities = new HashSet<>();
+        Set<String> foundDojutsus = new HashSet<>();
         int nonUtilityCount = 0;
+        int wheelEquippableCount = 0;
 
         for (Map.Entry<String, Ability> entry : ALL_ABILITIES.entrySet()) {
             String name = entry.getKey();
@@ -96,10 +102,30 @@ public class JutsuComboAuditTest {
 
             if (ability.isUtilityAbility()) {
                 foundUtilities.add(name);
+                assertFalse(ability.isDojutsu(),
+                        "Utility ability " + name + " must not be marked as Dōjutsu");
+                assertFalse(ability.isWheelEquippable(),
+                        "Utility ability " + name + " must not be wheel-equippable");
+                assertFalse(ability.playsHandSealSounds(),
+                        "Utility ability " + name + " must not play hand-seal sounds");
                 assertFalse(ability.requiresActivationDelay(),
                         "Utility ability " + name + " must not require activation delay");
             } else {
                 nonUtilityCount++;
+                if (ability.isDojutsu()) {
+                    foundDojutsus.add(name);
+                    assertFalse(ability.isWheelEquippable(),
+                            "Dōjutsu ability " + name + " must not be wheel-equippable");
+                    assertFalse(ability.playsHandSealSounds(),
+                            "Dōjutsu ability " + name + " must not play hand-seal sounds");
+                } else {
+                    wheelEquippableCount++;
+                    assertTrue(ability.isWheelEquippable(),
+                            "Combat/wheel ability " + name + " must be wheel-equippable");
+                    assertTrue(ability.playsHandSealSounds(),
+                            "Combat/wheel ability " + name + " must play hand-seal sounds");
+                }
+
                 if (ability.getDefaultChakraCost() > 0) {
                     assertTrue(ability.requiresActivationDelay(),
                             "Chakra-costing combat jutsu " + name + " must require activation delay");
@@ -112,7 +138,11 @@ public class JutsuComboAuditTest {
 
         assertEquals(EXPECTED_UTILITIES, foundUtilities,
                 "Exactly chakra_charge, water_walk, and leap must be utility abilities");
+        assertEquals(EXPECTED_DOJUTSUS, foundDojutsus,
+                "Exactly sharingan and byakugan must be Dōjutsu abilities");
         assertEquals(33, nonUtilityCount, "Remaining 33 abilities must have isUtilityAbility() == false");
+        assertEquals(31, wheelEquippableCount,
+                "Remaining 31 abilities must be wheel-equippable and play hand-seal sounds");
     }
 
     @Test

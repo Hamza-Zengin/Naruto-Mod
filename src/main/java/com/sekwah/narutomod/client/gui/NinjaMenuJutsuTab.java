@@ -8,6 +8,7 @@ import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaData;
 import com.sekwah.narutomod.capabilities.NinjaRank;
+import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -68,14 +69,16 @@ final class NinjaMenuJutsuTab {
         int cardH = 40;
         int cardGap = 4;
         int maxContentWidth = boxWidth - 92; // Leave space on the right for the 72px Equip button
+        ToggleAbilityData toggleData = ninjaData.getToggleAbilityData();
 
         for (int i = startIndex; i < endIndex; i++) {
             Ability ability = allAbilities.get(i);
             Identifier id = ability.getRegistryName();
             int cardY = cardStartY + (i - startIndex) * (cardH + cardGap);
+            boolean wheelEquippable = ability.isWheelEquippable();
 
             int equippedSlot = -1;
-            if (id != null) {
+            if (wheelEquippable && id != null) {
                 for (int s = 0; s < INinjaData.MAX_JUTSU_SLOTS; s++) {
                     if (id.equals(ninjaData.getEquippedJutsu(s))) {
                         equippedSlot = s;
@@ -84,8 +87,16 @@ final class NinjaMenuJutsuTab {
                 }
             }
 
-            int bgColor = equippedSlot == safeSlot ? 0xCC162D16 : (equippedSlot >= 0 ? 0xCC122814 : 0xCC112211);
-            int borderColor = equippedSlot == safeSlot ? 0xFFFFAA00 : (equippedSlot >= 0 ? 0xFF33AA33 : 0xFF228822);
+            boolean isDojutsuActive = !wheelEquippable && id != null && toggleData != null && toggleData.hasToggleAbility(id);
+            int bgColor;
+            int borderColor;
+            if (!wheelEquippable) {
+                bgColor = isDojutsuActive ? 0xCC2A183D : 0xCC1E1428;
+                borderColor = isDojutsuActive ? 0xFF9333EA : 0xFF6B21A8;
+            } else {
+                bgColor = equippedSlot == safeSlot ? 0xCC162D16 : (equippedSlot >= 0 ? 0xCC122814 : 0xCC112211);
+                borderColor = equippedSlot == safeSlot ? 0xFFFFAA00 : (equippedSlot >= 0 ? 0xFF33AA33 : 0xFF228822);
+            }
             graphics.fill(boxX, cardY, boxX + boxWidth, cardY + cardH, bgColor);
             graphics.outline(boxX, cardY, boxWidth, cardH, borderColor);
 
@@ -131,6 +142,27 @@ final class NinjaMenuJutsuTab {
                 reqBadge = font.plainSubstrByWidth(reqBadge, maxContentWidth - 8) + "...";
             }
             graphics.text(font, reqBadge, boxX + 8, cardY + 28, 0xFFAAAAAA);
+
+            // Right-side dedicated keybind badge for non-wheel-equippable abilities (e.g. Dōjutsu)
+            if (!wheelEquippable) {
+                Component badgeComp = Component.translatable("naruto.gui.ninja_menu.jutsu.dojutsu_key");
+                int maxBadgeWidth = 68;
+                int badgeW = font.width(badgeComp);
+                int badgeY = cardY + 15;
+                if (badgeW > maxBadgeWidth) {
+                    String truncated = font.plainSubstrByWidth(badgeComp.getString(), maxBadgeWidth - 6) + "...";
+                    int drawW = font.width(truncated);
+                    int badgeX = Math.max(boxX + boxWidth - 82, boxX + boxWidth - 10 - drawW);
+                    graphics.fill(badgeX - 4, badgeY - 3, badgeX + drawW + 4, badgeY + font.lineHeight + 2, 0x992D1646);
+                    graphics.outline(badgeX - 4, badgeY - 3, drawW + 8, font.lineHeight + 5, borderColor);
+                    graphics.text(font, truncated, badgeX, badgeY, 0xFFD8B4FE);
+                } else {
+                    int badgeX = Math.max(boxX + boxWidth - 82, boxX + boxWidth - 10 - badgeW);
+                    graphics.fill(badgeX - 4, badgeY - 3, badgeX + badgeW + 4, badgeY + font.lineHeight + 2, 0x992D1646);
+                    graphics.outline(badgeX - 4, badgeY - 3, badgeW + 8, font.lineHeight + 5, borderColor);
+                    graphics.text(font, badgeComp, badgeX, badgeY, 0xFFD8B4FE);
+                }
+            }
         }
     }
 

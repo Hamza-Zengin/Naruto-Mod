@@ -515,5 +515,8 @@
   "naruto.gui.ninja_menu.jutsu.loadout_hint": "Oben einen Platz (1-8) anklicken, dann unten ein Jutsu ausrüsten (Rechtsklick zum Leeren)",
   "naruto.hud.jutsu.active": "AKTIV",
   "naruto.hud.jutsu.slot": "Platz %s",
-  "naruto.hud.jutsu.empty": "Leer"
+  "naruto.hud.jutsu.empty": "Leer",
+  "naruto.keys.dojutsu": "Dōjutsu umschalten (G)",
+  "naruto.gui.ninja_menu.jutsu.dojutsu_key": "[Dōjutsu: G]",
+  "jutsu.dojutsu.none_unlocked": "Noch kein Dōjutsu freigeschaltet!"
 }
