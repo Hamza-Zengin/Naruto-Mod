@@ -94,8 +94,8 @@ public class NarutoInGameGUI {
     }
 
     /**
-     * Renders a compact HUD badge above the right side of the chakra/hotbar area showing
-     * the currently selected Jutsu slot, element accent, cooldown, or toggle status.
+     * Renders a minimalist floating HUD pill in the bottom-right corner showing
+     * an element-colored dot, the active jutsu name, and optional cooldown/toggle status.
      */
     public void renderSelectedJutsuHudBadge(GuiGraphicsExtractor guiGraphics) {
         Minecraft mc = Minecraft.getInstance();
@@ -107,60 +107,65 @@ public class NarutoInGameGUI {
         int slot = ninjaData.getSelectedJutsuSlot();
         Identifier selectedId = ninjaData.getEquippedJutsu(slot);
         Ability ability = NarutoAbilities.getAbility(selectedId);
+        if (ability != null && !ability.isWheelEquippable()) {
+            ability = null;
+        }
 
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int screenHeight = mc.getWindow().getGuiScaledHeight();
         Font font = mc.font;
 
-        int badgeW = 132;
-        int badgeH = 24;
-        int badgeX = screenWidth - badgeW - 10;
-        int badgeY = screenHeight - badgeH - 10;
-
-        int accent = ability != null ? JutsuWheelOverlay.getElementAccentColor(ability.getChakraElement()) : 0xFF475569;
-        guiGraphics.fill(badgeX, badgeY, badgeX + badgeW, badgeY + badgeH, 0xAA0C111A);
-        guiGraphics.outline(badgeX, badgeY, badgeW, badgeH, accent);
-
-        // Slot number badge on the left
-        String slotTag = "[R] #" + (slot + 1);
-        guiGraphics.text(font, slotTag, badgeX + 5, badgeY + 4, 0xFFFBBF24);
+        int accent = ability != null ? JutsuWheelOverlay.getElementAccentColor(ability.getChakraElement()) : 0xFF64748B;
+        String dot = "● ";
+        String labelText;
+        int labelColor;
+        String suffixText = "";
+        int suffixColor = 0xFFFFFFFF;
 
         if (ability == null) {
-            String noJutsu = Component.translatable("naruto.gui.jutsu_wheel.no_jutsu").getString();
-            String clipped = font.width(noJutsu) > badgeW - 10 ? font.plainSubstrByWidth(noJutsu, badgeW - 16) + ".." : noJutsu;
-            guiGraphics.text(font, clipped, badgeX + 5, badgeY + 13, 0xFF94A3B8);
-            return;
-        }
-
-        String jutsuName = Component.translatable(ability.getTranslationKey()).getString();
-        String clippedName = font.width(jutsuName) > badgeW - 10 ? font.plainSubstrByWidth(jutsuName, badgeW - 16) + ".." : jutsuName;
-        guiGraphics.text(font, clippedName, badgeX + 5, badgeY + 13, accent);
-
-        // Right-aligned status pill
-        String statusText;
-        int statusColor;
-        CooldownTickEvent cd = ninjaData.getCooldownEvents().get(ability.getTranslationKey());
-        ToggleAbilityData toggleData = ninjaData.getToggleAbilityData();
-        boolean isToggled = ability.activationType() == Ability.ActivationType.TOGGLE
-                && toggleData != null
-                && toggleData.hasToggleAbility(selectedId);
-
-        if (ninjaData.getActiveHandJutsuTicks() > 0 && selectedId != null && selectedId.getPath().equalsIgnoreCase(ninjaData.getActiveHandJutsu())) {
-            statusText = String.format(java.util.Locale.ROOT, "%.1fs!", ninjaData.getActiveHandJutsuTicks() / 20.0f);
-            statusColor = 0xFFFACC15;
-        } else if (cd != null && cd.ticks > 0) {
-            statusText = String.format(java.util.Locale.ROOT, "%.1fs", cd.ticks / 20.0f);
-            statusColor = 0xFFF87171;
-        } else if (isToggled) {
-            statusText = "● " + Component.translatable("naruto.hud.jutsu.active").getString();
-            statusColor = 0xFF4ADE80;
+            labelText = Component.translatable("naruto.gui.jutsu_wheel.no_jutsu").getString();
+            labelColor = 0xFF94A3B8;
         } else {
-            float cost = ability.getFinalChakraCost(mc.player, ninjaData);
-            statusText = cost > 0 ? ((int) Math.ceil(cost)) + " CP" : "Free";
-            statusColor = 0xFF38BDF8;
+            labelText = Component.translatable(ability.getTranslationKey()).getString();
+            labelColor = 0xFFF1F5F9;
+
+            CooldownTickEvent cd = ninjaData.getCooldownEvents().get(ability.getTranslationKey());
+            ToggleAbilityData toggleData = ninjaData.getToggleAbilityData();
+            boolean isToggled = ability.activationType() == Ability.ActivationType.TOGGLE
+                    && toggleData != null
+                    && toggleData.hasToggleAbility(selectedId);
+
+            if (ninjaData.getActiveHandJutsuTicks() > 0 && selectedId != null && selectedId.getPath().equalsIgnoreCase(ninjaData.getActiveHandJutsu())) {
+                suffixText = " " + String.format(java.util.Locale.ROOT, "%.1fs", ninjaData.getActiveHandJutsuTicks() / 20.0f);
+                suffixColor = 0xFFFACC15;
+            } else if (cd != null && cd.ticks > 0) {
+                suffixText = " " + String.format(java.util.Locale.ROOT, "%.1fs", cd.ticks / 20.0f);
+                suffixColor = 0xFFF87171;
+            } else if (isToggled) {
+                suffixText = " •";
+                suffixColor = 0xFF4ADE80;
+            }
         }
 
-        int sw = font.width(statusText);
-        guiGraphics.text(font, statusText, badgeX + badgeW - sw - 5, badgeY + 4, statusColor);
+        int dotW = font.width(dot);
+        int labelW = font.width(labelText);
+        int suffixW = suffixText.isEmpty() ? 0 : font.width(suffixText);
+        int padX = 6;
+        int pillW = padX * 2 + dotW + labelW + suffixW;
+        int pillH = 14;
+        int pillX = screenWidth - pillW - 8;
+        int pillY = screenHeight - pillH - 8;
+
+        guiGraphics.fill(pillX, pillY, pillX + pillW, pillY + pillH, 0x55000000);
+
+        int textY = pillY + 3;
+        int cursorX = pillX + padX;
+        guiGraphics.text(font, dot, cursorX, textY, accent);
+        cursorX += dotW;
+        guiGraphics.text(font, labelText, cursorX, textY, labelColor);
+        if (!suffixText.isEmpty()) {
+            cursorX += labelW;
+            guiGraphics.text(font, suffixText, cursorX, textY, suffixColor);
+        }
     }
 }
