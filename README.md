@@ -8,7 +8,7 @@
 
 ![Naruto-Mod Banner](banner.jpg)
 
-**Minecraft 26.3 NeoForge** için sıfırdan modernize edilmiş kapsamlı Naruto Shinobi Evreni modu. **7 ninja klanı**, **32 veri odaklı jutsu**, **elementel savaş komboları**, **kademeli incelen gerçekçi 3D silahlar**, **5 Büyük Shinobi Köyü ile 10 dünya yapısı**, **13 özel shinobi/tüccar/düşman mobu** ve sunucu dostu özelleştirme araçları sunar.
+**Minecraft 26.3 NeoForge** için sıfırdan modernize edilmiş kapsamlı Naruto Shinobi Evreni modu. **7 ninja klanı**, **36 veri odaklı jutsu**, **8 slotlu radyal jutsu çarkı**, **elementel savaş komboları**, **kademeli incelen gerçekçi 3D silahlar**, **5 Büyük Shinobi Köyü ile 10 dünya yapısı**, **13 özel shinobi/tüccar/düşman mobu** ve sunucu dostu özelleştirme araçları sunar.
 
 ---
 
@@ -26,28 +26,29 @@
 ### 🥋 Klanlar, Rütbe & Ustalık Sistemi
 Ninja Menüsü (`J` tuşu) üzerinden klanınızı seçin, görevleri tamamlayın ve shinobi rütbenizi yükseltin:
 - **7 Klan:** Wandering Shinobi, Uchiha, Hyūga, Uzumaki, Nara, Senju, Kaguya.
-- **Rütbe & Ustalık Kademeleri:** Genin → Chūnin → Jōnin → Kage ilerlemesi; her jutsu için Tier 1–5 ustalık ölçeklemesi ve önkoşul/parşömen hibrit kilit açma sistemi.
-- **Dinamik Jutsu Ansiklopedisi:** `NinjaMenuScreen` içinde her jutsu için canlı element, çakra maliyeti, bekleme süresi, temel hasar ve kilit durumu kartı.
+- **Rütbe & Fiziksel Pasifler:** Genin → Chūnin → Jōnin → Kage ilerlemesi; her rütbede dengeli fiziksel pasif bonuslar, her jutsu için Tier 1–5 ustalık ölçeklemesi ve önkoşul/parşömen hibrit kilit açma sistemi.
+- **Dinamik Jutsu Ansiklopedisi & Çark Dizilimi:** `NinjaMenuScreen` içinde her jutsu için canlı element, çakra maliyeti, bekleme süresi, temel hasar, kilit durumu ve 8 slotlu çark ataması.
 - **Shinobi Başarım Ağacı:** Klan seçimi, ilk jutsu, çakra kontrolü, element ustalığı ve rütbe ilerlemesini takip eden özel advancement ağacı.
 
-### 🌀 32 Jutsu, Elementel Kombolar & Parşömen Sistemi
+### 🌀 36 Jutsu, Radyal Çark, Elementel Kombolar & Parşömen Sistemi
+- **8 Slotlu Radyal Jutsu Çarkı (`V` Tuşu) & Özel Dōjutsu Tuşu (`G`):** `V` tuşuna basılı tutarak 8 slotlu radyal çarktan hızlıca jutsu seçin, `G` tuşuyla Sharingan/Byakugan dōjutsularını doğrudan açıp kapatın.
 - **5 Ana Element + Klan & Tıbbi Teknikler:** Ateş (*Katon*), Su (*Suiton*), Yıldırım (*Raiton*), Rüzgar (*Fūton*), Toprak (*Doton*), Kekkei Genkai ve destek teknikleri.
 - **Elementel Savaş Komboları:** Savaş alanında aktif **Su + Yıldırım**, **Rüzgar + Ateş** ve **Toprak + Yıldırım** etkileşimleri.
 - **Jutsu Kopyalama & Mühürlü Cephane:** Tier 4+ ustalığa ulaşılan element jutsularını `BlankJutsuScroll` ile parşömene aktarın; `SealedAmmoScroll` ile 64'e kadar Kunai/Senbon/Shuriken/Patlayıcı Kunai taşıyın.
-- **Oynanış Hissi:** Duruma duyarlı saydamlaşan dinamik HUD, kademeli el mührü ses/kıvılcım efektleri ve mikro ekran sarsıntısı.
+- **Oynanış Hissi:** Duruma duyarlı saydamlaşan dinamik HUD, ekran ölçeğine uyumlu minimalist seçili jutsu rozeti, 3'lü hızlı el mührü ses dizisi ve mikro ekran sarsıntısı.
 
 <details>
-<summary><b>📜 Tüm 32 Jutsu Listesini Görüntüle</b></summary>
+<summary><b>📜 Tüm 36 Jutsu Listesini Görüntüle</b></summary>
 
 | Kategori / Element | Jutsular |
 | :--- | :--- |
-| **Ateş (*Katon*)** | `Fireball` (Gōkakyū), `Phoenix Flower` (Hōsenka — 90° yaylı 4 ateş topu) |
-| **Su (*Suiton*)** | `Water Bullet`, `Water Dragon` (Suiryūdan) |
+| **Ateş (*Katon*)** | `Fireball` (Gōkakyū), `Phoenix Flower` (Hōsenka — 90° yaylı 4 ateş topu), `Ash Pile Burning` (Haisekishō) |
+| **Su (*Suiton*)** | `Water Bullet`, `Water Dragon` (Suiryūdan), `Water Encampment Wall` (Suijinheki) |
 | **Yıldırım (*Raiton*)** | `Chidori`, `Chidori Stream` (Nagashi — ustalıkla uzayan elektrik alanı), `Kirin` |
 | **Rüzgar (*Fūton*)** | `Wind Breaker`, `Vacuum Spheres` (Shinkūgyoku), `Rasenshuriken` |
 | **Toprak (*Doton*)** | `Mud Wall`, `Earth Dragon Bullet` (Doryūdan), `Stone Spikes` (Doryūsō) |
-| **Klan & Kekkei Genkai** | `Sharingan`, `Amaterasu`, `Tsukuyomi`, `Susanoo Ribcage`, `Byakugan`, `Hakke Kūshō`, `Shadow Possession` (Kage Mane), `Wood Prison` (Mokuton), `Bone Dance` (Sawarabi no Mai) |
-| **Genel & Tıbbi** | `Chakra Charge`, `Water Walk`, `Leap` (`X`), `Shadow Clone` (Kage Bunshin), `Substitution` (Kawarimi), `Rasengan`, `Summoning`, `Mystical Palm` (Shōsen), `Eight Gates`, `Eight Gates Death` |
+| **Klan & Kekkei Genkai** | `Sharingan`, `Amaterasu`, `Tsukuyomi`, `Susanoo Ribcage`, `Byakugan`, `Hakke Kūshō`, `Shadow Possession` (Kage Mane), `Wood Prison` (Mokuton), `Bone Dance` (Sawarabi no Mai), `Adamantine Chains` (Kongō Fūsa) |
+| **Genel & Tıbbi** | `Chakra Charge`, `Water Walk`, `Leap` (`X`), `Shadow Clone` (Kage Bunshin), `Substitution` (Kawarimi), `Rasengan`, `Summoning`, `Mystical Palm` (Shōsen), `Chakra Scalpel` (Chakra no Mesu), `Eight Gates`, `Eight Gates Death` |
 
 </details>
 
@@ -95,7 +96,7 @@ Naruto-Mod v0.1.0, sunucu sahiplerinin modpack ve PvP/PvE dengesini kod değişt
 
 ## 🌐 Çoklu Dil Desteği
 
-Tüm `8` dil dosyası (`en_us`, `tr_tr`, `de_de`, `es_es`, `fr_fr`, `ja_jp`, `pt_br`, `ru_ru`) **`466` anahtar** ile %100 eşitliğe sahiptir.
+Tüm `8` dil dosyası (`en_us`, `tr_tr`, `de_de`, `es_es`, `fr_fr`, `ja_jp`, `pt_br`, `ru_ru`) **`520` anahtar** ile %100 eşitliğe sahiptir.
 
 ---
 
