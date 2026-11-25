@@ -66,7 +66,8 @@ public class ByakuganAbility extends Ability implements Ability.Toggled, Ability
         if (ninjaData == null) {
             return false;
         }
-        if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("hyuga")) {
+        if (!isExplicitlyUnlocked(ninjaData)
+                && (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("hyuga"))) {
             if (player != null) {
                 player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
                         Component.literal("Hyūga").withStyle(ChatFormatting.AQUA)));

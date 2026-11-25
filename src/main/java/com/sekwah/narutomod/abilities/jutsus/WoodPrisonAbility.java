@@ -58,7 +58,8 @@ public class WoodPrisonAbility extends Ability implements Ability.Cooldown {
 
     @Override
     public boolean handleCost(Player player, INinjaData ninjaData, int chargeAmount) {
-        if (ninjaData == null || ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("senju")) {
+        if (!isExplicitlyUnlocked(ninjaData)
+                && (ninjaData == null || ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("senju"))) {
             if (player != null) {
                 player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
                         Component.literal("Senju").withStyle(ChatFormatting.GREEN)));

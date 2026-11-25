@@ -59,7 +59,8 @@ public class AdamantineChainsAbility extends Ability implements Ability.Cooldown
 
     @Override
     public boolean canActivate(Player player, INinjaData ninjaData) {
-        if (ninjaData == null || ninjaData.getClan() == null || !"uzumaki".equalsIgnoreCase(ninjaData.getClan().getPath())) {
+        if (!isExplicitlyUnlocked(ninjaData)
+                && (ninjaData == null || ninjaData.getClan() == null || !"uzumaki".equalsIgnoreCase(ninjaData.getClan().getPath()))) {
             if (player != null) {
                 player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
                         Component.literal("Uzumaki").withStyle(ChatFormatting.RED)));

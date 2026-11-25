@@ -58,7 +58,8 @@ public class TsukuyomiAbility extends Ability implements Ability.Cooldown {
     public boolean canActivate(Player player, INinjaData ninjaData) {
         if (!super.canActivate(player, ninjaData)) return false;
         if (ninjaData == null) return false;
-        if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha")) {
+        if (!isExplicitlyUnlocked(ninjaData)
+                && (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("uchiha"))) {
             if (player != null) {
                 player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
                         Component.literal("Uchiha").withStyle(ChatFormatting.RED)));

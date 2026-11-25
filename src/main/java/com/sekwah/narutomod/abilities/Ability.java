@@ -85,10 +85,19 @@ public abstract class Ability {
         return true;
     }
 
+    protected boolean isExplicitlyUnlocked(INinjaData ninjaData) {
+        return ninjaData != null
+                && this.getRegistryName() != null
+                && ninjaData.getUnlockedAbilities().contains(this.getRegistryName());
+    }
+
     /**
      * Determines whether this ability can currently be activated by the player.
      */
     public boolean canActivate(Player player, INinjaData ninjaData) {
+        if (isExplicitlyUnlocked(ninjaData)) {
+            return true;
+        }
         NinjaRank required = this.getRequiredRank();
         if (required != null && ninjaData != null) {
             NinjaRank current = NinjaRank.fromString(ninjaData.getRank());

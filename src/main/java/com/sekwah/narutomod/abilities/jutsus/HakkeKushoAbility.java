@@ -52,7 +52,8 @@ public class HakkeKushoAbility extends Ability implements Ability.Cooldown {
     public boolean canActivate(Player player, INinjaData ninjaData) {
         if (!super.canActivate(player, ninjaData)) return false;
         if (ninjaData == null) return false;
-        if (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("hyuga")) {
+        if (!isExplicitlyUnlocked(ninjaData)
+                && (ninjaData.getClan() == null || !ninjaData.getClan().getPath().equalsIgnoreCase("hyuga"))) {
             if (player != null) {
                 player.sendOverlayMessage(Component.translatable("jutsu.fail.notclan",
                         Component.literal("Hyuga").withStyle(ChatFormatting.AQUA)));
