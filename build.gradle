@@ -31,7 +31,7 @@ repositories {
     mavenLocal()
     maven {
         name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/Hamza-Zengin/SekCLib")
+        url = uri("https://maven.pkg.github.com/hamza-zengin/sekclib")
         credentials {
             username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
             password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
@@ -95,7 +95,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     // SekCLib 0.1.0 via mavenLocal() / GitHub Packages (no other external mod dependencies)
-    implementation "com.sekwah:SekCLib:${project.sekclib_version}"
+    implementation "com.sekwah:sekclib:${project.sekclib_version}"
 
     // Unit testing
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
