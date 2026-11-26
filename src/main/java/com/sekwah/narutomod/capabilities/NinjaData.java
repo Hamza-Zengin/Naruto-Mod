@@ -111,8 +111,7 @@ public class NinjaData implements INinjaData {
     @Sync
     private int selectedJutsuSlot = 0;
 
-    private ArrayList<DelayedPlayerTickEvent> delayedTickEvents = new ArrayList<>();
-    private HashMap<String, CooldownTickEvent> cooldownTickEvents = new HashMap<>();
+    private final NinjaTickScheduler tickScheduler = new NinjaTickScheduler();
 
     private static final Identifier SHARINGAN_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
     private static final Identifier BYAKUGAN_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "byakugan");
@@ -289,55 +288,37 @@ public class NinjaData implements INinjaData {
 
     @Override
     public boolean isAbilityUnlocked(Ability ability) {
-        if (ability == null) return false;
-        return JutsuUnlockRules.checkAbilityUnlocked(this, ability, ability.getRegistryName());
+        return NinjaMasteryHelper.isAbilityUnlocked(this, ability);
     }
 
     public static boolean isScrollRequiredJutsu(Identifier id) {
-        return JutsuUnlockRules.isScrollRequiredJutsu(id);
+        return NinjaMasteryHelper.isScrollRequiredJutsu(id);
     }
 
     public static boolean isClanRestrictedJutsu(Identifier id) {
-        return JutsuUnlockRules.isClanRestrictedJutsu(id);
+        return NinjaMasteryHelper.isClanRestrictedJutsu(id);
     }
 
     @Override
     public boolean isAbilityUnlocked(Identifier abilityId) {
-        if (abilityId == null) return false;
-        Ability ability = null;
-        try {
-            ability = NarutoAbilities.getAbility(abilityId);
-        } catch (Throwable ignored) {
-            // NarutoAbilities or registry may not be initialized in standalone unit tests
-        }
-        if (ability == null) {
-            return getUnlockedAbilities().contains(abilityId);
-        }
-        return JutsuUnlockRules.checkAbilityUnlocked(this, ability, abilityId);
+        return NinjaMasteryHelper.isAbilityUnlocked(this, abilityId);
     }
 
     @Override
     public void unlockAbility(Identifier abilityId) {
-        this.unlockedJutsus = JutsuUnlockRules.addUnlockedAbility(this.unlockedJutsus, abilityId);
+        this.unlockedJutsus = NinjaMasteryHelper.unlockAbility(this.unlockedJutsus, abilityId);
     }
 
     @Override
     public void lockAbility(Identifier abilityId) {
-        this.unlockedJutsus = JutsuUnlockRules.removeUnlockedAbility(this.unlockedJutsus, abilityId);
-        if (abilityId != null) {
-            for (int i = 0; i < MAX_JUTSU_SLOTS; i++) {
-                if (abilityId.equals(getEquippedJutsu(i))) {
-                    setEquippedJutsu(i, null);
-                }
-            }
-        }
+        this.unlockedJutsus = NinjaMasteryHelper.lockAbility(this, this.unlockedJutsus, abilityId);
     }
 
     @Override
     public Set<Identifier> getUnlockedAbilities() {
         String source = this.unlockedJutsus != null ? this.unlockedJutsus : "";
         if (this.cachedUnlockedAbilities == null || !source.equals(this.cachedUnlockedJutsusSource)) {
-            this.cachedUnlockedAbilities = Collections.unmodifiableSet(JutsuUnlockRules.parseUnlockedAbilities(source));
+            this.cachedUnlockedAbilities = NinjaMasteryHelper.parseUnlockedAbilities(source);
             this.cachedUnlockedJutsusSource = source;
         }
         return this.cachedUnlockedAbilities;
@@ -360,39 +341,22 @@ public class NinjaData implements INinjaData {
 
     @Override
     public int getMastery(Identifier jutsuId) {
-        if (jutsuId == null) return 0;
-        return this.jutsuMastery.getOrDefault(jutsuId, 0);
+        return NinjaMasteryHelper.getMastery(this.jutsuMastery, jutsuId);
     }
 
     @Override
     public void setMastery(Identifier jutsuId, int amount) {
-        if (jutsuId == null) return;
-        this.jutsuMastery.put(jutsuId, Math.max(0, amount));
+        NinjaMasteryHelper.setMastery(this.jutsuMastery, jutsuId, amount);
     }
 
     @Override
     public void addMastery(Identifier jutsuId, int amount) {
-        if (jutsuId == null || amount == 0) return;
-        int current = getMastery(jutsuId);
-        int updated = Math.max(0, current + amount);
-        this.jutsuMastery.put(jutsuId, updated);
+        NinjaMasteryHelper.addMastery(this.jutsuMastery, jutsuId, amount);
     }
 
     @Override
     public void incrementJutsuMastery(Identifier jutsuId, boolean isToggle) {
-        if (jutsuId == null) return;
-        int current = getMastery(jutsuId);
-        int gain;
-        if (current < 100) {
-            gain = isToggle ? 2 : 5;
-        } else if (current < 250) {
-            gain = isToggle ? 2 : 3;
-        } else if (current < 500) {
-            gain = isToggle ? 1 : 2;
-        } else {
-            gain = 1;
-        }
-        addMastery(jutsuId, gain);
+        NinjaMasteryHelper.incrementJutsuMastery(this.jutsuMastery, jutsuId, isToggle);
     }
 
     @Override
@@ -427,12 +391,12 @@ public class NinjaData implements INinjaData {
 
     @Override
     public int getEnemiesDefeated() {
-        return RankProgression.getEnemiesDefeated(this.getRank(), this.enemiesDefeated);
+        return NinjaMasteryHelper.getEnemiesDefeated(this.getRank(), this.enemiesDefeated);
     }
 
     @Override
     public void addEnemyDefeated() {
-        RankProgression.addEnemyDefeated(this);
+        NinjaMasteryHelper.addEnemyDefeated(this);
     }
 
     @Override
@@ -472,12 +436,12 @@ public class NinjaData implements INinjaData {
 
     @Override
     public int getJutsusCastCount() {
-        return RankProgression.getJutsusCastCount(this.getRank(), this.jutsusCastCount);
+        return NinjaMasteryHelper.getJutsusCastCount(this.getRank(), this.jutsusCastCount);
     }
 
     @Override
     public void addJutsuCast() {
-        RankProgression.addJutsuCast(this);
+        NinjaMasteryHelper.addJutsuCast(this);
     }
 
     @Override
@@ -487,12 +451,12 @@ public class NinjaData implements INinjaData {
 
     @Override
     public boolean canRankUp() {
-        return RankProgression.canRankUp(this);
+        return NinjaMasteryHelper.canRankUp(this);
     }
 
     @Override
     public boolean rankUp() {
-        return RankProgression.rankUp(this);
+        return NinjaMasteryHelper.rankUp(this);
     }
 
     @Override
@@ -642,22 +606,7 @@ public class NinjaData implements INinjaData {
             }
         }
 
-        // Zero-allocation delayed tick execution: iterate backwards to safely remove and run
-        if (!this.delayedTickEvents.isEmpty()) {
-            for (int i = this.delayedTickEvents.size() - 1; i >= 0; i--) {
-                DelayedPlayerTickEvent event = this.delayedTickEvents.get(i);
-                event.tick();
-                if (event.shouldRun()) {
-                    this.delayedTickEvents.remove(i);
-                    event.run(player);
-                }
-            }
-        }
-
-        // Zero-allocation cooldown tick execution: remove directly without allocating keySet copy
-        if (!this.cooldownTickEvents.isEmpty()) {
-            this.cooldownTickEvents.values().removeIf(CooldownTickEvent::tickAndCheckComplete);
-        }
+        this.tickScheduler.tick(player);
 
         boolean wearingKageHat = com.sekwah.narutomod.events.PlayerEvents.isKageHat(
                 player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).getItem());
@@ -720,29 +669,27 @@ public class NinjaData implements INinjaData {
 
     @Override
     public void scheduleDelayedTickEvent(Consumer<Player> consumer, int tickDelay) {
-        this.delayedTickEvents.add(new DelayedPlayerTickEvent(consumer, tickDelay));
+        this.tickScheduler.scheduleDelayedTickEvent(consumer, tickDelay);
     }
 
     @Override
     public void saveNBTData(CompoundTag nbt) {
-        NinjaDataNbtCodec.save(this, nbt);
+        NinjaDataSerializer.serializeNBT(this, nbt);
     }
 
     @Override
     public void serialize(ValueOutput output) {
-        final CompoundTag nbt = new CompoundTag();
-        saveNBTData(nbt);
-        output.store("ninjaData", CompoundTag.CODEC, nbt);
+        NinjaDataSerializer.serialize(this, output);
     }
 
     @Override
     public void deserialize(ValueInput input) {
-        input.read("ninjaData", CompoundTag.CODEC).ifPresent(this::loadNBTData);
+        NinjaDataSerializer.deserialize(this, input);
     }
 
     @Override
     public void loadNBTData(CompoundTag compoundTag) {
-        NinjaDataNbtCodec.load(this, compoundTag);
+        NinjaDataSerializer.deserializeNBT(this, compoundTag);
     }
 
     private boolean shimonPenaltyActive = false;
@@ -855,7 +802,7 @@ public class NinjaData implements INinjaData {
 
     @Override
     public HashMap<String, CooldownTickEvent> getCooldownEvents() {
-        return cooldownTickEvents;
+        return this.tickScheduler.getCooldownEvents();
     }
 
     private String[] parseEquippedSlots() {
@@ -966,37 +913,7 @@ public class NinjaData implements INinjaData {
      * without re-adding clan/rank bonuses on top of existing stats.
      */
     public static void applyDeathPenalty(INinjaData original, INinjaData future, boolean hasEighthGateToggle) {
-        if (original == null || future == null) {
-            return;
-        }
-        boolean isEighthGateDeath = original.isShimonPenaltyActive()
-                || original.isEighthGateActive()
-                || hasEighthGateToggle;
-        float multiplier = isEighthGateDeath ? 0.75f : 0.95f;
-
-        float newBaseMaxChakra = Math.max(100.0f, original.getBaseMaxChakra() * multiplier);
-        float newBaseMaxStamina = Math.max(100.0f, original.getBaseMaxStamina() * multiplier);
-
-        future.setBaseMaxChakra(newBaseMaxChakra);
-        future.setBaseMaxStamina(newBaseMaxStamina);
-        future.setChakra(future.getMaxChakra());
-        future.setStamina(future.getMaxStamina());
-
-        future.setChakraExp(original.getChakraExp() * multiplier);
-        future.setStaminaExp(original.getStaminaExp() * multiplier);
-
-        for (Map.Entry<Identifier, Integer> entry : original.getJutsuMasteryMap().entrySet()) {
-            int penalized = (int) Math.floor(entry.getValue() * multiplier);
-            future.setMastery(entry.getKey(), Math.max(0, penalized));
-        }
-
-        future.setShimonPenaltyActive(false);
-        future.setEighthGateActive(false);
-        future.setEightGatesActive(false);
-        future.clearActiveHandJutsu();
-        if (future.getToggleAbilityData() != null) {
-            future.getToggleAbilityData().clear();
-        }
+        NinjaMasteryHelper.applyDeathPenalty(original, future, hasEighthGateToggle);
     }
 
     @Override
@@ -1059,7 +976,7 @@ public class NinjaData implements INinjaData {
         return MissionLogic.claimMissionReward(this);
     }
 
-    // --- Package-private raw accessors used by NinjaDataNbtCodec (bypass clamping/side effects) ---
+    // --- Package-private raw accessors used by NinjaDataSerializer (bypass clamping/side effects) ---
 
     void setRawRank(String rank) { this.rank = rank; }
 
