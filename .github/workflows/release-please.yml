@@ -1,0 +1,87 @@
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+name: release-please
+
+permissions:
+  contents: write
+  packages: read
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      upload_url: ${{ steps.release.outputs.upload_url }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          command: manifest
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+
+  release:
+    needs: release-please
+    runs-on: ubuntu-latest
+    if: ${{ needs.release-please.outputs.release_created }}
+    env:
+      GITHUB_ACTOR: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: 25
+
+      - name: Resolve SekCLib from GitHub Packages
+        id: resolve-sekclib
+        run: |
+          if ./gradlew compileJava --refresh-dependencies; then
+            echo "resolved=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::SekCLib could not be resolved from GitHub Packages; falling back to source checkout."
+            echo "resolved=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout SekCLib (26.3 NeoForge fallback)
+        if: steps.resolve-sekclib.outputs.resolved != 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: Hamza-Zengin/SekCLib
+          ref: 6435782a756e9720a4d45a058d9f527588edeeff
+          path: .sekclib
+
+      - name: Publish SekCLib 0.1.0 to mavenLocal (fallback)
+        if: steps.resolve-sekclib.outputs.resolved != 'true'
+        working-directory: .sekclib
+        run: ./gradlew publishToMavenLocal -PisRelease=true
+
+      - name: Build and publish (release)
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          VERSION_ARG=""
+          if [ -n "${{ needs.release-please.outputs.version }}" ]; then
+            VERSION_ARG="-Pversion=${{ needs.release-please.outputs.version }}"
+          fi
+          ./gradlew build publish $VERSION_ARG
+
+      - name: Upload release assets to GitHub Release
+        if: ${{ needs.release-please.outputs.tag_name != '' }}
+        run: |
+          gh release upload "${{ needs.release-please.outputs.tag_name }}" build/libs/NarutoMod-*.jar --clobber
