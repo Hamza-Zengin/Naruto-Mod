@@ -108,15 +108,9 @@ public class KirinDragonModel extends Model<JutsuVisualModels.VisualState> {
 
     private static void addCircularShockRing(PartDefinition parent, String prefix, float radius,
                                              float segLen, float segHeight, float segThick, float tiltX) {
-        int segments = 16;
-        for (int i = 0; i < segments; i++) {
-            float angle = (float) (i * Math.PI * 2.0 / segments);
-            float px = Mth.cos(angle) * radius;
-            float pz = Mth.sin(angle) * radius;
-            parent.addOrReplaceChild(prefix + "_ring_" + i,
-                    CubeListBuilder.create().texOffs(0, 74).addBox(-segLen * 0.5F, -segHeight, -segThick * 0.5F, segLen, segHeight, segThick),
-                    PartPose.offsetAndRotation(px, 0.0F, pz, tiltX, -angle + (float) (Math.PI / 2.0), 0.0F));
-        }
+        JutsuModelGeometryHelper.addCircularXZRing(parent, prefix + "_ring_", 16, radius,
+                0.0F, tiltX, 0.0F, 0, 74,
+                -segLen * 0.5F, -segHeight, -segThick * 0.5F, segLen, segHeight, segThick);
     }
 
     @Override
@@ -126,7 +120,8 @@ public class KirinDragonModel extends Model<JutsuVisualModels.VisualState> {
     }
 
     public void setupAnim(float age, float progress) {
-        float plunge = progress < 0.25F ? (1.0F - (progress / 0.25F)) * -48.0F : 0.0F;
+        // Plunge from the sky during first 7 ticks, then coil & roar
+        float plunge = age < 7.0F ? (1.0F - (age / 7.0F)) * -48.0F : 0.0F;
         this.dragonHead.y = -14.0F + plunge + Mth.sin(age * 0.4F) * 1.5F;
         this.dragonHead.xRot = 0.35F + Mth.sin(age * 0.3F) * 0.12F;
         this.dragonBody.y = plunge;
