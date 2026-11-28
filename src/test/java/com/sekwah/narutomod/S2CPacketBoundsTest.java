@@ -1,7 +1,9 @@
 package com.sekwah.narutomod;
 
 import com.sekwah.narutomod.network.s2c.ClientCameraShakePacket;
+import com.sekwah.narutomod.network.s2c.ClientFlashEffectPacket;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
@@ -73,5 +75,23 @@ public class S2CPacketBoundsTest {
         excessiveDuration.writeFloat(1.0f);
         excessiveDuration.writeInt(999999);
         assertThrows(DecoderException.class, () -> ClientCameraShakePacket.decode(excessiveDuration));
+    }
+
+    @Test
+    void testClientFlashEffectPacketRoundTripAndClamping() {
+        ClientFlashEffectPacket clampedHigh = new ClientFlashEffectPacket(2.5f, 5000);
+        assertEquals(1.0f, clampedHigh.intensity(), 1e-6);
+        assertEquals(1200, clampedHigh.durationTicks());
+
+        ClientFlashEffectPacket clampedLow = new ClientFlashEffectPacket(-0.5f, -15);
+        assertEquals(0.0f, clampedLow.intensity(), 1e-6);
+        assertEquals(0, clampedLow.durationTicks());
+
+        ClientFlashEffectPacket original = new ClientFlashEffectPacket(0.85f, 70);
+        ByteBuf buf = Unpooled.buffer();
+        ClientFlashEffectPacket.STREAM_CODEC.encode(buf, original);
+        ClientFlashEffectPacket decoded = ClientFlashEffectPacket.STREAM_CODEC.decode(buf);
+        assertEquals(0.85f, decoded.intensity(), 1e-6);
+        assertEquals(70, decoded.durationTicks());
     }
 }

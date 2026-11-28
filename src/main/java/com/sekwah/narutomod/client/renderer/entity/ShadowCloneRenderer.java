@@ -75,7 +75,7 @@ public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, 
 
     public static NarutoRenderEvents.NinjaRenderStateData createNinjaRenderStateData(ShadowCloneEntity entity) {
         if (entity == null) {
-            return new NarutoRenderEvents.NinjaRenderStateData(false, false, null, false, "", false, false, false);
+            return new NarutoRenderEvents.NinjaRenderStateData(false, false, null, false, "", false, false, false, false, 0);
         }
         boolean sharingan = entity.hasActiveAbility("sharingan") || entity.getSharinganStage() > 0;
         boolean byakugan = entity.hasActiveAbility("byakugan");
@@ -98,7 +98,9 @@ public class ShadowCloneRenderer extends HumanoidMobRenderer<ShadowCloneEntity, 
                 activeHandJutsu != null ? activeHandJutsu : "",
                 hasEightGates,
                 hasEightGatesDeath,
-                hasWaterWalk
+                hasWaterWalk,
+                false,
+                0
         );
     }
 

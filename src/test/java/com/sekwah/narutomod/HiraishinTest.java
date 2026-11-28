@@ -26,7 +26,15 @@ public class HiraishinTest {
         assertTrue(ability.isWheelEquippable());
         assertTrue(ability.playsHandSealSounds());
         assertEquals(30.0f, ability.getDefaultChakraCost());
-        assertEquals(80, ability.getDefaultCooldown());
+        assertEquals(50, ability.getDefaultCooldown());
+        assertEquals(50, ability.getCooldown(0));
+        assertEquals(35, ability.getCooldown(500));
+        assertEquals(20, ability.getCooldown(1000));
+        assertEquals(96.0D, HiraishinMarkerTracker.getMaxTeleportRange(0), 0.001D);
+        assertEquals(144.0D, HiraishinMarkerTracker.getMaxTeleportRange(500), 0.001D);
+        assertEquals(192.0D, HiraishinMarkerTracker.getMaxTeleportRange(1000), 0.001D);
+        assertEquals(1200L, HiraishinMarkerTracker.getMarkerDurationTicks(0));
+        assertEquals(3000L, HiraishinMarkerTracker.getMarkerDurationTicks(1000));
 
         assertTrue(Files.exists(Paths.get("src/main/resources/data/narutomod/jutsus/hiraishin.json")));
         assertTrue(Files.exists(Paths.get("src/main/resources/data/narutomod/recipe/hiraishin_kunai.json")));
@@ -49,6 +57,10 @@ public class HiraishinTest {
 
         assertEquals(HiraishinMarkerTracker.MarkerStatus.OUT_OF_RANGE,
                 HiraishinMarkerTracker.evaluateMarker(entry, overworld, new Vec3(0, 64, 0), new Vec3(120, 64, 0), true, 500L));
+
+        // Mastery-scaled max range allows 120 blocks at high mastery
+        assertEquals(HiraishinMarkerTracker.MarkerStatus.ACTIVE,
+                HiraishinMarkerTracker.evaluateMarker(entry, overworld, new Vec3(0, 64, 0), new Vec3(120, 64, 0), true, 500L, 192.0D));
 
         assertEquals(HiraishinMarkerTracker.MarkerStatus.WRONG_DIMENSION,
                 HiraishinMarkerTracker.evaluateMarker(entry, nether, new Vec3(0, 64, 0), new Vec3(10, 64, 0), true, 500L));

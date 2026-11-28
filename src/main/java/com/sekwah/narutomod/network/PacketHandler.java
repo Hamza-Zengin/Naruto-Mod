@@ -8,6 +8,7 @@ import com.sekwah.narutomod.network.c2s.ServerSelectClanPacket;
 import com.sekwah.narutomod.network.c2s.ServerTriggerHandJutsuPacket;
 import com.sekwah.narutomod.network.c2s.ServerUpdateJutsuLoadoutPacket;
 import com.sekwah.narutomod.network.s2c.ClientCameraShakePacket;
+import com.sekwah.narutomod.network.s2c.ClientFlashEffectPacket;
 import com.sekwah.narutomod.network.s2c.ClientJutsuEffectPacket;
 import com.sekwah.narutomod.network.s2c.ClientJutsuStatsSyncPacket;
 import com.sekwah.narutomod.network.s2c.ClientMissionsSyncPacket;
@@ -38,6 +39,7 @@ public class PacketHandler {
         // Server to client packets
         registrar.playToClient(ClientJutsuEffectPacket.TYPE, ClientJutsuEffectPacket.STREAM_CODEC);
         registrar.playToClient(ClientCameraShakePacket.TYPE, ClientCameraShakePacket.STREAM_CODEC);
+        registrar.playToClient(ClientFlashEffectPacket.TYPE, ClientFlashEffectPacket.STREAM_CODEC);
         registrar.playToClient(ClientJutsuStatsSyncPacket.TYPE, ClientJutsuStatsSyncPacket.STREAM_CODEC);
         registrar.playToClient(ClientMissionsSyncPacket.TYPE, ClientMissionsSyncPacket.STREAM_CODEC);
     }

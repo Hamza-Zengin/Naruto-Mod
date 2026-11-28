@@ -698,6 +698,16 @@ public class NinjaData implements INinjaData {
     }
 
     @Override
+    public boolean isSageModeActive() {
+        return isJutsuActive(JUTSU_FLAG_SAGE_MODE);
+    }
+
+    @Override
+    public void setSageModeActive(boolean active) {
+        setJutsuActive(JUTSU_FLAG_SAGE_MODE, active);
+    }
+
+    @Override
     public HashMap<String, CooldownTickEvent> getCooldownEvents() {
         return this.tickScheduler.getCooldownEvents();
     }

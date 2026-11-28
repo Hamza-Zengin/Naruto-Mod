@@ -462,12 +462,22 @@ public class NarutoModGameTests {
         helper.setBlock(boardPos, com.sekwah.narutomod.block.NarutoBlocks.MISSION_BOARD.get().defaultBlockState());
         helper.assertTrue(helper.getBlockState(boardPos).is(com.sekwah.narutomod.block.NarutoBlocks.MISSION_BOARD.get()),
                 "Mission Board block must place cleanly");
+        helper.assertTrue(helper.getBlockState(boardPos).hasProperty(com.sekwah.narutomod.block.MissionBoardBlock.HALF),
+                "Mission Board must define DOUBLE_BLOCK_HALF property");
+        helper.assertTrue(com.sekwah.narutomod.block.NarutoBlocks.TRAINING_DUMMY.get().defaultBlockState()
+                .hasProperty(com.sekwah.narutomod.block.TrainingDummyBlock.HALF),
+                "Training Dummy must define DOUBLE_BLOCK_HALF property");
 
-        com.sekwah.narutomod.capabilities.SageModeHelper.activateSageMode(caster, false);
+        com.sekwah.narutomod.capabilities.SageModeHelper.activateSageMode(caster, 1, false);
         helper.assertTrue(com.sekwah.narutomod.capabilities.SageModeHelper.isSageModeActive(caster),
                 "Sage Mode must activate via SageModeHelper");
-        helper.assertTrue(com.sekwah.narutomod.capabilities.SageModeHelper.applySageModeDamageMultiplier(10.0F, caster) > 12.9F,
-                "Active Sage Mode must boost damage by +30%");
+        helper.assertTrue(com.sekwah.narutomod.capabilities.SageModeHelper.applySageModeDamageMultiplier(10.0F, caster) > 11.9F,
+                "Active Stage 1 Sage Mode must boost damage by +20%");
+        com.sekwah.narutomod.capabilities.SageModeHelper.activateSageMode(caster, 3, false);
+        helper.assertTrue(com.sekwah.narutomod.capabilities.SageModeHelper.applySageModeDamageMultiplier(10.0F, caster) > 14.4F,
+                "Active Stage 3 Sage Mode must boost damage by +45%");
+        helper.assertTrue(com.sekwah.narutomod.entity.NarutoEntities.SAGE_TRIAL_BOSS.get().getWidth() >= 2.0F,
+                "Toad Sage Boss hitbox width must match 3D toad boss model");
 
         helper.succeed();
     }

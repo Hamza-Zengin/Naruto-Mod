@@ -3,6 +3,7 @@ package com.sekwah.narutomod.worldgen;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.sekwah.narutomod.block.NarutoBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
@@ -324,23 +325,114 @@ public class AnchoredJigsawStructure extends Structure {
     private static void maybeSpawnMyobokuzanBoss(WorldGenLevel level, BoundingBox pieceBox, BoundingBox chunkBox) {
         int cx = (pieceBox.minX() + pieceBox.maxX()) / 2;
         int cz = (pieceBox.minZ() + pieceBox.maxZ()) / 2;
+        int arenaFloorY = pieceBox.minY() + 1;
+        int outerRadius = 12;
+
+        int minX = Math.max(chunkBox.minX(), cx - outerRadius);
+        int maxX = Math.min(chunkBox.maxX(), cx + outerRadius);
+        int minZ = Math.max(chunkBox.minZ(), cz - outerRadius);
+        int maxZ = Math.min(chunkBox.maxZ(), cz + outerRadius);
+
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        int maxClearY = Math.min(level.getMaxY() - 1, arenaFloorY + 9);
+
+        for (int x = minX; x <= maxX; x++) {
+            int dx = x - cx;
+            for (int z = minZ; z <= maxZ; z++) {
+                int dz = z - cz;
+                int distSq = dx * dx + dz * dz;
+                if (distSq > outerRadius * outerRadius) {
+                    continue;
+                }
+
+                // Preserve the Sanctuary Shrine Hall walls, roof, chest, and toad statue
+                boolean protectedColumn = isProtectedSanctuaryColumn(level, pos, x, z, arenaFloorY, maxClearY);
+                int hash = (x * 73428767) ^ (z * 912931);
+
+                // Clear headroom above the combat arena (Y+1..Y+9) so boss & players never clip
+                if (!protectedColumn) {
+                    for (int y = arenaFloorY + 1; y <= maxClearY; y++) {
+                        BlockState existing = level.getBlockState(pos.set(x, y, z));
+                        if (!existing.isAir() && !isProtectedSanctuaryBlock(existing)) {
+                            level.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
+                        }
+                    }
+                }
+
+                if (distSq <= 64) {
+                    // Circular mossy stone-brick & cracked/cobbled combat dais (radius ~8)
+                    if (!protectedColumn) {
+                        level.setBlock(pos.set(x, arenaFloorY - 1, z), Blocks.MOSSY_STONE_BRICKS.defaultBlockState(), 2);
+                        BlockState daisBlock = pickArenaStoneBlock(hash, false);
+                        level.setBlock(pos.set(x, arenaFloorY, z), daisBlock, 2);
+
+                        // Center raised 1-block stone shrine pad (radius ~2)
+                        if (distSq <= 5) {
+                            BlockState padBlock = (dx == 0 && dz == 0)
+                                    ? Blocks.CHISELED_STONE_BRICKS.defaultBlockState()
+                                    : pickArenaStoneBlock(hash, true);
+                            level.setBlock(pos.set(x, arenaFloorY + 1, z), padBlock, 2);
+                        }
+                    }
+                } else if (distSq <= 125 && !protectedColumn) {
+                    // Surrounding shallow tranquil water ring (radius 9..11, 1-2 blocks deep)
+                    boolean shallowRim = distSq >= 106 || (hash & 7) == 0;
+                    level.setBlock(pos.set(x, arenaFloorY - 3, z), Blocks.MOSSY_COBBLESTONE.defaultBlockState(), 2);
+
+                    if ((hash & 15) == 3 && !shallowRim) {
+                        level.setBlock(pos.set(x, arenaFloorY - 2, z), Blocks.SEA_LANTERN.defaultBlockState(), 2);
+                    } else {
+                        level.setBlock(pos.set(x, arenaFloorY - 2, z), Blocks.MOSSY_COBBLESTONE.defaultBlockState(), 2);
+                    }
+
+                    if (shallowRim) {
+                        level.setBlock(pos.set(x, arenaFloorY - 1, z), Blocks.MOSSY_STONE_BRICKS.defaultBlockState(), 2);
+                    } else {
+                        level.setBlock(pos.set(x, arenaFloorY - 1, z), Blocks.WATER.defaultBlockState(), 2);
+                    }
+                    level.setBlock(pos.set(x, arenaFloorY, z), Blocks.WATER.defaultBlockState(), 2);
+
+                    // Dotted lily pads floating on the water ring
+                    if ((hash & 7) == 1 && distSq >= 72) {
+                        level.setBlock(pos.set(x, arenaFloorY + 1, z), Blocks.LILY_PAD.defaultBlockState(), 2);
+                    }
+                } else if (!protectedColumn) {
+                    // Retaining mossy rim around the water ring so water never spills
+                    for (int y = arenaFloorY - 2; y <= arenaFloorY; y++) {
+                        BlockState existing = level.getBlockState(pos.set(x, y, z));
+                        if (existing.isAir() || !existing.getFluidState().isEmpty()) {
+                            level.setBlock(pos, Blocks.MOSSY_COBBLESTONE.defaultBlockState(), 2);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4 corner stone pillars topped with NarutoBlocks.STONE_LANTERN (outside the shrine hall in all rotations)
+        int[][] corners = {{-8, -8}, {8, -8}, {-8, 8}, {8, 8}};
+        for (int[] corner : corners) {
+            int px = cx + corner[0];
+            int pz = cz + corner[1];
+            if (!chunkBox.isInside(px, arenaFloorY, pz)) {
+                continue;
+            }
+            if (isProtectedSanctuaryColumn(level, pos, px, pz, arenaFloorY, maxClearY)) {
+                continue;
+            }
+            level.setBlock(pos.set(px, arenaFloorY - 2, pz), Blocks.MOSSY_COBBLESTONE.defaultBlockState(), 2);
+            level.setBlock(pos.set(px, arenaFloorY - 1, pz), Blocks.MOSSY_COBBLESTONE.defaultBlockState(), 2);
+            level.setBlock(pos.set(px, arenaFloorY, pz), Blocks.MOSSY_STONE_BRICKS.defaultBlockState(), 2);
+            level.setBlock(pos.set(px, arenaFloorY + 1, pz), Blocks.MOSSY_COBBLESTONE.defaultBlockState(), 2);
+            level.setBlock(pos.set(px, arenaFloorY + 2, pz), Blocks.MOSSY_STONE_BRICK_WALL.defaultBlockState(), 2);
+            level.setBlock(pos.set(px, arenaFloorY + 3, pz), Blocks.MOSSY_STONE_BRICK_WALL.defaultBlockState(), 2);
+            level.setBlock(pos.set(px, arenaFloorY + 4, pz), NarutoBlocks.STONE_LANTERN.get().defaultBlockState(), 2);
+        }
+
         if (!chunkBox.isInside(cx, pieceBox.minY(), cz)) {
             return;
         }
-        int spawnY = -1;
-        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        for (int y = pieceBox.maxY() - 2; y >= pieceBox.minY(); y--) {
-            BlockState below = level.getBlockState(pos.set(cx, y - 1, cz));
-            BlockState feet = level.getBlockState(pos.set(cx, y, cz));
-            BlockState head = level.getBlockState(pos.set(cx, y + 1, cz));
-            if (below.isSolid() && feet.isAir() && head.isAir()) {
-                spawnY = y;
-                break;
-            }
-        }
-        if (spawnY < 0) {
-            return;
-        }
+
+        int spawnY = arenaFloorY + 2;
         com.sekwah.narutomod.entity.mob.SageTrialBossEntity boss =
                 com.sekwah.narutomod.entity.NarutoEntities.SAGE_TRIAL_BOSS.get()
                         .create(level.getLevel(), net.minecraft.world.entity.EntitySpawnReason.STRUCTURE);
@@ -348,8 +440,55 @@ public class AnchoredJigsawStructure extends Structure {
             boss.snapTo(cx + 0.5D, spawnY, cz + 0.5D, 0.0F, 0.0F);
             boss.finalizeSpawn(level, level.getCurrentDifficultyAt(pos.set(cx, spawnY, cz)),
                     net.minecraft.world.entity.EntitySpawnReason.STRUCTURE, null);
+            boss.setHealth(boss.getMaxHealth());
+            boss.setPersistenceRequired();
             level.addFreshEntityWithPassengers(boss);
         }
+    }
+
+    private static BlockState pickArenaStoneBlock(int hash, boolean innerPad) {
+        int m = Math.floorMod(hash, 10);
+        if (innerPad) {
+            if (m < 5) {
+                return Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
+            }
+            if (m < 8) {
+                return Blocks.CRACKED_STONE_BRICKS.defaultBlockState();
+            }
+            return Blocks.STONE_BRICKS.defaultBlockState();
+        }
+        if (m < 4) {
+            return Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
+        }
+        if (m < 7) {
+            return Blocks.CRACKED_STONE_BRICKS.defaultBlockState();
+        }
+        if (m < 9) {
+            return Blocks.MOSSY_COBBLESTONE.defaultBlockState();
+        }
+        return Blocks.STONE_BRICKS.defaultBlockState();
+    }
+
+    private static boolean isProtectedSanctuaryColumn(WorldGenLevel level, BlockPos.MutableBlockPos pos,
+                                                      int x, int z, int minY, int maxY) {
+        for (int y = minY; y <= maxY; y++) {
+            if (isProtectedSanctuaryBlock(level.getBlockState(pos.set(x, y, z)))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isProtectedSanctuaryBlock(BlockState state) {
+        return state.is(net.minecraft.tags.BlockTags.TERRACOTTA)
+                || state.is(Blocks.RED_NETHER_BRICK_STAIRS)
+                || state.is(Blocks.RED_NETHER_BRICK_SLAB)
+                || state.is(Blocks.DARK_OAK_PLANKS)
+                || state.is(Blocks.CHEST)
+                || state.is(Blocks.GOLD_BLOCK)
+                || state.getBlock() instanceof net.minecraft.world.level.block.LightningRodBlock
+                || state.is(Blocks.OAK_LOG)
+                || state.is(Blocks.LANTERN);
     }
 
     static void clearOverheadNaturalTerrain(WorldGenLevel level,

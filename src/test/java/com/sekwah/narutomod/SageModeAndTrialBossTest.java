@@ -52,9 +52,18 @@ public class SageModeAndTrialBossTest {
     }
 
     @Test
-    @DisplayName("SageModeHelper handles NBT clamping, Cloak bonuses, stationary threshold, and damage multiplier")
+    @DisplayName("SageModeHelper handles 3-stage mastery scaling, NBT clamping, Cloak bonuses, and stationary threshold")
     void testSageModeHelperMathAndNbt() {
-        assertEquals(1.30F, SageModeHelper.SAGE_DAMAGE_MULTIPLIER, 0.0001F);
+        assertEquals(1, SageModeHelper.getSageStage(0));
+        assertEquals(1, SageModeHelper.getSageStage(199));
+        assertEquals(2, SageModeHelper.getSageStage(200));
+        assertEquals(2, SageModeHelper.getSageStage(499));
+        assertEquals(3, SageModeHelper.getSageStage(500));
+        assertEquals(3, SageModeHelper.getSageStage(1000));
+
+        assertEquals(1.20F, SageModeHelper.getSageDamageMultiplier(1), 0.0001F);
+        assertEquals(1.32F, SageModeHelper.getSageDamageMultiplier(2), 0.0001F);
+        assertEquals(1.45F, SageModeHelper.getSageDamageMultiplier(3), 0.0001F);
         assertEquals(1.35F, SageModeHelper.SAGE_CLOAK_CHARGE_MULTIPLIER, 0.0001F);
         assertEquals(1.25F, SageModeHelper.SAGE_CLOAK_DURATION_MULTIPLIER, 0.0001F);
         assertEquals(0.0025D, SageModeHelper.STATIONARY_SPEED_SQR_THRESHOLD, 0.00001D);
@@ -63,14 +72,24 @@ public class SageModeAndTrialBossTest {
         assertTrue(SageModeHelper.isStationary(0.0025D));
         assertFalse(SageModeHelper.isStationary(0.0026D));
 
-        assertEquals(5.0F, SageModeHelper.computeNatureEnergyGainPerTick(false), 0.0001F);
-        assertEquals(6.75F, SageModeHelper.computeNatureEnergyGainPerTick(true), 0.0001F);
+        assertEquals(1.25F, SageModeHelper.computeNatureEnergyGainPerTick(1, false), 0.0001F);
+        assertEquals(2.2F, SageModeHelper.computeNatureEnergyGainPerTick(2, false), 0.0001F);
+        assertEquals(3.8F, SageModeHelper.computeNatureEnergyGainPerTick(3, false), 0.0001F);
+        assertEquals(1.25F * 1.35F, SageModeHelper.computeNatureEnergyGainPerTick(1, true), 0.0001F);
 
-        assertEquals(600, SageModeHelper.computeSageModeDurationTicks(false));
-        assertEquals(750, SageModeHelper.computeSageModeDurationTicks(true));
+        assertEquals(400, SageModeHelper.computeSageModeDurationTicks(1, false));
+        assertEquals(700, SageModeHelper.computeSageModeDurationTicks(2, false));
+        assertEquals(1100, SageModeHelper.computeSageModeDurationTicks(3, false));
+        assertEquals(1375, SageModeHelper.computeSageModeDurationTicks(3, true));
+
+        assertEquals(16.0D, SageModeHelper.getSageSensoryRadius(1), 0.0001D);
+        assertEquals(26.0D, SageModeHelper.getSageSensoryRadius(2), 0.0001D);
+        assertEquals(36.0D, SageModeHelper.getSageSensoryRadius(3), 0.0001D);
 
         assertEquals(10.0F, SageModeHelper.applySageModeDamageMultiplier(10.0F, false), 0.0001F);
-        assertEquals(13.0F, SageModeHelper.applySageModeDamageMultiplier(10.0F, true), 0.0001F);
+        assertEquals(12.0F, SageModeHelper.applySageModeDamageMultiplier(10.0F, 1), 0.0001F);
+        assertEquals(13.2F, SageModeHelper.applySageModeDamageMultiplier(10.0F, 2), 0.0001F);
+        assertEquals(14.5F, SageModeHelper.applySageModeDamageMultiplier(10.0F, 3), 0.0001F);
         assertEquals(10.0F, SageModeHelper.applySageModeDamageMultiplier(10.0F, (Player) null), 0.0001F);
 
         CompoundTag tag = new CompoundTag();
@@ -80,8 +99,8 @@ public class SageModeAndTrialBossTest {
         SageModeHelper.setNatureEnergy(tag, -10.0F);
         assertEquals(0.0F, SageModeHelper.getNatureEnergy(tag), 0.0001F);
 
-        SageModeHelper.setSageModeTicks(tag, 900);
-        assertEquals(750, SageModeHelper.getSageModeTicks(tag));
+        SageModeHelper.setSageModeTicks(tag, 2000);
+        assertEquals(1375, SageModeHelper.getSageModeTicks(tag));
         assertTrue(SageModeHelper.isSageModeActive(tag));
         SageModeHelper.setSageModeTicks(tag, -5);
         assertEquals(0, SageModeHelper.getSageModeTicks(tag));
@@ -142,7 +161,7 @@ public class SageModeAndTrialBossTest {
     }
 
     @Test
-    @DisplayName("Sage Mode jutsu JSON, boss loot table, spawn egg JSONs, and 64x64 boss texture are valid")
+    @DisplayName("Sage Mode jutsu JSON, boss loot table, spawn egg, eye/pigment textures, and 128x128 toad boss texture are valid")
     void testSageAssetsAndDataFiles() throws IOException {
         Path jutsuJson = Paths.get("src/main/resources/data/narutomod/jutsus/sage_mode.json");
         assertTrue(Files.isRegularFile(jutsuJson));
@@ -160,11 +179,17 @@ public class SageModeAndTrialBossTest {
         assertTrue(Files.isRegularFile(clientItem));
         assertTrue(Files.isRegularFile(itemModel));
 
-        Path bossTex = Paths.get("src/main/resources/assets/narutomod/textures/entity/mob/sage_trial_boss.png");
+        for (int stage = 1; stage <= 3; stage++) {
+            Path eyeTex = Paths.get("src/main/resources/assets/narutomod/textures/entity/eyes/sage_eyes_" + stage + ".png");
+            assertTrue(Files.isRegularFile(eyeTex));
+        }
+        assertTrue(Files.isRegularFile(Paths.get("src/main/resources/assets/narutomod/textures/entity/eyes/sage_pigment.png")));
+
+        Path bossTex = Paths.get("src/main/resources/assets/narutomod/textures/entity/mob/toad_sage_boss.png");
         assertTrue(Files.isRegularFile(bossTex));
         BufferedImage img = ImageIO.read(bossTex.toFile());
         assertNotNull(img);
-        assertEquals(64, img.getWidth());
-        assertEquals(64, img.getHeight());
+        assertEquals(128, img.getWidth());
+        assertEquals(128, img.getHeight());
     }
 }

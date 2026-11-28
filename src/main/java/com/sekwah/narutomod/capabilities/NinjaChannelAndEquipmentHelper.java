@@ -147,11 +147,13 @@ public final class NinjaChannelAndEquipmentHelper {
             data.setRawTicksChanneled(data.getCurrentlyChanneledTicks() + 1);
         }
 
-        // Sync active abilities bitmask with ToggleAbilityData
+        // Sync active abilities bitmask with ToggleAbilityData and active Sage Mode state
         ToggleAbilityData toggleData = data.getRawToggleAbilityData();
-        if (toggleData != null) {
-            data.setActiveJutsusFlag(computeActiveJutsusFlag(toggleData));
+        int flags = computeActiveJutsusFlag(toggleData);
+        if (SageModeHelper.isSageModeActive(player)) {
+            flags |= INinjaData.JUTSU_FLAG_SAGE_MODE;
         }
+        data.setActiveJutsusFlag(flags);
     }
 
     public static int computeActiveJutsusFlag(@Nullable ToggleAbilityData toggleAbilityData) {

@@ -20,7 +20,8 @@ import net.minecraft.world.entity.player.Player;
  * Sennin Mōdo (Sage Mode)
  * Channeled senjutsu unlocked by defeating the Myōbokuzan Sage Trial Boss.
  * Requires standing still while channeling to gather Nature Energy up to 100%,
- * empowering jutsu damage (+30%), speed, regeneration, and 24-block sensory awareness.
+ * scaling across 3 mastery stages in charge speed, duration, damage (+20%/+32%/+45%),
+ * buffs, and sensory awareness (16/26/36 blocks).
  */
 public class SageModeAbility extends Ability implements Ability.Channeled, Ability.Cooldown {
 
@@ -119,8 +120,11 @@ public class SageModeAbility extends Ability implements Ability.Channeled, Abili
             return;
         }
 
+        Identifier reg = this.getRegistryName() != null ? this.getRegistryName() : SageModeHelper.SAGE_MODE_ID;
+        int mastery = ninjaData != null ? ninjaData.getMastery(reg) : 0;
+        int stage = SageModeHelper.getSageStage(mastery);
         boolean wearingCloak = SageModeHelper.isWearingSageCloak(player);
-        float gain = SageModeHelper.computeNatureEnergyGainPerTick(wearingCloak);
+        float gain = SageModeHelper.computeNatureEnergyGainPerTick(stage, wearingCloak);
         float nextEnergy = Math.min(
                 SageModeHelper.MAX_NATURE_ENERGY,
                 SageModeHelper.getNatureEnergy(persistent) + gain);
@@ -145,10 +149,9 @@ public class SageModeAbility extends Ability implements Ability.Channeled, Abili
             }
 
             if (nextEnergy >= SageModeHelper.MAX_NATURE_ENERGY) {
-                SageModeHelper.activateSageMode(player, wearingCloak);
-                Identifier reg = this.getRegistryName();
-                if (reg != null && ninjaData != null) {
-                    ninjaData.incrementJutsuMastery(reg, false);
+                SageModeHelper.activateSageMode(player, stage, wearingCloak);
+                if (this.getRegistryName() != null && ninjaData != null) {
+                    ninjaData.incrementJutsuMastery(this.getRegistryName(), false);
                     ninjaData.addJutsuCast();
                 }
 
