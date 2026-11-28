@@ -1,0 +1,2824 @@
+{
+  "credit": "NarutoMod 3-Pronged Hiraishin Kunai (26.3)",
+  "textures": {
+    "texture": "narutomod:item/weapons/hiraishin_kunai_3d",
+    "particle": "narutomod:item/weapons/hiraishin_kunai"
+  },
+  "elements": [
+    {
+      "name": "pommel_ring_0",
+      "from": [
+        7.79,
+        -1.235,
+        8.456
+      ],
+      "to": [
+        8.21,
+        -0.765,
+        9.174
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          -1.0,
+          8.815
+        ],
+        "axis": "x",
+        "angle": 0.0
+      }
+    },
+    {
+      "name": "pommel_ring_1",
+      "from": [
+        7.79,
+        -0.659,
+        8.218
+      ],
+      "to": [
+        8.21,
+        -0.189,
+        8.935
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          -0.42370797333296384,
+          8.576292026667037
+        ],
+        "axis": "x",
+        "angle": 45.0
+      }
+    },
+    {
+      "name": "pommel_ring_2",
+      "from": [
+        7.79,
+        -0.42,
+        7.641
+      ],
+      "to": [
+        8.21,
+        0.05,
+        8.359
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          -0.18500000000000005,
+          8.0
+        ],
+        "axis": "x",
+        "angle": 90.0
+      }
+    },
+    {
+      "name": "pommel_ring_3",
+      "from": [
+        7.79,
+        -0.659,
+        7.065
+      ],
+      "to": [
+        8.21,
+        -0.189,
+        7.782
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          -0.4237079733329637,
+          7.423707973332964
+        ],
+        "axis": "x",
+        "angle": 135.0
+      }
+    },
+    {
+      "name": "pommel_ring_4",
+      "from": [
+        7.79,
+        -1.235,
+        6.826
+      ],
+      "to": [
+        8.21,
+        -0.765,
+        7.544
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          -0.9999999999999999,
+          7.1850000000000005
+        ],
+        "axis": "x",
+        "angle": 180.0
+      }
+    },
+    {
+      "name": "pommel_ring_5",
+      "from": [
+        7.79,
+        -1.811,
+        7.065
+      ],
+      "to": [
+        8.21,
+        -1.341,
+        7.782
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          -1.5762920266670362,
+          7.423707973332964
+        ],
+        "axis": "x",
+        "angle": 225.0
+      }
+    },
+    {
+      "name": "pommel_ring_6",
+      "from": [
+        7.79,
+        -2.05,
+        7.641
+      ],
+      "to": [
+        8.21,
+        -1.58,
+        8.359
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          -1.815,
+          8.0
+        ],
+        "axis": "x",
+        "angle": 270.0
+      }
+    },
+    {
+      "name": "pommel_ring_7",
+      "from": [
+        7.79,
+        -1.811,
+        8.218
+      ],
+      "to": [
+        8.21,
+        -1.341,
+        8.935
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          -1.5762920266670362,
+          8.576292026667035
+        ],
+        "axis": "x",
+        "angle": 315.0
+      }
+    },
+    {
+      "name": "handle_lower",
+      "from": [
+        7.62,
+        0.0,
+        7.62
+      ],
+      "to": [
+        8.38,
+        2.4,
+        8.38
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "handle_upper",
+      "from": [
+        7.58,
+        2.4,
+        7.58
+      ],
+      "to": [
+        8.42,
+        4.9,
+        8.42
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "ferrule_collar",
+      "from": [
+        7.42,
+        4.85,
+        7.1
+      ],
+      "to": [
+        8.58,
+        5.45,
+        8.9
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_ridge_0",
+      "from": [
+        7.814,
+        5.4,
+        7.7
+      ],
+      "to": [
+        8.186,
+        6.4,
+        8.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_wing_0",
+      "from": [
+        7.93,
+        5.4,
+        7.28
+      ],
+      "to": [
+        8.07,
+        6.4,
+        8.72
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_ridge_1",
+      "from": [
+        7.74,
+        6.4,
+        7.58
+      ],
+      "to": [
+        8.26,
+        7.6,
+        8.42
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_wing_1",
+      "from": [
+        7.93,
+        6.4,
+        6.75
+      ],
+      "to": [
+        8.07,
+        7.6,
+        9.25
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_ridge_2",
+      "from": [
+        7.702,
+        7.6,
+        7.52
+      ],
+      "to": [
+        8.298,
+        9.2,
+        8.48
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_wing_2",
+      "from": [
+        7.93,
+        7.6,
+        6.52
+      ],
+      "to": [
+        8.07,
+        9.2,
+        9.48
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_ridge_3",
+      "from": [
+        7.74,
+        9.2,
+        7.58
+      ],
+      "to": [
+        8.26,
+        11.2,
+        8.42
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_wing_3",
+      "from": [
+        7.93,
+        9.2,
+        6.76
+      ],
+      "to": [
+        8.07,
+        11.2,
+        9.24
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_ridge_4",
+      "from": [
+        7.789,
+        11.2,
+        7.66
+      ],
+      "to": [
+        8.211,
+        13.0,
+        8.34
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_wing_4",
+      "from": [
+        7.93,
+        11.2,
+        7.08
+      ],
+      "to": [
+        8.07,
+        13.0,
+        8.92
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_ridge_5",
+      "from": [
+        7.851,
+        13.0,
+        7.76
+      ],
+      "to": [
+        8.149,
+        14.6,
+        8.24
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_wing_5",
+      "from": [
+        7.93,
+        13.0,
+        7.42
+      ],
+      "to": [
+        8.07,
+        14.6,
+        8.58
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_ridge_6",
+      "from": [
+        7.86,
+        14.6,
+        7.86
+      ],
+      "to": [
+        8.14,
+        16.0,
+        8.14
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_wing_6",
+      "from": [
+        7.93,
+        14.6,
+        7.72
+      ],
+      "to": [
+        8.07,
+        16.0,
+        8.28
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "handle_seal_band",
+      "from": [
+        7.54,
+        1.8,
+        7.54
+      ],
+      "to": [
+        8.46,
+        3.3,
+        8.46
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            8,
+            0,
+            12,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "hiraishin_guard_bar",
+      "from": [
+        7.78,
+        5.4,
+        5.45
+      ],
+      "to": [
+        8.22,
+        6.25,
+        10.55
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12,
+            8,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "hiraishin_guard_edge",
+      "from": [
+        7.93,
+        5.25,
+        5.35
+      ],
+      "to": [
+        8.07,
+        6.35,
+        10.65
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "prong_north_base_ridge",
+      "from": [
+        7.8,
+        6.25,
+        5.55
+      ],
+      "to": [
+        8.2,
+        8.3,
+        6.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "prong_north_base_wing",
+      "from": [
+        7.93,
+        6.25,
+        5.15
+      ],
+      "to": [
+        8.07,
+        8.3,
+        6.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "prong_north_mid_ridge",
+      "from": [
+        7.84,
+        8.3,
+        5.75
+      ],
+      "to": [
+        8.16,
+        10.1,
+        6.22
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "prong_north_mid_wing",
+      "from": [
+        7.93,
+        8.3,
+        5.45
+      ],
+      "to": [
+        8.07,
+        10.1,
+        6.38
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "prong_north_tip",
+      "from": [
+        7.93,
+        10.1,
+        5.72
+      ],
+      "to": [
+        8.07,
+        11.4,
+        6.18
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "prong_south_base_ridge",
+      "from": [
+        7.8,
+        6.25,
+        9.7
+      ],
+      "to": [
+        8.2,
+        8.3,
+        10.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "prong_south_base_wing",
+      "from": [
+        7.93,
+        6.25,
+        9.5
+      ],
+      "to": [
+        8.07,
+        8.3,
+        10.85
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "prong_south_mid_ridge",
+      "from": [
+        7.84,
+        8.3,
+        9.78
+      ],
+      "to": [
+        8.16,
+        10.1,
+        10.25
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            4,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "prong_south_mid_wing",
+      "from": [
+        7.93,
+        8.3,
+        9.62
+      ],
+      "to": [
+        8.07,
+        10.1,
+        10.55
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "prong_south_tip",
+      "from": [
+        7.93,
+        10.1,
+        9.82
+      ],
+      "to": [
+        8.07,
+        11.4,
+        10.28
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4,
+            0,
+            8,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3.6,
+        1.0
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        3.6,
+        1.0
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        -18
+      ],
+      "translation": [
+        1.13,
+        3.2,
+        1.13
+      ],
+      "scale": [
+        0.68,
+        0.68,
+        0.68
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        0,
+        180,
+        18
+      ],
+      "translation": [
+        1.13,
+        3.2,
+        1.13
+      ],
+      "scale": [
+        0.68,
+        0.68,
+        0.68
+      ]
+    },
+    "ground": {
+      "rotation": [
+        90,
+        35,
+        0
+      ],
+      "translation": [
+        0,
+        1.5,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ]
+    },
+    "gui": {
+      "rotation": [
+        0,
+        90,
+        -45
+      ],
+      "translation": [
+        0,
+        -1,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        -90,
+        -45
+      ],
+      "translation": [
+        0,
+        -1,
+        0
+      ],
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ]
+    }
+  }
+}

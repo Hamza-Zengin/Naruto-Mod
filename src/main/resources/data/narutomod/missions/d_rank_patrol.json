@@ -1,0 +1,14 @@
+{
+  "id": "d_rank_patrol",
+  "rank_label": "D-Rank",
+  "required_rank": "ACADEMY_STUDENT",
+  "target_type": "KILL_ENEMY",
+  "target_count": 10,
+  "reward_xp": 25,
+  "reward_items": [
+    {
+      "item": "minecraft:emerald",
+      "count": 2
+    }
+  ]
+}

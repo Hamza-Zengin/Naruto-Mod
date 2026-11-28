@@ -58,6 +58,7 @@ public class ElementalInteractionHandler {
             if (event.getSource().getEntity() instanceof ServerPlayer attacker) {
                 NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
                         .trigger(attacker, NinjaProgressTrigger.Action.ELEMENTAL_COMBO, "water_lightning");
+                advanceElementalComboMission(attacker);
             }
         }
 
@@ -68,6 +69,7 @@ public class ElementalInteractionHandler {
             if (target instanceof ServerPlayer defender) {
                 NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
                         .trigger(defender, NinjaProgressTrigger.Action.ELEMENTAL_COMBO, "earth_lightning");
+                advanceElementalComboMission(defender);
             }
         }
 
@@ -120,6 +122,7 @@ public class ElementalInteractionHandler {
         if (fireball.getOwner() instanceof ServerPlayer owner) {
             NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
                     .trigger(owner, NinjaProgressTrigger.Action.ELEMENTAL_COMBO, "wind_fire");
+            advanceElementalComboMission(owner);
         }
         if (fireball.level() instanceof ServerLevel serverLevel) {
             triggerComboShockwave(serverLevel, fireball.position(), 0xFF6622);
@@ -140,9 +143,28 @@ public class ElementalInteractionHandler {
         if (earthBullet.getOwner() instanceof ServerPlayer owner) {
             NarutoRegistries.NINJA_PROGRESS_TRIGGER.get()
                     .trigger(owner, NinjaProgressTrigger.Action.ELEMENTAL_COMBO, "fire_earth");
+            advanceElementalComboMission(owner);
         }
         if (earthBullet.level() instanceof ServerLevel serverLevel) {
             triggerComboShockwave(serverLevel, earthBullet.position(), 0xFF4500);
+        }
+    }
+
+    private static void advanceElementalComboMission(ServerPlayer player) {
+        if (player == null) {
+            return;
+        }
+        var data = player.getData(com.sekwah.narutomod.capabilities.NinjaCapabilityHandler.NINJA_DATA);
+        var active = com.sekwah.narutomod.capabilities.MissionDataManager.get(data.getActiveMissionId());
+        if (active != null
+                && active.targetType() == com.sekwah.narutomod.capabilities.NinjaMission.TargetType.ELEMENTAL_COMBO
+                && com.sekwah.narutomod.capabilities.NinjaMission.MissionStatus.fromString(data.getMissionStatus())
+                        == com.sekwah.narutomod.capabilities.NinjaMission.MissionStatus.IN_PROGRESS) {
+            if (data.incrementMissionProgress(1)) {
+                player.sendSystemMessage(net.minecraft.network.chat.Component.translatable(
+                        "naruto.mission.completed", active.getTitleComponent())
+                        .withStyle(net.minecraft.ChatFormatting.GOLD, net.minecraft.ChatFormatting.BOLD));
+            }
         }
     }
 

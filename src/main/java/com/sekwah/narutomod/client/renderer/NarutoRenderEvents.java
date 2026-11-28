@@ -188,11 +188,13 @@ public class NarutoRenderEvents {
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(NarutoEntities.KUNAI.get(), KunaiRenderer::new);
         event.registerEntityRenderer(NarutoEntities.EXPLOSIVE_KUNAI.get(), ExplosiveKunaiRenderer::new);
+        event.registerEntityRenderer(NarutoEntities.HIRAISHIN_KUNAI.get(), HiraishinKunaiRenderer::new);
         event.registerEntityRenderer(NarutoEntities.SENBON.get(), SenbonRenderer::new);
         event.registerEntityRenderer(NarutoEntities.SHURIKEN.get(), ShurikenRenderer::new);
         event.registerEntityRenderer(NarutoEntities.FUMA_SHURIKEN.get(), FumaShurikenRenderer::new);
         event.registerEntityRenderer(NarutoEntities.PAPER_BOMB.get(), PaperBombRenderer::new);
         event.registerEntityRenderer(NarutoEntities.SMOKE_BOMB.get(), SmokeBombRenderer::new);
+        event.registerEntityRenderer(NarutoEntities.FLASH_BOMB.get(), FlashBombRenderer::new);
 
         event.registerEntityRenderer(NarutoEntities.FIREBALL_JUTSU.get(), FireballJutsuRenderer::new);
         event.registerEntityRenderer(NarutoEntities.RASENSHURIKEN.get(), RasenshurikenRenderer::new);
@@ -208,6 +210,7 @@ public class NarutoRenderEvents {
         event.registerEntityRenderer(NarutoEntities.ROGUE_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "rogue_ninja"));
         event.registerEntityRenderer(NarutoEntities.AKATSUKI_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "akatsuki_ninja"));
         event.registerEntityRenderer(NarutoEntities.CHUNIN_CHAMPION.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "konoha_ninja"));
+        event.registerEntityRenderer(NarutoEntities.SAGE_TRIAL_BOSS.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "sage_trial_boss"));
         event.registerEntityRenderer(NarutoEntities.VILLAGE_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "village_ninja"));
         event.registerEntityRenderer(NarutoEntities.KONOHA_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "konoha_ninja"));
         event.registerEntityRenderer(NarutoEntities.SUNA_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "suna_ninja"));

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "narutomod:block/mission_board"
+    },
+    "facing=south": {
+      "model": "narutomod:block/mission_board",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "narutomod:block/mission_board",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "narutomod:block/mission_board",
+      "y": 270
+    }
+  }
+}

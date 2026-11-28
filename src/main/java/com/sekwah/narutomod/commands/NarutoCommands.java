@@ -66,8 +66,8 @@ public class NarutoCommands {
 
     private static final SuggestionProvider<CommandSourceStack> SUGGEST_MISSIONS = (ctx, builder) -> {
         List<String> missionIds = new ArrayList<>();
-        for (com.sekwah.narutomod.capabilities.NinjaMission m : com.sekwah.narutomod.capabilities.NinjaMission.values()) {
-            missionIds.add(m.getId());
+        for (com.sekwah.narutomod.capabilities.MissionDefinition m : com.sekwah.narutomod.capabilities.MissionDataManager.getAll()) {
+            missionIds.add(m.id());
         }
         return SharedSuggestionProvider.suggest(missionIds, builder);
     };

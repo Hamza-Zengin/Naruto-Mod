@@ -1,0 +1,18 @@
+{
+  "id": "a_rank_akatsuki_recon",
+  "rank_label": "A-Rank",
+  "required_rank": "JONIN",
+  "target_type": "KILL_AKATSUKI",
+  "target_count": 2,
+  "reward_xp": 200,
+  "reward_items": [
+    {
+      "item": "narutomod:blank_jutsu_scroll",
+      "count": 1
+    },
+    {
+      "item": "minecraft:emerald",
+      "count": 8
+    }
+  ]
+}

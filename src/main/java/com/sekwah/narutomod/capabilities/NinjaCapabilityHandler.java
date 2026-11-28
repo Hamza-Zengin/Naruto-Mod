@@ -135,21 +135,24 @@ public class NinjaCapabilityHandler {
                 ninjaData.addAkatsukiNinjaDefeated();
             }
 
-            NinjaMission active = NinjaMission.fromId(ninjaData.getActiveMissionId());
+            MissionDefinition active = MissionDataManager.get(ninjaData.getActiveMissionId());
             if (active != null && NinjaMission.MissionStatus.fromString(ninjaData.getMissionStatus()) == NinjaMission.MissionStatus.IN_PROGRESS) {
-                boolean matches = switch (active.getTargetType()) {
+                boolean matches = switch (active.targetType()) {
                     case KILL_ENEMY -> !(event.getEntity() instanceof Player)
                             && !(event.getEntity() instanceof com.sekwah.narutomod.entity.ShadowCloneEntity);
                     case KILL_ROGUE -> event.getEntity() instanceof RogueNinjaEntity;
                     case KILL_AKATSUKI -> event.getEntity() instanceof AkatsukiNinjaEntity;
-                    case CAST_JUTSU -> false;
+                    case KILL_BINGO_TARGET -> event.getEntity() instanceof RogueNinjaEntity rogue && rogue.isBingoTarget();
+                    case DEFEAT_BOSS -> event.getEntity() instanceof AkatsukiNinjaEntity
+                            || event.getEntity() instanceof com.sekwah.narutomod.entity.mob.ChuninChampionEntity;
+                    case CAST_JUTSU, ELEMENTAL_COMBO, MASTER_JUTSU -> false;
                 };
                 if (matches) {
                     boolean justCompleted = ninjaData.incrementMissionProgress(1);
                     if (justCompleted) {
                         killer.sendSystemMessage(net.minecraft.network.chat.Component.translatable(
                                 "naruto.mission.completed",
-                                net.minecraft.network.chat.Component.translatable(active.getTranslationKey()))
+                                active.getTitleComponent())
                                 .withStyle(net.minecraft.ChatFormatting.GOLD, net.minecraft.ChatFormatting.BOLD));
                     }
                 }

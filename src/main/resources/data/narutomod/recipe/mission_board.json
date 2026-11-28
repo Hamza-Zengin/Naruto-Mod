@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WWW",
+    "PPP",
+    "S S"
+  ],
+  "key": {
+    "W": "minecraft:oak_planks",
+    "P": "minecraft:paper",
+    "S": "minecraft:stick"
+  },
+  "result": {
+    "id": "narutomod:mission_board",
+    "count": 1
+  }
+}

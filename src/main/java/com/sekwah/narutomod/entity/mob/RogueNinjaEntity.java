@@ -7,12 +7,16 @@ import com.sekwah.narutomod.entity.ai.NinjaJutsuProfile;
 import com.sekwah.narutomod.entity.ai.NinjaJutsuUser;
 import com.sekwah.narutomod.entity.projectile.KunaiEntity;
 import com.sekwah.narutomod.item.NarutoItems;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -26,6 +30,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import javax.annotation.Nullable;
 
@@ -33,15 +39,45 @@ import javax.annotation.Nullable;
  * Rogue Ninja (Nukenin)
  * Agile hostile shinobi that casts basic Water Bullet jutsu at long range,
  * throws kunai at medium range, closes in with melee strikes, and executes safe Kawarimi evasion at low health.
+ * May spawn as an A-Rank or S-Rank Bingo Book mini-boss with elemental jutsu mastery and bounty loot.
  */
 public class RogueNinjaEntity extends Monster implements NinjaJutsuUser {
 
+    private static final EntityDataAccessor<Boolean> DATA_IS_BINGO_TARGET =
+            SynchedEntityData.defineId(RogueNinjaEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<String> DATA_BINGO_RANK =
+            SynchedEntityData.defineId(RogueNinjaEntity.class, EntityDataSerializers.STRING);
+
+    private static final float BINGO_SPAWN_CHANCE = 0.12F;
+
     private final NinjaJutsuCooldowns jutsuCooldowns = new NinjaJutsuCooldowns(60);
     private int kunaiCooldown = 40;
+    private String bingoElement = "";
+    @Nullable
+    private NinjaJutsuProfile bingoJutsuProfile;
 
     public RogueNinjaEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
         this.xpReward = 15;
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_IS_BINGO_TARGET, false);
+        builder.define(DATA_BINGO_RANK, "");
+    }
+
+    public boolean isBingoTarget() {
+        return this.entityData.get(DATA_IS_BINGO_TARGET);
+    }
+
+    public String getBingoRank() {
+        return this.entityData.get(DATA_BINGO_RANK);
+    }
+
+    private NinjaJutsuProfile getActiveJutsuProfile() {
+        return this.bingoJutsuProfile != null ? this.bingoJutsuProfile : NinjaJutsuProfile.roguePreset();
     }
 
     @Override
@@ -61,7 +97,7 @@ public class RogueNinjaEntity extends Monster implements NinjaJutsuUser {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new NinjaJutsuAttackGoal<>(this, NinjaJutsuProfile.roguePreset()));
+        this.goalSelector.addGoal(2, new NinjaJutsuAttackGoal<>(this, this::getActiveJutsuProfile));
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1.2D, false));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 12.0F));
@@ -124,7 +160,46 @@ public class RogueNinjaEntity extends Monster implements NinjaJutsuUser {
         SpawnGroupData data = super.finalizeSpawn(level, difficulty, reason, spawnData);
         RandomSource random = level.getRandom();
         this.populateDefaultEquipmentSlots(random, difficulty);
+        if (reason != EntitySpawnReason.SPAWN_ITEM_USE && random.nextFloat() < BINGO_SPAWN_CHANCE) {
+            this.promoteToBingoTarget(random);
+        }
         return data;
+    }
+
+    public BingoBookProfile promoteToBingoTarget(RandomSource random) {
+        BingoBookProfile profile = BingoBookProfile.generate(random);
+        this.entityData.set(DATA_IS_BINGO_TARGET, true);
+        this.entityData.set(DATA_BINGO_RANK, profile.rankTier().getCode());
+        this.bingoElement = profile.elementTheme().name();
+        this.bingoJutsuProfile = profile.jutsuProfile();
+        this.xpReward = profile.rankTier().getXpReward();
+
+        AttributeInstance maxHpAttr = this.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHpAttr != null) {
+            maxHpAttr.setBaseValue(profile.maxHealth());
+            this.setHealth((float) profile.maxHealth());
+        }
+        AttributeInstance armorAttr = this.getAttribute(Attributes.ARMOR);
+        if (armorAttr != null) {
+            armorAttr.setBaseValue(10.0D);
+        }
+        AttributeInstance attackAttr = this.getAttribute(Attributes.ATTACK_DAMAGE);
+        if (attackAttr != null) {
+            attackAttr.setBaseValue(profile.rankTier() == BingoBookProfile.RankTier.S ? 8.5D : 7.0D);
+        }
+
+        if (profile.rankTier() == BingoBookProfile.RankTier.S) {
+            this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(NarutoItems.CHAKRA_BLADES.get()));
+            this.setDropChance(EquipmentSlot.MAINHAND, 0.05F);
+        } else {
+            this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(NarutoItems.ANBU_TANTO.get()));
+            this.setDropChance(EquipmentSlot.MAINHAND, 0.05F);
+        }
+
+        this.setCustomName(profile.formatWantedName());
+        this.setCustomNameVisible(true);
+        this.setGlowingTag(true);
+        return profile;
     }
 
     @Override
@@ -136,6 +211,36 @@ public class RogueNinjaEntity extends Monster implements NinjaJutsuUser {
         }
         this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(NarutoItems.HEADBAND_LEAF_SCRATCHED.get()));
         this.setDropChance(EquipmentSlot.HEAD, 0.06F);
+    }
+
+    @Override
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putBoolean("IsBingoTarget", this.isBingoTarget());
+        output.putString("BingoRank", this.getBingoRank());
+        output.putString("BingoElement", this.bingoElement != null ? this.bingoElement : "");
+    }
+
+    @Override
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        boolean bingo = input.getBooleanOr("IsBingoTarget", false);
+        String rank = input.getStringOr("BingoRank", "");
+        String element = input.getStringOr("BingoElement", "");
+        this.entityData.set(DATA_IS_BINGO_TARGET, bingo);
+        this.entityData.set(DATA_BINGO_RANK, rank);
+        this.bingoElement = element;
+        if (bingo) {
+            BingoBookProfile.RankTier tier = BingoBookProfile.RankTier.fromString(rank);
+            BingoBookProfile.ElementTheme theme = BingoBookProfile.ElementTheme.fromNameOrSeed(
+                    element, this.getUUID().getLeastSignificantBits());
+            this.bingoJutsuProfile = BingoBookProfile.buildJutsuProfile(tier, theme);
+            this.xpReward = tier.getXpReward();
+            this.setGlowingTag(true);
+        } else {
+            this.bingoJutsuProfile = null;
+            this.xpReward = 15;
+        }
     }
 
     @Override
@@ -192,6 +297,11 @@ public class RogueNinjaEntity extends Monster implements NinjaJutsuUser {
                     ? NarutoItems.SCROLL_STONE_SPIKES.get()
                     : NarutoItems.SCROLL_WATER_DRAGON.get();
             this.spawnAtLocation(serverLevel, new ItemStack(scroll, 1));
+        }
+
+        if (this.isBingoTarget()) {
+            BingoBookProfile.RankTier tier = BingoBookProfile.RankTier.fromString(this.getBingoRank());
+            BingoBookProfile.dropBingoBonusLoot(serverLevel, this, this.random, tier);
         }
     }
 }

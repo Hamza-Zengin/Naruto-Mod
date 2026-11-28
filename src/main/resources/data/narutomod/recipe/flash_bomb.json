@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " P ",
+    "GLG",
+    " P "
+  ],
+  "key": {
+    "P": "minecraft:paper",
+    "G": "minecraft:gunpowder",
+    "L": "minecraft:glowstone_dust"
+  },
+  "result": {
+    "id": "narutomod:flash_bomb",
+    "count": 4
+  }
+}

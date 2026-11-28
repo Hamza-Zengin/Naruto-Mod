@@ -1,0 +1,14 @@
+{
+  "id": "c_rank_rogue_hunt",
+  "rank_label": "C-Rank",
+  "required_rank": "GENIN",
+  "target_type": "KILL_ROGUE",
+  "target_count": 5,
+  "reward_xp": 60,
+  "reward_items": [
+    {
+      "item": "minecraft:emerald",
+      "count": 4
+    }
+  ]
+}

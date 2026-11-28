@@ -1,0 +1,18 @@
+{
+  "id": "a_rank_bingo_bounty",
+  "rank_label": "A-Rank",
+  "required_rank": "JONIN",
+  "target_type": "KILL_BINGO_TARGET",
+  "target_count": 1,
+  "reward_xp": 260,
+  "reward_items": [
+    {
+      "item": "minecraft:emerald",
+      "count": 10
+    },
+    {
+      "item": "narutomod:blank_jutsu_scroll",
+      "count": 1
+    }
+  ]
+}

@@ -12,10 +12,13 @@ import com.sekwah.narutomod.entity.jutsuprojectile.WoodPrisonEntity;
 import com.sekwah.narutomod.entity.mob.AkatsukiNinjaEntity;
 import com.sekwah.narutomod.entity.mob.ChuninChampionEntity;
 import com.sekwah.narutomod.entity.mob.RogueNinjaEntity;
+import com.sekwah.narutomod.entity.mob.SageTrialBossEntity;
 import com.sekwah.narutomod.entity.mob.ShinobiVillagerEntity;
 import com.sekwah.narutomod.entity.mob.VillageNinjaEntity;
 import com.sekwah.narutomod.entity.projectile.ExplosiveKunaiEntity;
+import com.sekwah.narutomod.entity.projectile.FlashBombEntity;
 import com.sekwah.narutomod.entity.projectile.FumaShurikenEntity;
+import com.sekwah.narutomod.entity.projectile.HiraishinKunaiEntity;
 import com.sekwah.narutomod.entity.projectile.KunaiEntity;
 import com.sekwah.narutomod.entity.projectile.SenbonEntity;
 import com.sekwah.narutomod.entity.projectile.ShurikenEntity;
@@ -44,6 +47,9 @@ public class NarutoEntities {
 
     public static final DeferredHolder<EntityType<?>, EntityType<ExplosiveKunaiEntity>> EXPLOSIVE_KUNAI = register("explosive_kunai",
             ExplosiveKunaiEntity::new, MobCategory.MISC, builder -> builder.sized(0.5F, 0.5F).clientTrackingRange(8));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<HiraishinKunaiEntity>> HIRAISHIN_KUNAI = register("hiraishin_kunai",
+            HiraishinKunaiEntity::new, MobCategory.MISC, builder -> builder.sized(0.5F, 0.5F).clientTrackingRange(8));
 
     public static final DeferredHolder<EntityType<?>, EntityType<ShurikenEntity>> SHURIKEN = register("shuriken",
             ShurikenEntity::new, MobCategory.MISC, builder -> builder.sized(0.5F, 0.5F).clientTrackingRange(8));
@@ -84,6 +90,9 @@ public class NarutoEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<SmokeBombEntity>> SMOKE_BOMB = register("smoke_bomb",
             SmokeBombEntity::new, MobCategory.MISC, builder -> builder.sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(10));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<FlashBombEntity>> FLASH_BOMB = register("flash_bomb",
+            FlashBombEntity::new, MobCategory.MISC, builder -> builder.sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(10));
+
     public static final DeferredHolder<EntityType<?>, EntityType<ShadowCloneEntity>> SHADOW_CLONE = register("shadow_clone",
             ShadowCloneEntity::new, MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.8F).clientTrackingRange(8));
 
@@ -95,6 +104,9 @@ public class NarutoEntities {
 
     public static final DeferredHolder<EntityType<?>, EntityType<ChuninChampionEntity>> CHUNIN_CHAMPION = register("chunin_champion",
             ChuninChampionEntity::new, MobCategory.MONSTER, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(10));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SageTrialBossEntity>> SAGE_TRIAL_BOSS = register("sage_trial_boss",
+            SageTrialBossEntity::new, MobCategory.MONSTER, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(10));
 
     public static final DeferredHolder<EntityType<?>, EntityType<VillageNinjaEntity>> VILLAGE_NINJA = register("village_ninja",
             VillageNinjaEntity::new, MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));
@@ -156,6 +168,7 @@ public class NarutoEntities {
         event.put(ROGUE_NINJA.get(), RogueNinjaEntity.createAttributes().build());
         event.put(AKATSUKI_NINJA.get(), AkatsukiNinjaEntity.createAttributes().build());
         event.put(CHUNIN_CHAMPION.get(), ChuninChampionEntity.createAttributes().build());
+        event.put(SAGE_TRIAL_BOSS.get(), SageTrialBossEntity.createAttributes().build());
         event.put(VILLAGE_NINJA.get(), VillageNinjaEntity.createAttributes().build());
         event.put(KONOHA_NINJA.get(), VillageNinjaEntity.createAttributes().build());
         event.put(SUNA_NINJA.get(), VillageNinjaEntity.createAttributes().build());

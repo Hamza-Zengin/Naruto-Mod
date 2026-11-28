@@ -368,29 +368,29 @@ final class NarutoCommandHandlers {
 
     // === MISSION HANDLERS ===
     static int assignMission(CommandSourceStack source, ServerPlayer player, String missionId) {
-        NinjaMission mission = NinjaMission.fromId(missionId);
+        var mission = com.sekwah.narutomod.capabilities.MissionDataManager.get(missionId);
         if (mission == null) {
             source.sendFailure(Component.literal("Geçersiz görev ID'si: " + missionId).withStyle(ChatFormatting.RED));
             return 0;
         }
         var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
-        data.acceptMission(mission);
+        com.sekwah.narutomod.capabilities.MissionLogic.acceptMission(data, mission);
         data.updateServerData(player);
-        source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için görev atandı: " + mission.getId())
+        source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " için görev atandı: " + mission.id())
                 .withStyle(ChatFormatting.GREEN), true);
         return 1;
     }
 
     static int completeMission(CommandSourceStack source, ServerPlayer player) {
         var data = player.getData(NinjaCapabilityHandler.NINJA_DATA);
-        NinjaMission active = NinjaMission.fromId(data.getActiveMissionId());
+        var active = com.sekwah.narutomod.capabilities.MissionDataManager.get(data.getActiveMissionId());
         if (active == null) {
             source.sendFailure(Component.literal(player.getScoreboardName() + " için aktif görev yok.").withStyle(ChatFormatting.RED));
             return 0;
         }
-        data.setMissionProgress(active.getTargetCount());
+        data.setMissionProgress(active.targetCount());
         data.updateServerData(player);
-        source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " görevi tamamlandı olarak işaretlendi: " + active.getId())
+        source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " görevi tamamlandı olarak işaretlendi: " + active.id())
                 .withStyle(ChatFormatting.GOLD), true);
         return 1;
     }
