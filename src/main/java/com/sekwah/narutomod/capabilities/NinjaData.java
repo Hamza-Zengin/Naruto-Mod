@@ -2,23 +2,16 @@ package com.sekwah.narutomod.capabilities;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.Ability;
-import com.sekwah.narutomod.abilities.NarutoAbilities;
 import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import com.sekwah.narutomod.config.NarutoConfig;
 import com.sekwah.sekclib.capabilitysync.annotation.Sync;
-import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -112,12 +105,6 @@ public class NinjaData implements INinjaData {
     private int selectedJutsuSlot = 0;
 
     private final NinjaTickScheduler tickScheduler = new NinjaTickScheduler();
-
-    private static final Identifier SHARINGAN_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sharingan");
-    private static final Identifier BYAKUGAN_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "byakugan");
-    private static final Identifier EIGHT_GATES_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates");
-    private static final Identifier EIGHT_GATES_DEATH_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "eight_gates_death");
-    private static final Identifier WATER_WALK_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "water_walk");
 
     private transient Set<Identifier> cachedUnlockedAbilities;
     private transient String cachedUnlockedJutsusSource;
@@ -538,31 +525,7 @@ public class NinjaData implements INinjaData {
 
     @Override
     public void setCurrentlyChanneledAbility(Player player, Ability ability) {
-        if (ability != null) {
-            if (ability.castingSound() != null) {
-                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ability.castingSound(), SoundSource.PLAYERS, 0.5f, 1.0f);
-            }
-            if (ability instanceof Ability.Channeled channeled && channeled.useChargedMessages()) {
-                player.sendSystemMessage(Component.translatable("jutsu.charge.start", Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
-            } else {
-                player.sendSystemMessage(Component.translatable("jutsu.channel.start", Component.translatable(ability.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
-            }
-
-            this.currentlyChanneled = ability.getRegistryName();
-        } else {
-            if (this.currentlyChanneled != null) {
-                Ability currentAbility = NarutoAbilities.getAbility(this.currentlyChanneled);
-                if (currentAbility != null) {
-                    if (currentAbility instanceof Ability.Channeled channeled && channeled.useChargedMessages()) {
-                        player.sendSystemMessage(Component.translatable("jutsu.cast", Component.translatable(currentAbility.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.GREEN));
-                    } else {
-                        player.sendSystemMessage(Component.translatable("jutsu.channel.stop", Component.translatable(currentAbility.getTranslationKey()).withStyle(ChatFormatting.YELLOW)).withStyle(ChatFormatting.RED));
-                    }
-                }
-            }
-            this.currentlyChanneled = null;
-        }
-        this.ticksChanneled = 0;
+        NinjaChannelAndEquipmentHelper.setCurrentlyChanneledAbility(this, player, ability);
     }
 
     @Override
@@ -575,90 +538,8 @@ public class NinjaData implements INinjaData {
 
     @Override
     public void updateServerData(Player player) {
-        if (player.isDeadOrDying()) {
-            if (this.currentlyChanneled != null) {
-                this.setCurrentlyChanneledAbility(player, null);
-            }
-            if (this.activeHandJutsuTicks > 0) {
-                this.clearActiveHandJutsu();
-            }
-            this.activeJutsusFlag = 0;
-            return;
-        }
-
-        // Countdown active hand jutsu (Rasengan/Chidori 5-second window)
-        if (this.activeHandJutsuTicks > 0) {
-            this.activeHandJutsuTicks--;
-            if (this.activeHandJutsuTicks % 20 == 0) {
-                if ("chidori".equals(this.activeHandJutsu)) {
-                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                            com.sekwah.narutomod.sounds.NarutoSounds.CHIDORI_LOOP.get(), net.minecraft.sounds.SoundSource.PLAYERS, 0.8f, 1.1f);
-                } else if ("rasengan".equals(this.activeHandJutsu)) {
-                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                            com.sekwah.narutomod.sounds.NarutoSounds.RASENGAN_LOOP.get(), net.minecraft.sounds.SoundSource.PLAYERS, 0.8f, 1.0f);
-                }
-            }
-            if (this.activeHandJutsuTicks == 0) {
-                if ("chidori".equals(this.activeHandJutsu)) {
-                    player.removeEffect(net.minecraft.world.effect.MobEffects.SPEED);
-                }
-                this.activeHandJutsu = "";
-            }
-        }
-
-        this.tickScheduler.tick(player);
-
-        boolean wearingKageHat = com.sekwah.narutomod.events.PlayerEvents.isKageHat(
-                player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.HEAD).getItem());
-        if (this.kageHatEquipped != wearingKageHat) {
-            this.setKageHatEquipped(wearingKageHat);
-        }
-
-        ChakraStaminaLogic.tickRegen(this, player, this.staminaRegenInfo, this.chakraRegenInfo);
-
-        if (this.currentlyChanneled != null) {
-            Ability ability = NarutoAbilities.getAbility(this.currentlyChanneled);
-            if (ability != null && ability.activationType() == Ability.ActivationType.CHANNELED) {
-                if(ability.handleCost(player, this, this.ticksChanneled)) {
-                    if (ability instanceof Ability.Channeled channeled) {
-                        channeled.handleChannelling(player, this, this.ticksChanneled);
-                    }
-                } else {
-                    if (this.ticksChanneled > 0) {
-                        ability.performServer(player, this, this.ticksChanneled - 1);
-                    }
-                    this.setCurrentlyChanneledAbility(player, null);
-                }
-            } else {
-                NarutoMod.LOGGER.error("Somehow non channeled ability has been set to ninja data {}", this.currentlyChanneled);
-                this.setCurrentlyChanneledAbility(player, null);
-            }
-            this.ticksChanneled++;
-        }
-
-        // Sync active abilities bitmask with ToggleAbilityData
-        if (this.toggleAbilityData != null) {
-            var activeToggleAbilities = this.toggleAbilityData.getAbilitiesHashSet();
-            if (activeToggleAbilities == null || activeToggleAbilities.isEmpty()) {
-                this.activeJutsusFlag = 0;
-            } else {
-                int flags = 0;
-                for (Identifier id : activeToggleAbilities) {
-                    if (SHARINGAN_ID.equals(id)) {
-                        flags |= JUTSU_FLAG_SHARINGAN;
-                    } else if (BYAKUGAN_ID.equals(id)) {
-                        flags |= JUTSU_FLAG_BYAKUGAN;
-                    } else if (EIGHT_GATES_ID.equals(id)) {
-                        flags |= JUTSU_FLAG_EIGHT_GATES;
-                    } else if (EIGHT_GATES_DEATH_ID.equals(id)) {
-                        flags |= JUTSU_FLAG_EIGHT_GATES | JUTSU_FLAG_EIGHT_GATES_DEATH;
-                    } else if (WATER_WALK_ID.equals(id)) {
-                        flags |= JUTSU_FLAG_WATER_WALK;
-                    }
-                }
-                this.activeJutsusFlag = flags;
-            }
-        }
+        NinjaChannelAndEquipmentHelper.updateServerData(
+                this, player, this.tickScheduler, this.staminaRegenInfo, this.chakraRegenInfo);
     }
 
     public void updateClientData() {
@@ -743,11 +624,7 @@ public class NinjaData implements INinjaData {
 
     @Override
     public void setJutsuActive(int flag, boolean active) {
-        if (active) {
-            this.activeJutsusFlag |= flag;
-        } else {
-            this.activeJutsusFlag &= ~flag;
-        }
+        this.activeJutsusFlag = NinjaChannelAndEquipmentHelper.setJutsuActiveFlag(this.activeJutsusFlag, flag, active);
     }
 
     @Override
@@ -805,68 +682,20 @@ public class NinjaData implements INinjaData {
         return this.tickScheduler.getCooldownEvents();
     }
 
-    private String[] parseEquippedSlots() {
-        String[] slots = new String[MAX_JUTSU_SLOTS];
-        java.util.Arrays.fill(slots, "");
-        if (this.equippedJutsus != null && !this.equippedJutsus.isEmpty()) {
-            String[] parts = this.equippedJutsus.split(";", -1);
-            for (int i = 0; i < Math.min(MAX_JUTSU_SLOTS, parts.length); i++) {
-                slots[i] = parts[i] != null ? parts[i].trim() : "";
-            }
-        }
-        return slots;
-    }
-
-    private void writeEquippedSlots(String[] slots) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < MAX_JUTSU_SLOTS; i++) {
-            if (i > 0) sb.append(';');
-            if (slots[i] != null && !slots[i].isEmpty()) {
-                sb.append(slots[i]);
-            }
-        }
-        this.equippedJutsus = sb.toString();
-    }
-
     @Override
     @javax.annotation.Nullable
     public Identifier getEquippedJutsu(int slot) {
-        if (slot < 0 || slot >= MAX_JUTSU_SLOTS) {
-            return null;
-        }
-        String raw = parseEquippedSlots()[slot];
-        if (raw.isEmpty()) {
-            return null;
-        }
-        return Identifier.tryParse(raw);
+        return NinjaChannelAndEquipmentHelper.getEquippedJutsu(this.equippedJutsus, slot);
     }
 
     @Override
     public void setEquippedJutsu(int slot, @javax.annotation.Nullable Identifier abilityId) {
-        if (slot < 0 || slot >= MAX_JUTSU_SLOTS) {
-            return;
-        }
-        String[] slots = parseEquippedSlots();
-        String idStr = abilityId != null ? abilityId.toString() : "";
-        if (!idStr.isEmpty()) {
-            for (int i = 0; i < MAX_JUTSU_SLOTS; i++) {
-                if (i != slot && idStr.equals(slots[i])) {
-                    slots[i] = "";
-                }
-            }
-        }
-        slots[slot] = idStr;
-        writeEquippedSlots(slots);
+        this.equippedJutsus = NinjaChannelAndEquipmentHelper.setEquippedJutsu(this.equippedJutsus, slot, abilityId);
     }
 
     @Override
-    public List<Identifier> getEquippedJutsusList() {
-        String[] slots = parseEquippedSlots();
-        List<Identifier> list = new ArrayList<>(MAX_JUTSU_SLOTS);
-        for (int i = 0; i < MAX_JUTSU_SLOTS; i++) {
-            list.add(slots[i].isEmpty() ? null : Identifier.tryParse(slots[i]));
-        }
-        return Collections.unmodifiableList(list);
+    public java.util.List<Identifier> getEquippedJutsusList() {
+        return NinjaChannelAndEquipmentHelper.getEquippedJutsusList(this.equippedJutsus);
     }
 
     @Override
@@ -876,30 +705,17 @@ public class NinjaData implements INinjaData {
 
     @Override
     public void setEquippedJutsusString(String serialized) {
-        if (serialized == null || serialized.isEmpty()) {
-            this.equippedJutsus = ";;;;;;;";
-            return;
-        }
-        String[] slots = new String[MAX_JUTSU_SLOTS];
-        java.util.Arrays.fill(slots, "");
-        String[] parts = serialized.split(";", -1);
-        for (int i = 0; i < Math.min(MAX_JUTSU_SLOTS, parts.length); i++) {
-            String trimmed = parts[i] != null ? parts[i].trim() : "";
-            if (!trimmed.isEmpty() && Identifier.tryParse(trimmed) != null) {
-                slots[i] = trimmed;
-            }
-        }
-        writeEquippedSlots(slots);
+        this.equippedJutsus = NinjaChannelAndEquipmentHelper.normalizeEquippedJutsusString(serialized);
     }
 
     @Override
     public int getSelectedJutsuSlot() {
-        return Math.max(0, Math.min(MAX_JUTSU_SLOTS - 1, this.selectedJutsuSlot));
+        return NinjaChannelAndEquipmentHelper.clampSelectedJutsuSlot(this.selectedJutsuSlot);
     }
 
     @Override
     public void setSelectedJutsuSlot(int slot) {
-        this.selectedJutsuSlot = Math.max(0, Math.min(MAX_JUTSU_SLOTS - 1, slot));
+        this.selectedJutsuSlot = NinjaChannelAndEquipmentHelper.clampSelectedJutsuSlot(slot);
     }
 
     @Override
@@ -1005,4 +821,12 @@ public class NinjaData implements INinjaData {
     int getRawEnemiesDefeated() { return this.enemiesDefeated; }
 
     int getRawJutsusCastCount() { return this.jutsusCastCount; }
+
+    void setRawCurrentlyChanneled(Identifier abilityId) { this.currentlyChanneled = abilityId; }
+
+    void setRawTicksChanneled(int ticks) { this.ticksChanneled = ticks; }
+
+    void setRawActiveHandJutsuTicks(int ticks) { this.activeHandJutsuTicks = ticks; }
+
+    ToggleAbilityData getRawToggleAbilityData() { return this.toggleAbilityData; }
 }
