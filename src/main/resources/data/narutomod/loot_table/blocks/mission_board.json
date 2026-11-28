@@ -11,7 +11,7 @@
             "type": "minecraft:match_block",
             "blocks": "narutomod:mission_board",
             "state": {
-              "half": "lower"
+              "part": "bottom_center"
             }
           }
         }

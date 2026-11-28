@@ -105,9 +105,9 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
 
     private final Set<ServerPlayer> trackingPlayers = new HashSet<>();
     private final Set<UUID> participantUuids = new HashSet<>();
-    private final NinjaJutsuCooldowns jutsuCooldowns = new NinjaJutsuCooldowns(26);
+    private final NinjaJutsuCooldowns jutsuCooldowns = new NinjaJutsuCooldowns(36);
     private int dashCooldown = 50;
-    private int shockwaveCooldown = 90;
+    private int shockwaveCooldown = 130;
     private int leapAirTicks = 0;
     private int prevLeapTicks = 0;
     private boolean leapSlamArmed = false;
@@ -178,11 +178,11 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
                 .rangedDistances(7.0D, 24.0D)
                 .closeThreatDistance(6.5D)
                 .criticalHealthRatio(0.35F)
-                .globalCooldownTicks(26)
+                .globalCooldownTicks(36)
                 .handSealWindupTicks(8)
-                .waterBullet(true, 60, 20, 11.5F, 36, 1.35D)
-                .vacuumSpheres(true, 65, 20, 6.5F, 32, 1.60D)
-                .kawarimi(true, 130, 5.5D, 75, 1)
+                .waterBullet(true, 85, 20, 8.0F, 36, 1.35D)
+                .vacuumSpheres(true, 90, 20, 4.5F, 32, 1.60D)
+                .kawarimi(true, 220, 5.5D, 75, 1)
                 .build();
     }
 
@@ -193,11 +193,11 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
 
     public static AttributeSupplier.Builder createAttributes() {
         return PathfinderMob.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 260.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.36D)
-                .add(Attributes.ATTACK_DAMAGE, 10.0D)
-                .add(Attributes.ARMOR, 14.0D)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 0.60D)
+                .add(Attributes.MAX_HEALTH, 180.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.32D)
+                .add(Attributes.ATTACK_DAMAGE, 8.0D)
+                .add(Attributes.ARMOR, 8.0D)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 0.45D)
                 .add(Attributes.FOLLOW_RANGE, 38.0D);
     }
 
@@ -464,8 +464,8 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
                         this.shockwaveCooldown--;
                     } else if (this.getTarget() != null && this.getTarget().isAlive()
                             && this.distanceToSqr(this.getTarget()) <= 6.5D * 6.5D) {
-                        this.performNatureEnergyShockwave(serverLevel, 5.0D, 6.0F);
-                        this.shockwaveCooldown = 90 + this.random.nextInt(30);
+                        this.performNatureEnergyShockwave(serverLevel, 5.0D, 4.0F);
+                        this.shockwaveCooldown = 130 + this.random.nextInt(40);
                     }
                 }
             }
@@ -525,10 +525,10 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
         this.phaseTwoTriggered = true;
         this.entityData.set(DATA_PHASE_TWO, true);
         this.dashCooldown = Math.min(this.dashCooldown, 15);
-        this.shockwaveCooldown = 85;
+        this.shockwaveCooldown = 130;
 
-        this.addEffect(new MobEffectInstance(MobEffects.SPEED, 800, 1));
-        this.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 800, 1));
+        this.addEffect(new MobEffectInstance(MobEffects.SPEED, 600, 0));
+        this.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 600, 0));
 
         serverLevel.playSound(null, this.blockPosition(), SoundEvents.FROG_AMBIENT, SoundSource.HOSTILE, 1.45F, 0.48F);
         serverLevel.playSound(null, this.blockPosition(), SoundEvents.TOTEM_USE, SoundSource.HOSTILE, 0.9F, 1.05F);
@@ -543,7 +543,7 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
                 24, 0.9D, 0.7D, 0.9D, 0.10D,
                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
 
-        this.performNatureEnergyShockwave(serverLevel, 5.5D, 7.5F);
+        this.performNatureEnergyShockwave(serverLevel, 5.5D, 5.5F);
 
         Component msg = Component.translatable("entity.narutomod.sage_trial_boss.phase2")
                 .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD);
@@ -603,7 +603,7 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
 
     private void performToadGroundSlam(ServerLevel serverLevel) {
         double radius = this.phaseTwoTriggered ? 6.0D : 4.8D;
-        float damage = this.phaseTwoTriggered ? 8.5F : 6.0F;
+        float damage = this.phaseTwoTriggered ? 6.0F : 4.5F;
 
         serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(),
                 SoundSource.HOSTILE, 0.9F, 0.72F);
