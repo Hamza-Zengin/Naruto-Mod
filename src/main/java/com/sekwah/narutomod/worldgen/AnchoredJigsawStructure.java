@@ -314,6 +314,41 @@ public class AnchoredJigsawStructure extends Structure {
                     maxFoundationDepth, dominantBaseState);
             clearOverheadNaturalTerrain(
                     level, cursor, chunkBox, pieces, piece, pieceBox, x0, x1, z0, z1, scanHigh, worldMaxY, baseYs);
+            if (piece instanceof PoolElementStructurePiece poolPiece
+                    && poolPiece.getElement().toString().contains("myobokuzan_sanctuary")) {
+                maybeSpawnMyobokuzanBoss(level, pieceBox, chunkBox);
+            }
+        }
+    }
+
+    private static void maybeSpawnMyobokuzanBoss(WorldGenLevel level, BoundingBox pieceBox, BoundingBox chunkBox) {
+        int cx = (pieceBox.minX() + pieceBox.maxX()) / 2;
+        int cz = (pieceBox.minZ() + pieceBox.maxZ()) / 2;
+        if (!chunkBox.isInside(cx, pieceBox.minY(), cz)) {
+            return;
+        }
+        int spawnY = -1;
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (int y = pieceBox.maxY() - 2; y >= pieceBox.minY(); y--) {
+            BlockState below = level.getBlockState(pos.set(cx, y - 1, cz));
+            BlockState feet = level.getBlockState(pos.set(cx, y, cz));
+            BlockState head = level.getBlockState(pos.set(cx, y + 1, cz));
+            if (below.isSolid() && feet.isAir() && head.isAir()) {
+                spawnY = y;
+                break;
+            }
+        }
+        if (spawnY < 0) {
+            return;
+        }
+        com.sekwah.narutomod.entity.mob.SageTrialBossEntity boss =
+                com.sekwah.narutomod.entity.NarutoEntities.SAGE_TRIAL_BOSS.get()
+                        .create(level.getLevel(), net.minecraft.world.entity.EntitySpawnReason.STRUCTURE);
+        if (boss != null) {
+            boss.snapTo(cx + 0.5D, spawnY, cz + 0.5D, 0.0F, 0.0F);
+            boss.finalizeSpawn(level, level.getCurrentDifficultyAt(pos.set(cx, spawnY, cz)),
+                    net.minecraft.world.entity.EntitySpawnReason.STRUCTURE, null);
+            level.addFreshEntityWithPassengers(boss);
         }
     }
 

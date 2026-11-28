@@ -28,7 +28,11 @@ public enum NinjaMission {
         KILL_ENEMY,
         KILL_ROGUE,
         CAST_JUTSU,
-        KILL_AKATSUKI
+        KILL_AKATSUKI,
+        ELEMENTAL_COMBO,
+        DEFEAT_BOSS,
+        MASTER_JUTSU,
+        KILL_BINGO_TARGET
     }
 
     private final String id;

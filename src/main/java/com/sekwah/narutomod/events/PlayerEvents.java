@@ -281,6 +281,10 @@ public class PlayerEvents {
                 }
             }
 
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                com.sekwah.narutomod.capabilities.SageModeHelper.tickServer(serverPlayer);
+            }
+
             if (player.tickCount % 20 == 0) {
                 Item headItem = player.getItemBySlot(EquipmentSlot.HEAD).getItem();
                 Item chestItem = player.getItemBySlot(EquipmentSlot.CHEST).getItem();
@@ -349,6 +353,10 @@ public class PlayerEvents {
             }
             if (attacker.getItemBySlot(EquipmentSlot.CHEST).getItem() == NarutoItems.SAGE_CLOAK.get()) {
                 event.setAmount(applySageCloakDamageMultiplier(event.getAmount(), true));
+            }
+            if (com.sekwah.narutomod.capabilities.SageModeHelper.isSageModeActive(attacker)
+                    && (!isDirectMelee || event.getSource().getDirectEntity() instanceof com.sekwah.narutomod.entity.jutsuprojectile.JutsuProjectile)) {
+                event.setAmount(com.sekwah.narutomod.capabilities.SageModeHelper.applySageModeDamageMultiplier(event.getAmount(), attacker));
             }
         }
         if (event.getEntity() instanceof Player defender) {

@@ -445,6 +445,30 @@ public class NarutoModGameTests {
                         .get(Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "anchored_jigsaw")).isPresent(),
                 "Custom narutomod:anchored_jigsaw StructureType must be registered");
 
+        // v0.2.0 live registry, Mission Board, Mission v2, Hiraishin & Sage Mode checks
+        helper.assertTrue(com.sekwah.narutomod.item.NarutoItems.FLASH_BOMB.get() != null, "Flash Bomb item must be registered");
+        helper.assertTrue(com.sekwah.narutomod.item.NarutoItems.HIRAISHIN_KUNAI.get() != null, "Hiraishin Kunai item must be registered");
+        helper.assertTrue(com.sekwah.narutomod.item.NarutoItems.SAGE_TRIAL_BOSS_SPAWN_EGG.get() != null, "Sage Trial Boss spawn egg must be registered");
+        helper.assertTrue(com.sekwah.narutomod.block.NarutoBlocks.MISSION_BOARD.get() != null, "Mission Board block must be registered");
+        helper.assertTrue(com.sekwah.narutomod.entity.NarutoEntities.FLASH_BOMB.get() != null, "Flash Bomb entity must be registered");
+        helper.assertTrue(com.sekwah.narutomod.entity.NarutoEntities.HIRAISHIN_KUNAI.get() != null, "Hiraishin Kunai entity must be registered");
+        helper.assertTrue(com.sekwah.narutomod.entity.NarutoEntities.SAGE_TRIAL_BOSS.get() != null, "Sage Trial Boss entity must be registered");
+        helper.assertTrue(NarutoAbilities.HIRAISHIN.get() != null, "Hiraishin ability must be registered");
+        helper.assertTrue(NarutoAbilities.SAGE_MODE.get() != null, "Sage Mode ability must be registered");
+        helper.assertTrue(com.sekwah.narutomod.capabilities.MissionDataManager.getAll().size() >= 9,
+                "MissionDataManager must expose at least 9 missions");
+
+        net.minecraft.core.BlockPos boardPos = new net.minecraft.core.BlockPos(4, 1, 2);
+        helper.setBlock(boardPos, com.sekwah.narutomod.block.NarutoBlocks.MISSION_BOARD.get().defaultBlockState());
+        helper.assertTrue(helper.getBlockState(boardPos).is(com.sekwah.narutomod.block.NarutoBlocks.MISSION_BOARD.get()),
+                "Mission Board block must place cleanly");
+
+        com.sekwah.narutomod.capabilities.SageModeHelper.activateSageMode(caster, false);
+        helper.assertTrue(com.sekwah.narutomod.capabilities.SageModeHelper.isSageModeActive(caster),
+                "Sage Mode must activate via SageModeHelper");
+        helper.assertTrue(com.sekwah.narutomod.capabilities.SageModeHelper.applySageModeDamageMultiplier(10.0F, caster) > 12.9F,
+                "Active Sage Mode must boost damage by +30%");
+
         helper.succeed();
     }
 }

@@ -1,0 +1,14 @@
+{
+  "id": "b_rank_jutsu_drill",
+  "rank_label": "B-Rank",
+  "required_rank": "CHUNIN",
+  "target_type": "CAST_JUTSU",
+  "target_count": 20,
+  "reward_xp": 100,
+  "reward_items": [
+    {
+      "item": "narutomod:blank_jutsu_scroll",
+      "count": 1
+    }
+  ]
+}

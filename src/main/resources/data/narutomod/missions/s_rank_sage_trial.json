@@ -1,0 +1,18 @@
+{
+  "id": "s_rank_sage_trial",
+  "rank_label": "S-Rank",
+  "required_rank": "JONIN",
+  "target_type": "DEFEAT_BOSS",
+  "target_count": 1,
+  "reward_xp": 500,
+  "reward_items": [
+    {
+      "item": "narutomod:blank_jutsu_scroll",
+      "count": 2
+    },
+    {
+      "item": "minecraft:emerald",
+      "count": 16
+    }
+  ]
+}

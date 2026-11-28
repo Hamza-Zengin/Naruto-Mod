@@ -1,0 +1,14 @@
+{
+  "id": "b_rank_jutsu_mastery",
+  "rank_label": "B-Rank",
+  "required_rank": "CHUNIN",
+  "target_type": "MASTER_JUTSU",
+  "target_count": 1,
+  "reward_xp": 140,
+  "reward_items": [
+    {
+      "item": "narutomod:blank_jutsu_scroll",
+      "count": 1
+    }
+  ]
+}

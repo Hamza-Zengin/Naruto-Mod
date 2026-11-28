@@ -2,6 +2,7 @@ package com.sekwah.narutomod.network.s2c;
 
 import com.sekwah.narutomod.NarutoMod;
 import com.sekwah.narutomod.abilities.JutsuDataManager;
+import com.sekwah.narutomod.capabilities.MissionDataManager;
 import com.sekwah.narutomod.client.events.CameraShakeManager;
 import com.sekwah.narutomod.client.events.ClientEffectHandler;
 import net.neoforged.api.distmarker.Dist;
@@ -18,6 +19,7 @@ public class ClientPayloadHandler {
         event.register(ClientJutsuEffectPacket.TYPE, ClientPayloadHandler::handleJutsuEffect);
         event.register(ClientCameraShakePacket.TYPE, ClientPayloadHandler::handleCameraShake);
         event.register(ClientJutsuStatsSyncPacket.TYPE, ClientPayloadHandler::handleJutsuStatsSync);
+        event.register(ClientMissionsSyncPacket.TYPE, ClientPayloadHandler::handleMissionsSync);
     }
 
     public static void handleJutsuEffect(final ClientJutsuEffectPacket msg, final IPayloadContext context) {
@@ -36,5 +38,9 @@ public class ClientPayloadHandler {
 
     public static void handleJutsuStatsSync(final ClientJutsuStatsSyncPacket msg, final IPayloadContext context) {
         context.enqueueWork(() -> JutsuDataManager.applySynced(msg.stats()));
+    }
+
+    public static void handleMissionsSync(final ClientMissionsSyncPacket msg, final IPayloadContext context) {
+        context.enqueueWork(() -> MissionDataManager.applySynced(msg.missions()));
     }
 }

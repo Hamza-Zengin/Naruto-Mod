@@ -69,6 +69,8 @@ public class NarutoMod {
         com.sekwah.narutomod.gametest.NarutoModGameTests.register(modEventBus);
 
         NeoForge.EVENT_BUS.addListener(NarutoMod::onServerStarting);
+        NeoForge.EVENT_BUS.addListener(com.sekwah.narutomod.capabilities.MissionDataManager::onAddReloadListeners);
+        NeoForge.EVENT_BUS.addListener(com.sekwah.narutomod.capabilities.MissionDataManager::onDatapackSync);
 
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
             modEventBus.addListener((FMLClientSetupEvent event) -> event.enqueueWork(NarutoInGameGUI::new));

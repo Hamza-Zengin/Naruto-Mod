@@ -1,0 +1,14 @@
+{
+  "id": "c_rank_combo_training",
+  "rank_label": "C-Rank",
+  "required_rank": "GENIN",
+  "target_type": "ELEMENTAL_COMBO",
+  "target_count": 3,
+  "reward_xp": 85,
+  "reward_items": [
+    {
+      "item": "minecraft:emerald",
+      "count": 5
+    }
+  ]
+}

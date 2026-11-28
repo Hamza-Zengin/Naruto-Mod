@@ -33,6 +33,9 @@ public class NarutoItems {
     public static final DeferredItem<Item> EXPLOSIVE_KUNAI = ITEMS.registerItem("explosive_kunai",
             props -> new ExplosiveKunaiItem(props.stacksTo(16)));
 
+    public static final DeferredItem<Item> HIRAISHIN_KUNAI = ITEMS.registerItem("hiraishin_kunai",
+            props -> new HiraishinKunaiItem(props.stacksTo(16).rarity(Rarity.RARE)));
+
     public static final DeferredItem<Item> SHURIKEN = ITEMS.registerItem("shuriken", ShurikenItem::new);
 
     public static final DeferredItem<Item> FUMA_SHURIKEN = ITEMS.registerItem("fuma_shuriken", FumaShurikenItem::new);
@@ -53,6 +56,9 @@ public class NarutoItems {
 
     public static final DeferredItem<Item> SMOKE_BOMB = ITEMS.registerItem("smoke_bomb",
             props -> new SmokeBombItem(props.stacksTo(16)));
+
+    public static final DeferredItem<Item> FLASH_BOMB = ITEMS.registerItem("flash_bomb",
+            props -> new FlashBombItem(props.stacksTo(16)));
 
     public static final DeferredItem<Item> MILITARY_RATIONS_PILL = ITEMS.registerItem("military_rations_pill",
             props -> new MilitaryRationsPillItem(props.stacksTo(16)));
@@ -110,6 +116,9 @@ public class NarutoItems {
 
     public static final DeferredItem<Item> CHUNIN_CHAMPION_SPAWN_EGG = ITEMS.registerItem("chunin_champion_spawn_egg",
             props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.CHUNIN_CHAMPION.get())));
+
+    public static final DeferredItem<Item> SAGE_TRIAL_BOSS_SPAWN_EGG = ITEMS.registerItem("sage_trial_boss_spawn_egg",
+            props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.SAGE_TRIAL_BOSS.get())));
 
     public static final DeferredItem<Item> VILLAGE_NINJA_SPAWN_EGG = ITEMS.registerItem("village_ninja_spawn_egg",
             props -> new SpawnEggItem(props.spawnEgg(NarutoEntities.VILLAGE_NINJA.get())));
@@ -314,6 +323,7 @@ public class NarutoItems {
                         output.accept(KUNAI.get());
                         output.accept(SENBON.get());
                         output.accept(EXPLOSIVE_KUNAI.get());
+                        output.accept(HIRAISHIN_KUNAI.get());
                         output.accept(SHURIKEN.get());
                         output.accept(FUMA_SHURIKEN.get());
                         output.accept(KUSANAGI_SWORD.get());
@@ -325,6 +335,7 @@ public class NarutoItems {
                         output.accept(GUNBAI_UCHIWA.get());
                         output.accept(NarutoBlocks.ITEM_PAPER_BOMB.get());
                         output.accept(SMOKE_BOMB.get());
+                        output.accept(FLASH_BOMB.get());
                         output.accept(MILITARY_RATIONS_PILL.get());
                         output.accept(MEDICAL_POUCH.get());
                         output.accept(ICHIRAKU_RAMEN.get());
@@ -427,6 +438,7 @@ public class NarutoItems {
             event.accept(ROGUE_NINJA_SPAWN_EGG.get());
             event.accept(AKATSUKI_NINJA_SPAWN_EGG.get());
             event.accept(CHUNIN_CHAMPION_SPAWN_EGG.get());
+            event.accept(SAGE_TRIAL_BOSS_SPAWN_EGG.get());
             event.accept(VILLAGE_NINJA_SPAWN_EGG.get());
             event.accept(KONOHA_NINJA_SPAWN_EGG.get());
             event.accept(SUNA_NINJA_SPAWN_EGG.get());

@@ -128,6 +128,15 @@ public class NarutoBlocks {
 
     public static final DeferredItem<BlockItem> ITEM_WEAPON_RACK = BLOCK_ITEMS.registerSimpleBlockItem(WEAPON_RACK);
 
+    public static final DeferredBlock<Block> MISSION_BOARD = BLOCKS.registerBlock("mission_board",
+            props -> new MissionBoardBlock(props
+                    .mapColor(MapColor.WOOD)
+                    .noOcclusion()
+                    .strength(2.5F, 6.0F)
+                    .sound(SoundType.WOOD)));
+
+    public static final DeferredItem<BlockItem> ITEM_MISSION_BOARD = BLOCK_ITEMS.registerSimpleBlockItem(MISSION_BOARD);
+
     // --- Village building blocks (Phase C-1) ---
     public static final DeferredBlock<Block> TATAMI = BLOCKS.registerBlock("tatami",
             props -> new Block(props

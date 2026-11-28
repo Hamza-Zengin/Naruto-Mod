@@ -338,12 +338,32 @@ public class NinjaData implements INinjaData {
 
     @Override
     public void addMastery(Identifier jutsuId, int amount) {
+        int before = getMastery(jutsuId);
         NinjaMasteryHelper.addMastery(this.jutsuMastery, jutsuId, amount);
+        checkMasterJutsuMissionProgress(before, getMastery(jutsuId));
     }
 
     @Override
     public void incrementJutsuMastery(Identifier jutsuId, boolean isToggle) {
+        int before = getMastery(jutsuId);
         NinjaMasteryHelper.incrementJutsuMastery(this.jutsuMastery, jutsuId, isToggle);
+        checkMasterJutsuMissionProgress(before, getMastery(jutsuId));
+    }
+
+    private void checkMasterJutsuMissionProgress(int beforeMastery, int afterMastery) {
+        if (afterMastery <= beforeMastery) {
+            return;
+        }
+        int tierBefore = NinjaMasteryHelper.getMasteryTier(beforeMastery);
+        int tierAfter = NinjaMasteryHelper.getMasteryTier(afterMastery);
+        if (tierAfter > tierBefore) {
+            MissionDefinition active = MissionDataManager.get(this.getActiveMissionId());
+            if (active != null
+                    && active.targetType() == NinjaMission.TargetType.MASTER_JUTSU
+                    && NinjaMission.MissionStatus.fromString(this.getMissionStatus()) == NinjaMission.MissionStatus.IN_PROGRESS) {
+                this.incrementMissionProgress(1);
+            }
+        }
     }
 
     @Override

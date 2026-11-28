@@ -1,0 +1,7 @@
+{
+  "chakra_cost": 0.0,
+  "stamina_cost": 0.0,
+  "cooldown_ticks": 200,
+  "base_damage": 0.0,
+  "requiredRank": "JONIN"
+}

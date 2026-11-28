@@ -51,8 +51,8 @@ public final class RankProgression {
         } else {
             data.setJutsusCastCount(raw + 1);
         }
-        NinjaMission active = NinjaMission.fromId(data.getActiveMissionId());
-        if (active != null && active.getTargetType() == NinjaMission.TargetType.CAST_JUTSU
+        MissionDefinition active = MissionDataManager.get(data.getActiveMissionId());
+        if (active != null && active.targetType() == NinjaMission.TargetType.CAST_JUTSU
                 && NinjaMission.MissionStatus.fromString(data.getMissionStatus()) == NinjaMission.MissionStatus.IN_PROGRESS) {
             data.incrementMissionProgress(1);
         }

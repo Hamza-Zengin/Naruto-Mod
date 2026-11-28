@@ -1,9 +1,11 @@
 package com.sekwah.narutomod.network.c2s;
 
 import com.sekwah.narutomod.NarutoMod;
+import com.sekwah.narutomod.capabilities.MissionDataManager;
+import com.sekwah.narutomod.capabilities.MissionDefinition;
+import com.sekwah.narutomod.capabilities.MissionLogic;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
 import com.sekwah.narutomod.capabilities.NinjaData;
-import com.sekwah.narutomod.capabilities.NinjaMission;
 import com.sekwah.narutomod.capabilities.NinjaRank;
 import com.sekwah.narutomod.network.ServerSecurityValidator;
 import net.minecraft.ChatFormatting;
@@ -68,7 +70,7 @@ public class ServerMissionActionPacket implements CustomPacketPayload {
             NinjaData ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
             switch (msg.action) {
                 case ACCEPT_MISSION -> {
-                    NinjaMission mission = NinjaMission.fromId(msg.missionId);
+                    MissionDefinition mission = MissionDataManager.get(msg.missionId);
                     if (mission == null) return;
                     if (!ninjaData.getActiveMissionId().isEmpty()) {
                         player.sendSystemMessage(Component.translatable("naruto.mission.already_active")
@@ -78,52 +80,24 @@ public class ServerMissionActionPacket implements CustomPacketPayload {
                     NinjaRank rank = NinjaRank.fromString(ninjaData.getRank());
                     if (!mission.canAccept(rank)) {
                         player.sendSystemMessage(Component.translatable("naruto.mission.rank_too_low",
-                                mission.getRequiredRank().getEnglishName()).withStyle(ChatFormatting.RED));
+                                mission.requiredRank().getEnglishName()).withStyle(ChatFormatting.RED));
                         return;
                     }
-                    ninjaData.acceptMission(mission);
+                    MissionLogic.acceptMission(ninjaData, mission);
                     ninjaData.updateServerData(player);
                     player.sendSystemMessage(Component.translatable("naruto.mission.accepted",
-                            Component.translatable(mission.getTranslationKey()).withStyle(ChatFormatting.GOLD))
+                            mission.getTitleComponent().copy().withStyle(ChatFormatting.GOLD))
                             .withStyle(ChatFormatting.GREEN));
                 }
                 case CLAIM_REWARD -> {
-                    NinjaMission active = NinjaMission.fromId(ninjaData.getActiveMissionId());
-                    if (active != null && ninjaData.claimMissionReward()) {
-                        switch (active) {
-                            case B_RANK_JUTSU_DRILL -> giveOrDrop(player,
-                                    new net.minecraft.world.item.ItemStack(com.sekwah.narutomod.item.NarutoItems.BLANK_JUTSU_SCROLL.get()));
-                            case A_RANK_AKATSUKI_RECON -> {
-                                giveOrDrop(player,
-                                        new net.minecraft.world.item.ItemStack(com.sekwah.narutomod.item.NarutoItems.BLANK_JUTSU_SCROLL.get()));
-                                if (player.getRandom().nextFloat() < 0.45f) {
-                                    var scroll = player.getRandom().nextBoolean()
-                                            ? com.sekwah.narutomod.item.NarutoItems.SCROLL_STONE_SPIKES.get()
-                                            : com.sekwah.narutomod.item.NarutoItems.SCROLL_WATER_DRAGON.get();
-                                    giveOrDrop(player, new net.minecraft.world.item.ItemStack(scroll));
-                                }
-                            }
-                            case S_RANK_AKATSUKI_BOUNTY -> {
-                                giveOrDrop(player,
-                                        new net.minecraft.world.item.ItemStack(com.sekwah.narutomod.item.NarutoItems.BLANK_JUTSU_SCROLL.get()));
-                                if (player.getRandom().nextFloat() < 0.35f) {
-                                    giveOrDrop(player,
-                                            new net.minecraft.world.item.ItemStack(com.sekwah.narutomod.item.NarutoItems.WARRING_STATES_ARMOR.get()));
-                                } else {
-                                    var scroll = player.getRandom().nextBoolean()
-                                            ? com.sekwah.narutomod.item.NarutoItems.SCROLL_WATER_DRAGON.get()
-                                            : com.sekwah.narutomod.item.NarutoItems.SCROLL_STONE_SPIKES.get();
-                                    giveOrDrop(player, new net.minecraft.world.item.ItemStack(scroll));
-                                }
-                            }
-                            default -> {}
-                        }
+                    MissionDefinition active = MissionDataManager.get(ninjaData.getActiveMissionId());
+                    if (active != null && MissionLogic.claimMissionReward(ninjaData, player)) {
                         ninjaData.updateServerData(player);
                         player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP,
                                 SoundSource.PLAYERS, 1.0f, 1.2f);
                         player.sendSystemMessage(Component.translatable("naruto.mission.reward_claimed",
-                                Component.translatable(active.getTranslationKey()).withStyle(ChatFormatting.GOLD),
-                                active.getRewardXp()).withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD));
+                                active.getTitleComponent().copy().withStyle(ChatFormatting.GOLD),
+                                active.rewardXp()).withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD));
                     }
                 }
                 case ABANDON_MISSION -> {
@@ -136,12 +110,5 @@ public class ServerMissionActionPacket implements CustomPacketPayload {
                 }
             }
         });
-    }
-
-    private static void giveOrDrop(ServerPlayer player, net.minecraft.world.item.ItemStack stack) {
-        if (!stack.isEmpty() && !player.getInventory().add(stack)
-                && player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-            player.spawnAtLocation(serverLevel, stack);
-        }
     }
 }

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "narutomod:kunai",
+    "minecraft:gold_ingot",
+    "narutomod:chakra_metal"
+  ],
+  "result": {
+    "id": "narutomod:hiraishin_kunai",
+    "count": 2
+  }
+}

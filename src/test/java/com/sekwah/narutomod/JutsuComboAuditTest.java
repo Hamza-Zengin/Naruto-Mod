@@ -65,6 +65,8 @@ public class JutsuComboAuditTest {
             Map.entry("wood_prison", new WoodPrisonAbility()),
             Map.entry("adamantine_chains", new AdamantineChainsAbility()),
             Map.entry("eight_gates", new EightGatesAbility()),
+            Map.entry("hiraishin", new HiraishinAbility()),
+            Map.entry("sage_mode", new SageModeAbility()),
             // [C] Ultimate
             Map.entry("rasenshuriken", new RasenshurikenAbility()),
             Map.entry("kirin", new KirinAbility()),
@@ -78,10 +80,10 @@ public class JutsuComboAuditTest {
     private static final Set<String> EXPECTED_DOJUTSUS = Set.of("sharingan", "byakugan");
 
     @Test
-    @DisplayName("Verify all 36 jutsu JSONs omit 'combo', utility (3) and Dōjutsu (2) separation, wheel-equippable (31), and activation delay")
+    @DisplayName("Verify all 38 jutsu JSONs omit 'combo', utility (3) and Dōjutsu (2) separation, wheel-equippable (33), and activation delay")
     public void testAllAbilitiesAndJsonAudit() throws IOException {
         assertTrue(Files.isDirectory(JUTSU_DIR), "Jutsu data directory must exist");
-        assertEquals(36, ALL_ABILITIES.size(), "Audit map must cover all 36 abilities");
+        assertEquals(38, ALL_ABILITIES.size(), "Audit map must cover all 38 abilities");
 
         Set<String> foundUtilities = new HashSet<>();
         Set<String> foundDojutsus = new HashSet<>();
@@ -140,9 +142,9 @@ public class JutsuComboAuditTest {
                 "Exactly chakra_charge, water_walk, and leap must be utility abilities");
         assertEquals(EXPECTED_DOJUTSUS, foundDojutsus,
                 "Exactly sharingan and byakugan must be Dōjutsu abilities");
-        assertEquals(33, nonUtilityCount, "Remaining 33 abilities must have isUtilityAbility() == false");
-        assertEquals(31, wheelEquippableCount,
-                "Remaining 31 abilities must be wheel-equippable and play hand-seal sounds");
+        assertEquals(35, nonUtilityCount, "Remaining 35 abilities must have isUtilityAbility() == false");
+        assertEquals(33, wheelEquippableCount,
+                "Remaining 33 abilities must be wheel-equippable and play hand-seal sounds");
     }
 
     @Test

@@ -49,7 +49,12 @@ public class NinjaMenuScreen extends Screen {
     private final List<Ability> allAbilities = new ArrayList<>();
 
     public NinjaMenuScreen() {
+        this(0);
+    }
+
+    public NinjaMenuScreen(int initialTab) {
         super(Component.translatable("naruto.gui.ninja_menu.title"));
+        this.activeTab = Math.max(0, Math.min(3, initialTab));
     }
 
     @Override
@@ -383,8 +388,8 @@ public class NinjaMenuScreen extends Screen {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
         INinjaData ninjaData = mc.player.getData(NinjaCapabilityHandler.NINJA_DATA);
-        com.sekwah.narutomod.capabilities.NinjaMission active =
-                com.sekwah.narutomod.capabilities.NinjaMission.fromId(ninjaData.getActiveMissionId());
+        com.sekwah.narutomod.capabilities.MissionDefinition active =
+                com.sekwah.narutomod.capabilities.MissionDataManager.get(ninjaData.getActiveMissionId());
         int boxX = centerX - BOX_WIDTH / 2;
 
         if (active != null) {
@@ -398,7 +403,7 @@ public class NinjaMenuScreen extends Screen {
                         b -> {
                             ClientPacketDistributor.sendToServer(new com.sekwah.narutomod.network.c2s.ServerMissionActionPacket(
                                     com.sekwah.narutomod.network.c2s.ServerMissionActionPacket.Action.CLAIM_REWARD,
-                                    active.getId()));
+                                    active.id()));
                             this.onClose();
                         }).bounds(centerX - 80, btnY, 160, 22).build());
             } else {
@@ -407,21 +412,21 @@ public class NinjaMenuScreen extends Screen {
                         b -> {
                             ClientPacketDistributor.sendToServer(new com.sekwah.narutomod.network.c2s.ServerMissionActionPacket(
                                     com.sekwah.narutomod.network.c2s.ServerMissionActionPacket.Action.ABANDON_MISSION,
-                                    active.getId()));
+                                    active.id()));
                             this.onClose();
                         }).bounds(centerX - 80, btnY, 160, 22).build());
             }
         } else {
             NinjaRank playerRank = NinjaRank.fromString(ninjaData.getRank());
-            com.sekwah.narutomod.capabilities.NinjaMission[] missions =
-                    com.sekwah.narutomod.capabilities.NinjaMission.values();
-            for (com.sekwah.narutomod.capabilities.NinjaMission m : missions) {
+            List<com.sekwah.narutomod.capabilities.MissionDefinition> missions =
+                    com.sekwah.narutomod.capabilities.MissionDataManager.getAll();
+            for (com.sekwah.narutomod.capabilities.MissionDefinition m : missions) {
                 Button acceptBtn = Button.builder(
                         Component.translatable("naruto.gui.ninja_menu.mission.accept"),
                         b -> {
                             ClientPacketDistributor.sendToServer(new com.sekwah.narutomod.network.c2s.ServerMissionActionPacket(
                                     com.sekwah.narutomod.network.c2s.ServerMissionActionPacket.Action.ACCEPT_MISSION,
-                                    m.getId()));
+                                    m.id()));
                             this.onClose();
                         }).bounds(boxX + BOX_WIDTH - 92, boxY + 32, 80, 20).build();
                 acceptBtn.active = m.canAccept(playerRank);
