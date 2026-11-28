@@ -16,9 +16,11 @@ import net.minecraft.util.Mth;
 
 /**
  * 3D articulated Toad Sage Boss (Gamabunta-inspired) model using a 128x128 texture sheet.
- * Features a squatting broad amphibian body with swelling throat sac, dark navy haori coat
- * with white trim and clan crests, furrowed scarred brow with horizontal toad pupils,
- * smoking kiseru pipe, splayed forelimbs and webbed hind legs, and a giant hip-mounted tantō.
+ * Features a squatting broad amphibian body with a tucked inflatable throat sac,
+ * dark navy haori coat with white trim, upturned collar, and toad-clan crests,
+ * furrowed scarred brow with recessed golden horizontal-pupil eyes, left-mouth-corner kiseru pipe,
+ * sleeve-tracked splayed forelimbs and webbed hind legs resting at Y = 24,
+ * and a giant hip-mounted shinobi tantō.
  */
 public class ToadSageBossModel extends EntityModel<ToadSageBossRenderer.ToadBossRenderState> {
 
@@ -56,199 +58,213 @@ public class ToadSageBossModel extends EntityModel<ToadSageBossRenderer.ToadBoss
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
 
-        // Core squatting toad torso (root Y = 14 -> bottom at 19, hovering low above ground Y = 24)
+        // Core squatting toad torso (root Y = 14 -> ground is Y_body = +10 -> Y_world = 24)
         PartDefinition body = root.addOrReplaceChild("body",
                 CubeListBuilder.create()
                         .texOffs(0, 0)
-                        .addBox(-7.0F, -5.0F, -6.0F, 14.0F, 10.0F, 12.0F, CubeDeformation.NONE),
+                        .addBox(-7.0F, -4.5F, -5.5F, 14.0F, 9.0F, 11.0F, CubeDeformation.NONE),
                 PartPose.offset(0.0F, 14.0F, 0.0F));
 
-        // Inflatable vocal throat sac on upper chest
+        // Rounded warm-cream belly protruding cleanly between the open haori lapels
+        body.addOrReplaceChild("belly",
+                CubeListBuilder.create()
+                        .texOffs(52, 0)
+                        .addBox(-4.5F, -1.3F, -6.3F, 9.0F, 5.0F, 2.0F, CubeDeformation.NONE),
+                PartPose.ZERO);
+
+        // Smooth inflatable vocal throat sac tucked cleanly underneath the lower jaw (behind snout line)
         body.addOrReplaceChild("throat_sac",
                 CubeListBuilder.create()
-                        .texOffs(54, 0)
-                        .addBox(-6.0F, -1.5F, -2.5F, 12.0F, 4.0F, 4.0F, CubeDeformation.NONE),
-                PartPose.offset(0.0F, -3.2F, -5.0F));
+                        .texOffs(52, 8)
+                        .addBox(-4.5F, -1.0F, -1.6F, 9.0F, 3.0F, 3.0F, CubeDeformation.NONE),
+                PartPose.offset(0.0F, -2.2F, -4.6F));
 
-        // Dark navy haori samurai coat with white trim, crest lapels, and wide sleeves
+        // Dark navy samurai haori coat with white trim, upturned collar, and front lapels
         PartDefinition haoriJacket = body.addOrReplaceChild("haori_jacket",
                 CubeListBuilder.create()
-                        .texOffs(0, 24)
-                        .addBox(-8.0F, -5.5F, -0.5F, 16.0F, 10.0F, 7.0F, CubeDeformation.NONE),
+                        .texOffs(0, 22)
+                        .addBox(-8.0F, -5.0F, 0.0F, 16.0F, 9.0F, 6.0F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
         haoriJacket.addOrReplaceChild("haori_right_lapel",
                 CubeListBuilder.create()
-                        .texOffs(48, 24)
-                        .addBox(-8.0F, -5.2F, -6.3F, 3.0F, 9.0F, 6.0F, CubeDeformation.NONE),
+                        .texOffs(46, 22)
+                        .addBox(-7.8F, -4.8F, -6.0F, 3.0F, 8.0F, 6.0F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
         haoriJacket.addOrReplaceChild("haori_left_lapel",
                 CubeListBuilder.create()
-                        .texOffs(68, 24)
-                        .addBox(5.0F, -5.2F, -6.3F, 3.0F, 9.0F, 6.0F, CubeDeformation.NONE),
+                        .texOffs(66, 22)
+                        .addBox(4.8F, -4.8F, -6.0F, 3.0F, 8.0F, 6.0F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
-        haoriJacket.addOrReplaceChild("haori_right_sleeve",
+        haoriJacket.addOrReplaceChild("haori_collar",
                 CubeListBuilder.create()
-                        .texOffs(88, 24)
-                        .addBox(-3.5F, -0.5F, -3.5F, 4.0F, 5.0F, 7.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(-8.0F, -4.5F, -1.0F, 0.0F, 0.0F, 0.22F));
+                        .texOffs(86, 22)
+                        .addBox(-6.0F, -6.2F, 3.2F, 12.0F, 2.0F, 3.0F, CubeDeformation.NONE),
+                PartPose.ZERO);
 
-        haoriJacket.addOrReplaceChild("haori_left_sleeve",
-                CubeListBuilder.create()
-                        .texOffs(88, 24)
-                        .addBox(-0.5F, -0.5F, -3.5F, 4.0F, 5.0F, 7.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(8.0F, -4.5F, -1.0F, 0.0F, 0.0F, -0.22F));
-
-        // Broad amphibian head with brow ridges, recessed yellow horizontal-pupil eyes, lower jaw, and kiseru pipe
+        // Broad amphibian head with sculpted brow ridges, scarred left brow, horizontal-pupil eyes, hinged jaw, and kiseru pipe
         PartDefinition head = body.addOrReplaceChild("head",
                 CubeListBuilder.create()
-                        .texOffs(0, 43)
-                        .addBox(-6.0F, -5.0F, -6.0F, 12.0F, 6.0F, 10.0F, CubeDeformation.NONE),
-                PartPose.offset(0.0F, -5.5F, -1.0F));
+                        .texOffs(0, 40)
+                        .addBox(-6.0F, -5.0F, -6.0F, 12.0F, 5.0F, 10.0F, CubeDeformation.NONE),
+                PartPose.offset(0.0F, -5.0F, -1.0F));
 
+        // Back-hinged wide lower jaw with subtle overbite recess beneath upper snout
         head.addOrReplaceChild("jaw",
                 CubeListBuilder.create()
-                        .texOffs(46, 43)
-                        .addBox(-6.0F, -0.5F, -5.8F, 12.0F, 2.0F, 9.0F, CubeDeformation.NONE),
-                PartPose.offset(0.0F, 0.8F, 0.0F));
+                        .texOffs(46, 40)
+                        .addBox(-5.5F, 0.0F, -7.8F, 11.0F, 2.0F, 8.0F, CubeDeformation.NONE),
+                PartPose.offset(0.0F, 0.2F, 2.0F));
 
+        // Furrowed supraorbital brow ridges cleanly separated across the nasal bridge
         head.addOrReplaceChild("right_brow",
                 CubeListBuilder.create()
-                        .texOffs(90, 43)
-                        .addBox(-2.8F, -2.6F, -2.5F, 6.0F, 3.0F, 6.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(-3.5F, -4.6F, -4.4F, 0.08F, 0.0F, 0.14F));
+                        .texOffs(86, 40)
+                        .addBox(-2.0F, -1.5F, -2.5F, 4.0F, 2.0F, 5.0F, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(-3.6F, -5.1F, -3.65F, 0.06F, 0.0F, 0.14F));
 
         head.addOrReplaceChild("left_brow",
                 CubeListBuilder.create()
-                        .texOffs(90, 53)
-                        .addBox(-3.2F, -2.6F, -2.5F, 6.0F, 3.0F, 6.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(3.5F, -4.6F, -4.4F, 0.08F, 0.0F, -0.14F));
+                        .texOffs(106, 40)
+                        .addBox(-2.0F, -1.5F, -2.5F, 4.0F, 2.0F, 5.0F, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(3.6F, -5.1F, -3.65F, 0.06F, 0.0F, -0.14F));
 
+        // Crisp 4x3 recessed golden-amber eyes with dark horizontal toad pupils
         head.addOrReplaceChild("right_eye",
                 CubeListBuilder.create()
-                        .texOffs(88, 0)
-                        .addBox(-1.5F, -1.5F, -0.5F, 3.0F, 3.0F, 1.0F, CubeDeformation.NONE),
-                PartPose.offset(-3.3F, -3.2F, -5.9F).scaled(0.75F, 0.55F, 1.0F));
+                        .texOffs(78, 0)
+                        .addBox(-2.0F, -1.5F, -0.5F, 4.0F, 3.0F, 1.0F, CubeDeformation.NONE),
+                PartPose.offset(-3.6F, -3.2F, -5.65F));
 
         head.addOrReplaceChild("left_eye",
                 CubeListBuilder.create()
-                        .texOffs(88, 0)
-                        .addBox(-1.5F, -1.5F, -0.5F, 3.0F, 3.0F, 1.0F, CubeDeformation.NONE),
-                PartPose.offset(3.3F, -3.2F, -5.9F).scaled(0.75F, 0.55F, 1.0F));
+                        .texOffs(90, 0)
+                        .addBox(-2.0F, -1.5F, -0.5F, 4.0F, 3.0F, 1.0F, CubeDeformation.NONE),
+                PartPose.offset(3.6F, -3.2F, -5.65F));
 
-        // Traditional wooden & brass kiseru smoking pipe jutting from the left mouth corner
+        // Traditional wooden & brass kiseru smoking pipe gripped cleanly in the left mouth corner
         PartDefinition pipe = head.addOrReplaceChild("pipe",
                 CubeListBuilder.create()
-                        .texOffs(0, 61)
+                        .texOffs(0, 56)
                         .addBox(-0.5F, -0.5F, -5.5F, 1.0F, 1.0F, 6.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(4.2F, 0.0F, -5.4F, -0.22F, -0.45F, -0.18F));
+                PartPose.offsetAndRotation(5.0F, 0.1F, -5.0F, 0.08F, -0.58F, 0.0F));
 
         pipe.addOrReplaceChild("pipe_collar",
                 CubeListBuilder.create()
-                        .texOffs(16, 61)
-                        .addBox(-1.0F, -1.0F, -6.5F, 2.0F, 2.0F, 2.0F, CubeDeformation.NONE),
+                        .texOffs(16, 56)
+                        .addBox(-1.0F, -1.0F, -5.8F, 2.0F, 2.0F, 1.0F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
         pipe.addOrReplaceChild("pipe_bowl",
                 CubeListBuilder.create()
-                        .texOffs(26, 61)
-                        .addBox(-1.5F, -3.2F, -8.5F, 3.0F, 3.0F, 3.0F, CubeDeformation.NONE),
+                        .texOffs(24, 56)
+                        .addBox(-1.0F, -1.8F, -7.8F, 2.0F, 2.0F, 2.0F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
-        // Muscular forelimbs + splayed 3-fingered toad hands resting at Y = 24
+        // Muscular forelimbs with attached haori sleeves + splayed 3-fingered hands resting at Y = 24
         PartDefinition rightArm = body.addOrReplaceChild("right_arm",
                 CubeListBuilder.create()
-                        .texOffs(0, 70)
-                        .addBox(-1.5F, 0.0F, -1.5F, 3.0F, 9.0F, 3.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(-8.8F, -1.5F, -2.5F, -0.20F, 0.10F, 0.08F));
-        addToadHand(rightArm, "right");
+                        .texOffs(0, 65)
+                        .addBox(-1.5F, 0.0F, -1.5F, 3.0F, 11.0F, 3.0F, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(-9.5F, -2.25F, -2.0F, -0.15F, 0.0F, 0.06F));
+        rightArm.addOrReplaceChild("haori_right_sleeve",
+                CubeListBuilder.create()
+                        .texOffs(86, 28)
+                        .addBox(-2.0F, -1.5F, -3.0F, 4.0F, 5.0F, 6.0F, CubeDeformation.NONE),
+                PartPose.ZERO);
+        addToadHand(rightArm, "right", 1);
 
         PartDefinition leftArm = body.addOrReplaceChild("left_arm",
                 CubeListBuilder.create()
-                        .texOffs(14, 70)
-                        .addBox(-1.5F, 0.0F, -1.5F, 3.0F, 9.0F, 3.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(8.8F, -1.5F, -2.5F, -0.20F, -0.10F, -0.08F));
-        addToadHand(leftArm, "left");
+                        .texOffs(14, 65)
+                        .addBox(-1.5F, 0.0F, -1.5F, 3.0F, 11.0F, 3.0F, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(9.5F, -2.25F, -2.0F, -0.15F, 0.0F, -0.06F));
+        leftArm.addOrReplaceChild("haori_left_sleeve",
+                CubeListBuilder.create()
+                        .texOffs(108, 28)
+                        .addBox(-2.0F, -1.5F, -3.0F, 4.0F, 5.0F, 6.0F, CubeDeformation.NONE),
+                PartPose.ZERO);
+        addToadHand(leftArm, "left", -1);
 
         // Heavy bent squatting hind legs + wide webbed feet resting at Y = 24
         PartDefinition rightLeg = body.addOrReplaceChild("right_leg",
                 CubeListBuilder.create()
-                        .texOffs(0, 84)
+                        .texOffs(0, 81)
                         .addBox(-2.5F, -2.5F, -8.0F, 5.0F, 5.0F, 9.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(-6.5F, 3.5F, 1.5F, -0.18F, 0.65F, 0.0F));
+                PartPose.offsetAndRotation(-6.2F, 2.5F, 1.5F, -0.15F, 0.62F, 0.0F));
         addToadHindLimb(rightLeg, "right");
 
         PartDefinition leftLeg = body.addOrReplaceChild("left_leg",
                 CubeListBuilder.create()
-                        .texOffs(30, 84)
+                        .texOffs(30, 81)
                         .addBox(-2.5F, -2.5F, -8.0F, 5.0F, 5.0F, 9.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(6.5F, 3.5F, 1.5F, -0.18F, -0.65F, 0.0F));
+                PartPose.offsetAndRotation(6.2F, 2.5F, 1.5F, -0.15F, -0.62F, 0.0F));
         addToadHindLimb(leftLeg, "left");
 
         // Giant sheathed shinobi tantō blade mounted diagonally across the left hip/back
         PartDefinition sword = body.addOrReplaceChild("sword",
                 CubeListBuilder.create()
-                        .texOffs(0, 100)
+                        .texOffs(0, 98)
                         .addBox(-1.0F, -1.0F, -5.5F, 2.0F, 2.0F, 6.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(7.0F, 2.0F, 1.5F, -0.32F, -0.45F, 0.28F));
+                PartPose.offsetAndRotation(8.8F, 1.5F, 3.8F, -0.32F, -0.22F, 0.14F));
 
         sword.addOrReplaceChild("sword_guard",
                 CubeListBuilder.create()
-                        .texOffs(18, 100)
-                        .addBox(-1.5F, -1.5F, 0.5F, 3.0F, 3.0F, 2.0F, CubeDeformation.NONE),
+                        .texOffs(18, 98)
+                        .addBox(-1.5F, -1.5F, 0.5F, 3.0F, 3.0F, 1.0F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
         sword.addOrReplaceChild("sword_blade",
                 CubeListBuilder.create()
-                        .texOffs(30, 100)
-                        .addBox(-0.5F, -1.5F, 2.5F, 1.0F, 3.0F, 14.0F, CubeDeformation.NONE),
+                        .texOffs(28, 98)
+                        .addBox(-0.5F, -1.5F, 1.5F, 1.0F, 3.0F, 14.0F, CubeDeformation.NONE),
                 PartPose.ZERO);
 
         return LayerDefinition.create(mesh, 128, 128);
     }
 
-    private static void addToadHand(PartDefinition arm, String side) {
+    private static void addToadHand(PartDefinition arm, String side, int zSign) {
         PartDefinition palm = arm.addOrReplaceChild(side + "_hand",
                 CubeListBuilder.create()
-                        .texOffs(28, 70)
+                        .texOffs(28, 65)
                         .addBox(-2.5F, 0.0F, -3.5F, 5.0F, 2.0F, 4.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(0.0F, 9.4F, -0.4F, 0.20F, 0.0F, 0.0F));
+                PartPose.offsetAndRotation(0.0F, 10.4F, 0.0F, 0.15F, 0.0F, -0.06F * zSign));
 
         palm.addOrReplaceChild(side + "_finger_outer",
-                CubeListBuilder.create().texOffs(48, 70).addBox(-1.0F, 0.0F, -3.5F, 2.0F, 2.0F, 4.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(-1.8F, 0.0F, -3.0F, 0.0F, 0.38F, 0.0F));
+                CubeListBuilder.create().texOffs(48, 65).addBox(-1.0F, 0.0F, -3.0F, 2.0F, 2.0F, 3.0F, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(-1.8F, 0.02F, -3.3F, 0.0F, 0.36F, 0.0F));
         palm.addOrReplaceChild(side + "_finger_mid",
-                CubeListBuilder.create().texOffs(48, 70).addBox(-1.0F, 0.0F, -3.5F, 2.0F, 2.0F, 4.0F, CubeDeformation.NONE),
-                PartPose.offset(0.0F, 0.0F, -3.4F));
+                CubeListBuilder.create().texOffs(48, 65).addBox(-1.0F, 0.0F, -3.0F, 2.0F, 2.0F, 3.0F, CubeDeformation.NONE),
+                PartPose.offset(0.0F, 0.0F, -3.5F));
         palm.addOrReplaceChild(side + "_finger_inner",
-                CubeListBuilder.create().texOffs(48, 70).addBox(-1.0F, 0.0F, -3.5F, 2.0F, 2.0F, 4.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(1.8F, 0.0F, -3.0F, 0.0F, -0.38F, 0.0F));
+                CubeListBuilder.create().texOffs(48, 65).addBox(-1.0F, 0.0F, -3.0F, 2.0F, 2.0F, 3.0F, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(1.8F, 0.02F, -3.3F, 0.0F, -0.36F, 0.0F));
     }
 
     private static void addToadHindLimb(PartDefinition thigh, String side) {
         PartDefinition calf = thigh.addOrReplaceChild(side + "_calf",
                 CubeListBuilder.create()
-                        .texOffs(60, 84)
-                        .addBox(-2.0F, 0.0F, -2.0F, 4.0F, 6.0F, 4.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(0.0F, 0.0F, -7.2F, 0.18F, 0.0F, 0.0F));
+                        .texOffs(60, 81)
+                        .addBox(-2.0F, 0.0F, -2.0F, 4.0F, 7.0F, 4.0F, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(0.0F, 0.0F, -7.0F, 0.15F, 0.0F, 0.0F));
 
         PartDefinition foot = calf.addOrReplaceChild(side + "_foot",
                 CubeListBuilder.create()
-                        .texOffs(78, 84)
+                        .texOffs(78, 81)
                         .addBox(-3.0F, 0.0F, -4.5F, 6.0F, 2.0F, 6.0F, CubeDeformation.NONE),
-                PartPose.offset(0.0F, 5.8F, 0.0F));
+                PartPose.offset(0.0F, 6.55F, -0.5F));
 
         foot.addOrReplaceChild(side + "_toe_outer",
-                CubeListBuilder.create().texOffs(48, 70).addBox(-1.0F, 0.0F, -3.2F, 2.0F, 2.0F, 4.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(-2.2F, 0.0F, -4.0F, 0.0F, 0.36F, 0.0F));
+                CubeListBuilder.create().texOffs(48, 65).addBox(-1.0F, 0.0F, -3.0F, 2.0F, 2.0F, 3.0F, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(-2.2F, 0.02F, -4.3F, 0.0F, 0.34F, 0.0F));
         foot.addOrReplaceChild(side + "_toe_mid",
-                CubeListBuilder.create().texOffs(48, 70).addBox(-1.0F, 0.0F, -3.5F, 2.0F, 2.0F, 4.0F, CubeDeformation.NONE),
-                PartPose.offset(0.0F, 0.0F, -4.3F));
+                CubeListBuilder.create().texOffs(48, 65).addBox(-1.0F, 0.0F, -3.0F, 2.0F, 2.0F, 3.0F, CubeDeformation.NONE),
+                PartPose.offset(0.0F, 0.0F, -4.5F));
         foot.addOrReplaceChild(side + "_toe_inner",
-                CubeListBuilder.create().texOffs(48, 70).addBox(-1.0F, 0.0F, -3.2F, 2.0F, 2.0F, 4.0F, CubeDeformation.NONE),
-                PartPose.offsetAndRotation(2.2F, 0.0F, -4.0F, 0.0F, -0.36F, 0.0F));
+                CubeListBuilder.create().texOffs(48, 65).addBox(-1.0F, 0.0F, -3.0F, 2.0F, 2.0F, 3.0F, CubeDeformation.NONE),
+                PartPose.offsetAndRotation(2.2F, 0.02F, -4.3F, 0.0F, -0.34F, 0.0F));
     }
 
     @Override
@@ -256,23 +272,23 @@ public class ToadSageBossModel extends EntityModel<ToadSageBossRenderer.ToadBoss
         super.setupAnim(state);
         this.resetPose();
 
-        // 1. Breathing bob, throat-sac inflation, and subtle kiseru pipe tilt
+        // 1. Breathing bob, tucked throat-sac pulse, and gentle kiseru pipe sway
         float breathFreq = state.isPhaseTwo ? 0.18F : 0.10F;
         float breath = Mth.sin(state.ageInTicks * breathFreq);
         float sacPulse = 0.5F + 0.5F * Mth.sin(state.ageInTicks * (state.isPhaseTwo ? 0.24F : 0.12F));
 
-        this.body.y += breath * 0.35F;
-        this.throatSac.xScale = 1.0F + sacPulse * (state.isPhaseTwo ? 0.16F : 0.10F);
-        this.throatSac.yScale = 1.0F + sacPulse * (state.isPhaseTwo ? 0.28F : 0.18F);
-        this.throatSac.zScale = 1.0F + sacPulse * (state.isPhaseTwo ? 0.35F : 0.22F);
+        this.body.y += breath * 0.30F;
+        this.throatSac.xScale = 1.0F + sacPulse * (state.isPhaseTwo ? 0.12F : 0.08F);
+        this.throatSac.yScale = 1.0F + sacPulse * (state.isPhaseTwo ? 0.20F : 0.14F);
+        this.throatSac.zScale = 1.0F + sacPulse * (state.isPhaseTwo ? 0.24F : 0.16F);
 
-        this.pipe.xRot += breath * 0.05F;
-        this.pipe.zRot += Mth.cos(state.ageInTicks * 0.08F) * 0.03F;
+        this.pipe.xRot += breath * 0.03F;
+        this.pipe.zRot += Mth.cos(state.ageInTicks * 0.08F) * 0.02F;
 
-        // 2. Head tracking & mouth breathing
+        // 2. Head tracking & hinged mouth breathing
         this.head.yRot += Mth.clamp(state.yRot, -45.0F, 45.0F) * Mth.DEG_TO_RAD * 0.65F;
         this.head.xRot += Mth.clamp(state.xRot, -30.0F, 30.0F) * Mth.DEG_TO_RAD * 0.45F;
-        this.jaw.xRot += state.isPhaseTwo ? (0.14F + sacPulse * 0.08F) : (sacPulse * 0.05F);
+        this.jaw.xRot += state.isPhaseTwo ? (0.12F + sacPulse * 0.07F) : (sacPulse * 0.04F);
 
         // 3. Rhythmic amphibian hopping / stride cycle
         float walkSpeed = Math.min(state.walkAnimationSpeed, 1.0F);
@@ -294,7 +310,7 @@ public class ToadSageBossModel extends EntityModel<ToadSageBossRenderer.ToadBoss
             this.leftLeg.xRot += leap * 0.85F;
             this.rightArm.xRot -= leap * 0.72F;
             this.leftArm.xRot -= leap * 0.72F;
-            this.jaw.xRot += leap * 0.20F;
+            this.jaw.xRot += leap * 0.22F;
         }
 
         // 5. Powerful melee lunge & tantō cleave
@@ -312,7 +328,7 @@ public class ToadSageBossModel extends EntityModel<ToadSageBossRenderer.ToadBoss
 
         // 6. Phase 2 aggressive lower crouch, flared stance & billowing haori
         if (state.isPhaseTwo) {
-            this.body.y += 1.3F;
+            this.body.y += 1.2F;
             this.body.xRot += 0.12F;
             this.rightArm.zRot += 0.16F;
             this.leftArm.zRot -= 0.16F;
@@ -320,7 +336,7 @@ public class ToadSageBossModel extends EntityModel<ToadSageBossRenderer.ToadBoss
             this.leftLeg.yRot += 0.14F;
             this.sword.xRot += 0.24F;
             this.sword.zRot -= 0.18F;
-            this.haoriJacket.xRot += 0.08F + Mth.sin(state.ageInTicks * 0.35F) * 0.04F;
+            this.haoriJacket.xRot += 0.06F + Mth.sin(state.ageInTicks * 0.35F) * 0.03F;
         }
     }
 }

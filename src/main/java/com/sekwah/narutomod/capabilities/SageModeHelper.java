@@ -49,8 +49,8 @@ public final class SageModeHelper {
     public static final Identifier SAGE_EYES_3_TEXTURE =
             Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "textures/entity/eyes/sage_eyes_3.png");
 
-    public static final int STAGE_2_MASTERY_THRESHOLD = 200;
-    public static final int STAGE_3_MASTERY_THRESHOLD = 500;
+    public static final int STAGE_2_MASTERY_THRESHOLD = 500;
+    public static final int STAGE_3_MASTERY_THRESHOLD = 1000;
 
     public static final float MAX_NATURE_ENERGY = 100.0F;
     public static final float STAGE_1_NATURE_ENERGY_PER_TICK = 1.25F;

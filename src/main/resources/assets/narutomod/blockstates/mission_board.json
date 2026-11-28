@@ -1,33 +1,138 @@
 {
   "variants": {
-    "facing=north,half=lower": {
-      "model": "narutomod:block/mission_board_lower"
+    "facing=north,part=bottom_left": {
+      "model": "narutomod:block/mission_board_bottom_left"
     },
-    "facing=south,half=lower": {
-      "model": "narutomod:block/mission_board_lower",
+    "facing=south,part=bottom_left": {
+      "model": "narutomod:block/mission_board_bottom_left",
       "y": 180
     },
-    "facing=east,half=lower": {
-      "model": "narutomod:block/mission_board_lower",
+    "facing=east,part=bottom_left": {
+      "model": "narutomod:block/mission_board_bottom_left",
       "y": 90
     },
-    "facing=west,half=lower": {
-      "model": "narutomod:block/mission_board_lower",
+    "facing=west,part=bottom_left": {
+      "model": "narutomod:block/mission_board_bottom_left",
       "y": 270
     },
-    "facing=north,half=upper": {
-      "model": "narutomod:block/mission_board_upper"
+    "facing=north,part=bottom_center": {
+      "model": "narutomod:block/mission_board_bottom_center"
     },
-    "facing=south,half=upper": {
-      "model": "narutomod:block/mission_board_upper",
+    "facing=south,part=bottom_center": {
+      "model": "narutomod:block/mission_board_bottom_center",
       "y": 180
     },
-    "facing=east,half=upper": {
-      "model": "narutomod:block/mission_board_upper",
+    "facing=east,part=bottom_center": {
+      "model": "narutomod:block/mission_board_bottom_center",
       "y": 90
     },
-    "facing=west,half=upper": {
-      "model": "narutomod:block/mission_board_upper",
+    "facing=west,part=bottom_center": {
+      "model": "narutomod:block/mission_board_bottom_center",
+      "y": 270
+    },
+    "facing=north,part=bottom_right": {
+      "model": "narutomod:block/mission_board_bottom_right"
+    },
+    "facing=south,part=bottom_right": {
+      "model": "narutomod:block/mission_board_bottom_right",
+      "y": 180
+    },
+    "facing=east,part=bottom_right": {
+      "model": "narutomod:block/mission_board_bottom_right",
+      "y": 90
+    },
+    "facing=west,part=bottom_right": {
+      "model": "narutomod:block/mission_board_bottom_right",
+      "y": 270
+    },
+    "facing=north,part=mid_left": {
+      "model": "narutomod:block/mission_board_mid_left"
+    },
+    "facing=south,part=mid_left": {
+      "model": "narutomod:block/mission_board_mid_left",
+      "y": 180
+    },
+    "facing=east,part=mid_left": {
+      "model": "narutomod:block/mission_board_mid_left",
+      "y": 90
+    },
+    "facing=west,part=mid_left": {
+      "model": "narutomod:block/mission_board_mid_left",
+      "y": 270
+    },
+    "facing=north,part=mid_center": {
+      "model": "narutomod:block/mission_board_mid_center"
+    },
+    "facing=south,part=mid_center": {
+      "model": "narutomod:block/mission_board_mid_center",
+      "y": 180
+    },
+    "facing=east,part=mid_center": {
+      "model": "narutomod:block/mission_board_mid_center",
+      "y": 90
+    },
+    "facing=west,part=mid_center": {
+      "model": "narutomod:block/mission_board_mid_center",
+      "y": 270
+    },
+    "facing=north,part=mid_right": {
+      "model": "narutomod:block/mission_board_mid_right"
+    },
+    "facing=south,part=mid_right": {
+      "model": "narutomod:block/mission_board_mid_right",
+      "y": 180
+    },
+    "facing=east,part=mid_right": {
+      "model": "narutomod:block/mission_board_mid_right",
+      "y": 90
+    },
+    "facing=west,part=mid_right": {
+      "model": "narutomod:block/mission_board_mid_right",
+      "y": 270
+    },
+    "facing=north,part=top_left": {
+      "model": "narutomod:block/mission_board_top_left"
+    },
+    "facing=south,part=top_left": {
+      "model": "narutomod:block/mission_board_top_left",
+      "y": 180
+    },
+    "facing=east,part=top_left": {
+      "model": "narutomod:block/mission_board_top_left",
+      "y": 90
+    },
+    "facing=west,part=top_left": {
+      "model": "narutomod:block/mission_board_top_left",
+      "y": 270
+    },
+    "facing=north,part=top_center": {
+      "model": "narutomod:block/mission_board_top_center"
+    },
+    "facing=south,part=top_center": {
+      "model": "narutomod:block/mission_board_top_center",
+      "y": 180
+    },
+    "facing=east,part=top_center": {
+      "model": "narutomod:block/mission_board_top_center",
+      "y": 90
+    },
+    "facing=west,part=top_center": {
+      "model": "narutomod:block/mission_board_top_center",
+      "y": 270
+    },
+    "facing=north,part=top_right": {
+      "model": "narutomod:block/mission_board_top_right"
+    },
+    "facing=south,part=top_right": {
+      "model": "narutomod:block/mission_board_top_right",
+      "y": 180
+    },
+    "facing=east,part=top_right": {
+      "model": "narutomod:block/mission_board_top_right",
+      "y": 90
+    },
+    "facing=west,part=top_right": {
+      "model": "narutomod:block/mission_board_top_right",
       "y": 270
     }
   }

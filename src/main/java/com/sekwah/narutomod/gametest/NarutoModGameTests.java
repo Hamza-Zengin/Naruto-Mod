@@ -458,12 +458,29 @@ public class NarutoModGameTests {
         helper.assertTrue(com.sekwah.narutomod.capabilities.MissionDataManager.getAll().size() >= 9,
                 "MissionDataManager must expose at least 9 missions");
 
-        net.minecraft.core.BlockPos boardPos = new net.minecraft.core.BlockPos(4, 1, 2);
-        helper.setBlock(boardPos, com.sekwah.narutomod.block.NarutoBlocks.MISSION_BOARD.get().defaultBlockState());
+        net.minecraft.core.BlockPos boardPos = new net.minecraft.core.BlockPos(6, 1, 5);
+        net.minecraft.world.level.block.state.BlockState boardState =
+                com.sekwah.narutomod.block.NarutoBlocks.MISSION_BOARD.get().defaultBlockState();
+        helper.setBlock(boardPos, boardState);
+        com.sekwah.narutomod.block.NarutoBlocks.MISSION_BOARD.get().setPlacedBy(
+                helper.getLevel(), helper.absolutePos(boardPos), boardState, null,
+                new net.minecraft.world.item.ItemStack(com.sekwah.narutomod.block.NarutoBlocks.ITEM_MISSION_BOARD.get()));
         helper.assertTrue(helper.getBlockState(boardPos).is(com.sekwah.narutomod.block.NarutoBlocks.MISSION_BOARD.get()),
                 "Mission Board block must place cleanly");
-        helper.assertTrue(helper.getBlockState(boardPos).hasProperty(com.sekwah.narutomod.block.MissionBoardBlock.HALF),
-                "Mission Board must define DOUBLE_BLOCK_HALF property");
+        helper.assertTrue(helper.getBlockState(boardPos).hasProperty(com.sekwah.narutomod.block.MissionBoardBlock.PART),
+                "Mission Board must define PART property");
+        helper.assertValueEqual(helper.getBlockState(boardPos).getValue(com.sekwah.narutomod.block.MissionBoardBlock.PART),
+                com.sekwah.narutomod.block.MissionBoardBlock.BoardPart.BOTTOM_CENTER,
+                "Mission Board anchor part");
+        helper.assertValueEqual(helper.getBlockState(boardPos.west()).getValue(com.sekwah.narutomod.block.MissionBoardBlock.PART),
+                com.sekwah.narutomod.block.MissionBoardBlock.BoardPart.BOTTOM_LEFT,
+                "Mission Board bottom_left part");
+        helper.assertValueEqual(helper.getBlockState(boardPos.above(2).east()).getValue(com.sekwah.narutomod.block.MissionBoardBlock.PART),
+                com.sekwah.narutomod.block.MissionBoardBlock.BoardPart.TOP_RIGHT,
+                "Mission Board top_right part");
+        helper.setBlock(boardPos.above(2).east(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+        helper.assertTrue(helper.getBlockState(boardPos).isAir(),
+                "Breaking top_right of 3x3 Mission Board must cleanly clear anchor block without orphans");
         helper.assertTrue(com.sekwah.narutomod.block.NarutoBlocks.TRAINING_DUMMY.get().defaultBlockState()
                 .hasProperty(com.sekwah.narutomod.block.TrainingDummyBlock.HALF),
                 "Training Dummy must define DOUBLE_BLOCK_HALF property");

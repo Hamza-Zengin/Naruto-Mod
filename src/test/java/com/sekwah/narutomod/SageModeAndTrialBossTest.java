@@ -23,6 +23,8 @@ import net.minecraft.SharedConstants;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.Bootstrap;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.golem.AbstractGolem;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
@@ -55,11 +57,11 @@ public class SageModeAndTrialBossTest {
     @DisplayName("SageModeHelper handles 3-stage mastery scaling, NBT clamping, Cloak bonuses, and stationary threshold")
     void testSageModeHelperMathAndNbt() {
         assertEquals(1, SageModeHelper.getSageStage(0));
-        assertEquals(1, SageModeHelper.getSageStage(199));
-        assertEquals(2, SageModeHelper.getSageStage(200));
-        assertEquals(2, SageModeHelper.getSageStage(499));
-        assertEquals(3, SageModeHelper.getSageStage(500));
+        assertEquals(1, SageModeHelper.getSageStage(499));
+        assertEquals(2, SageModeHelper.getSageStage(500));
+        assertEquals(2, SageModeHelper.getSageStage(999));
         assertEquals(3, SageModeHelper.getSageStage(1000));
+        assertEquals(3, SageModeHelper.getSageStage(1500));
 
         assertEquals(1.20F, SageModeHelper.getSageDamageMultiplier(1), 0.0001F);
         assertEquals(1.32F, SageModeHelper.getSageDamageMultiplier(2), 0.0001F);
@@ -143,6 +145,19 @@ public class SageModeAndTrialBossTest {
         assertTrue(profile.isVacuumSpheresEnabled());
         assertTrue(profile.isKawarimiEnabled());
         assertFalse(profile.isFireballEnabled());
+        assertEquals(36, profile.getGlobalCooldownTicks());
+        assertEquals(8.0F, profile.getWaterBulletDamage(), 0.0001F);
+        assertEquals(85, profile.getWaterBulletCooldownTicks());
+        assertEquals(4.5F, profile.getVacuumSpheresDamage(), 0.0001F);
+        assertEquals(90, profile.getVacuumSpheresCooldownTicks());
+        assertEquals(220, profile.getKawarimiCooldownTicks());
+
+        AttributeSupplier bossAttributes = SageTrialBossEntity.createAttributes().build();
+        assertEquals(180.0D, bossAttributes.getBaseValue(Attributes.MAX_HEALTH), 0.0001D);
+        assertEquals(8.0D, bossAttributes.getBaseValue(Attributes.ARMOR), 0.0001D);
+        assertEquals(8.0D, bossAttributes.getBaseValue(Attributes.ATTACK_DAMAGE), 0.0001D);
+        assertEquals(0.32D, bossAttributes.getBaseValue(Attributes.MOVEMENT_SPEED), 0.0001D);
+        assertEquals(0.45D, bossAttributes.getBaseValue(Attributes.KNOCKBACK_RESISTANCE), 0.0001D);
 
         assertTrue(SageTrialBossEntity.isProtectedFriendlyClass(VillageNinjaEntity.class));
         assertTrue(SageTrialBossEntity.isProtectedFriendlyClass(ShinobiVillagerEntity.class));
