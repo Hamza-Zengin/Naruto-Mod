@@ -106,7 +106,7 @@ public class NarutoEntities {
             ChuninChampionEntity::new, MobCategory.MONSTER, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(10));
 
     public static final DeferredHolder<EntityType<?>, EntityType<SageTrialBossEntity>> SAGE_TRIAL_BOSS = register("sage_trial_boss",
-            SageTrialBossEntity::new, MobCategory.MONSTER, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(10));
+            SageTrialBossEntity::new, MobCategory.MONSTER, builder -> builder.sized(2.2F, 2.3F).clientTrackingRange(10));
 
     public static final DeferredHolder<EntityType<?>, EntityType<VillageNinjaEntity>> VILLAGE_NINJA = register("village_ninja",
             VillageNinjaEntity::new, MobCategory.CREATURE, builder -> builder.sized(0.6F, 1.95F).clientTrackingRange(8));

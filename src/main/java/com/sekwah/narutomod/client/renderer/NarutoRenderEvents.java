@@ -6,8 +6,10 @@ import com.sekwah.narutomod.abilities.jutsus.SharinganAbility;
 import com.sekwah.narutomod.block.NarutoBlockEntities;
 import com.sekwah.narutomod.capabilities.INinjaData;
 import com.sekwah.narutomod.capabilities.NinjaCapabilityHandler;
+import com.sekwah.narutomod.capabilities.SageModeHelper;
 import com.sekwah.narutomod.capabilities.toggleabilitydata.ToggleAbilityData;
 import com.sekwah.narutomod.client.model.entity.SusanooRibcageModel;
+import com.sekwah.narutomod.client.model.entity.ToadSageBossModel;
 import com.sekwah.narutomod.client.model.item.model.AnbuMaskModel;
 import com.sekwah.narutomod.client.model.item.model.HeadbandModel;
 import com.sekwah.narutomod.client.model.item.model.ShinobiArmorModel;
@@ -64,7 +66,9 @@ public class NarutoRenderEvents {
             String activeHandJutsu,
             boolean hasEightGates,
             boolean hasEightGatesDeath,
-            boolean hasWaterWalk
+            boolean hasWaterWalk,
+            boolean hasSageMode,
+            int sageModeStage
     ) {
         public static NinjaRenderStateData fromPlayer(Player player) {
             INinjaData ninjaData = player.getData(NinjaCapabilityHandler.NINJA_DATA);
@@ -83,6 +87,8 @@ public class NarutoRenderEvents {
                     || (toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.EIGHT_GATES.getId()));
             boolean hasWaterWalk = ninjaData.isWaterWalkActive()
                     || (toggleData != null && toggleData.hasToggleAbility(NarutoAbilities.WATER_WALK.getId()));
+            boolean hasSageMode = ninjaData.isSageModeActive() || SageModeHelper.isSageModeActive(player);
+            int sageModeStage = hasSageMode ? SageModeHelper.getSageStage(ninjaData) : 0;
             return new NinjaRenderStateData(
                     hasSusanoo,
                     hasSharingan,
@@ -91,7 +97,9 @@ public class NarutoRenderEvents {
                     activeHand == null ? "" : activeHand,
                     hasEightGates,
                     hasEightGatesDeath,
-                    hasWaterWalk
+                    hasWaterWalk,
+                    hasSageMode,
+                    sageModeStage
             );
         }
     }
@@ -210,7 +218,7 @@ public class NarutoRenderEvents {
         event.registerEntityRenderer(NarutoEntities.ROGUE_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "rogue_ninja"));
         event.registerEntityRenderer(NarutoEntities.AKATSUKI_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "akatsuki_ninja"));
         event.registerEntityRenderer(NarutoEntities.CHUNIN_CHAMPION.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "konoha_ninja"));
-        event.registerEntityRenderer(NarutoEntities.SAGE_TRIAL_BOSS.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "sage_trial_boss"));
+        event.registerEntityRenderer(NarutoEntities.SAGE_TRIAL_BOSS.get(), ToadSageBossRenderer::new);
         event.registerEntityRenderer(NarutoEntities.VILLAGE_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "village_ninja"));
         event.registerEntityRenderer(NarutoEntities.KONOHA_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "konoha_ninja"));
         event.registerEntityRenderer(NarutoEntities.SUNA_NINJA.get(), (ctx) -> new ShinobiMobRenderer<>(ctx, "suna_ninja"));
@@ -270,6 +278,7 @@ public class NarutoRenderEvents {
         event.registerLayerDefinition(ASH_CLOUD_LAYER, JutsuVisualModels.AshCloudModel::createLayer);
         event.registerLayerDefinition(WATER_WALL_LAYER, JutsuVisualModels.WaterWallModel::createLayer);
         event.registerLayerDefinition(CHAKRA_SCALPEL_LAYER, JutsuVisualModels.ChakraScalpelModel::createLayer);
+        event.registerLayerDefinition(ToadSageBossModel.LAYER_LOCATION, ToadSageBossModel::createBodyLayer);
     }
 
     @SubscribeEvent

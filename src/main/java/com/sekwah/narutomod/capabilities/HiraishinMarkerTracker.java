@@ -3,9 +3,11 @@ package com.sekwah.narutomod.capabilities;
 import com.sekwah.narutomod.entity.projectile.HiraishinKunaiEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -23,8 +25,11 @@ import java.util.function.Predicate;
  */
 public final class HiraishinMarkerTracker {
 
-    public static final long MARKER_DURATION_TICKS = 1200L; // 60 seconds
-    public static final double MAX_TELEPORT_RANGE = 96.0D;
+    public static final long MARKER_DURATION_TICKS = 1200L; // 60 seconds base
+    public static final long MAX_MARKER_DURATION_TICKS = 3000L; // 150 seconds max mastery
+    public static final double MAX_TELEPORT_RANGE = 96.0D; // 96 blocks base
+    public static final double MAX_SCALED_TELEPORT_RANGE = 192.0D; // 192 blocks max mastery
+    public static final float MAX_MASTERY = 1000.0F;
 
     private static final float PLAYER_HALF_WIDTH = 0.3F;
     private static final float PLAYER_HEIGHT = 1.8F;
@@ -44,6 +49,18 @@ public final class HiraishinMarkerTracker {
     private static final Map<UUID, MarkerEntry> ACTIVE_MARKERS = new ConcurrentHashMap<>();
 
     private HiraishinMarkerTracker() {
+    }
+
+    public static float getMasteryProgress(int mastery) {
+        return Mth.clamp(mastery / MAX_MASTERY, 0.0F, 1.0F);
+    }
+
+    public static double getMaxTeleportRange(int mastery) {
+        return MAX_TELEPORT_RANGE + 96.0D * getMasteryProgress(mastery);
+    }
+
+    public static long getMarkerDurationTicks(int mastery) {
+        return MARKER_DURATION_TICKS + Math.round(1800.0D * getMasteryProgress(mastery));
     }
 
     public record MarkerEntry(UUID kunaiUuid, ResourceKey<Level> dimension, long expiryTick) {
@@ -67,17 +84,26 @@ public final class HiraishinMarkerTracker {
     }
 
     public static void registerMarker(Player owner, HiraishinKunaiEntity kunai, long gameTime) {
+        registerMarker(owner, kunai, gameTime, MARKER_DURATION_TICKS);
+    }
+
+    public static void registerMarker(Player owner, HiraishinKunaiEntity kunai, long gameTime, long durationTicks) {
         if (owner == null || kunai == null || owner.level().isClientSide()) {
             return;
         }
-        registerMarker(owner.getUUID(), kunai.getUUID(), kunai.level().dimension(), gameTime);
+        registerMarker(owner.getUUID(), kunai.getUUID(), kunai.level().dimension(), gameTime, durationTicks);
     }
 
     public static void registerMarker(UUID ownerUuid, UUID kunaiUuid, ResourceKey<Level> dimension, long gameTime) {
+        registerMarker(ownerUuid, kunaiUuid, dimension, gameTime, MARKER_DURATION_TICKS);
+    }
+
+    public static void registerMarker(UUID ownerUuid, UUID kunaiUuid, ResourceKey<Level> dimension, long gameTime, long durationTicks) {
         if (ownerUuid == null || kunaiUuid == null || dimension == null) {
             return;
         }
-        ACTIVE_MARKERS.put(ownerUuid, new MarkerEntry(kunaiUuid, dimension, gameTime + MARKER_DURATION_TICKS));
+        long effectiveDuration = Math.max(1L, durationTicks);
+        ACTIVE_MARKERS.put(ownerUuid, new MarkerEntry(kunaiUuid, dimension, gameTime + effectiveDuration));
     }
 
     @Nullable
@@ -97,6 +123,17 @@ public final class HiraishinMarkerTracker {
     }
 
     public static MarkerResolution resolveMarkerStatus(ServerPlayer player, long gameTime) {
+        return resolveMarkerStatus(player, gameTime, MAX_TELEPORT_RANGE);
+    }
+
+    public static MarkerResolution resolveMarkerStatus(ServerPlayer player, @Nullable MinecraftServer server, double maxRange) {
+        long gameTime = player != null
+                ? player.level().getGameTime()
+                : (server != null ? server.overworld().getGameTime() : 0L);
+        return resolveMarkerStatus(player, gameTime, maxRange);
+    }
+
+    public static MarkerResolution resolveMarkerStatus(ServerPlayer player, long gameTime, double maxRange) {
         if (player == null) {
             return new MarkerResolution(MarkerStatus.NO_MARKER, null, Double.POSITIVE_INFINITY);
         }
@@ -120,7 +157,7 @@ public final class HiraishinMarkerTracker {
             return new MarkerResolution(MarkerStatus.NO_MARKER, null, Double.POSITIVE_INFINITY);
         }
         double distance = kunai.position().distanceTo(player.position());
-        if (distance > MAX_TELEPORT_RANGE) {
+        if (distance > maxRange) {
             return new MarkerResolution(MarkerStatus.OUT_OF_RANGE, kunai, distance);
         }
         return new MarkerResolution(MarkerStatus.ACTIVE, kunai, distance);
@@ -128,7 +165,12 @@ public final class HiraishinMarkerTracker {
 
     @Nullable
     public static HiraishinKunaiEntity resolveActiveMarker(ServerPlayer player, long gameTime) {
-        MarkerResolution resolution = resolveMarkerStatus(player, gameTime);
+        return resolveActiveMarker(player, gameTime, MAX_TELEPORT_RANGE);
+    }
+
+    @Nullable
+    public static HiraishinKunaiEntity resolveActiveMarker(ServerPlayer player, long gameTime, double maxRange) {
+        MarkerResolution resolution = resolveMarkerStatus(player, gameTime, maxRange);
         return resolution.isUsable() ? resolution.kunai() : null;
     }
 
@@ -143,6 +185,21 @@ public final class HiraishinMarkerTracker {
             boolean kunaiAlive,
             long gameTime
     ) {
+        return evaluateMarker(entry, playerDimension, playerPos, kunaiPos, kunaiAlive, gameTime, MAX_TELEPORT_RANGE);
+    }
+
+    /**
+     * Pure validation helper for marker eligibility checks with explicit max teleport range.
+     */
+    public static MarkerStatus evaluateMarker(
+            @Nullable MarkerEntry entry,
+            ResourceKey<Level> playerDimension,
+            Vec3 playerPos,
+            @Nullable Vec3 kunaiPos,
+            boolean kunaiAlive,
+            long gameTime,
+            double maxRange
+    ) {
         if (entry == null) {
             return MarkerStatus.NO_MARKER;
         }
@@ -155,7 +212,7 @@ public final class HiraishinMarkerTracker {
         if (!kunaiAlive || kunaiPos == null || playerPos == null) {
             return MarkerStatus.NO_MARKER;
         }
-        if (kunaiPos.distanceTo(playerPos) > MAX_TELEPORT_RANGE) {
+        if (kunaiPos.distanceTo(playerPos) > maxRange) {
             return MarkerStatus.OUT_OF_RANGE;
         }
         return MarkerStatus.ACTIVE;

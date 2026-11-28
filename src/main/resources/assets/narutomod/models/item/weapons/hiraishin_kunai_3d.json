@@ -6,147 +6,345 @@
   },
   "elements": [
     {
-      "name": "pommel_ring_0",
+      "name": "pommel_ring_top",
       "from": [
         7.79,
-        -1.235,
-        8.456
+        -0.25,
+        7.56
       ],
       "to": [
         8.21,
-        -0.765,
-        9.174
+        0.17,
+        8.44
       ],
       "faces": {
         "north": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         }
-      },
-      "rotation": {
-        "origin": [
-          8.0,
-          -1.0,
-          8.815
-        ],
-        "axis": "x",
-        "angle": 0.0
       }
     },
     {
-      "name": "pommel_ring_1",
+      "name": "pommel_ring_bottom",
       "from": [
         7.79,
-        -0.659,
-        8.218
+        -2.17,
+        7.56
       ],
       "to": [
         8.21,
-        -0.189,
-        8.935
+        -1.75,
+        8.44
       ],
       "faces": {
         "north": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "pommel_ring_north",
+      "from": [
+        7.79,
+        -1.44,
+        6.83
+      ],
+      "to": [
+        8.21,
+        -0.56,
+        7.25
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "pommel_ring_south",
+      "from": [
+        7.79,
+        -1.44,
+        8.75
+      ],
+      "to": [
+        8.21,
+        -0.56,
+        9.17
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "pommel_ring_diag_0",
+      "from": [
+        7.798,
+        -0.531,
+        8.239
+      ],
+      "to": [
+        8.202,
+        -0.111,
+        9.119
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         }
@@ -154,77 +352,77 @@
       "rotation": {
         "origin": [
           8.0,
-          -0.42370797333296384,
-          8.576292026667037
+          -0.321,
+          8.679
         ],
         "axis": "x",
         "angle": 45.0
       }
     },
     {
-      "name": "pommel_ring_2",
+      "name": "pommel_ring_diag_1",
       "from": [
-        7.79,
-        -0.42,
-        7.641
+        7.798,
+        -0.531,
+        6.881
       ],
       "to": [
-        8.21,
-        0.05,
-        8.359
+        8.202,
+        -0.111,
+        7.761
       ],
       "faces": {
         "north": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         }
@@ -232,2471 +430,4928 @@
       "rotation": {
         "origin": [
           8.0,
-          -0.18500000000000005,
+          -0.321,
+          7.321
+        ],
+        "axis": "x",
+        "angle": -45.0
+      }
+    },
+    {
+      "name": "pommel_ring_diag_2",
+      "from": [
+        7.798,
+        -1.889,
+        8.239
+      ],
+      "to": [
+        8.202,
+        -1.469,
+        9.119
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          -1.679,
+          8.679
+        ],
+        "axis": "x",
+        "angle": -45.0
+      }
+    },
+    {
+      "name": "pommel_ring_diag_3",
+      "from": [
+        7.798,
+        -1.889,
+        6.881
+      ],
+      "to": [
+        8.202,
+        -1.469,
+        7.761
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          -1.679,
+          7.321
+        ],
+        "axis": "x",
+        "angle": 45.0
+      }
+    },
+    {
+      "name": "pommel_stem",
+      "from": [
+        7.75,
+        0.06,
+        7.75
+      ],
+      "to": [
+        8.25,
+        0.42,
+        8.25
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "handle_cap_bottom",
+      "from": [
+        7.56,
+        0.4,
+        7.56
+      ],
+      "to": [
+        8.44,
+        0.78,
+        8.44
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            12.2,
+            0.2,
+            15.8,
+            7.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "handle_grip_a",
+      "from": [
+        7.53,
+        0.78,
+        7.53
+      ],
+      "to": [
+        8.47,
+        5.95,
+        8.47
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "handle_grip_b",
+      "from": [
+        7.53,
+        0.79,
+        7.53
+      ],
+      "to": [
+        8.47,
+        5.94,
+        8.47
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            8.2,
+            0.2,
+            11.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          3.36,
           8.0
         ],
-        "axis": "x",
-        "angle": 90.0
+        "axis": "y",
+        "angle": 45.0
       }
     },
     {
-      "name": "pommel_ring_3",
+      "name": "handle_cap_top",
       "from": [
-        7.79,
-        -0.659,
-        7.065
+        7.56,
+        5.95,
+        7.56
       ],
       "to": [
-        8.21,
-        -0.189,
-        7.782
+        8.44,
+        6.32,
+        8.44
       ],
       "faces": {
         "north": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        }
-      },
-      "rotation": {
-        "origin": [
-          8.0,
-          -0.4237079733329637,
-          7.423707973332964
-        ],
-        "axis": "x",
-        "angle": 135.0
-      }
-    },
-    {
-      "name": "pommel_ring_4",
-      "from": [
-        7.79,
-        -1.235,
-        6.826
-      ],
-      "to": [
-        8.21,
-        -0.765,
-        7.544
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        }
-      },
-      "rotation": {
-        "origin": [
-          8.0,
-          -0.9999999999999999,
-          7.1850000000000005
-        ],
-        "axis": "x",
-        "angle": 180.0
-      }
-    },
-    {
-      "name": "pommel_ring_5",
-      "from": [
-        7.79,
-        -1.811,
-        7.065
-      ],
-      "to": [
-        8.21,
-        -1.341,
-        7.782
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        }
-      },
-      "rotation": {
-        "origin": [
-          8.0,
-          -1.5762920266670362,
-          7.423707973332964
-        ],
-        "axis": "x",
-        "angle": 225.0
-      }
-    },
-    {
-      "name": "pommel_ring_6",
-      "from": [
-        7.79,
-        -2.05,
-        7.641
-      ],
-      "to": [
-        8.21,
-        -1.58,
-        8.359
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        }
-      },
-      "rotation": {
-        "origin": [
-          8.0,
-          -1.815,
-          8.0
-        ],
-        "axis": "x",
-        "angle": 270.0
-      }
-    },
-    {
-      "name": "pommel_ring_7",
-      "from": [
-        7.79,
-        -1.811,
-        8.218
-      ],
-      "to": [
-        8.21,
-        -1.341,
-        8.935
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        }
-      },
-      "rotation": {
-        "origin": [
-          8.0,
-          -1.5762920266670362,
-          8.576292026667035
-        ],
-        "axis": "x",
-        "angle": 315.0
-      }
-    },
-    {
-      "name": "handle_lower",
-      "from": [
-        7.62,
-        0.0,
-        7.62
-      ],
-      "to": [
-        8.38,
-        2.4,
-        8.38
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         }
       }
     },
     {
-      "name": "handle_upper",
+      "name": "blade_neck",
       "from": [
-        7.58,
-        2.4,
-        7.58
-      ],
-      "to": [
-        8.42,
-        4.9,
-        8.42
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            8,
-            0,
-            12,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "ferrule_collar",
-      "from": [
-        7.42,
-        4.85,
-        7.1
-      ],
-      "to": [
-        8.58,
-        5.45,
-        8.9
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            12,
-            8,
-            16,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "blade_ridge_0",
-      "from": [
-        7.814,
-        5.4,
-        7.7
-      ],
-      "to": [
-        8.186,
-        6.4,
-        8.3
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "blade_wing_0",
-      "from": [
-        7.93,
-        5.4,
-        7.28
-      ],
-      "to": [
-        8.07,
-        6.4,
-        8.72
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "blade_ridge_1",
-      "from": [
-        7.74,
-        6.4,
-        7.58
-      ],
-      "to": [
-        8.26,
-        7.6,
-        8.42
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "blade_wing_1",
-      "from": [
-        7.93,
-        6.4,
-        6.75
-      ],
-      "to": [
-        8.07,
-        7.6,
-        9.25
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "blade_ridge_2",
-      "from": [
-        7.702,
-        7.6,
-        7.52
-      ],
-      "to": [
-        8.298,
-        9.2,
-        8.48
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "blade_wing_2",
-      "from": [
-        7.93,
-        7.6,
-        6.52
-      ],
-      "to": [
-        8.07,
-        9.2,
-        9.48
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "blade_ridge_3",
-      "from": [
-        7.74,
-        9.2,
-        7.58
-      ],
-      "to": [
-        8.26,
-        11.2,
-        8.42
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            4,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "blade_wing_3",
-      "from": [
-        7.93,
-        9.2,
-        6.76
-      ],
-      "to": [
-        8.07,
-        11.2,
-        9.24
-      ],
-      "faces": {
-        "north": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "east": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "up": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        },
-        "down": {
-          "uv": [
-            4,
-            0,
-            8,
-            16
-          ],
-          "texture": "#texture"
-        }
-      }
-    },
-    {
-      "name": "blade_ridge_4",
-      "from": [
-        7.789,
-        11.2,
+        7.7,
+        6.3,
         7.66
       ],
       "to": [
-        8.211,
-        13.0,
+        8.3,
+        6.94,
         8.34
       ],
       "faces": {
         "north": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            12.2,
+            0.2,
+            15.8,
+            7.8
           ],
           "texture": "#texture"
         }
       }
     },
     {
-      "name": "blade_wing_4",
+      "name": "center_blade_north_0",
       "from": [
-        7.93,
-        11.2,
-        7.08
+        7.864,
+        6.85,
+        6.169
       ],
       "to": [
-        8.07,
-        13.0,
-        8.92
+        8.136,
+        7.682,
+        7.817
       ],
       "faces": {
         "north": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         }
       }
     },
     {
-      "name": "blade_ridge_5",
+      "name": "center_blade_south_0",
       "from": [
-        7.851,
-        13.0,
-        7.76
+        7.864,
+        6.85,
+        8.183
       ],
       "to": [
-        8.149,
-        14.6,
-        8.24
+        8.136,
+        7.682,
+        9.831
       ],
       "faces": {
         "north": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         }
       }
     },
     {
-      "name": "blade_wing_5",
+      "name": "center_spine_0",
       "from": [
-        7.93,
-        13.0,
-        7.42
+        7.71,
+        6.85,
+        7.542
       ],
       "to": [
-        8.07,
-        14.6,
-        8.58
+        8.29,
+        7.682,
+        8.458
       ],
       "faces": {
         "north": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         }
       }
     },
     {
-      "name": "blade_ridge_6",
+      "name": "center_blade_north_1",
+      "from": [
+        7.873,
+        7.662,
+        6.327
+      ],
+      "to": [
+        8.127,
+        8.495,
+        7.833
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_south_1",
+      "from": [
+        7.873,
+        7.662,
+        8.167
+      ],
+      "to": [
+        8.127,
+        8.495,
+        9.673
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_spine_1",
+      "from": [
+        7.729,
+        7.662,
+        7.582
+      ],
+      "to": [
+        8.271,
+        8.495,
+        8.418
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_north_2",
+      "from": [
+        7.881,
+        8.475,
+        6.484
+      ],
+      "to": [
+        8.119,
+        9.307,
+        7.848
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_south_2",
+      "from": [
+        7.881,
+        8.475,
+        8.152
+      ],
+      "to": [
+        8.119,
+        9.307,
+        9.516
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_spine_2",
+      "from": [
+        7.749,
+        8.475,
+        7.621
+      ],
+      "to": [
+        8.251,
+        9.307,
+        8.379
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_north_3",
+      "from": [
+        7.889,
+        9.287,
+        6.642
+      ],
+      "to": [
+        8.111,
+        10.12,
+        7.864
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_south_3",
+      "from": [
+        7.889,
+        9.287,
+        8.136
+      ],
+      "to": [
+        8.111,
+        10.12,
+        9.358
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_spine_3",
+      "from": [
+        7.768,
+        9.287,
+        7.66
+      ],
+      "to": [
+        8.232,
+        10.12,
+        8.34
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_north_4",
+      "from": [
+        7.898,
+        10.1,
+        6.798
+      ],
+      "to": [
+        8.102,
+        10.933,
+        7.88
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_south_4",
+      "from": [
+        7.898,
+        10.1,
+        8.12
+      ],
+      "to": [
+        8.102,
+        10.933,
+        9.202
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_spine_4",
+      "from": [
+        7.788,
+        10.1,
+        7.7
+      ],
+      "to": [
+        8.212,
+        10.933,
+        8.3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_north_5",
+      "from": [
+        7.906,
+        10.913,
+        6.955
+      ],
+      "to": [
+        8.094,
+        11.745,
+        7.895
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_south_5",
+      "from": [
+        7.906,
+        10.913,
+        8.105
+      ],
+      "to": [
+        8.094,
+        11.745,
+        9.045
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_spine_5",
+      "from": [
+        7.807,
+        10.913,
+        7.739
+      ],
+      "to": [
+        8.193,
+        11.745,
+        8.261
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_north_6",
+      "from": [
+        7.915,
+        11.725,
+        7.111
+      ],
+      "to": [
+        8.085,
+        12.558,
+        7.911
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_south_6",
+      "from": [
+        7.915,
+        11.725,
+        8.089
+      ],
+      "to": [
+        8.085,
+        12.558,
+        8.889
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_spine_6",
+      "from": [
+        7.827,
+        11.725,
+        7.778
+      ],
+      "to": [
+        8.173,
+        12.558,
+        8.222
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_north_7",
+      "from": [
+        7.923,
+        12.538,
+        7.266
+      ],
+      "to": [
+        8.077,
+        13.37,
+        7.927
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_south_7",
+      "from": [
+        7.923,
+        12.538,
+        8.073
+      ],
+      "to": [
+        8.077,
+        13.37,
+        8.734
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_spine_7",
+      "from": [
+        7.846,
+        12.538,
+        7.817
+      ],
+      "to": [
+        8.154,
+        13.37,
+        8.183
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_north_8",
+      "from": [
+        7.931,
+        13.35,
+        7.421
+      ],
+      "to": [
+        8.069,
+        14.183,
+        7.942
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_south_8",
+      "from": [
+        7.931,
+        13.35,
+        8.058
+      ],
+      "to": [
+        8.069,
+        14.183,
+        8.579
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_spine_8",
+      "from": [
+        7.866,
+        13.35,
+        7.855
+      ],
+      "to": [
+        8.134,
+        14.183,
+        8.145
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_north_9",
+      "from": [
+        7.94,
+        14.163,
+        7.574
+      ],
+      "to": [
+        8.06,
+        14.995,
+        7.957
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_south_9",
+      "from": [
+        7.94,
+        14.163,
+        8.043
+      ],
+      "to": [
+        8.06,
+        14.995,
+        8.426
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_spine_9",
+      "from": [
+        7.885,
+        14.163,
+        7.894
+      ],
+      "to": [
+        8.115,
+        14.995,
+        8.106
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_north_10",
+      "from": [
+        7.948,
+        14.975,
+        7.727
+      ],
+      "to": [
+        8.052,
+        15.808,
+        7.973
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_south_10",
+      "from": [
+        7.948,
+        14.975,
+        8.027
+      ],
+      "to": [
+        8.052,
+        15.808,
+        8.273
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_spine_10",
+      "from": [
+        7.905,
+        14.975,
+        7.932
+      ],
+      "to": [
+        8.095,
+        15.808,
+        8.068
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_north_11",
+      "from": [
+        7.957,
+        15.788,
+        7.877
+      ],
+      "to": [
+        8.043,
+        16.6,
+        7.984
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_blade_south_11",
+      "from": [
+        7.957,
+        15.788,
+        8.016
+      ],
+      "to": [
+        8.043,
+        16.6,
+        8.123
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "center_spine_11",
+      "from": [
+        7.924,
+        15.788,
+        7.96
+      ],
+      "to": [
+        8.076,
+        16.6,
+        8.04
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_shoulder_hub",
+      "from": [
+        7.73,
+        6.85,
+        6.65
+      ],
+      "to": [
+        8.27,
+        8.15,
+        9.35
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "blade_shoulder_upper",
+      "from": [
+        7.8,
+        8.15,
+        6.85
+      ],
+      "to": [
+        8.2,
+        9.05,
+        9.15
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      }
+    },
+    {
+      "name": "prong_north_0",
+      "from": [
+        7.82,
+        6.89,
+        5.58
+      ],
+      "to": [
+        8.18,
+        8.55,
+        6.98
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          7.72,
+          6.28
+        ],
+        "axis": "x",
+        "angle": 12.0
+      }
+    },
+    {
+      "name": "prong_north_bevel_0",
+      "from": [
+        7.748,
+        7.355,
+        5.692
+      ],
+      "to": [
+        8.252,
+        8.085,
+        6.868
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          7.72,
+          6.28
+        ],
+        "axis": "x",
+        "angle": 12.0
+      }
+    },
+    {
+      "name": "prong_north_1",
+      "from": [
+        7.85,
+        7.42,
+        4.84
+      ],
+      "to": [
+        8.15,
+        8.82,
+        6.16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          8.12,
+          5.5
+        ],
+        "axis": "x",
+        "angle": 20.0
+      }
+    },
+    {
+      "name": "prong_north_bevel_1",
+      "from": [
+        7.79,
+        7.812,
+        4.946
+      ],
+      "to": [
+        8.21,
+        8.428,
+        6.054
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          8.12,
+          5.5
+        ],
+        "axis": "x",
+        "angle": 20.0
+      }
+    },
+    {
+      "name": "prong_north_2",
+      "from": [
+        7.875,
+        8.1,
+        4.19
+      ],
+      "to": [
+        8.125,
+        9.22,
+        5.41
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          8.66,
+          4.8
+        ],
+        "axis": "x",
+        "angle": 28.0
+      }
+    },
+    {
+      "name": "prong_north_bevel_2",
+      "from": [
+        7.825,
+        8.414,
+        4.288
+      ],
+      "to": [
+        8.175,
+        8.906,
+        5.312
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            4.2,
+            0.2,
+            7.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          8.66,
+          4.8
+        ],
+        "axis": "x",
+        "angle": 28.0
+      }
+    },
+    {
+      "name": "prong_north_3",
+      "from": [
+        7.9,
+        8.89,
+        3.62
+      ],
+      "to": [
+        8.1,
+        9.71,
+        4.74
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "east": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "up": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        },
+        "down": {
+          "uv": [
+            0.2,
+            0.2,
+            3.8,
+            15.8
+          ],
+          "texture": "#texture"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          9.3,
+          4.18
+        ],
+        "axis": "x",
+        "angle": 35.0
+      }
+    },
+    {
+      "name": "prong_north_bevel_3",
       "from": [
         7.86,
-        14.6,
-        7.86
+        9.12,
+        3.71
       ],
       "to": [
         8.14,
-        16.0,
-        8.14
+        9.48,
+        4.65
       ],
       "faces": {
         "north": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          9.3,
+          4.18
+        ],
+        "axis": "x",
+        "angle": 35.0
       }
     },
     {
-      "name": "blade_wing_6",
+      "name": "prong_north_4",
       "from": [
-        7.93,
-        14.6,
-        7.72
+        7.925,
+        9.71,
+        3.21
       ],
       "to": [
-        8.07,
-        16.0,
-        8.28
+        8.075,
+        10.21,
+        4.15
       ],
       "faces": {
         "north": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          9.96,
+          3.68
+        ],
+        "axis": "x",
+        "angle": 41.0
       }
     },
     {
-      "name": "handle_seal_band",
+      "name": "prong_north_bevel_4",
       "from": [
-        7.54,
-        1.8,
-        7.54
+        7.895,
+        9.85,
+        3.285
       ],
       "to": [
-        8.46,
-        3.3,
-        8.46
+        8.105,
+        10.07,
+        4.075
       ],
       "faces": {
         "north": {
           "uv": [
-            8,
-            0,
-            12,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            8,
-            0,
-            12,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            8,
-            0,
-            12,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            8,
-            0,
-            12,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            8,
-            0,
-            12,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            8,
-            0,
-            12,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          9.96,
+          3.68
+        ],
+        "axis": "x",
+        "angle": 41.0
       }
     },
     {
-      "name": "hiraishin_guard_bar",
+      "name": "prong_north_5",
       "from": [
-        7.78,
-        5.4,
-        5.45
+        7.95,
+        10.45,
+        3.03
       ],
       "to": [
-        8.22,
-        6.25,
-        10.55
+        8.05,
+        10.67,
+        3.61
       ],
       "faces": {
         "north": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            12,
-            8,
-            16,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          10.56,
+          3.32
+        ],
+        "axis": "x",
+        "angle": 45.0
       }
     },
     {
-      "name": "hiraishin_guard_edge",
+      "name": "prong_south_0",
       "from": [
-        7.93,
-        5.25,
-        5.35
+        7.82,
+        6.89,
+        9.02
       ],
       "to": [
-        8.07,
-        6.35,
-        10.65
+        8.18,
+        8.55,
+        10.42
       ],
       "faces": {
         "north": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          7.72,
+          9.72
+        ],
+        "axis": "x",
+        "angle": -12.0
       }
     },
     {
-      "name": "prong_north_base_ridge",
+      "name": "prong_south_bevel_0",
       "from": [
-        7.8,
-        6.25,
-        5.55
+        7.748,
+        7.355,
+        9.132
       ],
       "to": [
-        8.2,
-        8.3,
-        6.3
+        8.252,
+        8.085,
+        10.308
       ],
       "faces": {
         "north": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          7.72,
+          9.72
+        ],
+        "axis": "x",
+        "angle": -12.0
       }
     },
     {
-      "name": "prong_north_base_wing",
+      "name": "prong_south_1",
       "from": [
-        7.93,
-        6.25,
-        5.15
+        7.85,
+        7.42,
+        9.84
       ],
       "to": [
-        8.07,
-        8.3,
-        6.5
+        8.15,
+        8.82,
+        11.16
       ],
       "faces": {
         "north": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          8.12,
+          10.5
+        ],
+        "axis": "x",
+        "angle": -20.0
       }
     },
     {
-      "name": "prong_north_mid_ridge",
+      "name": "prong_south_bevel_1",
       "from": [
-        7.84,
-        8.3,
-        5.75
+        7.79,
+        7.812,
+        9.946
       ],
       "to": [
-        8.16,
-        10.1,
-        6.22
+        8.21,
+        8.428,
+        11.054
       ],
       "faces": {
         "north": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          8.12,
+          10.5
+        ],
+        "axis": "x",
+        "angle": -20.0
       }
     },
     {
-      "name": "prong_north_mid_wing",
+      "name": "prong_south_2",
       "from": [
-        7.93,
-        8.3,
-        5.45
+        7.875,
+        8.1,
+        10.59
       ],
       "to": [
-        8.07,
-        10.1,
-        6.38
+        8.125,
+        9.22,
+        11.81
       ],
       "faces": {
         "north": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          8.66,
+          11.2
+        ],
+        "axis": "x",
+        "angle": -28.0
       }
     },
     {
-      "name": "prong_north_tip",
+      "name": "prong_south_bevel_2",
       "from": [
-        7.93,
-        10.1,
-        5.72
+        7.825,
+        8.414,
+        10.688
       ],
       "to": [
-        8.07,
-        11.4,
-        6.18
+        8.175,
+        8.906,
+        11.712
       ],
       "faces": {
         "north": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          8.66,
+          11.2
+        ],
+        "axis": "x",
+        "angle": -28.0
       }
     },
     {
-      "name": "prong_south_base_ridge",
+      "name": "prong_south_3",
       "from": [
-        7.8,
-        6.25,
-        9.7
+        7.9,
+        8.89,
+        11.26
       ],
       "to": [
-        8.2,
-        8.3,
-        10.45
+        8.1,
+        9.71,
+        12.38
       ],
       "faces": {
         "north": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          9.3,
+          11.82
+        ],
+        "axis": "x",
+        "angle": -35.0
       }
     },
     {
-      "name": "prong_south_base_wing",
+      "name": "prong_south_bevel_3",
       "from": [
-        7.93,
-        6.25,
-        9.5
+        7.86,
+        9.12,
+        11.35
       ],
       "to": [
-        8.07,
-        8.3,
-        10.85
+        8.14,
+        9.48,
+        12.29
       ],
       "faces": {
         "north": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          9.3,
+          11.82
+        ],
+        "axis": "x",
+        "angle": -35.0
       }
     },
     {
-      "name": "prong_south_mid_ridge",
+      "name": "prong_south_4",
       "from": [
-        7.84,
-        8.3,
-        9.78
+        7.925,
+        9.71,
+        11.85
       ],
       "to": [
-        8.16,
-        10.1,
-        10.25
+        8.075,
+        10.21,
+        12.79
       ],
       "faces": {
         "north": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            0,
-            0,
-            4,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          9.96,
+          12.32
+        ],
+        "axis": "x",
+        "angle": -41.0
       }
     },
     {
-      "name": "prong_south_mid_wing",
+      "name": "prong_south_bevel_4",
       "from": [
-        7.93,
-        8.3,
-        9.62
+        7.895,
+        9.85,
+        11.925
       ],
       "to": [
-        8.07,
-        10.1,
-        10.55
+        8.105,
+        10.07,
+        12.715
       ],
       "faces": {
         "north": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            0.2,
+            0.2,
+            3.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          9.96,
+          12.32
+        ],
+        "axis": "x",
+        "angle": -41.0
       }
     },
     {
-      "name": "prong_south_tip",
+      "name": "prong_south_5",
       "from": [
-        7.93,
-        10.1,
-        9.82
+        7.95,
+        10.45,
+        12.39
       ],
       "to": [
-        8.07,
-        11.4,
-        10.28
+        8.05,
+        10.67,
+        12.97
       ],
       "faces": {
         "north": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "south": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            4,
-            0,
-            8,
-            16
+            4.2,
+            0.2,
+            7.8,
+            15.8
           ],
           "texture": "#texture"
         }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          10.56,
+          12.68
+        ],
+        "axis": "x",
+        "angle": -45.0
       }
     }
   ],

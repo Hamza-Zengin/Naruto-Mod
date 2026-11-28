@@ -6,7 +6,14 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "narutomod:mission_board"
+          "name": "narutomod:mission_board",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "narutomod:mission_board",
+            "state": {
+              "half": "lower"
+            }
+          }
         }
       ],
       "condition": {

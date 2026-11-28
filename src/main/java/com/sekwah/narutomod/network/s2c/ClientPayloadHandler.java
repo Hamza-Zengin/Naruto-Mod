@@ -18,6 +18,7 @@ public class ClientPayloadHandler {
     public static void registerClientPayloads(final RegisterClientPayloadHandlersEvent event) {
         event.register(ClientJutsuEffectPacket.TYPE, ClientPayloadHandler::handleJutsuEffect);
         event.register(ClientCameraShakePacket.TYPE, ClientPayloadHandler::handleCameraShake);
+        event.register(ClientFlashEffectPacket.TYPE, ClientFlashEffectPacket::handle);
         event.register(ClientJutsuStatsSyncPacket.TYPE, ClientPayloadHandler::handleJutsuStatsSync);
         event.register(ClientMissionsSyncPacket.TYPE, ClientPayloadHandler::handleMissionsSync);
     }

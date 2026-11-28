@@ -21,12 +21,17 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.DifficultyInstance;
@@ -71,7 +76,7 @@ import java.util.function.BiConsumer;
 /**
  * Toad Sage Trial Boss (Kurbağa Bilge Sınavı Bossu)
  * Waits peacefully at the Myōbokuzan Shrine until challenged via right-click or attack.
- * Phase 1 uses Water/Wind jutsus, melee, and dash blitzes; Phase 2 (<50% HP) unleashes
+ * Phase 1 uses Water/Wind jutsus, melee, and toad leap-slams; Phase 2 (<50% HP) unleashes
  * Nature Energy bursts, self-buffs, and periodic knockback shockwaves.
  * Defeating this boss unlocks {@code narutomod:sage_mode} for participating duelists.
  * Entity drops are defined in {@code data/narutomod/loot_table/entities/sage_trial_boss.json}.
@@ -80,6 +85,14 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
 
     public static final Identifier SAGE_MODE_ID = Identifier.fromNamespaceAndPath(NarutoMod.MOD_ID, "sage_mode");
     public static final double BOSS_PARTICIPATION_RADIUS = 32.0D;
+    private static final int LEAP_ANIM_DURATION = 18;
+
+    private static final EntityDataAccessor<Boolean> DATA_DUEL_ACTIVE =
+            SynchedEntityData.defineId(SageTrialBossEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_PHASE_TWO =
+            SynchedEntityData.defineId(SageTrialBossEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> DATA_LEAP_TICKS =
+            SynchedEntityData.defineId(SageTrialBossEntity.class, EntityDataSerializers.INT);
 
     @Nullable
     private static BiConsumer<ServerPlayer, INinjaData> bossDefeatMissionHook;
@@ -95,13 +108,41 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
     private final NinjaJutsuCooldowns jutsuCooldowns = new NinjaJutsuCooldowns(26);
     private int dashCooldown = 50;
     private int shockwaveCooldown = 90;
+    private int leapAirTicks = 0;
+    private int prevLeapTicks = 0;
+    private boolean leapSlamArmed = false;
     private boolean duelActive = false;
     private boolean phaseTwoTriggered = false;
 
     public SageTrialBossEntity(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
-        this.xpReward = 180;
+        this.xpReward = 200;
         this.bossEvent.setVisible(false);
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_DUEL_ACTIVE, false);
+        builder.define(DATA_PHASE_TWO, false);
+        builder.define(DATA_LEAP_TICKS, 0);
+    }
+
+    public boolean isDuelActive() {
+        return this.duelActive || this.entityData.get(DATA_DUEL_ACTIVE);
+    }
+
+    public boolean isPhaseTwo() {
+        return this.phaseTwoTriggered || this.entityData.get(DATA_PHASE_TWO);
+    }
+
+    public float getLeapAnimation(float partialTick) {
+        int current = this.entityData.get(DATA_LEAP_TICKS);
+        if (current <= 0 && this.prevLeapTicks <= 0) {
+            return 0.0F;
+        }
+        float interpolated = Mth.lerp(partialTick, (float) this.prevLeapTicks, (float) current);
+        return Mth.clamp(1.0F - (interpolated / (float) LEAP_ANIM_DURATION), 0.0F, 1.0F);
     }
 
     public static void setBossDefeatMissionHook(@Nullable BiConsumer<ServerPlayer, INinjaData> hook) {
@@ -283,6 +324,43 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
         return result;
     }
 
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return SoundEvents.FROG_AMBIENT;
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return SoundEvents.FROG_HURT;
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.FROG_DEATH;
+    }
+
+    @Override
+    public float getVoicePitch() {
+        return 0.55F + (this.random.nextFloat() - 0.5F) * 0.08F;
+    }
+
+    @Override
+    public int getAmbientSoundInterval() {
+        return 140;
+    }
+
+    @Override
+    public boolean doHurtTarget(ServerLevel serverLevel, Entity target) {
+        boolean hit = super.doHurtTarget(serverLevel, target);
+        if (hit) {
+            serverLevel.playSound(null, this.blockPosition(), SoundEvents.PLAYER_ATTACK_STRONG,
+                    SoundSource.HOSTILE, 1.0F, 0.72F);
+            serverLevel.playSound(null, this.blockPosition(), SoundEvents.FROG_STEP,
+                    SoundSource.HOSTILE, 0.9F, 0.55F);
+        }
+        return hit;
+    }
+
     public void activateDuel(Player challenger) {
         if (challenger != null) {
             this.participantUuids.add(challenger.getUUID());
@@ -291,6 +369,7 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
             return;
         }
         this.duelActive = true;
+        this.entityData.set(DATA_DUEL_ACTIVE, true);
         this.bossEvent.setVisible(true);
         this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
         if (challenger != null) {
@@ -305,8 +384,10 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
         }
 
         if (this.level() instanceof ServerLevel serverLevel) {
+            serverLevel.playSound(null, this.blockPosition(), SoundEvents.FROG_AMBIENT,
+                    SoundSource.HOSTILE, 1.35F, 0.52F);
             serverLevel.playSound(null, this.blockPosition(), NarutoSounds.JUTSU_CAST.get(),
-                    SoundSource.HOSTILE, 1.2F, 0.95F);
+                    SoundSource.HOSTILE, 1.1F, 0.90F);
             serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER, this.getX(), this.getY() + 1.0D, this.getZ(),
                     20, 0.55D, 0.6D, 0.55D, 0.05D,
                     ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
@@ -327,10 +408,34 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
 
     @Override
     public void tick() {
+        this.prevLeapTicks = this.entityData.get(DATA_LEAP_TICKS);
         super.tick();
-        if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
+
+        if (this.level().isClientSide()) {
+            this.spawnClientAmbientParticles();
+            return;
+        }
+
+        if (this.level() instanceof ServerLevel serverLevel) {
             if (this.tickCount == 1 && this.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) {
                 this.equipDefaultGear();
+            }
+
+            int currentLeap = this.entityData.get(DATA_LEAP_TICKS);
+            if (currentLeap > 0) {
+                this.entityData.set(DATA_LEAP_TICKS, currentLeap - 1);
+            }
+
+            if (this.leapSlamArmed) {
+                this.leapAirTicks++;
+                if (this.onGround() && this.leapAirTicks >= 4) {
+                    this.performToadGroundSlam(serverLevel);
+                    this.leapSlamArmed = false;
+                    this.leapAirTicks = 0;
+                } else if (this.leapAirTicks > 40) {
+                    this.leapSlamArmed = false;
+                    this.leapAirTicks = 0;
+                }
             }
 
             if (shouldClearTargetOutsideDuel(this.getTarget(), this.duelActive)) {
@@ -373,24 +478,59 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
             LivingEntity target = this.getTarget();
             if (target != null && target.isAlive()) {
                 double distSqr = this.distanceToSqr(target);
-                if (distSqr >= 20.0D && distSqr <= 85.0D && this.dashCooldown <= 0 && this.onGround()) {
+                if (distSqr >= 20.0D && distSqr <= 90.0D && this.dashCooldown <= 0 && this.onGround()) {
                     this.performNatureDash(serverLevel, target);
                     this.dashCooldown = this.phaseTwoTriggered
                             ? (45 + this.random.nextInt(20))
-                            : (80 + this.random.nextInt(25));
+                            : (75 + this.random.nextInt(25));
                 }
             }
         }
     }
 
+    private void spawnClientAmbientParticles() {
+        // Subtle kiseru pipe smoke puffs drifting up from the left side of the toad's mouth
+        if (this.tickCount % 7 == 0) {
+            float yawRad = this.yBodyRot * Mth.DEG_TO_RAD;
+            double forwardX = -Mth.sin(yawRad);
+            double forwardZ = Mth.cos(yawRad);
+            double leftX = Mth.cos(yawRad);
+            double leftZ = Mth.sin(yawRad);
+
+            double pipeX = this.getX() + forwardX * 0.95D + leftX * 0.62D;
+            double pipeY = this.getY() + 1.56D;
+            double pipeZ = this.getZ() + forwardZ * 0.95D + leftZ * 0.62D;
+
+            this.level().addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE,
+                    pipeX, pipeY, pipeZ,
+                    (this.random.nextDouble() - 0.5D) * 0.01D,
+                    0.028D + this.random.nextDouble() * 0.012D,
+                    (this.random.nextDouble() - 0.5D) * 0.01D);
+        }
+
+        // Phase 2 Senjutsu aura particles swirling around the boss
+        if (this.isPhaseTwo() && this.tickCount % 4 == 0) {
+            double angle = this.random.nextDouble() * Math.PI * 2.0D;
+            double radius = 0.75D + this.random.nextDouble() * 0.65D;
+            double px = this.getX() + Math.cos(angle) * radius;
+            double py = this.getY() + 0.35D + this.random.nextDouble() * 1.45D;
+            double pz = this.getZ() + Math.sin(angle) * radius;
+            this.level().addParticle(
+                    this.random.nextBoolean() ? ParticleTypes.HAPPY_VILLAGER : ParticleTypes.END_ROD,
+                    px, py, pz, 0.0D, 0.04D, 0.0D);
+        }
+    }
+
     private void triggerPhaseTwo(ServerLevel serverLevel) {
         this.phaseTwoTriggered = true;
+        this.entityData.set(DATA_PHASE_TWO, true);
         this.dashCooldown = Math.min(this.dashCooldown, 15);
         this.shockwaveCooldown = 85;
 
         this.addEffect(new MobEffectInstance(MobEffects.SPEED, 800, 1));
         this.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 800, 1));
 
+        serverLevel.playSound(null, this.blockPosition(), SoundEvents.FROG_AMBIENT, SoundSource.HOSTILE, 1.45F, 0.48F);
         serverLevel.playSound(null, this.blockPosition(), SoundEvents.TOTEM_USE, SoundSource.HOSTILE, 0.9F, 1.05F);
         serverLevel.playSound(null, this.blockPosition(), NarutoSounds.JUTSU_CAST.get(), SoundSource.HOSTILE, 1.2F, 0.9F);
         serverLevel.sendParticles(ParticleTypes.TOTEM_OF_UNDYING, this.getX(), this.getY() + 1.0D, this.getZ(),
@@ -414,7 +554,7 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
 
     private void performNatureEnergyShockwave(ServerLevel serverLevel, double radius, float damage) {
         serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(),
-                SoundSource.HOSTILE, 0.95F, 1.3F);
+                SoundSource.HOSTILE, 0.95F, 1.15F);
         serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER, this.getX(), this.getY() + 0.8D, this.getZ(),
                 24, radius * 0.4D, 0.35D, radius * 0.4D, 0.06D,
                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
@@ -445,13 +585,55 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
     }
 
     private void performNatureDash(ServerLevel serverLevel, LivingEntity target) {
-        Vec3 dir = target.position().subtract(this.position()).normalize();
-        this.setDeltaMovement(dir.x * 1.45D, 0.34D, dir.z * 1.45D);
+        Vec3 diff = target.position().subtract(this.position());
+        Vec3 horizontal = new Vec3(diff.x, 0.0D, diff.z);
+        Vec3 dir = horizontal.lengthSqr() > 1.0E-5D ? horizontal.normalize() : new Vec3(0.0D, 0.0D, 1.0D);
+        this.setDeltaMovement(dir.x * 1.25D, 0.62D, dir.z * 1.25D);
         this.needsSync = true;
-        serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER, this.getX(), this.getY() + 0.3D, this.getZ(),
-                10, 0.3D, 0.2D, 0.3D, 0.04D,
+        this.leapSlamArmed = true;
+        this.leapAirTicks = 0;
+        this.entityData.set(DATA_LEAP_TICKS, LEAP_ANIM_DURATION);
+
+        serverLevel.sendParticles(ParticleTypes.CLOUD, this.getX(), this.getY() + 0.25D, this.getZ(),
+                14, 0.55D, 0.2D, 0.55D, 0.05D,
                 ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
-        serverLevel.playSound(null, this.blockPosition(), NarutoSounds.LEAP.get(), SoundSource.HOSTILE, 1.0F, 1.15F);
+        serverLevel.playSound(null, this.blockPosition(), SoundEvents.FROG_LONG_JUMP, SoundSource.HOSTILE, 1.3F, 0.55F);
+        serverLevel.playSound(null, this.blockPosition(), NarutoSounds.LEAP.get(), SoundSource.HOSTILE, 1.0F, 0.95F);
+    }
+
+    private void performToadGroundSlam(ServerLevel serverLevel) {
+        double radius = this.phaseTwoTriggered ? 6.0D : 4.8D;
+        float damage = this.phaseTwoTriggered ? 8.5F : 6.0F;
+
+        serverLevel.playSound(null, this.blockPosition(), SoundEvents.GENERIC_EXPLODE.value(),
+                SoundSource.HOSTILE, 0.9F, 0.72F);
+        serverLevel.playSound(null, this.blockPosition(), SoundEvents.FROG_STEP,
+                SoundSource.HOSTILE, 1.2F, 0.50F);
+
+        serverLevel.sendParticles(ParticleTypes.CLOUD, this.getX(), this.getY() + 0.2D, this.getZ(),
+                26, radius * 0.42D, 0.15D, radius * 0.42D, 0.08D,
+                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+        serverLevel.sendParticles(ParticleTypes.SPLASH, this.getX(), this.getY() + 0.3D, this.getZ(),
+                22, radius * 0.38D, 0.25D, radius * 0.38D, 0.12D,
+                ClientboundLevelParticlesPacket.RandomizationType.DEFAULT);
+
+        double radiusSq = radius * radius;
+        for (LivingEntity entity : serverLevel.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius))) {
+            if (entity == this || !entity.isAlive() || entity.isSpectator() || isProtectedFriendly(entity)) {
+                continue;
+            }
+            if (entity instanceof Player && !this.duelActive) {
+                continue;
+            }
+            if (entity.distanceToSqr(this) <= radiusSq) {
+                entity.hurtServer(serverLevel, serverLevel.damageSources().mobAttack(this), damage);
+                Vec3 diff = entity.position().subtract(this.position());
+                Vec3 horizontal = new Vec3(diff.x, 0.0D, diff.z);
+                Vec3 push = horizontal.lengthSqr() > 1.0E-5D ? horizontal.normalize() : new Vec3(1.0D, 0.0D, 0.0D);
+                entity.push(push.x * 1.25D, 0.58D, push.z * 1.25D);
+                entity.needsSync = true;
+            }
+        }
     }
 
     @Override
@@ -482,6 +664,8 @@ public class SageTrialBossEntity extends PathfinderMob implements NinjaJutsuUser
         super.readAdditionalSaveData(input);
         this.duelActive = input.getBooleanOr("DuelActive", false);
         this.phaseTwoTriggered = input.getBooleanOr("PhaseTwoTriggered", false);
+        this.entityData.set(DATA_DUEL_ACTIVE, this.duelActive);
+        this.entityData.set(DATA_PHASE_TWO, this.phaseTwoTriggered);
         this.bossEvent.setVisible(this.duelActive);
     }
 

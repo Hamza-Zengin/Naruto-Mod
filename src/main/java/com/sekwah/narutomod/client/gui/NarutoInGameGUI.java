@@ -36,6 +36,7 @@ public class NarutoInGameGUI {
     @SubscribeEvent
     public void clientTickEvent(ClientTickEvent.Post event) {
         this.chakraOverlay.tick();
+        FlashOverlayManager.tick();
     }
 
     @SubscribeEvent
@@ -45,7 +46,9 @@ public class NarutoInGameGUI {
             this.renderSelectedJutsuHudBadge(event.getGuiGraphics());
             JutsuWheelOverlay.render(event.getGuiGraphics());
         } else if (event.getName().equals(VanillaGuiLayers.CAMERA_OVERLAYS)) {
-            renderFirstPersonAuraVignette(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(false));
+            float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(false);
+            renderFirstPersonAuraVignette(event.getGuiGraphics(), partialTick);
+            FlashOverlayManager.render(event.getGuiGraphics(), partialTick);
         }
     }
 

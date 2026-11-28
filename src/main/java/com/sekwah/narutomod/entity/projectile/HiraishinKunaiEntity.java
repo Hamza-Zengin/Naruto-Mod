@@ -3,6 +3,7 @@ package com.sekwah.narutomod.entity.projectile;
 import com.sekwah.narutomod.capabilities.HiraishinMarkerTracker;
 import com.sekwah.narutomod.entity.NarutoEntities;
 import com.sekwah.narutomod.item.NarutoItems;
+import com.sekwah.narutomod.item.weapons.HiraishinKunaiItem;
 import com.sekwah.narutomod.sounds.NarutoSounds;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -21,7 +22,8 @@ import net.minecraft.world.phys.EntityHitResult;
 /**
  * Flying Raijin Kunai (Hiraishin Kunai) projectile entity.
  * Registers itself with {@link HiraishinMarkerTracker} when thrown and upon impact,
- * remains marked for 60 seconds (1200 ticks), and emits subtle golden electric sparks.
+ * remains marked for 60s to 150s (1200 to 3000 ticks) based on Hiraishin mastery,
+ * and emits subtle golden electric sparks.
  */
 public class HiraishinKunaiEntity extends KunaiEntity {
 
@@ -71,7 +73,7 @@ public class HiraishinKunaiEntity extends KunaiEntity {
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
         if (!this.level().isClientSide() && this.getOwner() instanceof Player owner) {
-            HiraishinMarkerTracker.registerMarker(owner, this, this.level().getGameTime());
+            registerOwnerScaledMarker(owner);
         }
     }
 
@@ -79,8 +81,14 @@ public class HiraishinKunaiEntity extends KunaiEntity {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (!this.level().isClientSide() && !this.isRemoved() && this.getOwner() instanceof Player owner) {
-            HiraishinMarkerTracker.registerMarker(owner, this, this.level().getGameTime());
+            registerOwnerScaledMarker(owner);
         }
+    }
+
+    private void registerOwnerScaledMarker(Player owner) {
+        int mastery = HiraishinKunaiItem.getOwnerHiraishinMastery(owner);
+        long durationTicks = HiraishinMarkerTracker.getMarkerDurationTicks(mastery);
+        HiraishinMarkerTracker.registerMarker(owner, this, this.level().getGameTime(), durationTicks);
     }
 
     @Override

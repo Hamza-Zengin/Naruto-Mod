@@ -121,6 +121,7 @@ public interface INinjaData extends ValueIOSerializable {
     int JUTSU_FLAG_EIGHT_GATES         = 1 << 2;
     int JUTSU_FLAG_WATER_WALK          = 1 << 3;
     int JUTSU_FLAG_EIGHT_GATES_DEATH   = 1 << 4;
+    int JUTSU_FLAG_SAGE_MODE           = 1 << 5;
 
     int getActiveJutsusFlag();
     void setActiveJutsusFlag(int flag);
@@ -137,6 +138,8 @@ public interface INinjaData extends ValueIOSerializable {
     void setWaterWalkActive(boolean active);
     boolean isEighthGateActive();
     void setEighthGateActive(boolean active);
+    boolean isSageModeActive();
+    void setSageModeActive(boolean active);
 
     int MAX_JUTSU_SLOTS = 8;
 
